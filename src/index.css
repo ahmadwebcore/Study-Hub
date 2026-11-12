@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: #e1ede7;
+  }
+  body {
+    background-color: #F7F9F8;
+    color: #263B35;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Universal single crisp border rule for all inputs - ZERO double borders */
+  input, select, textarea {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none !important;
+    border-color: #14B866 !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+  }
+}
+
+/* Custom delicate scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccdcd4;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a9c4b7;
+}
+
+/* Clean hairline glass panel without blurry shadows */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e1ede7;
+}

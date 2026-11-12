@@ -1,0 +1,256 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  ListTree,
+  CalendarDays,
+  FileCheck2,
+  GraduationCap,
+  ClipboardList,
+  Award,
+  BarChart3,
+  ChevronRight,
+  ShieldCheck,
+  UserCheck,
+  Library,
+  Home,
+  CheckCircle2,
+  FileText,
+  Clock,
+  Mail,
+} from 'lucide-react';
+import { useRole } from '../../hooks/useRole';
+import { cn } from '../../lib/utils';
+import { emailService } from '../../services/emailService';
+
+interface NavItem {
+  name: string;
+  path: string;
+  icon: React.ElementType;
+  badge?: string | number;
+  badgeVariant?: 'primary' | 'warning' | 'info' | 'holiday';
+  teacherOnly?: boolean;
+  studentOnly?: boolean;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+      { name: 'Weekly Tasks', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sunday & PK Off', badgeVariant: 'holiday' },
+      { name: 'Test Desk (Submit)', path: '/test-submit', icon: FileText, badge: 'Live', badgeVariant: 'warning' },
+      { name: 'Completed Work', path: '/completed-work', icon: CheckCircle2, badge: 'Verified', badgeVariant: 'primary' },
+    ],
+  },
+  {
+    title: 'Academic Core',
+    items: [
+      { name: 'Students', path: '/students', icon: Users, badge: 'Active Cohort', teacherOnly: true },
+      { name: 'Subjects', path: '/subjects', icon: BookOpen },
+      { name: 'Book Library', path: '/library', icon: Library },
+      { name: 'Syllabus', path: '/syllabus', icon: ListTree },
+      { name: 'Study Planner', path: '/planner', icon: Clock },
+      { name: 'Assignments', path: '/assignments', icon: FileCheck2, badge: '2 Due', badgeVariant: 'warning' },
+      { name: 'Tests & Quizzes', path: '/tests', icon: GraduationCap, badge: 'Nov 15', badgeVariant: 'info' },
+    ],
+  },
+  {
+    title: 'Evaluation & Records',
+    items: [
+      { name: 'Submissions', path: '/submissions', icon: ClipboardList, badge: 3, badgeVariant: 'primary', teacherOnly: true },
+      { name: 'Results & Grades', path: '/results', icon: Award },
+      { name: 'Reports & Analytics', path: '/reports', icon: BarChart3 },
+    ],
+  },
+  {
+    title: 'Communications',
+    items: [
+      { name: 'Gmail Dispatch & Settings', path: '/settings', icon: Mail, badge: 'Connected', badgeVariant: 'primary' },
+    ],
+  },
+];
+
+interface SidebarProps {
+  onCloseMobile?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
+  const { role, toggleRole } = useRole();
+  const configuredSender = emailService.getTeacherConfiguredEmail();
+  const configuredStudent = emailService.getStudentConfiguredEmail();
+
+  return (
+    <aside
+      className="h-full flex flex-col bg-white border-r border-[#e1ede7] select-none w-64 xl:w-72"
+      aria-label="Main Salesmate Navigation Sidebar"
+    >
+      {/* Brand Header */}
+      <div className="h-16 flex items-center px-5 border-b border-[#e1ede7] justify-between">
+        <NavLink
+          to="/"
+          className="flex items-center gap-3 group focus:outline-none"
+          onClick={onCloseMobile}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#142D27] text-[#14B866] shadow-sm ring-1 ring-black/5 group-hover:scale-105 transition-transform duration-200">
+            <GraduationCap className="h-5 w-5" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-base tracking-tight text-[#142D27]">
+                Study<span className="text-[#14B866]">Hub</span>
+              </span>
+              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#E7EFEA] text-[#142D27]">
+                Salesmate UI
+              </span>
+            </div>
+            <span className="text-[10px] font-medium text-[#7d9990] -mt-0.5">
+              Academy Workspace
+            </span>
+          </div>
+        </NavLink>
+      </div>
+
+      {/* Role Perspective Switcher Pill */}
+      <div className="p-3 mx-3 my-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7]">
+        <div className="flex items-center justify-between text-xs mb-1.5">
+          <span className="text-[#557067] font-semibold uppercase tracking-wider text-[9px]">
+            Perspective Mode
+          </span>
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#142D27]">
+            {role === 'teacher' ? (
+              <ShieldCheck className="w-3.5 h-3.5 text-[#14B866]" />
+            ) : (
+              <UserCheck className="w-3.5 h-3.5 text-sky-500" />
+            )}
+            {role === 'teacher' ? 'Faculty Lead' : 'Student'}
+          </span>
+        </div>
+        <button
+          onClick={toggleRole}
+          className="w-full flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs font-semibold bg-white border border-[#e1ede7] text-[#263B35] hover:bg-[#e8f8f0] hover:text-[#14B866] hover:border-[#14B866]/40 transition-all duration-150 active:scale-[0.98]"
+          title="Switch view"
+        >
+          <span>Switch to {role === 'teacher' ? 'Student View' : 'Teacher View'}</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#7d9990]" />
+        </button>
+      </div>
+
+      {/* Main Navigation Links Grouped by Section (Salesmate Style) */}
+      <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-4">
+        {navSections.map((section) => {
+          const visibleItems = section.items.filter((item) => {
+            if (item.teacherOnly && role !== 'teacher') return false;
+            if (item.studentOnly && role !== 'student') return false;
+            return true;
+          });
+
+          if (visibleItems.length === 0) return null;
+
+          return (
+            <div key={section.title} className="space-y-0.5">
+              <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#7d9990]">
+                {section.title}
+              </p>
+              {visibleItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
+                  end={item.path === '/'}
+                  onClick={onCloseMobile}
+                  className={({ isActive }) =>
+                    cn(
+                      'group flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150',
+                      isActive
+                        ? 'bg-[#142D27] text-white shadow-sm'
+                        : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27]'
+                    )
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <item.icon
+                          className={cn(
+                            'h-4 w-4 shrink-0 transition-colors',
+                            isActive ? 'text-[#14B866]' : 'text-[#7d9990] group-hover:text-[#142D27]'
+                          )}
+                        />
+                        <span className="truncate">{item.name}</span>
+                      </div>
+
+                      {item.badge && (
+                        <span
+                          className={cn(
+                            'ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0',
+                            isActive
+                              ? 'bg-[#14B866] text-white'
+                              : item.badgeVariant === 'warning'
+                              ? 'bg-amber-100 text-amber-800'
+                              : item.badgeVariant === 'info'
+                              ? 'bg-sky-100 text-sky-800'
+                              : item.badgeVariant === 'holiday'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-[#E7EFEA] text-[#142D27]'
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          );
+        })}
+      </nav>
+
+      {/* Pakistan Calendar Policy Card & Email Status (Bottom Section) */}
+      <div className="p-3 border-t border-[#e1ede7] space-y-2">
+        {/* Pakistan Calendar Badge */}
+        <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-[11px]">
+          <div className="flex items-center gap-1.5 font-bold text-emerald-950">
+            <span>🇵🇰</span>
+            <span>Pakistan Academic Calendar</span>
+          </div>
+          <p className="text-[10px] text-emerald-800 mt-0.5 leading-snug">
+            Sundays & Gazetted Holidays are strictly OFF. No exam submissions or tasks due.
+          </p>
+        </div>
+
+        {/* Gmail Link Widget */}
+        <NavLink
+          to="/settings"
+          className="flex items-center justify-between p-2 rounded-xl text-[11px] font-semibold text-[#263B35] hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all"
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <Mail className="w-3.5 h-3.5 text-[#14B866]" />
+            <span className="truncate text-[10px]">
+              {role === 'teacher' ? configuredSender : configuredStudent}
+            </span>
+          </div>
+          <ChevronRight className="w-3 h-3 text-[#7d9990] shrink-0" />
+        </NavLink>
+
+        <NavLink
+          to="/welcome"
+          className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold text-[#142D27] hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all"
+        >
+          <div className="flex items-center gap-2">
+            <Home className="w-3.5 h-3.5 text-[#14B866]" />
+            <span className="text-xs">Get Started / Welcome</span>
+          </div>
+          <ChevronRight className="w-3 h-3 text-[#7d9990]" />
+        </NavLink>
+      </div>
+    </aside>
+  );
+};
