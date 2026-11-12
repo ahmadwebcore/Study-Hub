@@ -89,7 +89,7 @@ export const StudentDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* 1. Salesmate Student Header Banner */}
+      {/* 1. Student Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#142D27] via-[#1a3831] to-[#142D27] p-6 sm:p-7 text-white shadow-sm">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
@@ -128,7 +128,7 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Salesmate Metric Stats Bento Bar */}
+      {/* Metric Stats Overview Bar */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
           <span className="text-[10px] font-bold text-[#7d9990] uppercase tracking-wider block">
@@ -181,7 +181,7 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Salesmate 2-Column Student Task Grid */}
+      {/* 2-Column Student Task Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Column: Interactive Student Task Stream */}
         <div className="lg:col-span-2 space-y-4">

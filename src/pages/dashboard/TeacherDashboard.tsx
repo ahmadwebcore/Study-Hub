@@ -179,7 +179,7 @@ export const TeacherDashboard: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  // Filter tasks Salesmate-style
+  // Filter tasks by status
   const filteredTasks = tasks.filter((t) => {
     const matchesSearch =
       t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -222,19 +222,19 @@ export const TeacherDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Salesmate Action Header */}
+      {/* Faculty Action Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-[#e1ede7]">
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#142D27] tracking-tight">
-              Task Operations & Academic Command
+              Faculty Dashboard & Daily Tasks
             </h1>
             <Badge variant="primary" size="sm" dot pulseDot>
-              Salesmate UI
+              Academic Lead
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-[#557067] mt-1">
-            Real-time daily task stream, strict teacher approval gate, automated Gmail dispatch, and Pakistan Gazetted Academic Calendar.
+            Daily syllabus targets, student submission approvals, Pakistan Gazetted calendar, and Gmail notifications.
           </p>
         </div>
 
@@ -267,7 +267,7 @@ export const TeacherDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Salesmate KPI Metrics Row */}
+      {/* KPI Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
           <span className="text-[10px] font-bold text-[#7d9990] uppercase tracking-wider block">
@@ -338,11 +338,11 @@ export const TeacherDashboard: React.FC = () => {
         </span>
       </div>
 
-      {/* Salesmate 2-Column High-Productivity Layout */}
+      {/* 2-Column Task & Schedule Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left / Main Column (Salesmate Task View) */}
+        {/* Left / Main Column (Task View) */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Salesmate Task Navigation Tabs */}
+          {/* Task Navigation Tabs */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#e1ede7]">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               {[
@@ -382,7 +382,7 @@ export const TeacherDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Salesmate Interactive Task List */}
+          {/* Interactive Task List */}
           <div className="space-y-2.5">
             {filteredTasks.length === 0 ? (
               <div className="p-8 text-center rounded-2xl bg-white border border-[#e1ede7]">

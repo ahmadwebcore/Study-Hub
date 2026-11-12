@@ -69,7 +69,8 @@ export const LoginPage: React.FC = () => {
     if (error) {
       setAuthError(error.message || 'Invalid credentials. Please verify your email and password.');
     } else {
-      navigate(from, { replace: true });
+      const destination = from === '/' ? '/dashboard' : from;
+      navigate(destination, { replace: true });
     }
   };
 
@@ -109,8 +110,8 @@ export const LoginPage: React.FC = () => {
           Access your courses, scheduled assessments, and grading records
         </p>
         <div className="mt-2">
-          <Link to="/welcome" className="text-xs font-semibold text-[#14B866] hover:underline inline-flex items-center gap-1">
-            <span>← Back to Welcome Overview & Features</span>
+          <Link to="/" className="text-xs font-semibold text-[#14B866] hover:underline inline-flex items-center gap-1">
+            <span>&larr; Back to Home</span>
           </Link>
         </div>
       </div>

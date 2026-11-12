@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const handleSignOut = async () => {
     setShowProfileMenu(false);
     await signOut();
-    navigate('/login');
+    navigate('/');
   };
 
   return (

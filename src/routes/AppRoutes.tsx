@@ -30,7 +30,8 @@ export const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Public Landing & Authentication Screens */}
-      <Route path="/welcome" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/welcome" element={<Navigate to="/" replace />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -44,8 +45,7 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<DashboardOverview />} />
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<DashboardOverview />} />
 
         {/* Core LMS Screens */}
         <Route

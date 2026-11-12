@@ -44,7 +44,7 @@ const navSections: NavSection[] = [
   {
     title: 'Workspace',
     items: [
-      { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
       { name: 'Weekly Tasks', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sunday & PK Off', badgeVariant: 'holiday' },
       { name: 'Test Desk (Submit)', path: '/test-submit', icon: FileText, badge: 'Live', badgeVariant: 'warning' },
       { name: 'Completed Work', path: '/completed-work', icon: CheckCircle2, badge: 'Verified', badgeVariant: 'primary' },
@@ -90,12 +90,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
   return (
     <aside
       className="h-full flex flex-col bg-white border-r border-[#e1ede7] select-none w-64 xl:w-72"
-      aria-label="Main Salesmate Navigation Sidebar"
+      aria-label="Main Navigation Sidebar"
     >
       {/* Brand Header */}
       <div className="h-16 flex items-center px-5 border-b border-[#e1ede7] justify-between">
         <NavLink
-          to="/"
+          to="/dashboard"
           className="flex items-center gap-3 group focus:outline-none"
           onClick={onCloseMobile}
         >
@@ -107,12 +107,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
               <span className="font-extrabold text-base tracking-tight text-[#142D27]">
                 Study<span className="text-[#14B866]">Hub</span>
               </span>
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-[#E7EFEA] text-[#142D27]">
-                Salesmate UI
+              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Portal
               </span>
             </div>
             <span className="text-[10px] font-medium text-[#7d9990] -mt-0.5">
-              Academy Workspace
+              Academic Workspace
             </span>
           </div>
         </NavLink>
@@ -143,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         </button>
       </div>
 
-      {/* Main Navigation Links Grouped by Section (Salesmate Style) */}
+      {/* Main Navigation Links Grouped by Section */}
       <nav className="flex-1 overflow-y-auto px-3 py-1 space-y-4">
         {navSections.map((section) => {
           const visibleItems = section.items.filter((item) => {
