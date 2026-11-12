@@ -4,13 +4,25 @@
 export const BASE32_SECRET = 'AHMADWEBCORE2345';
 export const TEACHER_EMAIL = 'ahmadwebcore@gmail.com';
 
-// Convert Base32 string to Uint8Array
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+// In-memory server time drift in seconds (calibrated against Supabase / server)
+let serverTimeDriftSeconds = 0;
+let lastSyncTimestamp = 0;
+
+// Replay protection: records the last verified step per secret
+const lastVerifiedSteps = new Map<string, number>();
+
+/**
+ * Decode Base32 string to Uint8Array (RFC 4648)
+ * Strips whitespace, hyphens, and padding '='
+ */
 export function base32ToBytes(base32: string): Uint8Array {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const clean = base32.toUpperCase().replace(/[\s\-=]/g, '');
   let bits = '';
-  const clean = base32.toUpperCase().replace(/[\s-]/g, '');
+
   for (let i = 0; i < clean.length; i++) {
-    const val = alphabet.indexOf(clean[i]);
+    const val = BASE32_ALPHABET.indexOf(clean[i]);
     if (val === -1) continue;
     bits += val.toString(2).padStart(5, '0');
   }
@@ -22,13 +34,90 @@ export function base32ToBytes(base32: string): Uint8Array {
   return new Uint8Array(bytes);
 }
 
-// Generate the exact 6-digit TOTP code for the current 30-second window
-export async function generateTOTP(
-  secret: string = BASE32_SECRET,
-  offsetSeconds: number = 0
+/**
+ * Encode Uint8Array to Base32 string (RFC 4648)
+ */
+export function bytesToBase32(bytes: Uint8Array): string {
+  let bits = '';
+  for (let i = 0; i < bytes.length; i++) {
+    bits += bytes[i].toString(2).padStart(8, '0');
+  }
+  let base32 = '';
+  for (let i = 0; i + 5 <= bits.length; i += 5) {
+    const index = parseInt(bits.substring(i, i + 5), 2);
+    base32 += BASE32_ALPHABET[index];
+  }
+  return base32;
+}
+
+/**
+ * Generate a cryptographically secure 160-bit (20 bytes = 32 Base32 chars) TOTP secret.
+ * Google Authenticator and RFC 6238 standard recommend 160-bit keys.
+ */
+export function generateTOTPSecret(): string {
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes);
+  return bytesToBase32(bytes);
+}
+
+/**
+ * Generate 4 secure, single-use recovery codes (format: SH-XXXX-XXXX)
+ */
+export function generateRecoveryCodes(count: number = 4): string[] {
+  const chars = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const codes: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const randomBytes = new Uint8Array(8);
+    crypto.getRandomValues(randomBytes);
+    let code = 'SH-';
+    for (let j = 0; j < 4; j++) {
+      code += chars[randomBytes[j] % chars.length];
+    }
+    code += '-';
+    for (let j = 4; j < 8; j++) {
+      code += chars[randomBytes[j] % chars.length];
+    }
+    codes.push(code);
+  }
+  return codes;
+}
+
+/**
+ * Calibrate local clock against Supabase or server time.
+ * Calculates drift (seconds) so codes match Google Authenticator accurately.
+ */
+export async function syncServerTime(serverUrl?: string): Promise<number> {
+  const now = Date.now();
+  // Throttle sync to at most once every 60 seconds
+  if (lastSyncTimestamp && now - lastSyncTimestamp < 60000) {
+    return serverTimeDriftSeconds;
+  }
+
+  try {
+    const target = serverUrl || import.meta.env.VITE_SUPABASE_URL || window.location.origin;
+    const response = await fetch(target, { method: 'HEAD', cache: 'no-store' });
+    const dateHeader = response.headers.get('date');
+    if (dateHeader) {
+      const serverTimeMs = new Date(dateHeader).getTime();
+      const localTimeMs = Date.now();
+      serverTimeDriftSeconds = Math.round((serverTimeMs - localTimeMs) / 1000);
+      lastSyncTimestamp = now;
+    }
+  } catch {
+    // If offline or network error, retain existing drift
+  }
+  return serverTimeDriftSeconds;
+}
+
+/**
+ * Generate the standard 6-digit TOTP code for a given timestamp using Web Crypto API.
+ */
+export async function generateTOTPAtTime(
+  secret: string,
+  unixTimestampSeconds: number
 ): Promise<string> {
-  const epoch = Math.floor(Date.now() / 1000) + offsetSeconds;
-  const timeStep = Math.floor(epoch / 30);
+  const timeStep = Math.floor(unixTimestampSeconds / 30);
 
   const timeBuffer = new ArrayBuffer(8);
   const view = new DataView(timeBuffer);
@@ -36,7 +125,11 @@ export async function generateTOTP(
   view.setUint32(4, timeStep, false);
 
   const keyBytes = base32ToBytes(secret);
-  const keyBuffer = keyBytes.buffer as ArrayBuffer;
+  const keyBuffer = keyBytes.buffer.slice(
+    keyBytes.byteOffset,
+    keyBytes.byteOffset + keyBytes.byteLength
+  ) as ArrayBuffer;
+
   const key = await crypto.subtle.importKey(
     'raw',
     keyBuffer,
@@ -58,36 +151,74 @@ export async function generateTOTP(
   return otp.toString().padStart(6, '0');
 }
 
-// Strictly verify entered 6-digit code against Google Authenticator
+/**
+ * Verify entered 6-digit code against Google Authenticator.
+ * Includes time drift calibration, clock-skew window (±60s / 2 steps), and replay protection.
+ */
 export async function verifyTOTP(
   enteredCode: string,
-  secret: string = BASE32_SECRET
+  secret: string,
+  options: { window?: number; timeDriftOverride?: number } = {}
 ): Promise<{ valid: boolean; reason?: string }> {
   const clean = enteredCode.trim().replace(/\s/g, '');
   if (!clean || clean.length !== 6 || !/^\d{6}$/.test(clean)) {
-    return { valid: false, reason: 'Please enter a 6-digit code.' };
+    return { valid: false, reason: 'Please enter a valid 6-digit numerical code.' };
+  }
+
+  if (!secret) {
+    return { valid: false, reason: 'Two-factor authentication secret is missing.' };
   }
 
   try {
-    const currentCode = await generateTOTP(secret, 0);
-    const prevCode = await generateTOTP(secret, -30);
-    const nextCode = await generateTOTP(secret, 30);
+    // Calibrate drift if not provided
+    const drift = options.timeDriftOverride !== undefined
+      ? options.timeDriftOverride
+      : (await syncServerTime());
 
-    if (clean === currentCode || clean === prevCode || clean === nextCode) {
-      return { valid: true };
+    const currentEpoch = Math.floor(Date.now() / 1000) + drift;
+    const currentStep = Math.floor(currentEpoch / 30);
+    const window = options.window !== undefined ? options.window : 2; // ±2 steps (±60s window)
+
+    // Check steps in order of likelihood: 0, 1, -1, 2, -2
+    const stepOffsets = [0, 1, -1, 2, -2].slice(0, window * 2 + 1);
+
+    for (const offset of stepOffsets) {
+      const stepToCheck = currentStep + offset;
+      const expectedCode = await generateTOTPAtTime(secret, stepToCheck * 30);
+
+      if (clean === expectedCode) {
+        // Replay attack protection: ensure code from this exact step hasn't been used yet
+        const lastStep = lastVerifiedSteps.get(secret);
+        if (lastStep === stepToCheck) {
+          return {
+            valid: false,
+            reason: 'This code was already used. Please wait for the next 30-second code.',
+          };
+        }
+
+        // Record verified step
+        lastVerifiedSteps.set(secret, stepToCheck);
+        return { valid: true };
+      }
     }
 
     return {
       valid: false,
-      reason: 'Incorrect code. Please enter the current 6-digit code from Google Authenticator.',
+      reason: 'Incorrect code. Please check your Google Authenticator app and ensure your phone time is accurate.',
     };
-  } catch {
-    return { valid: false, reason: 'Failed to verify Authenticator code.' };
+  } catch (err) {
+    return {
+      valid: false,
+      reason: err instanceof Error ? err.message : 'Failed to verify Authenticator code.',
+    };
   }
 }
 
-// Generate the standard scannable otpauth URI for Google Authenticator
-export function getOtpAuthUri(email: string = TEACHER_EMAIL, secret: string = BASE32_SECRET): string {
-  const cleanEmail = encodeURIComponent(email);
+/**
+ * Generate standard otpauth provisioning URI for Google Authenticator QR codes.
+ * Format: otpauth://totp/StudyHub:user@example.com?secret=...&issuer=StudyHub&algorithm=SHA1&digits=6&period=30
+ */
+export function getOtpAuthUri(email: string, secret: string): string {
+  const cleanEmail = encodeURIComponent(email.trim());
   return `otpauth://totp/StudyHub:${cleanEmail}?secret=${secret}&issuer=StudyHub&algorithm=SHA1&digits=6&period=30`;
 }

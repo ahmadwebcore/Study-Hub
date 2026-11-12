@@ -14,7 +14,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
 }) => {
-  const { user, role, loading, isDemoMode, toggleDemoRole } = useAuth();
+  const { user, role, loading, isDemoMode } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -42,11 +42,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           The requested console is restricted to faculty members. You are currently browsing StudyHub under the <strong>Student Role</strong>.
         </p>
         <div className="pt-2 flex justify-center gap-3">
-          <Button variant="primary" size="sm" onClick={toggleDemoRole}>
-            Switch to Teacher Mode
+          <Button variant="primary" size="sm" onClick={() => window.location.href = '/login'}>
+            Faculty Login Required
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.history.back()}>
-            Go Back
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/dashboard'}>
+            Return to Student Dashboard
           </Button>
         </div>
       </div>

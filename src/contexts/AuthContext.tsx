@@ -13,7 +13,8 @@ interface AuthContextType {
   loading: boolean;
   isConfigured: boolean;
   isDemoMode: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string, roleMode?: UserRole) => Promise<{ error: Error | null }>;
+  completeTwoFactorAuth: (email: string, targetRole?: UserRole) => void;
   signUpTeacher: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signUpStudentWithInvite: (email: string, password: string, token: string, fullName: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -95,9 +96,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [configured, demoRole]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, roleMode: UserRole = 'teacher') => {
     setLoading(true);
-    const { user: authedUser, profile: authedProfile, error } = await authService.signInWithEmail(email, password);
+    const { user: authedUser, profile: authedProfile, error } = await authService.signInWithEmail(email, password, roleMode);
     setLoading(false);
     if (error) {
       return { error: new Error(error.message) };
@@ -107,6 +108,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(authedProfile);
     }
     return { error: null };
+  };
+
+  const completeTwoFactorAuth = (email: string, targetRole: UserRole = 'teacher') => {
+    setRole(targetRole);
+    const authedProfile = targetRole === 'teacher'
+      ? { ...SAMPLE_TEACHER, email }
+      : { ...SAMPLE_STUDENT, email };
+    setUser({ id: authedProfile.id, email } as User);
+    setProfile(authedProfile);
+    sessionStorage.removeItem('studyhub_pending_2fa');
   };
 
   const signUpTeacher = async (email: string, password: string, fullName: string) => {
@@ -181,6 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isConfigured: configured,
         isDemoMode,
         signIn,
+        completeTwoFactorAuth,
         signUpTeacher,
         signUpStudentWithInvite,
         signOut,

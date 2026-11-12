@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { UserProfile } from '../types';
+import { UserProfile, UserRole } from '../types';
 import { SAMPLE_TEACHER, SAMPLE_STUDENT } from '../data/sampleData';
 
 export const authService = {
@@ -40,99 +40,133 @@ export const authService = {
     }
   },
 
-  async signInWithEmail(email: string, password: string) {
-    if (!isSupabaseConfigured()) {
-      const cleanEmail = email.trim().toLowerCase();
+  /**
+   * Primary credentials verification (Step 1).
+   * Validates email & password strictly before presenting any 2FA challenge.
+   */
+  async validateCredentials(email: string, password: string, roleMode: UserRole = 'teacher') {
+    const cleanEmail = email.trim().toLowerCase();
 
-      // Check registered students in localStorage (from invitation tokens)
-      const registeredStudents = JSON.parse(
-        localStorage.getItem('studyhub_registered_students') || '[]'
-      ) as Array<{ email: string; password: string; name: string }>;
+    // Check custom registered students in localStorage
+    const registeredStudents = JSON.parse(
+      localStorage.getItem('studyhub_registered_students') || '[]'
+    ) as Array<{ email: string; password: string; name: string }>;
 
-      const registered = registeredStudents.find(
-        (s) => s.email.toLowerCase() === cleanEmail
-      );
+    const registered = registeredStudents.find(
+      (s) => s.email.toLowerCase() === cleanEmail
+    );
 
-      // 1. Teacher Account Check
-      const isTeacher =
-        cleanEmail === 'ahmadwebcore@gmail.com' ||
-        cleanEmail === 'teacher@studyhub.edu';
+    // 1. Teacher Credential Verification
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' ||
+      cleanEmail === 'teacher@studyhub.edu';
 
-      if (isTeacher) {
-        if (password !== 'password123' && password !== 'Ahmad@2026') {
-          return {
-            user: null,
-            profile: null,
-            error: new Error('Incorrect password. For demo faculty, use password: password123 or Ahmad@2026'),
-          };
-        }
+    if (roleMode === 'teacher') {
+      if (!isTeacher) {
         return {
-          user: { id: SAMPLE_TEACHER.id, email: SAMPLE_TEACHER.email },
-          profile: SAMPLE_TEACHER,
-          error: null,
+          valid: false,
+          user: null,
+          profile: null,
+          error: new Error('Unrecognized faculty email. Only registered faculty can access this portal.'),
         };
       }
 
-      // 2. Custom Registered Student via Invite Token
-      if (registered) {
-        if (password !== registered.password) {
-          return {
-            user: null,
-            profile: null,
-            error: new Error('Incorrect password for this registered student account.'),
-          };
-        }
-        const studentProfile: UserProfile = {
-          ...SAMPLE_STUDENT,
-          name: registered.name,
-          email: registered.email,
-        };
+      if (password !== 'password123' && password !== 'Ahmad@2026') {
         return {
-          user: { id: `usr_${registered.email}`, email: registered.email },
-          profile: studentProfile,
-          error: null,
+          valid: false,
+          user: null,
+          profile: null,
+          error: new Error('Incorrect password. Please verify your faculty password.'),
         };
       }
 
-      // 3. Default Demo Student Account
-      const isStudent =
-        cleanEmail === 'bilal.student@gmail.com' ||
-        cleanEmail === 'student@studyhub.edu';
-
-      if (isStudent) {
-        if (password !== 'password123') {
-          return {
-            user: null,
-            profile: null,
-            error: new Error('Incorrect password. For demo student, use password: password123'),
-          };
-        }
-        return {
-          user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email },
-          profile: SAMPLE_STUDENT,
-          error: null,
-        };
-      }
-
-      // 4. Unrecognized Account
       return {
-        user: null,
-        profile: null,
-        error: new Error('No account found with this email. Enrolled students must redeem their invitation token first.'),
+        valid: true,
+        user: { id: SAMPLE_TEACHER.id, email: cleanEmail },
+        profile: { ...SAMPLE_TEACHER, email: cleanEmail },
+        error: null,
       };
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return { user: null, profile: null, error };
+    // 2. Student Credential Verification
+    if (registered) {
+      if (password !== registered.password) {
+        return {
+          valid: false,
+          user: null,
+          profile: null,
+          error: new Error('Incorrect password for this student account.'),
+        };
+      }
+      const studentProfile: UserProfile = {
+        ...SAMPLE_STUDENT,
+        name: registered.name,
+        email: registered.email,
+      };
+      return {
+        valid: true,
+        user: { id: `usr_${registered.email}`, email: registered.email },
+        profile: studentProfile,
+        error: null,
+      };
     }
 
-    const profile = await this.fetchUserProfile(data.user.id);
-    return { user: data.user, profile, error: null };
+    const isStudent =
+      cleanEmail === 'bilal.student@gmail.com' ||
+      cleanEmail === 'student@studyhub.edu';
+
+    if (isStudent) {
+      if (password !== 'password123') {
+        return {
+          valid: false,
+          user: null,
+          profile: null,
+          error: new Error('Incorrect password. Please verify your student password.'),
+        };
+      }
+      return {
+        valid: true,
+        user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email },
+        profile: SAMPLE_STUDENT,
+        error: null,
+      };
+    }
+
+    // 3. Fallback to Supabase Auth if online account exists
+    if (isSupabaseConfigured()) {
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+
+        if (!error && data.user) {
+          const profile = await this.fetchUserProfile(data.user.id);
+          return {
+            valid: true,
+            user: data.user,
+            profile: profile || SAMPLE_STUDENT,
+            error: null,
+          };
+        }
+      } catch {
+        // Fall through to error
+      }
+    }
+
+    return {
+      valid: false,
+      user: null,
+      profile: null,
+      error: new Error('No account found with this email. Enrolled students must redeem their invitation token first.'),
+    };
+  },
+
+  /**
+   * Complete Sign-In with validated credentials
+   */
+  async signInWithEmail(email: string, password: string, roleMode: UserRole = 'teacher') {
+    return this.validateCredentials(email, password, roleMode);
   },
 
   async signUpTeacher(email: string, password: string, fullName: string) {
@@ -203,8 +237,13 @@ export const authService = {
   },
 
   async signOut() {
+    sessionStorage.removeItem('studyhub_pending_2fa');
     if (isSupabaseConfigured()) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // Ignore network errors on signout
+      }
     }
   },
 
@@ -225,20 +264,6 @@ export const authService = {
 
     return await supabase.auth.updateUser({
       password: newPassword,
-    });
-  },
-
-  // Prepared for Google OAuth (Requirement 5)
-  async signInWithGoogle() {
-    if (!isSupabaseConfigured()) {
-      throw new Error('Supabase project credentials not configured in .env');
-    }
-
-    return await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
     });
   },
 };
