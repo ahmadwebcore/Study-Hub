@@ -730,6 +730,46 @@ class EmailService {
     this.saveEmails();
     return newEmail;
   }
+
+  // 8. Send Login Verification OTP to Gmail
+  public sendLoginVerificationCode(params: {
+    email: string;
+    code: string;
+    recipientName?: string;
+  }): EmailMessage {
+    const newEmail: EmailMessage = {
+      id: `em_otp_${Date.now()}`,
+      recipientEmail: params.email,
+      recipientName: params.recipientName || 'StudyHub User',
+      senderName: 'StudyHub Security Gate',
+      senderEmail: 'security@studyhub.edu',
+      subject: `🔐 Your StudyHub Login Verification Code: ${params.code}`,
+      previewText: `Use verification code ${params.code} to complete your secure academic portal login.`,
+      category: 'system',
+      sentAt: 'Just now',
+      read: false,
+      htmlBody: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden; padding: 24px;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #142D27; margin: 0 0 6px 0; font-size: 20px;">StudyHub Security Verification</h2>
+            <p style="color: #557067; font-size: 13px; margin: 0;">Enter this code to complete your login verification</p>
+          </div>
+          <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 20px;">
+            <span style="font-family: monospace; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #142D27; display: block;">
+              ${params.code}
+            </span>
+          </div>
+          <p style="color: #7d9990; font-size: 12px; line-height: 1.5; margin: 0; text-align: center;">
+            This single-use code is valid for 10 minutes. If you did not request this login code, please secure your account immediately.
+          </p>
+        </div>
+      `,
+    };
+
+    this.emails.unshift(newEmail);
+    this.saveEmails();
+    return newEmail;
+  }
 }
 
 export const emailService = new EmailService();

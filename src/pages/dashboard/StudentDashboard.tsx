@@ -3,11 +3,8 @@ import {
   CalendarDays,
   FileCheck2,
   CheckCircle2,
-  Calendar,
   Check,
 } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { taskService, DailyTask } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
@@ -48,8 +45,8 @@ export const StudentDashboard: React.FC = () => {
     setSubmittingTask(null);
     setSubmissionNotes('');
     loadData();
-    setSuccessToast(`Work submitted for "${submittingTask.title}"! Awaiting faculty review.`);
-    setTimeout(() => setSuccessToast(null), 4000);
+    setSuccessToast(`Work submitted for "${submittingTask.title}".`);
+    setTimeout(() => setSuccessToast(null), 3000);
   };
 
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -67,77 +64,89 @@ export const StudentDashboard: React.FC = () => {
       : verifiedTasks;
 
   return (
-    <div className="space-y-6 font-sans">
-      {/* Toast */}
+    <div className="space-y-6 font-sans max-w-6xl mx-auto">
+      {/* Toast Notification */}
       {successToast && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between text-xs font-semibold">
+        <div className="p-3 rounded-lg bg-zinc-900 text-white flex items-center justify-between text-xs font-medium">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             {successToast}
           </span>
-          <button onClick={() => setSuccessToast(null)} className="text-emerald-700 text-base">
+          <button onClick={() => setSuccessToast(null)} className="text-zinc-400 hover:text-white text-sm">
             &times;
           </button>
         </div>
       )}
 
-      {/* Clean Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      {/* Top Level Plain Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
         <div>
-          <h1 className="text-2xl font-bold text-[#142D27] tracking-tight">
+          <h1 className="text-xl font-semibold text-zinc-900 tracking-tight">
             Welcome back, {studentName}
           </h1>
-          <p className="text-xs text-[#557067] mt-0.5">
-            Faculty Instructor: <strong className="text-[#142D27]">Prof. Clara Evans</strong> ({configuredTeacherEmail})
+          <p className="text-xs text-zinc-500 mt-0.5">
+            Instructor: <strong className="text-zinc-800">Prof. Clara Evans</strong> &bull; {configuredTeacherEmail}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <Link to="/test-submit">
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<FileCheck2 className="w-3.5 h-3.5 text-white" />}
-            >
-              Exam Desk
-            </Button>
+          <Link
+            to="/test-submit"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors shadow-xs"
+          >
+            <FileCheck2 className="w-3.5 h-3.5" />
+            Exam Desk
           </Link>
-          <Link to="/weekly-tasks">
-            <Button
-              variant="outline"
-              size="sm"
-              icon={<CalendarDays className="w-3.5 h-3.5 text-[#557067]" />}
-            >
-              Weekly Schedule
-            </Button>
+          <Link
+            to="/weekly-tasks"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
+          >
+            <CalendarDays className="w-3.5 h-3.5 text-zinc-500" />
+            Schedule
           </Link>
         </div>
       </div>
 
-      {/* 4 Clean Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-semibold text-[#7d9990] block">Today's Tasks</span>
-          <span className="text-2xl font-bold text-[#142D27] mt-1 block">{todayTasks.length}</span>
+      {/* Plain Metrics Row (Linear / Stripe Minimal Style) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-4 rounded-xl bg-white border border-zinc-200">
+          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+            Today's Tasks
+          </span>
+          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+            {todayTasks.length}
+          </span>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-semibold text-[#7d9990] block">Weekly Total</span>
-          <span className="text-2xl font-bold text-[#142D27] mt-1 block">{tasks.length}</span>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200">
+          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+            Weekly Total
+          </span>
+          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+            {tasks.length}
+          </span>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-semibold text-[#7d9990] block">Awaiting Review</span>
-          <span className="text-2xl font-bold text-amber-600 mt-1 block">{awaitingTasks.length}</span>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200">
+          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+            Awaiting Review
+          </span>
+          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+            {awaitingTasks.length}
+          </span>
         </div>
-        <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-semibold text-[#7d9990] block">Verified Complete</span>
-          <span className="text-2xl font-bold text-emerald-600 mt-1 block">{verifiedTasks.length}</span>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200">
+          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+            Verified Complete
+          </span>
+          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+            {verifiedTasks.length}
+          </span>
         </div>
       </div>
 
-      {/* Student Tasks List */}
-      <div className="bg-white rounded-2xl border border-[#e1ede7] p-5 space-y-4">
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-1.5 pb-3 border-b border-[#e1ede7] overflow-x-auto">
+      {/* Plain Tasks Table / Desk */}
+      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+        {/* Filter Bar */}
+        <div className="p-3 border-b border-zinc-200 flex items-center gap-1 bg-zinc-50/50 overflow-x-auto">
           {[
             { id: 'today', label: "Today's Target", count: todayTasks.length },
             { id: 'week', label: 'All Tasks', count: tasks.length },
@@ -147,77 +156,74 @@ export const StudentDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-[#142D27] text-white'
-                  : 'text-[#557067] hover:bg-[#F7F9F8]'
+                  ? 'bg-zinc-900 text-white shadow-xs'
+                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
               }`}
             >
-              <span>{tab.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${activeTab === tab.id ? 'bg-[#14B866] text-white' : 'bg-[#E7EFEA] text-[#142D27]'}`}>
-                {tab.count}
-              </span>
+              {tab.label} <span className="opacity-70 text-[10px]">({tab.count})</span>
             </button>
           ))}
         </div>
 
-        {/* Task Rows */}
-        <div className="space-y-2">
+        {/* Task Rows List */}
+        <div className="divide-y divide-zinc-100">
           {currentDisplayTasks.length === 0 ? (
-            <div className="p-8 text-center text-xs text-[#7d9990]">
+            <div className="p-8 text-center text-xs text-zinc-500">
               No tasks found in this view.
             </div>
           ) : (
             currentDisplayTasks.map((task) => (
               <div
                 key={task.id}
-                className="p-3.5 rounded-xl border border-[#e1ede7] hover:border-[#14B866]/40 transition-colors bg-[#F7F9F8]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 transition-colors"
               >
-                <div className="space-y-1 min-w-0">
+                <div className="space-y-0.5 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#142D27] truncate">
+                    <span className="text-xs font-medium text-zinc-900 truncate">
                       {task.title}
                     </span>
-                    <span className="text-[10px] text-[#557067] px-2 py-0.5 rounded bg-white border border-[#e1ede7]">
+                    <span className="text-[10px] text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200">
                       {task.subjectName}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#557067] line-clamp-1">{task.description}</p>
+                  <p className="text-[11px] text-zinc-500 line-clamp-1">
+                    {task.description}
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-[11px] text-[#7d9990] flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
+                <div className="flex items-center gap-3 shrink-0 text-xs">
+                  <span className="text-zinc-500 text-[11px]">
                     {task.dueDate}
                   </span>
 
                   {task.status === 'pending' && !task.isSundayOff && !task.isPakistanHoliday && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      icon={<Check className="w-3.5 h-3.5" />}
+                    <button
                       onClick={() => setSubmittingTask(task)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-zinc-900 rounded-md hover:bg-zinc-800 transition-colors shadow-xs"
                     >
+                      <Check className="w-3 h-3" />
                       Submit for Review
-                    </Button>
+                    </button>
                   )}
 
                   {task.status === 'submitted_for_approval' && (
-                    <Badge variant="warning" size="sm">
+                    <span className="px-2 py-0.5 text-[10px] font-medium text-amber-700 bg-amber-50 rounded border border-amber-200/80">
                       Awaiting Gate
-                    </Badge>
+                    </span>
                   )}
 
                   {task.status === 'approved' && (
-                    <Badge variant="primary" size="sm">
+                    <span className="px-2 py-0.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 rounded border border-emerald-200/80">
                       Verified
-                    </Badge>
+                    </span>
                   )}
 
                   {(task.isSundayOff || task.isPakistanHoliday) && (
-                    <Badge variant="info" size="sm">
-                      🇵🇰 Off Day
-                    </Badge>
+                    <span className="px-2 py-0.5 text-[10px] font-medium text-zinc-600 bg-zinc-100 rounded border border-zinc-200">
+                      🇵🇰 Rest Day
+                    </span>
                   )}
                 </div>
               </div>
@@ -230,38 +236,42 @@ export const StudentDashboard: React.FC = () => {
       <Modal
         isOpen={!!submittingTask}
         onClose={() => setSubmittingTask(null)}
-        title="Submit Daily Task for Faculty Review"
+        title="Submit Task for Faculty Review"
       >
-        <div className="space-y-4">
-          <p className="text-xs text-[#557067]">
-            Submit work for: <strong className="text-[#142D27]">{submittingTask?.title}</strong>
+        <div className="space-y-3.5">
+          <p className="text-xs text-zinc-600">
+            Submit work for: <strong className="text-zinc-900">{submittingTask?.title}</strong>
           </p>
 
           <div>
-            <label className="block text-xs font-semibold text-[#142D27] mb-1">
-              Work Notes / Comments (Optional)
+            <label className="block text-xs font-medium text-zinc-700 mb-1">
+              Work Notes (Optional)
             </label>
             <textarea
               value={submissionNotes}
               onChange={(e) => setSubmissionNotes(e.target.value)}
-              placeholder="e.g. Completed Chapter 4 exercises 1 through 15."
+              placeholder="e.g. Completed questions 1 through 10."
               rows={3}
-              className="w-full p-3 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
+              className="w-full p-2.5 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" size="sm" onClick={() => setSubmittingTask(null)}>
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              isLoading={isSubmitting}
-              onClick={handleConfirmSubmitWork}
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setSubmittingTask(null)}
+              className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50"
             >
-              Confirm Submission
-            </Button>
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={handleConfirmSubmitWork}
+              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 disabled:opacity-50"
+            >
+              {isSubmitting ? 'Submitting...' : 'Confirm Submission'}
+            </button>
           </div>
         </div>
       </Modal>
