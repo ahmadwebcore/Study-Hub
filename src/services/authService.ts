@@ -112,8 +112,8 @@ export const authService = {
     }
 
     const isStudent =
-      cleanEmail === 'bilal.student@gmail.com' ||
-      cleanEmail === 'student@studyhub.edu';
+      cleanEmail === 'student@studyhub.edu' ||
+      cleanEmail === 'student@gmail.com';
 
     if (isStudent) {
       if (password !== 'password123') {

@@ -200,8 +200,8 @@ export const TestsPage: React.FC = () => {
 
     // Automated Dispatch to Student's Gmail
     const assignedStudent = students.find((s) => s.id === data.assignedTo);
-    const targetEmail = assignedStudent?.email || 'bilal.student@gmail.com';
-    const targetName = assignedStudent?.name || 'Bilal Ahmad';
+    const targetEmail = assignedStudent?.email || emailService.getStudentConfiguredEmail();
+    const targetName = assignedStudent?.name || 'Student Scholar';
 
     emailService.sendNewTestAlert({
       studentEmail: targetEmail,
@@ -227,8 +227,8 @@ export const TestsPage: React.FC = () => {
 
   const handleSendDeadlineReminder = (t: TestItem) => {
     emailService.sendDeadlineReminder({
-      studentEmail: 'bilal.student@gmail.com',
-      studentName: 'Bilal Ahmad',
+      studentEmail: emailService.getStudentConfiguredEmail(),
+      studentName: 'Student Scholar',
       itemTitle: t.title,
       itemType: 'test',
       subjectName: t.subjectName,

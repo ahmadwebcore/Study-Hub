@@ -37,11 +37,11 @@ export const SAMPLE_TEACHER: UserProfile = {
 
 export const SAMPLE_STUDENT: UserProfile = {
   id: 'usr_s_01',
-  name: 'Bilal Ahmad',
-  email: 'bilal.student@gmail.com',
+  name: 'Student Scholar',
+  email: 'student@studyhub.edu',
   role: 'student',
-  title: 'Enrolled Scholar (Cambridge CIE)',
-  grade: 'Grade 11 (Advanced STEM)',
+  title: 'Enrolled Scholar (1st Year FSc)',
+  grade: '1st Year FSc',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
   institution: 'StudyHub Learning Portal',
   phone: '+92 300 7654321',

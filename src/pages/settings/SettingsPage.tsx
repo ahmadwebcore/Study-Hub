@@ -82,7 +82,7 @@ export const SettingsPage: React.FC = () => {
       senderEmail: teacherEmailInput,
       senderName: teacherDisplayName,
       recipientEmail: studentEmailInput,
-      recipientName: 'Bilal Ahmad (Student)',
+      recipientName: 'Student Scholar',
       subject: '✅ Verification: StudyHub Gmail Channel Connected',
       message: `Your Gmail notification pipeline is successfully active!\n\n• Sender (Teacher): ${teacherEmailInput}\n• Receiver (Student): ${studentEmailInput}\n\nAutomated dispatches for exam marks, scheduled tests, and Pakistan Gazetted Holidays are now configured.`,
       category: 'system',
@@ -334,7 +334,7 @@ export const SettingsPage: React.FC = () => {
                         type="email"
                         value={studentEmailInput}
                         onChange={(e) => setStudentEmailInput(e.target.value)}
-                        placeholder="bilal.student@gmail.com"
+                        placeholder="student@studyhub.edu"
                         className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                       />
                     </div>
@@ -666,7 +666,7 @@ export const SettingsPage: React.FC = () => {
                     {role === 'teacher' ? 'Your Faculty Profile (Sender)' : 'Your Student Profile (Receiver)'}
                   </span>
                   <p className="text-sm font-bold text-[#142D27] mt-0.5">
-                    {role === 'teacher' ? teacherDisplayName : 'Bilal Ahmad'}
+                    {role === 'teacher' ? teacherDisplayName : 'Student Scholar'}
                   </p>
                   <p className="text-xs text-[#14B866] font-semibold mt-0.5">
                     {role === 'teacher' ? teacherEmailInput : studentEmailInput}
@@ -678,7 +678,7 @@ export const SettingsPage: React.FC = () => {
                     {role === 'teacher' ? 'Connected Student (Target)' : 'Assigned Faculty Evaluator'}
                   </span>
                   <p className="text-sm font-bold text-[#142D27] mt-0.5">
-                    {role === 'teacher' ? 'Bilal Ahmad' : teacherDisplayName}
+                    {role === 'teacher' ? 'Student Scholar' : teacherDisplayName}
                   </p>
                   <p className="text-xs text-[#557067] font-semibold mt-0.5">
                     {role === 'teacher' ? studentEmailInput : teacherEmailInput}
@@ -862,7 +862,7 @@ export const SettingsPage: React.FC = () => {
         isOpen={isComposeOpen}
         onClose={() => setIsComposeOpen(false)}
         defaultRecipientEmail={studentEmailInput}
-        defaultRecipientName="Bilal Ahmad"
+        defaultRecipientName="Student Scholar"
         onSuccess={(msg) => {
           setSuccessToast(msg);
           setTimeout(() => setSuccessToast(null), 5000);

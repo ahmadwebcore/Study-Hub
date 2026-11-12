@@ -34,8 +34,8 @@ const STORAGE_KEY = 'studyhub_dispatched_emails';
 const INITIAL_EMAILS: EmailMessage[] = [
   {
     id: 'em_001',
-    recipientEmail: 'bilal.student@gmail.com',
-    recipientName: 'Bilal Ahmad',
+    recipientEmail: 'student@studyhub.edu',
+    recipientName: 'Student Scholar',
     senderName: 'Ahmad WebCore',
     senderEmail: 'ahmadwebcore@gmail.com',
     subject: '🎓 Exam Graded: Advanced Differential Forms - PASSED (48/50)',
@@ -64,7 +64,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Exam Results Certified: Advanced Differential Forms</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
-            Dear <strong>Bilal Ahmad</strong>,<br/>
+            Dear <strong>Student Scholar</strong>,<br/>
             Your faculty evaluator <strong>Ahmad WebCore</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
@@ -100,7 +100,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
         </div>
         <div style="background: #F7F9F8; padding: 16px; text-align: center; border-top: 1px solid #e1ede7;">
           <p style="color: #7d9990; font-size: 11px; margin: 0;">
-            StudyHub LMS • Automated Notification Engine • Sent to bilal.student@gmail.com
+            StudyHub LMS • Automated Notification Engine • Sent to student@studyhub.edu
           </p>
         </div>
       </div>
@@ -108,8 +108,8 @@ const INITIAL_EMAILS: EmailMessage[] = [
   },
   {
     id: 'em_002',
-    recipientEmail: 'bilal.student@gmail.com',
-    recipientName: 'Bilal Ahmad',
+    recipientEmail: 'student@studyhub.edu',
+    recipientName: 'Student Scholar',
     senderName: 'StudyHub Academic Scheduler',
     senderEmail: 'scheduler@studyhub.edu',
     subject: '⏰ Urgent Reminder: Quantum Mechanics Assessment Due in 24 Hours',
@@ -134,7 +134,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Upcoming Submission Deadline</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
-            Hello <strong>Bilal Ahmad</strong>,<br/>
+            Hello <strong>Student Scholar</strong>,<br/>
             This is an automated countdown reminder that your scheduled assessment <strong>Quantum Mechanics Mid-Term Examination</strong> is scheduled for tomorrow.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
@@ -150,15 +150,15 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
         </div>
         <div style="background: #F7F9F8; padding: 14px; text-align: center; border-top: 1px solid #e1ede7;">
-          <p style="color: #7d9990; font-size: 11px; margin: 0;">Sent to bilal.student@gmail.com • StudyHub Notification Scheduler</p>
+          <p style="color: #7d9990; font-size: 11px; margin: 0;">Sent to student@studyhub.edu • StudyHub Notification Scheduler</p>
         </div>
       </div>
     `,
   },
   {
     id: 'em_003',
-    recipientEmail: 'bilal.student@gmail.com',
-    recipientName: 'Bilal Ahmad',
+    recipientEmail: 'student@studyhub.edu',
+    recipientName: 'Student Scholar',
     senderName: 'Ahmad WebCore',
     senderEmail: 'ahmadwebcore@gmail.com',
     subject: '✉️ Faculty Invitation: Join Advanced STEM Cohort on StudyHub',
@@ -599,7 +599,7 @@ class EmailService {
       const stored = localStorage.getItem('studyhub_student_configured_gmail');
       if (stored) return stored;
     } catch {}
-    return 'bilal.student@gmail.com';
+    return 'student@studyhub.edu';
   }
 
   public setStudentConfiguredEmail(email: string): void {

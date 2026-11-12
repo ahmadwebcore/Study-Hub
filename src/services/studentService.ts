@@ -238,7 +238,7 @@ export const studentService = {
       if (token.startsWith('INV-') || token.startsWith('demo') || token.length >= 6) {
         return {
           id: 'demo_inv_01',
-          email: 'bilal.student@gmail.com',
+          email: 'student@studyhub.edu',
           role: 'student',
           token,
           invitedBy: 'Ahmad WebCore',

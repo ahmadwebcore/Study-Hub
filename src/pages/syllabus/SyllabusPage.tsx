@@ -219,7 +219,7 @@ export const SyllabusPage: React.FC = () => {
         senderEmail: teacherGmail,
         senderName: user?.name || 'Ahmad WebCore',
         recipientEmail: studentGmail,
-        recipientName: 'Bilal Ahmad (Student)',
+        recipientName: 'Student Scholar',
         subject: `📋 Syllabus Daily Tasks Assigned: ${data.title}`,
         message: `New syllabus chapter "${data.title}" has been scheduled into daily study targets across Monday to Saturday.\n\n• Subject: ${currentSubject.name}\n• Sunday Policy: Mandatory Rest Day (Zero tasks scheduled)\n• Pakistan Holiday Policy: Gazetted public holidays are observed with zero homework.\n\nLog in to your StudyHub student portal to track progress and submit notes.`,
         category: 'system',

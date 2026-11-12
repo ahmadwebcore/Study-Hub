@@ -82,7 +82,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Verified. Working calculations are rigorous and notation is exact.',
     },
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_02',
@@ -110,7 +110,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Good proof steps. Well done.',
     },
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_03',
@@ -133,7 +133,7 @@ const SEED_TASKS: DailyTask[] = [
       notes: 'Submitted wave equation solutions. Awaiting teacher review.',
     },
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_04',
@@ -152,7 +152,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 80,
     status: 'pending',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_05',
@@ -171,7 +171,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 60,
     status: 'pending',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_06',
@@ -190,7 +190,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 90,
     status: 'pending',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_07',
@@ -208,7 +208,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_pk_01',
@@ -229,7 +229,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
   {
     id: 'tsk_pk_02',
@@ -250,7 +250,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Bilal Ahmad',
+    studentName: 'Student Scholar',
   },
 ];
 
@@ -345,7 +345,7 @@ class TaskService {
       estimatedMinutes: params.estimatedMinutes || 45,
       status: 'pending',
       studentId: params.studentId || 'usr_student_demo',
-      studentName: params.studentName || 'Bilal Ahmad',
+      studentName: params.studentName || 'Student Scholar',
     };
 
     this.tasks.unshift(newTask);
@@ -368,7 +368,7 @@ class TaskService {
     this.loadTasks();
     const created: DailyTask[] = [];
     const studentId = params.studentId || 'usr_student_demo';
-    const studentName = params.studentName || 'Bilal Ahmad';
+    const studentName = params.studentName || 'Student Scholar';
 
     const startPage = params.startPage || 1;
     const pagesPerDay = Math.max(15, Math.ceil(params.totalPagesOrTopics / 6));
@@ -565,7 +565,7 @@ class TaskService {
       ) {
         // Dispatch late alert to student Gmail!
         emailService.sendDeadlineReminder({
-          studentEmail: 'bilal.student@gmail.com',
+          studentEmail: 'student@studyhub.edu',
           studentName: task.studentName,
           itemTitle: task.title,
           itemType: 'assignment',

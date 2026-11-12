@@ -49,7 +49,6 @@ export const TestSubmissionPage: React.FC = () => {
         : true
     );
   const mySubmissions = submissions
-    .filter((s) => s.studentName === 'Bilal Ahmad' || s.studentName.includes('Bilal') || true)
     .filter((s) =>
       searchTerm
         ? s.assignmentTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -74,7 +73,7 @@ export const TestSubmissionPage: React.FC = () => {
       assignmentTitle: uploadingTest.title,
       subjectName: uploadingTest.subjectName,
       studentId: user?.id || 'usr_student_demo',
-      studentName: user?.name || 'Bilal Ahmad',
+      studentName: user?.name || 'Student Scholar',
       studentAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop',
       submittedAt: 'Just now',
       status: 'submitted',

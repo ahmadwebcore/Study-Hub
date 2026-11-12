@@ -1,33 +1,46 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, ArrowRight } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    // Ensure video plays smoothly across all browsers
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch((err) => {
+        console.warn('Autoplay prevented by browser:', err);
+      });
+    }
+  }, []);
 
   return (
     <div className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden font-sans select-none bg-zinc-950 text-white">
       {/* Background Aesthetic Study Video with Dark Glass Overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
           poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1920&auto=format&fit=crop"
-          className="w-full h-full object-cover opacity-35 scale-105 filter blur-[1px]"
+          className="w-full h-full object-cover opacity-40 scale-105 filter blur-[0.5px]"
         >
+          <source src="/videos/study-bg.mp4" type="video/mp4" />
           <source
-            src="https://assets.mixkit.co/videos/preview/mixkit-student-studying-in-a-library-41551-large.mp4"
+            src="https://cdn.jsdelivr.net/gh/intel-iot-devkit/sample-videos@master/classroom.mp4"
             type="video/mp4"
           />
         </video>
-        {/* Subtle Gradient Overlays for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/80" />
-        <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent" />
+        {/* Modern 2026 Gradient Overlays for Contrast & Atmosphere */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/85" />
+        <div className="absolute inset-0 bg-radial from-emerald-500/15 via-transparent to-transparent" />
       </div>
 
-      {/* Top Brand Tag (No Navigation Header) */}
+      {/* Top Brand Pill (Clean, No Distracting Header) */}
       <div className="relative z-10 pt-10 text-center">
         <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 shadow-lg">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-zinc-950 font-bold shadow-xs">
@@ -37,7 +50,7 @@ export const LandingPage: React.FC = () => {
             Study<span className="text-emerald-400">Hub</span>
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] text-zinc-300 font-medium">Pakistani Academic Portal</span>
+          <span className="text-[11px] text-zinc-300 font-medium">Academic Portal 2026</span>
         </div>
       </div>
 
@@ -56,11 +69,11 @@ export const LandingPage: React.FC = () => {
             Daily textbook targets, assignment submissions, Pakistan calendar rest days, and 2FA authentication in one place.
           </p>
 
-          {/* ONE SINGLE BIG BUTTON */}
+          {/* ONE SINGLE HIGH-CONTRAST ACTION BUTTON */}
           <div className="pt-4 flex justify-center">
             <button
               onClick={() => navigate('/login')}
-              className="group inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-full shadow-2xl hover:shadow-emerald-500/20 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer ring-1 ring-white/30"
+              className="group inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-full shadow-2xl hover:shadow-emerald-500/25 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer ring-1 ring-white/30"
             >
               <span>Get Started</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

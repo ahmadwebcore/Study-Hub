@@ -36,8 +36,8 @@ export const TeacherDashboard: React.FC = () => {
   const [isScheduleTestOpen, setIsScheduleTestOpen] = useState(false);
   const [isComposeEmailOpen, setIsComposeEmailOpen] = useState(false);
   const [isInviteStudentOpen, setIsInviteStudentOpen] = useState(false);
-  const [newStudentName, setNewStudentName] = useState('Bilal Ahmad');
-  const [newStudentEmail, setNewStudentEmail] = useState('bilal.student@gmail.com');
+  const [newStudentName, setNewStudentName] = useState('Student Scholar');
+  const [newStudentEmail, setNewStudentEmail] = useState('student@studyhub.edu');
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [approvingTask, setApprovingTask] = useState<DailyTask | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState('Work verified and approved.');
@@ -168,7 +168,7 @@ export const TeacherDashboard: React.FC = () => {
             Faculty Overview
           </h1>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Teacher: <strong className="text-zinc-800">Ahmad WebCore</strong> &bull; {teacherEmail} &bull; Connected Student: <strong className="text-zinc-800">Bilal Ahmad</strong>
+            Faculty Lead: <strong className="text-zinc-800">Ahmad WebCore</strong> &bull; {teacherEmail}
           </p>
         </div>
 
@@ -352,7 +352,7 @@ export const TeacherDashboard: React.FC = () => {
               type="text"
               value={newStudentName}
               onChange={(e) => setNewStudentName(e.target.value)}
-              placeholder="e.g. Bilal Ahmad"
+              placeholder="e.g. Student Name"
               className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>
@@ -363,7 +363,7 @@ export const TeacherDashboard: React.FC = () => {
               type="email"
               value={newStudentEmail}
               onChange={(e) => setNewStudentEmail(e.target.value)}
-              placeholder="e.g. bilal.student@gmail.com"
+              placeholder="e.g. student@studyhub.edu"
               className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>
@@ -566,7 +566,7 @@ export const TeacherDashboard: React.FC = () => {
         isOpen={isComposeEmailOpen}
         onClose={() => setIsComposeEmailOpen(false)}
         defaultRecipientEmail={configuredStudent}
-        defaultRecipientName="Bilal Ahmad"
+        defaultRecipientName="Student Scholar"
       />
     </div>
   );

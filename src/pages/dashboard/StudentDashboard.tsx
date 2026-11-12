@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 
 export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
-  const studentName = userProfile?.fullName || userProfile?.name || user?.name || 'Bilal Ahmad';
+  const studentName = userProfile?.fullName || userProfile?.name || user?.name || 'Student Scholar';
 
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [activeTab, setActiveTab] = useState<'today' | 'week' | 'awaiting' | 'verified'>('today');

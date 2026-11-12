@@ -31,7 +31,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [recipientFilter, setRecipientFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [testEmailAddress, setTestEmailAddress] = useState<string>('bilal.student@gmail.com');
+  const [testEmailAddress, setTestEmailAddress] = useState<string>('student@studyhub.edu');
   const [dispatchFeedback, setDispatchFeedback] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'inbox' | 'dispatch_test'>('inbox');
 
@@ -69,7 +69,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const triggerPassingMarksAlert = () => {
     const em = emailService.sendGradeResultEmail({
       studentEmail: testEmailAddress,
-      studentName: 'Bilal Ahmad',
+      studentName: 'Student Scholar',
       teacherName: 'Ahmad WebCore',
       testTitle: 'Vector Calculus & Multivariable Systems Exam',
       subjectName: 'Advanced Calculus & Vectors (MATH-301)',
@@ -88,7 +88,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const triggerNewTestAlert = () => {
     const em = emailService.sendNewTestAlert({
       studentEmail: testEmailAddress,
-      studentName: 'Bilal Ahmad',
+      studentName: 'Student Scholar',
       teacherName: 'Ahmad WebCore',
       testTitle: 'Electrodynamics & Relativity Assessment',
       subjectName: 'Quantum Physics (PHY-201)',
@@ -110,7 +110,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const triggerDeadlineReminder = () => {
     const em = emailService.sendDeadlineReminder({
       studentEmail: testEmailAddress,
-      studentName: 'Bilal Ahmad',
+      studentName: 'Student Scholar',
       itemTitle: 'Organic Chemistry Synthesis Assignment #4',
       itemType: 'assignment',
       subjectName: 'Organic Chemistry (CHEM-102)',
@@ -127,7 +127,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const triggerInvitationEmail = () => {
     const em = emailService.sendInvitationEmail({
       studentEmail: testEmailAddress,
-      studentName: 'Bilal Ahmad',
+      studentName: 'Student Scholar',
       teacherName: 'Ahmad WebCore',
       inviteToken: `sh_inv_${Math.floor(100000 + Math.random() * 900000)}`,
       course: 'Advanced STEM Honors (2026-2027)',
@@ -239,7 +239,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
               aria-label="Filter emails by recipient"
             >
               <option value="all">All Student Accounts</option>
-              <option value="bilal.student@gmail.com">bilal.student@gmail.com</option>
+              <option value="student@studyhub.edu">student@studyhub.edu</option>
             </select>
 
             <select
@@ -271,7 +271,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
                   type="email"
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
-                  placeholder="bilal.student@gmail.com"
+                  placeholder="student@studyhub.edu"
                   className="flex-1 px-3 py-2 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
                 />
               </div>

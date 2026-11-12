@@ -106,7 +106,7 @@ export const SubmissionsPage: React.FC = () => {
 
     // Automated Dispatch to Student's Gmail
     emailService.sendGradeResultEmail({
-      studentEmail: 'bilal.student@gmail.com',
+      studentEmail: emailService.getStudentConfiguredEmail(),
       studentName: studentName,
       teacherName: user?.name || 'Ahmad WebCore',
       testTitle: gradingSubmission.assignmentTitle,
