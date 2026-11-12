@@ -15,6 +15,7 @@ import {
   Trash2,
   Paperclip,
   CheckCircle,
+  Upload,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -61,6 +62,16 @@ export const SyllabusPage: React.FC = () => {
   const [editingTopic, setEditingTopic] = useState<{ unitId: string; topic: SyllabusTopic } | null>(null);
   const [deletingTopic, setDeletingTopic] = useState<{ unitId: string; topic: SyllabusTopic } | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  // Student Syllabus Upload & Auto-Scheduler State
+  const [uploadedSyllabusName, setUploadedSyllabusName] = useState<string>('');
+  const [taskDurationChoice, setTaskDurationChoice] = useState<number>(45); // 30, 45, 60, 90 mins
+  const [paceTargetChoice, setPaceTargetChoice] = useState<'2_weeks' | '4_weeks' | '8_weeks'>('4_weeks');
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState<boolean>(false);
+  const [isManualTaskModalOpen, setIsManualTaskModalOpen] = useState<boolean>(false);
+  const [manualTaskTitle, setManualTaskTitle] = useState<string>('');
+  const [manualTaskMinutes, setManualTaskMinutes] = useState<number>(45);
+  const [manualTaskDate, setManualTaskDate] = useState<string>(new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
     let mounted = true;
@@ -304,6 +315,54 @@ export const SyllabusPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadedSyllabusName(file.name);
+    setSuccessToast(`Syllabus "${file.name}" loaded. Pick your daily study duration below to automate tasks.`);
+    setTimeout(() => setSuccessToast(null), 4000);
+  };
+
+  const handleGenerateStudyTasksFromSyllabus = async () => {
+    setIsGeneratingPlan(true);
+    await new Promise((r) => setTimeout(r, 600));
+
+    syllabusList.forEach((unit, idx) => {
+      taskService.generateDailyTasksFromSource({
+        sourceType: 'syllabus',
+        sourceTitle: `${currentSubject.name}: ${unit.title}`,
+        subjectId: selectedSubjectId,
+        subjectName: currentSubject.name,
+        subjectCode: currentSubject.code,
+        totalPagesOrTopics: unit.topics.length || 6,
+        startPage: idx * 10 + 1,
+      });
+    });
+
+    setIsGeneratingPlan(false);
+    setSuccessToast(`Automated daily ${taskDurationChoice}-minute study tasks generated for ${currentSubject.name} with Sundays OFF!`);
+    setTimeout(() => setSuccessToast(null), 5000);
+  };
+
+  const handleCreateManualTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualTaskTitle.trim()) return;
+
+    taskService.createCustomTask({
+      title: manualTaskTitle.trim(),
+      description: `Manual target for ${currentSubject.name}`,
+      subjectId: selectedSubjectId,
+      subjectName: currentSubject.name,
+      dueDate: manualTaskDate,
+      estimatedMinutes: manualTaskMinutes,
+    });
+
+    setIsManualTaskModalOpen(false);
+    setManualTaskTitle('');
+    setSuccessToast(`Custom study task "${manualTaskTitle}" added.`);
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
   return (
     <div className="space-y-6">
       {/* Toast Notification */}
@@ -435,6 +494,109 @@ export const SyllabusPage: React.FC = () => {
             />
           </div>
         </Card>
+      </div>
+
+      {/* Student Syllabus Upload & Task Auto-Scheduler Card */}
+      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              Upload Syllabus & Auto-Schedule Daily Study Tasks
+            </h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Upload your 1st Year / 2nd Year FSc syllabus document or photo to automatically create daily study targets with Sunday rest days.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsManualTaskModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors shadow-xs shrink-0"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-zinc-500" />
+            + Add Task Manually
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+          {/* Step 1: Upload File */}
+          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">
+              1. Syllabus Document / Photo
+            </span>
+            <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-zinc-200 rounded-lg bg-white hover:border-emerald-500 hover:bg-emerald-50/20 cursor-pointer transition-colors text-center">
+              <Upload className="w-5 h-5 text-zinc-400 mb-1" />
+              <span className="text-xs font-semibold text-zinc-700 truncate max-w-[200px]">
+                {uploadedSyllabusName || 'Choose PDF or Syllabus Image'}
+              </span>
+              <span className="text-[10px] text-zinc-400">PDF, JPG, PNG up to 25MB</span>
+              <input
+                type="file"
+                accept=".pdf,image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* Step 2: Choose Daily Duration */}
+          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">
+              2. Daily Task Duration
+            </span>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { mins: 30, label: '30 Mins (Quick)' },
+                { mins: 45, label: '45 Mins (Best)' },
+                { mins: 60, label: '60 Mins (Deep)' },
+                { mins: 90, label: '90 Mins (Intense)' },
+              ].map((opt) => (
+                <button
+                  key={opt.mins}
+                  type="button"
+                  onClick={() => setTaskDurationChoice(opt.mins)}
+                  className={`py-1.5 px-2 text-xs font-semibold rounded-lg border transition-all text-center ${
+                    taskDurationChoice === opt.mins
+                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-xs'
+                      : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Step 3: Target Pace & Trigger Button */}
+          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex flex-col justify-between space-y-2">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">
+                3. Completion Pace
+              </span>
+              <select
+                value={paceTargetChoice}
+                onChange={(e) => setPaceTargetChoice(e.target.value as any)}
+                className="w-full h-8 px-2 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-800 font-medium focus:outline-none"
+              >
+                <option value="2_weeks">2 Weeks (Exam Sprint)</option>
+                <option value="4_weeks">4 Weeks (Standard Semester)</option>
+                <option value="8_weeks">8 Weeks (Comprehensive Review)</option>
+              </select>
+            </div>
+
+            <Button
+              variant="primary"
+              size="sm"
+              className="w-full text-xs font-bold shadow-xs py-2"
+              isLoading={isGeneratingPlan}
+              loadingText="Scheduling Tasks..."
+              onClick={handleGenerateStudyTasksFromSyllabus}
+            >
+              Generate Daily Tasks (Sundays OFF)
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Chapters & Topics List */}
@@ -813,6 +975,63 @@ export const SyllabusPage: React.FC = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Modal: Add Manual Task */}
+      <Modal
+        isOpen={isManualTaskModalOpen}
+        onClose={() => setIsManualTaskModalOpen(false)}
+        title="Add Custom Study Target"
+      >
+        <form onSubmit={handleCreateManualTask} className="space-y-3.5">
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 mb-1">Task Target Title</label>
+            <input
+              type="text"
+              value={manualTaskTitle}
+              onChange={(e) => setManualTaskTitle(e.target.value)}
+              placeholder="e.g. Chapter 2 Vectors: Review Dot Product Proofs"
+              className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1">Duration (Minutes)</label>
+              <input
+                type="number"
+                min={15}
+                max={240}
+                value={manualTaskMinutes}
+                onChange={(e) => setManualTaskMinutes(Number(e.target.value))}
+                className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1">Target Due Date</label>
+              <input
+                type="date"
+                value={manualTaskDate}
+                onChange={(e) => setManualTaskDate(e.target.value)}
+                className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+            <button
+              type="button"
+              onClick={() => setIsManualTaskModalOpen(false)}
+              className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50"
+            >
+              Cancel
+            </button>
+            <Button type="submit" variant="primary" size="sm">
+              Save Target
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

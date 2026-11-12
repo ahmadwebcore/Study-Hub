@@ -30,7 +30,7 @@ const subjectSchema = z.object({
   code: z.string().min(3, 'Subject code must be at least 3 characters').max(10, 'Code too long'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   totalModules: z.number().min(1, 'Minimum 1 module').max(30, 'Maximum 30 modules'),
-  category: z.enum(['STEM', 'Humanities', 'Languages', 'Commerce']),
+  category: z.enum(['1st Year FSc', '2nd Year FSc', 'STEM', 'Humanities', 'Languages', 'Commerce']),
   course: z.string().min(2, 'Course stream is required'),
   academicSession: z.string().min(4, 'Session is required'),
   accentColor: z.string().min(4, 'Color is required'),
@@ -276,9 +276,9 @@ export const SubjectsPage: React.FC = () => {
           className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
         >
           <option value="all">All Categories</option>
+          <option value="1st Year FSc">1st Year FSc (Part 1)</option>
+          <option value="2nd Year FSc">2nd Year FSc (Part 2)</option>
           <option value="STEM">STEM</option>
-          <option value="Humanities">Humanities</option>
-          <option value="Languages">Languages</option>
           <option value="Commerce">Commerce</option>
         </select>
 
@@ -486,10 +486,12 @@ export const SubjectsPage: React.FC = () => {
                 {...registerCreate('category')}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
               >
+                <option value="1st Year FSc">1st Year FSc (Part 1)</option>
+                <option value="2nd Year FSc">2nd Year FSc (Part 2)</option>
                 <option value="STEM">STEM</option>
+                <option value="Commerce">Commerce</option>
                 <option value="Humanities">Humanities</option>
                 <option value="Languages">Languages</option>
-                <option value="Commerce">Commerce</option>
               </select>
             </div>
           </div>
@@ -584,10 +586,12 @@ export const SubjectsPage: React.FC = () => {
                 {...registerEdit('category')}
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] bg-white"
               >
+                <option value="1st Year FSc">1st Year FSc (Part 1)</option>
+                <option value="2nd Year FSc">2nd Year FSc (Part 2)</option>
                 <option value="STEM">STEM</option>
+                <option value="Commerce">Commerce</option>
                 <option value="Humanities">Humanities</option>
                 <option value="Languages">Languages</option>
-                <option value="Commerce">Commerce</option>
               </select>
             </div>
             <div>

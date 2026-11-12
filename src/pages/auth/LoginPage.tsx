@@ -20,7 +20,6 @@ import {
   BASE32_SECRET,
   TEACHER_EMAIL,
   getOtpAuthUri,
-  generateTOTP,
   verifyTOTP,
 } from '../../lib/totp';
 
@@ -34,20 +33,18 @@ export const LoginPage: React.FC = () => {
   // Authenticator State
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [totpCode, setTotpCode] = useState('');
-  const [liveCode, setLiveCode] = useState('');
   const [copiedKey, setCopiedKey] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(30);
 
   // Password State
-  const [email, setEmail] = useState(TEACHER_EMAIL);
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [authError, setAuthError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
   // Generate scannable QR Code specifically for ahmadwebcore@gmail.com
   useEffect(() => {
-    const currentEmail = roleMode === 'teacher' ? TEACHER_EMAIL : 'bilal.student@gmail.com';
+    const currentEmail = roleMode === 'teacher' ? TEACHER_EMAIL : 'student@studyhub.edu';
     const otpauthUrl = getOtpAuthUri(currentEmail, BASE32_SECRET);
 
     QRCode.toDataURL(otpauthUrl, {
@@ -60,18 +57,6 @@ export const LoginPage: React.FC = () => {
     })
       .then((url) => setQrCodeUrl(url))
       .catch((err) => console.error('QR code generation error:', err));
-
-    // Calculate real live TOTP code
-    const updateCode = async () => {
-      const code = await generateTOTP(BASE32_SECRET);
-      setLiveCode(code);
-      const seconds = 30 - (Math.floor(Date.now() / 1000) % 30);
-      setTimeRemaining(seconds);
-    };
-
-    updateCode();
-    const interval = setInterval(updateCode, 1000);
-    return () => clearInterval(interval);
   }, [roleMode]);
 
   const handleCopyKey = () => {
@@ -127,11 +112,7 @@ export const LoginPage: React.FC = () => {
 
   const switchRole = (newRole: 'teacher' | 'student') => {
     setRoleMode(newRole);
-    if (newRole === 'teacher') {
-      setEmail(TEACHER_EMAIL);
-    } else {
-      setEmail('bilal.student@gmail.com');
-    }
+    setAuthError(null);
   };
 
   return (
@@ -224,7 +205,7 @@ export const LoginPage: React.FC = () => {
             <form onSubmit={handleVerify2FA} className="space-y-4">
               <div className="text-center space-y-2">
                 <p className="text-xs text-zinc-500">
-                  Scan in <strong>Google Authenticator</strong> for <strong className="text-zinc-800">{roleMode === 'teacher' ? TEACHER_EMAIL : 'bilal.student@gmail.com'}</strong>:
+                  Scan with <strong>Google Authenticator</strong> on your phone:
                 </p>
 
                 {/* Scannable Base32 QR Code */}
@@ -256,15 +237,6 @@ export const LoginPage: React.FC = () => {
                     {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
-
-                {/* Live Code Timer Helper */}
-                {liveCode && (
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-medium">
-                    <span>Live Code:</span>
-                    <strong className="font-mono font-bold tracking-wider">{liveCode}</strong>
-                    <span className="text-[10px] text-emerald-600">({timeRemaining}s)</span>
-                  </div>
-                )}
               </div>
 
               <div>
@@ -311,6 +283,7 @@ export const LoginPage: React.FC = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    placeholder={roleMode === 'teacher' ? 'ahmadwebcore@gmail.com' : 'student@gmail.com'}
                     className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-zinc-500"
                     required
                   />
@@ -327,6 +300,7 @@ export const LoginPage: React.FC = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter account password"
                     className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-zinc-500"
                     required
                   />

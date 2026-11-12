@@ -1,75 +1,79 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { GraduationCap, ArrowRight } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] text-[#142D27] flex flex-col justify-between selection:bg-[#14B866]/20 font-sans">
-      {/* Modern Sleek Floating Header */}
-      <header className="w-full max-w-5xl mx-auto px-4 sm:px-6 pt-6">
-        <nav className="bg-white/90 backdrop-blur-md border border-[#e1ede7] rounded-full px-6 h-14 flex items-center justify-between shadow-sm">
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group focus:outline-none">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#142D27] text-[#14B866] shadow-sm">
-              <GraduationCap className="h-4.5 w-4.5" />
-            </div>
-            <span className="font-extrabold text-base tracking-tight text-[#142D27]">
-              Study<span className="text-[#14B866]">Hub</span>
-            </span>
-          </Link>
+    <div className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden font-sans select-none bg-zinc-950 text-white">
+      {/* Background Aesthetic Study Video with Dark Glass Overlay */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1920&auto=format&fit=crop"
+          className="w-full h-full object-cover opacity-35 scale-105 filter blur-[1px]"
+        >
+          <source
+            src="https://assets.mixkit.co/videos/preview/mixkit-student-studying-in-a-library-41551-large.mp4"
+            type="video/mp4"
+          />
+        </video>
+        {/* Subtle Gradient Overlays for Readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/80" />
+        <div className="absolute inset-0 bg-radial from-emerald-500/10 via-transparent to-transparent" />
+      </div>
 
-          {/* Simple Clean Header Action */}
-          <button
-            onClick={() => navigate('/login')}
-            className="text-xs font-bold text-[#142D27] hover:text-[#14B866] transition-colors px-3 py-1.5"
-          >
-            Sign In
-          </button>
-        </nav>
-      </header>
+      {/* Top Brand Tag (No Navigation Header) */}
+      <div className="relative z-10 pt-10 text-center">
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 shadow-lg">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-zinc-950 font-bold shadow-xs">
+            <GraduationCap className="h-4 w-4" />
+          </div>
+          <span className="font-extrabold text-sm tracking-tight text-white">
+            Study<span className="text-emerald-400">Hub</span>
+          </span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] text-zinc-300 font-medium">Pakistani Academic Portal</span>
+        </div>
+      </div>
 
-      {/* Main Hero: Ultra Simple & Clean with ONE Button */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-16">
-        <div className="w-full max-w-2xl mx-auto text-center space-y-6">
-          {/* Minimal Academic Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Academic Management &bull; 2026</span>
+      {/* Center Hero: Ultra Clean with ONE Action Button */}
+      <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
+        <div className="w-full max-w-2xl mx-auto text-center space-y-7">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
+            <span>FSc 1st Year & 2nd Year &bull; 2026 Academic Session</span>
           </div>
 
-          {/* Strong, Clean Headline */}
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-[#142D27] tracking-tight leading-[1.12]">
+          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.1]">
             A focused learning portal for teachers and students
           </h1>
 
-          {/* Clean 1-Line Description */}
-          <p className="text-sm sm:text-base text-[#557067] max-w-lg mx-auto leading-relaxed">
-            Daily textbook targets, assignment submissions, Pakistan calendar schedules, and 2FA authentication in one place.
+          <p className="text-base sm:text-lg text-zinc-300 max-w-lg mx-auto leading-relaxed">
+            Daily textbook targets, assignment submissions, Pakistan calendar rest days, and 2FA authentication in one place.
           </p>
 
-          {/* ONE SINGLE SIMPLE BUTTON */}
-          <div className="pt-2 flex justify-center">
-            <Button
-              variant="primary"
-              size="lg"
-              className="px-8 py-3.5 text-base font-bold rounded-full shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
-              icon={<ArrowRight className="w-4 h-4" />}
+          {/* ONE SINGLE BIG BUTTON */}
+          <div className="pt-4 flex justify-center">
+            <button
               onClick={() => navigate('/login')}
+              className="group inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 rounded-full shadow-2xl hover:shadow-emerald-500/20 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer ring-1 ring-white/30"
             >
-              Get Started
-            </Button>
+              <span>Get Started</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
       </main>
 
       {/* Clean Minimal Footer */}
-      <footer className="w-full text-center py-5 text-xs text-[#7d9990] border-t border-[#e1ede7]">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>StudyHub &bull; Academic Portal</span>
-          <span>Official Session &bull; 2FA Protected</span>
+      <footer className="relative z-10 w-full text-center py-6 text-xs text-zinc-400 border-t border-white/10 backdrop-blur-xs">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>StudyHub &bull; Pakistani Academic LMS</span>
+          <span>Google Authenticator 2FA Secured</span>
         </div>
       </footer>
     </div>

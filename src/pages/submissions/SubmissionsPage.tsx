@@ -29,7 +29,6 @@ export const SubmissionsPage: React.FC = () => {
   const [previewSubmission, setPreviewSubmission] = useState<Submission | null>(null);
   const [gradeInput, setGradeInput] = useState<string>('');
   const [feedbackInput, setFeedbackInput] = useState<string>('');
-  const [allowResubmitToggle, setAllowResubmitToggle] = useState<boolean>(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [isGradingSaving, setIsGradingSaving] = useState(false);
 
@@ -58,7 +57,6 @@ export const SubmissionsPage: React.FC = () => {
     setGradingSubmission(sub);
     setGradeInput(sub.score !== undefined ? sub.score.toString() : '');
     setFeedbackInput(sub.feedback || sub.comment || '');
-    setAllowResubmitToggle(false);
   };
 
   const handleDownloadFile = async (sub: Submission) => {
@@ -327,48 +325,96 @@ export const SubmissionsPage: React.FC = () => {
             </button>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-[#142D27]">Awarded Score Points</label>
-              <span className="text-xs text-[#7d9990]">
-                Maximum Available: <strong>{gradingSubmission?.maxScore}</strong> pts
+          {/* Solution Sheet Visual Preview Box */}
+          <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+                📄 Student Solution Sheet (FSc Exam Script)
+              </span>
+              <button
+                type="button"
+                onClick={() => gradingSubmission && handleDownloadFile(gradingSubmission)}
+                className="text-[11px] text-zinc-300 hover:text-white flex items-center gap-1"
+              >
+                <Download className="w-3 h-3" />
+                Download Original
+              </button>
+            </div>
+            <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700 font-mono text-[11px] text-zinc-300 space-y-1">
+              <p className="text-emerald-300 font-bold">&bull; Worked Solution Script Preview:</p>
+              <p className="text-zinc-400 italic">"Q1. Resolved vector components along orthogonal axes: F_x = F cos(θ), F_y = F sin(θ). Resultant magnitude R = √(F_x² + F_y²) = 25.4 N. Proof verified."</p>
+              <div className="pt-1 text-[10px] text-zinc-500">Document: {gradingSubmission?.fileName || 'FSc_Physics_Paper.pdf'}</div>
+            </div>
+          </div>
+
+          {/* Marks Awarded & Live Progress Bar */}
+          <div className="p-3 rounded-xl bg-white border border-zinc-200 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-zinc-900">Awarded Marks</label>
+              <span className="text-xs font-mono font-bold text-emerald-600">
+                {Number(gradeInput) || 0} / {gradingSubmission?.maxScore} Marks
               </span>
             </div>
-            <input
-              type="number"
-              value={gradeInput}
-              onChange={(e) => setGradeInput(e.target.value)}
-              placeholder={`Enter score 0 - ${gradingSubmission?.maxScore}`}
-              min={0}
-              max={gradingSubmission?.maxScore}
-              className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
-            />
+
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={gradeInput}
+                onChange={(e) => setGradeInput(e.target.value)}
+                placeholder={`Enter marks (0 - ${gradingSubmission?.maxScore})`}
+                min={0}
+                max={gradingSubmission?.maxScore}
+                className="w-full px-3 py-2 text-xs font-bold rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+              />
+              <span className="text-xs font-bold text-zinc-500 shrink-0">
+                / {gradingSubmission?.maxScore} Total
+              </span>
+            </div>
+
+            {/* Cool Progress Bar Underneath */}
+            {gradingSubmission && (
+              <div className="space-y-1 pt-1">
+                {(() => {
+                  const score = Number(gradeInput) || 0;
+                  const max = gradingSubmission.maxScore || 50;
+                  const pct = Math.min(100, Math.max(0, Math.round((score / max) * 100)));
+                  const isPass = pct >= 50;
+                  return (
+                    <>
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-zinc-500">Live Progress:</span>
+                        <span className="font-bold text-zinc-900">
+                          {pct}%
+                          <span className={`ml-1.5 font-semibold ${isPass ? 'text-emerald-600' : 'text-rose-600'}`}>
+                            ({isPass ? 'Passing Benchmark Met' : 'Below Passing Threshold'})
+                          </span>
+                        </span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-zinc-100 overflow-hidden border border-zinc-200">
+                        <div
+                          className={`h-full transition-all duration-300 rounded-full ${isPass ? 'bg-emerald-500' : 'bg-rose-500'}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#142D27] mb-1">
-              Teacher Qualitative Evaluation & Feedback
+            <label className="block text-xs font-semibold text-zinc-800 mb-1">
+              Teacher Evaluation & Feedback
             </label>
             <textarea
-              rows={3}
+              rows={2}
               value={feedbackInput}
               onChange={(e) => setFeedbackInput(e.target.value)}
-              placeholder="Highlight areas of strength, mathematical proof rigor, or specific revision points..."
-              className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
+              placeholder="Good step-by-step mathematical working..."
+              className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 focus:outline-none focus:border-zinc-500"
             />
           </div>
-
-          <label className="flex items-center gap-2 p-3 rounded-xl border border-[#e1ede7] bg-white cursor-pointer">
-            <input
-              type="checkbox"
-              checked={allowResubmitToggle}
-              onChange={(e) => setAllowResubmitToggle(e.target.checked)}
-              className="accent-[#14B866] w-4 h-4 rounded"
-            />
-            <span className="text-xs text-[#142D27] font-semibold">
-              Request Revision & Permit Student Resubmission
-            </span>
-          </label>
 
           <div className="pt-3 border-t border-[#e1ede7] flex justify-end gap-2">
             <Button

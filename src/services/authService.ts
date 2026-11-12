@@ -42,15 +42,84 @@ export const authService = {
 
   async signInWithEmail(email: string, password: string) {
     if (!isSupabaseConfigured()) {
-      // Offline / Demo check
-      if (
-        email.toLowerCase().includes('teacher') ||
-        email.toLowerCase().includes('ahmadwebcore') ||
-        email.toLowerCase().includes('clara')
-      ) {
-        return { user: { id: SAMPLE_TEACHER.id, email: SAMPLE_TEACHER.email }, profile: SAMPLE_TEACHER, error: null };
+      const cleanEmail = email.trim().toLowerCase();
+
+      // Check registered students in localStorage (from invitation tokens)
+      const registeredStudents = JSON.parse(
+        localStorage.getItem('studyhub_registered_students') || '[]'
+      ) as Array<{ email: string; password: string; name: string }>;
+
+      const registered = registeredStudents.find(
+        (s) => s.email.toLowerCase() === cleanEmail
+      );
+
+      // 1. Teacher Account Check
+      const isTeacher =
+        cleanEmail === 'ahmadwebcore@gmail.com' ||
+        cleanEmail === 'teacher@studyhub.edu';
+
+      if (isTeacher) {
+        if (password !== 'password123' && password !== 'Ahmad@2026') {
+          return {
+            user: null,
+            profile: null,
+            error: new Error('Incorrect password. For demo faculty, use password: password123 or Ahmad@2026'),
+          };
+        }
+        return {
+          user: { id: SAMPLE_TEACHER.id, email: SAMPLE_TEACHER.email },
+          profile: SAMPLE_TEACHER,
+          error: null,
+        };
       }
-      return { user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email }, profile: SAMPLE_STUDENT, error: null };
+
+      // 2. Custom Registered Student via Invite Token
+      if (registered) {
+        if (password !== registered.password) {
+          return {
+            user: null,
+            profile: null,
+            error: new Error('Incorrect password for this registered student account.'),
+          };
+        }
+        const studentProfile: UserProfile = {
+          ...SAMPLE_STUDENT,
+          name: registered.name,
+          email: registered.email,
+        };
+        return {
+          user: { id: `usr_${registered.email}`, email: registered.email },
+          profile: studentProfile,
+          error: null,
+        };
+      }
+
+      // 3. Default Demo Student Account
+      const isStudent =
+        cleanEmail === 'bilal.student@gmail.com' ||
+        cleanEmail === 'student@studyhub.edu';
+
+      if (isStudent) {
+        if (password !== 'password123') {
+          return {
+            user: null,
+            profile: null,
+            error: new Error('Incorrect password. For demo student, use password: password123'),
+          };
+        }
+        return {
+          user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email },
+          profile: SAMPLE_STUDENT,
+          error: null,
+        };
+      }
+
+      // 4. Unrecognized Account
+      return {
+        user: null,
+        profile: null,
+        error: new Error('No account found with this email. Enrolled students must redeem their invitation token first.'),
+      };
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -96,9 +165,19 @@ export const authService = {
 
   async signUpStudentWithInvite(email: string, password: string, token: string, fullName: string) {
     if (!isSupabaseConfigured()) {
+      const cleanEmail = email.trim().toLowerCase();
+      const registered = JSON.parse(
+        localStorage.getItem('studyhub_registered_students') || '[]'
+      ) as Array<{ email: string; password: string; name: string; token: string }>;
+
+      // Add or update
+      const filtered = registered.filter((s) => s.email.toLowerCase() !== cleanEmail);
+      filtered.push({ email: cleanEmail, password, name: fullName, token });
+      localStorage.setItem('studyhub_registered_students', JSON.stringify(filtered));
+
       return {
-        user: { id: 'usr_s_demo', email },
-        profile: { ...SAMPLE_STUDENT, name: fullName, email },
+        user: { id: `usr_${cleanEmail}`, email: cleanEmail },
+        profile: { ...SAMPLE_STUDENT, name: fullName, email: cleanEmail },
         error: null,
       };
     }

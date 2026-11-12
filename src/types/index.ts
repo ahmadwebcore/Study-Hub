@@ -71,7 +71,7 @@ export interface Subject {
   nextClassTime: string;
   scheduleDays: string[];
   progress: number;
-  category: 'STEM' | 'Humanities' | 'Languages' | 'Commerce';
+  category: 'STEM' | 'Humanities' | 'Languages' | 'Commerce' | '1st Year FSc' | '2nd Year FSc';
   course?: string;
   academicSession?: string;
   description?: string;

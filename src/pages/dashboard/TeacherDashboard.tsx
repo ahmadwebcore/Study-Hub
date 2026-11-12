@@ -41,6 +41,8 @@ export const TeacherDashboard: React.FC = () => {
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [approvingTask, setApprovingTask] = useState<DailyTask | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState('Work verified and approved.');
+  const [taskMarks, setTaskMarks] = useState<number>(45);
+  const [taskMaxMarks, setTaskMaxMarks] = useState<number>(50);
 
   const configuredStudent = emailService.getStudentConfiguredEmail();
   const teacherEmail = 'ahmadwebcore@gmail.com';
@@ -117,10 +119,12 @@ export const TeacherDashboard: React.FC = () => {
   const handleConfirmApproval = () => {
     if (!approvingTask) return;
 
-    taskService.approveTask(approvingTask.id, 'Ahmad WebCore', approvalFeedback);
+    const taskPercentage = taskMaxMarks > 0 ? Math.round((taskMarks / taskMaxMarks) * 100) : 100;
+    const finalNote = `${approvalFeedback} [Marks Awarded: ${taskMarks}/${taskMaxMarks} (${taskPercentage}%)]`;
+    taskService.approveTask(approvingTask.id, 'Ahmad WebCore', finalNote);
     loadTasks();
     setApprovingTask(null);
-    setSuccessToast(`Task "${approvingTask.title}" approved.`);
+    setSuccessToast(`Task "${approvingTask.title}" approved with ${taskMarks}/${taskMaxMarks} Marks (${taskPercentage}%).`);
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -445,28 +449,100 @@ export const TeacherDashboard: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Modal: Approve Task */}
+      {/* Modal: Check Work & Award Marks */}
       <Modal
         isOpen={!!approvingTask}
         onClose={() => setApprovingTask(null)}
-        title="Faculty Sign-off"
+        title="Check & Grade Student Submission"
       >
-        <div className="space-y-3.5">
-          <p className="text-xs text-zinc-600">
-            Sign off on: <strong className="text-zinc-900">{approvingTask?.title}</strong>
-          </p>
+        <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+            <span className="text-[10px] uppercase font-bold text-zinc-500 block">Task Assignment</span>
+            <p className="text-xs font-bold text-zinc-900 mt-0.5">{approvingTask?.title}</p>
+            <p className="text-[11px] text-zinc-600 mt-0.5">{approvingTask?.subjectName} &bull; Due: {approvingTask?.dueDate}</p>
+          </div>
+
+          {/* Solution Sheet Preview */}
+          <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+                📄 Student Solution Sheet
+              </span>
+              <span className="text-[10px] text-zinc-400">PDF / Image Preview</span>
+            </div>
+            <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700/80 font-mono text-[11px] text-zinc-300 space-y-1">
+              <p className="text-emerald-300 font-bold">&bull; Worked Solution Problem Set (FSc):</p>
+              <p className="text-zinc-400 italic">"Step 1: Formula substituted correctly. Vector components resolved along X and Y axes. Boundary conditions satisfied."</p>
+              <div className="pt-1 text-[10px] text-zinc-500">File: {approvingTask?.studentSubmission?.attachmentName || 'student_solution_notes.pdf'}</div>
+            </div>
+          </div>
+
+          {/* Marks Input & Cool Progress Bar */}
+          <div className="p-3 rounded-xl bg-white border border-zinc-200 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-zinc-900">Total Marks Awarded</label>
+              <span className="text-xs font-mono font-bold text-emerald-600">
+                {taskMarks} / {taskMaxMarks}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className="text-[10px] text-zinc-500 block mb-1">Obtained Marks</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={taskMaxMarks}
+                  value={taskMarks}
+                  onChange={(e) => setTaskMarks(Math.min(taskMaxMarks, Math.max(0, Number(e.target.value))))}
+                  className="w-full h-9 px-3 text-xs font-bold rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+                />
+              </div>
+              <div>
+                <span className="text-[10px] text-zinc-500 block mb-1">Total Max Marks</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={taskMaxMarks}
+                  onChange={(e) => setTaskMaxMarks(Math.max(1, Number(e.target.value)))}
+                  className="w-full h-9 px-3 text-xs font-bold rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-500"
+                />
+              </div>
+            </div>
+
+            {/* Cool Mini Progress Bar Underneath */}
+            <div className="space-y-1 pt-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-zinc-500">Score Percentage</span>
+                <span className="font-bold text-zinc-900">
+                  {taskMaxMarks > 0 ? Math.round((taskMarks / taskMaxMarks) * 100) : 100}%
+                  <span className="ml-1 text-emerald-600 font-semibold">
+                    ({(taskMarks / taskMaxMarks) >= 0.5 ? 'Passed' : 'Needs Work'})
+                  </span>
+                </span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-zinc-100 overflow-hidden border border-zinc-200">
+                <div
+                  className="h-full bg-emerald-500 transition-all duration-300 rounded-full"
+                  style={{
+                    width: `${taskMaxMarks > 0 ? Math.min(100, Math.round((taskMarks / taskMaxMarks) * 100)) : 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1">Verification Note</label>
+            <label className="block text-xs font-medium text-zinc-700 mb-1">Teacher Remarks / Notes</label>
             <textarea
               value={approvalFeedback}
               onChange={(e) => setApprovalFeedback(e.target.value)}
-              rows={3}
+              rows={2}
               className="w-full p-2.5 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex justify-end gap-2 pt-1 border-t border-zinc-100">
             <button
               type="button"
               onClick={() => setApprovingTask(null)}
@@ -477,9 +553,9 @@ export const TeacherDashboard: React.FC = () => {
             <button
               type="button"
               onClick={handleConfirmApproval}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700"
+              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg shadow-xs"
             >
-              Confirm Sign-off
+              Save Marks & Sign Off
             </button>
           </div>
         </div>

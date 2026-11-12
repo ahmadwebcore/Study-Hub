@@ -313,6 +313,46 @@ class TaskService {
     );
   }
 
+  public createCustomTask(params: {
+    title: string;
+    description: string;
+    subjectId: string;
+    subjectName: string;
+    dueDate: string;
+    estimatedMinutes?: number;
+    studentId?: string;
+    studentName?: string;
+  }): DailyTask {
+    this.loadTasks();
+
+    const d = new Date(params.dueDate);
+    const dayName = DAY_NAMES[d.getDay()] || 'Monday';
+    const isSunday = d.getDay() === 0;
+
+    const newTask: DailyTask = {
+      id: `tsk_manual_${Date.now()}`,
+      subjectId: params.subjectId,
+      subjectName: params.subjectName,
+      subjectCode: 'FSC-TASK',
+      sourceType: 'manual',
+      sourceTitle: 'Custom Study Target',
+      title: params.title,
+      description: params.description,
+      assignedDate: new Date().toISOString().slice(0, 10),
+      dueDate: params.dueDate,
+      dayOfWeek: dayName,
+      isSundayOff: isSunday,
+      estimatedMinutes: params.estimatedMinutes || 45,
+      status: 'pending',
+      studentId: params.studentId || 'usr_student_demo',
+      studentName: params.studentName || 'Bilal Ahmad',
+    };
+
+    this.tasks.unshift(newTask);
+    this.saveTasks();
+    return newTask;
+  }
+
   // Generate Daily Tasks from an Uploaded PDF or Syllabus (Enforces Sunday OFF!)
   public generateDailyTasksFromSource(params: {
     sourceType: 'syllabus' | 'book_pdf';
