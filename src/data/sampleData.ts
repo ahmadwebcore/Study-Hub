@@ -26,25 +26,25 @@ import {
 
 export const SAMPLE_TEACHER: UserProfile = {
   id: 'usr_t_01',
-  name: 'Dr. Clara Evans',
-  email: 'clara.evans@studyhub.edu',
+  name: 'Ahmad WebCore',
+  email: 'ahmadwebcore@gmail.com',
   role: 'teacher',
-  title: 'Lead Instructor & STEM Director',
+  title: 'Faculty Lead & Academic Director',
   avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=256&auto=format&fit=crop',
-  institution: 'StudyHub Academic Center',
-  phone: '+1 (555) 234-8901',
+  institution: 'StudyHub Learning Portal',
+  phone: '+92 300 1234567',
 };
 
 export const SAMPLE_STUDENT: UserProfile = {
   id: 'usr_s_01',
-  name: 'Ryan Patel',
-  email: 'ryan.patel@student.studyhub.edu',
+  name: 'Bilal Ahmad',
+  email: 'bilal.student@gmail.com',
   role: 'student',
-  title: 'Grade 11 Honors Scholar',
+  title: 'Enrolled Scholar (Cambridge CIE)',
   grade: 'Grade 11 (Advanced STEM)',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
-  institution: 'StudyHub Academic Center',
-  phone: '+1 (555) 472-9102',
+  institution: 'StudyHub Learning Portal',
+  phone: '+92 300 7654321',
 };
 
 export const SAMPLE_STUDENTS_LIST: Student[] = [

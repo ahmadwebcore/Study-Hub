@@ -18,6 +18,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   BASE32_SECRET,
+  TEACHER_EMAIL,
   getOtpAuthUri,
   generateTOTP,
   verifyTOTP,
@@ -37,16 +38,16 @@ export const LoginPage: React.FC = () => {
   const [copiedKey, setCopiedKey] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(30);
 
-  // Standard Password State
-  const [email, setEmail] = useState('faculty.evans@studyhub.edu');
+  // Password State
+  const [email, setEmail] = useState(TEACHER_EMAIL);
   const [password, setPassword] = useState('password123');
 
   const [authError, setAuthError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  // Update QR Code and live TOTP calculation every second
+  // Generate scannable QR Code specifically for ahmadwebcore@gmail.com
   useEffect(() => {
-    const currentEmail = roleMode === 'teacher' ? 'faculty.evans@studyhub.edu' : 'bilal.student@gmail.com';
+    const currentEmail = roleMode === 'teacher' ? TEACHER_EMAIL : 'bilal.student@gmail.com';
     const otpauthUrl = getOtpAuthUri(currentEmail, BASE32_SECRET);
 
     QRCode.toDataURL(otpauthUrl, {
@@ -58,9 +59,9 @@ export const LoginPage: React.FC = () => {
       },
     })
       .then((url) => setQrCodeUrl(url))
-      .catch((err) => console.error('QR code error:', err));
+      .catch((err) => console.error('QR code generation error:', err));
 
-    // Calculate current live code
+    // Calculate real live TOTP code
     const updateCode = async () => {
       const code = await generateTOTP(BASE32_SECRET);
       setLiveCode(code);
@@ -79,41 +80,35 @@ export const LoginPage: React.FC = () => {
     setTimeout(() => setCopiedKey(false), 2000);
   };
 
-  // 1. Verify 2FA Authenticator
+  // 1. STRICT Real 2FA Verification
   const handleVerify2FA = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
 
-    const isValid = await verifyTOTP(totpCode, BASE32_SECRET);
-    if (!isValid) {
-      setAuthError('Please enter a valid 6-digit code from Google Authenticator.');
+    if (!totpCode || totpCode.trim().length !== 6) {
+      setAuthError('Please enter a 6-digit code from Google Authenticator.');
       return;
     }
 
     setIsVerifying(true);
+    const result = await verifyTOTP(totpCode, BASE32_SECRET);
+
+    if (!result.valid) {
+      setIsVerifying(false);
+      setAuthError(result.reason || 'Incorrect Authenticator code. Check your Google Authenticator app.');
+      return;
+    }
+
+    // Success: activate session
     setRole(roleMode);
     localStorage.setItem(`studyhub_2fa_enabled_${roleMode}`, 'true');
-    const targetEmail = roleMode === 'teacher' ? 'faculty.evans@studyhub.edu' : 'bilal.student@gmail.com';
+    const targetEmail = roleMode === 'teacher' ? TEACHER_EMAIL : 'bilal.student@gmail.com';
     await signIn(targetEmail, 'password123');
     setIsVerifying(false);
     navigate('/dashboard', { replace: true });
   };
 
-  // 2. Google OAuth Sign In
-  const handleGoogleSignIn = async () => {
-    setIsVerifying(true);
-    setAuthError(null);
-    setRole(roleMode);
-
-    setTimeout(async () => {
-      const targetEmail = roleMode === 'teacher' ? 'faculty.evans@studyhub.edu' : 'bilal.student@gmail.com';
-      await signIn(targetEmail, 'password123');
-      setIsVerifying(false);
-      navigate('/dashboard', { replace: true });
-    }, 500);
-  };
-
-  // 3. Password Login
+  // 2. Standard Password Login
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -133,7 +128,7 @@ export const LoginPage: React.FC = () => {
   const switchRole = (newRole: 'teacher' | 'student') => {
     setRoleMode(newRole);
     if (newRole === 'teacher') {
-      setEmail('faculty.evans@studyhub.edu');
+      setEmail(TEACHER_EMAIL);
     } else {
       setEmail('bilal.student@gmail.com');
     }
@@ -156,11 +151,11 @@ export const LoginPage: React.FC = () => {
             Academic Portal Access
           </h1>
           <p className="text-xs text-[#557067]">
-            Sign in to access your syllabus, assignments, and examinations
+            Official portal login for faculty and enrolled scholars
           </p>
         </div>
 
-        {/* Clean Card */}
+        {/* Clean Login Card */}
         <div className="bg-white p-6 sm:p-7 rounded-2xl border border-zinc-200 shadow-sm space-y-5">
           {/* Role Selector: Teacher vs Student */}
           <div className="grid grid-cols-2 p-1 rounded-xl bg-[#F7F9F8] border border-zinc-200">
@@ -190,44 +185,7 @@ export const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Clean Google Sign In Button */}
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={isVerifying}
-            className="w-full h-11 flex items-center justify-center gap-3 px-4 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-800 transition-colors shadow-xs"
-          >
-            {/* Google G Multi-Color SVG */}
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.27 21.36 7.35 24 12 24z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.17 0 9.97 0 12s.46 3.83 1.26 5.42l4.02-3.15z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.27 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-              />
-            </svg>
-            <span>Continue with Google</span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-zinc-200 w-full" />
-            <span className="bg-white px-3 text-[11px] uppercase tracking-wider text-zinc-400 font-semibold absolute">
-              or sign in with
-            </span>
-          </div>
-
-          {/* Method Tabs: 2FA vs Password */}
+          {/* Clean Method Tabs: 2FA Authenticator vs Password */}
           <div className="flex items-center justify-center gap-6 text-xs border-b border-zinc-200 pb-2">
             <button
               type="button"
@@ -249,7 +207,7 @@ export const LoginPage: React.FC = () => {
                   : 'border-transparent text-zinc-400 hover:text-zinc-700'
               }`}
             >
-              Password
+              Password Login
             </button>
           </div>
 
@@ -261,15 +219,15 @@ export const LoginPage: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 1: REAL GOOGLE AUTHENTICATOR */}
+          {/* TAB 1: GOOGLE AUTHENTICATOR (STRICT VERIFICATION) */}
           {authMethod === 'authenticator' && (
             <form onSubmit={handleVerify2FA} className="space-y-4">
               <div className="text-center space-y-2">
                 <p className="text-xs text-zinc-500">
-                  Scan with <strong>Google Authenticator</strong> or <strong>Microsoft Authenticator</strong>:
+                  Scan in <strong>Google Authenticator</strong> for <strong className="text-zinc-800">{roleMode === 'teacher' ? TEACHER_EMAIL : 'bilal.student@gmail.com'}</strong>:
                 </p>
 
-                {/* Scannable QR Code */}
+                {/* Scannable Base32 QR Code */}
                 <div className="p-2.5 bg-white border border-zinc-200 rounded-xl inline-block shadow-xs">
                   {qrCodeUrl ? (
                     <img
@@ -299,10 +257,10 @@ export const LoginPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Live Current Code Helper */}
+                {/* Live Code Timer Helper */}
                 {liveCode && (
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-medium">
-                    <span>Current Live Code:</span>
+                    <span>Live Code:</span>
                     <strong className="font-mono font-bold tracking-wider">{liveCode}</strong>
                     <span className="text-[10px] text-emerald-600">({timeRemaining}s)</span>
                   </div>
@@ -311,7 +269,7 @@ export const LoginPage: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-800 mb-1 text-center">
-                  Enter 6-Digit Code
+                  Enter 6-Digit Google Authenticator Code
                 </label>
                 <div className="relative">
                   <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -320,7 +278,7 @@ export const LoginPage: React.FC = () => {
                     maxLength={6}
                     value={totpCode}
                     onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="e.g. 489201"
+                    placeholder="e.g. 843850"
                     className="w-full h-11 pl-10 pr-4 text-center text-base font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-zinc-500"
                     autoFocus
                   />
@@ -330,9 +288,9 @@ export const LoginPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full h-11 text-xs font-bold"
+                className="w-full h-11 text-xs font-bold shadow-xs"
                 isLoading={isVerifying}
-                loadingText="Verifying Authenticator..."
+                loadingText="Verifying Authenticator Code..."
                 icon={<ArrowRight className="w-4 h-4" />}
               >
                 Verify & Enter Portal
@@ -378,7 +336,7 @@ export const LoginPage: React.FC = () => {
               <Button
                 type="submit"
                 variant="primary"
-                className="w-full h-11 text-xs font-bold"
+                className="w-full h-11 text-xs font-bold shadow-xs"
                 isLoading={isVerifying}
                 loadingText="Signing In..."
                 icon={<ArrowRight className="w-4 h-4" />}
@@ -388,7 +346,7 @@ export const LoginPage: React.FC = () => {
             </form>
           )}
 
-          {/* Clean Student Invitation Banner */}
+          {/* Student Invitation Token Redeem Banner */}
           <div className="pt-2 border-t border-zinc-200">
             <Link
               to="/accept-invite"
@@ -410,7 +368,7 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Home Back Link */}
+        {/* Back to Home Link */}
         <div className="text-center">
           <Link to="/" className="text-xs font-medium text-zinc-500 hover:text-zinc-900">
             &larr; Back to Home

@@ -19,6 +19,7 @@ import { Badge } from '../../components/ui/Badge';
 import { ComposeEmailModal } from '../../components/mail/ComposeEmailModal';
 import { useRole } from '../../hooks/useRole';
 import { emailService } from '../../services/emailService';
+import { BASE32_SECRET, verifyTOTP } from '../../lib/totp';
 
 export const SettingsPage: React.FC = () => {
   const { role, user, toggleRole, userProfile } = useRole();
@@ -26,7 +27,7 @@ export const SettingsPage: React.FC = () => {
     'gmail_dispatch'
   );
   const [teacherEmailInput, setTeacherEmailInput] = useState(emailService.getTeacherConfiguredEmail());
-  const [teacherDisplayName, setTeacherDisplayName] = useState('Prof. Clara Evans');
+  const [teacherDisplayName, setTeacherDisplayName] = useState('Ahmad WebCore');
   const [studentEmailInput, setStudentEmailInput] = useState(emailService.getStudentConfiguredEmail());
   const [guardianEmailInput, setGuardianEmailInput] = useState('parent.ahmad@gmail.com');
   const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -93,15 +94,19 @@ export const SettingsPage: React.FC = () => {
 
   const handleVerify2FA = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!totpCode || totpCode.length < 6) {
+    if (!totpCode || totpCode.trim().length !== 6) {
       alert('Please enter a valid 6-digit Authenticator code.');
       return;
     }
     setIsVerifying2FA(true);
-    await new Promise((r) => setTimeout(r, 600));
+    const result = await verifyTOTP(totpCode, BASE32_SECRET);
+    setIsVerifying2FA(false);
+    if (!result.valid) {
+      alert(result.reason || 'Incorrect Authenticator code.');
+      return;
+    }
     setIs2FAEnabled(true);
     localStorage.setItem(`studyhub_2fa_enabled_${role}`, 'true');
-    setIsVerifying2FA(false);
     setTotpCode('');
     setSuccessToast('Authenticator App (2FA) successfully linked & verified for your portal!');
     setTimeout(() => setSuccessToast(null), 4000);
@@ -740,11 +745,11 @@ export const SettingsPage: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-[11px] font-mono font-bold text-[#142D27] select-all">
-                        JBSWY3DPEHPK3PXP
+                        {BASE32_SECRET}
                       </span>
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText('JBSWY3DPEHPK3PXP')}
+                        onClick={() => navigator.clipboard.writeText(BASE32_SECRET)}
                         className="p-1 rounded hover:bg-[#e1ede7] text-[#557067] hover:text-[#142D27]"
                         title="Copy Key"
                       >

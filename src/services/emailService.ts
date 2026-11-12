@@ -585,7 +585,7 @@ class EmailService {
       const stored = localStorage.getItem('studyhub_teacher_configured_gmail');
       if (stored) return stored;
     } catch {}
-    return 'faculty.evans@studyhub.edu';
+    return 'ahmadwebcore@gmail.com';
   }
 
   public setTeacherConfiguredEmail(email: string): void {

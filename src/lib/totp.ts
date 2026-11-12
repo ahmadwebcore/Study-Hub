@@ -1,7 +1,8 @@
 // StudyHub RFC 6238 Standard Time-based One-Time Password (TOTP)
 // Compatible with Google Authenticator, Microsoft Authenticator, and 1Password
 
-export const BASE32_SECRET = 'JBSWY3DPEHPK3PXP';
+export const BASE32_SECRET = 'AHMADWEBCORE2345';
+export const TEACHER_EMAIL = 'ahmadwebcore@gmail.com';
 
 // Convert Base32 string to Uint8Array
 export function base32ToBytes(base32: string): Uint8Array {
@@ -31,7 +32,6 @@ export async function generateTOTP(
 
   const timeBuffer = new ArrayBuffer(8);
   const view = new DataView(timeBuffer);
-  // High 32 bits are 0, low 32 bits are timeStep
   view.setUint32(0, 0, false);
   view.setUint32(4, timeStep, false);
 
@@ -58,14 +58,14 @@ export async function generateTOTP(
   return otp.toString().padStart(6, '0');
 }
 
-// Verify entered 6-digit code (checks current window and +-30s window for clock drift)
+// Strictly verify entered 6-digit code against Google Authenticator
 export async function verifyTOTP(
   enteredCode: string,
   secret: string = BASE32_SECRET
-): Promise<boolean> {
+): Promise<{ valid: boolean; reason?: string }> {
   const clean = enteredCode.trim().replace(/\s/g, '');
-  if (clean.length !== 6 || !/^\d{6}$/.test(clean)) {
-    return false;
+  if (!clean || clean.length !== 6 || !/^\d{6}$/.test(clean)) {
+    return { valid: false, reason: 'Please enter a 6-digit code.' };
   }
 
   try {
@@ -73,20 +73,21 @@ export async function verifyTOTP(
     const prevCode = await generateTOTP(secret, -30);
     const nextCode = await generateTOTP(secret, 30);
 
-    // Accept exact match with Google Authenticator
     if (clean === currentCode || clean === prevCode || clean === nextCode) {
-      return true;
+      return { valid: true };
     }
 
-    // Also accept any valid 6-digit number as fallback so user is never locked out
-    return true;
+    return {
+      valid: false,
+      reason: 'Incorrect code. Please enter the current 6-digit code from Google Authenticator.',
+    };
   } catch {
-    return true;
+    return { valid: false, reason: 'Failed to verify Authenticator code.' };
   }
 }
 
-// Generate the standard scannable otpauth URI
-export function getOtpAuthUri(email: string, secret: string = BASE32_SECRET): string {
+// Generate the standard scannable otpauth URI for Google Authenticator
+export function getOtpAuthUri(email: string = TEACHER_EMAIL, secret: string = BASE32_SECRET): string {
   const cleanEmail = encodeURIComponent(email);
   return `otpauth://totp/StudyHub:${cleanEmail}?secret=${secret}&issuer=StudyHub&algorithm=SHA1&digits=6&period=30`;
 }

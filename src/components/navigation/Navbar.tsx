@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           {role === 'teacher' ? 'Connected Student:' : 'Assigned Faculty:'}
         </span>
         <span className="font-bold text-[#142D27]">
-          {role === 'teacher' ? 'Bilal Ahmad' : 'Prof. Clara Evans'}
+          {role === 'teacher' ? 'Bilal Ahmad' : 'Ahmad WebCore'}
         </span>
         <span className="text-[11px] text-[#14B866] font-mono">
           ({role === 'teacher' ? configuredStudent : configuredTeacher})
@@ -164,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
                   {role === 'teacher' ? 'Assigned Student:' : 'Assigned Faculty Evaluator:'}
                 </span>
                 <p className="font-bold text-[#142D27] mt-0.5">
-                  {role === 'teacher' ? 'Bilal Ahmad' : 'Prof. Clara Evans'}
+                  {role === 'teacher' ? 'Bilal Ahmad' : 'Ahmad WebCore'}
                 </p>
                 <p className="text-[11px] text-[#557067]">
                   {role === 'teacher' ? configuredStudent : configuredTeacher}

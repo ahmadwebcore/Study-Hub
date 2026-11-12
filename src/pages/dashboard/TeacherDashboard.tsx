@@ -8,6 +8,7 @@ import {
   Mail,
   Check,
   Search,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
@@ -16,6 +17,7 @@ import { useRole } from '../../hooks/useRole';
 import { testService } from '../../services/testService';
 import { taskService, DailyTask } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
+import { studentService } from '../../services/studentService';
 
 const testSchema = z.object({
   title: z.string().min(3, 'Test title must be at least 3 characters'),
@@ -33,11 +35,15 @@ export const TeacherDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isScheduleTestOpen, setIsScheduleTestOpen] = useState(false);
   const [isComposeEmailOpen, setIsComposeEmailOpen] = useState(false);
+  const [isInviteStudentOpen, setIsInviteStudentOpen] = useState(false);
+  const [newStudentName, setNewStudentName] = useState('Bilal Ahmad');
+  const [newStudentEmail, setNewStudentEmail] = useState('bilal.student@gmail.com');
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [approvingTask, setApprovingTask] = useState<DailyTask | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState('Work verified and approved.');
 
   const configuredStudent = emailService.getStudentConfiguredEmail();
+  const teacherEmail = 'ahmadwebcore@gmail.com';
 
   const loadTasks = () => {
     setTasks(taskService.getTasks());
@@ -81,10 +87,37 @@ export const TeacherDashboard: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
+  const handleSendInvite = async () => {
+    if (!newStudentEmail || !newStudentEmail.includes('@')) return;
+
+    await studentService.createInvitation(
+      newStudentEmail,
+      user.id || 'usr_t_01',
+      'Grade 11',
+      'Advanced STEM',
+      'Cambridge International',
+      '2026-2027'
+    );
+
+    emailService.sendInvitationEmail({
+      studentEmail: newStudentEmail,
+      studentName: newStudentName,
+      teacherName: 'Ahmad WebCore',
+      inviteToken: 'INV-STUDYHUB-2026-MATH',
+      course: 'Advanced STEM',
+      board: 'Cambridge International',
+    });
+
+    emailService.setStudentConfiguredEmail(newStudentEmail);
+    setIsInviteStudentOpen(false);
+    setSuccessToast(`Invitation sent to ${newStudentEmail} with token INV-STUDYHUB-2026-MATH.`);
+    setTimeout(() => setSuccessToast(null), 4000);
+  };
+
   const handleConfirmApproval = () => {
     if (!approvingTask) return;
 
-    taskService.approveTask(approvingTask.id, user.name, approvalFeedback);
+    taskService.approveTask(approvingTask.id, 'Ahmad WebCore', approvalFeedback);
     loadTasks();
     setApprovingTask(null);
     setSuccessToast(`Task "${approvingTask.title}" approved.`);
@@ -131,11 +164,18 @@ export const TeacherDashboard: React.FC = () => {
             Faculty Overview
           </h1>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Student: <strong className="text-zinc-800">Bilal Ahmad</strong> &bull; {configuredStudent}
+            Teacher: <strong className="text-zinc-800">Ahmad WebCore</strong> &bull; {teacherEmail} &bull; Connected Student: <strong className="text-zinc-800">Bilal Ahmad</strong>
           </p>
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsInviteStudentOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors shadow-xs"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            Invite Student
+          </button>
           <button
             onClick={() => setIsComposeEmailOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
@@ -145,15 +185,15 @@ export const TeacherDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setIsScheduleTestOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-zinc-500" />
             Schedule Test
           </button>
         </div>
       </div>
 
-      {/* Plain Metrics Row (Linear / Stripe Minimal Style) */}
+      {/* Plain Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl bg-white border border-zinc-200">
           <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
@@ -290,6 +330,58 @@ export const TeacherDashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal: Invite Student by Email */}
+      <Modal
+        isOpen={isInviteStudentOpen}
+        onClose={() => setIsInviteStudentOpen(false)}
+        title="Invite Student via Email"
+      >
+        <div className="space-y-3.5">
+          <p className="text-xs text-zinc-600">
+            Invite a student to your StudyHub academic portal. They will receive an invitation token to redeem.
+          </p>
+
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 mb-1">Student Full Name</label>
+            <input
+              type="text"
+              value={newStudentName}
+              onChange={(e) => setNewStudentName(e.target.value)}
+              placeholder="e.g. Bilal Ahmad"
+              className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-zinc-700 mb-1">Student Email Address</label>
+            <input
+              type="email"
+              value={newStudentEmail}
+              onChange={(e) => setNewStudentEmail(e.target.value)}
+              placeholder="e.g. bilal.student@gmail.com"
+              className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsInviteStudentOpen(false)}
+              className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSendInvite}
+              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800"
+            >
+              Send Invitation Token
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Modal: Schedule Test */}
       <Modal

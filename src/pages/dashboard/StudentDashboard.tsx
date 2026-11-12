@@ -85,7 +85,7 @@ export const StudentDashboard: React.FC = () => {
             Welcome back, {studentName}
           </h1>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Instructor: <strong className="text-zinc-800">Prof. Clara Evans</strong> &bull; {configuredTeacherEmail}
+            Instructor: <strong className="text-zinc-800">Ahmad WebCore</strong> &bull; {configuredTeacherEmail}
           </p>
         </div>
 

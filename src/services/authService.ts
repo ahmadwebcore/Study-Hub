@@ -43,7 +43,11 @@ export const authService = {
   async signInWithEmail(email: string, password: string) {
     if (!isSupabaseConfigured()) {
       // Offline / Demo check
-      if (email.toLowerCase().includes('teacher') || email.toLowerCase().includes('clara')) {
+      if (
+        email.toLowerCase().includes('teacher') ||
+        email.toLowerCase().includes('ahmadwebcore') ||
+        email.toLowerCase().includes('clara')
+      ) {
         return { user: { id: SAMPLE_TEACHER.id, email: SAMPLE_TEACHER.email }, profile: SAMPLE_TEACHER, error: null };
       }
       return { user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email }, profile: SAMPLE_STUDENT, error: null };
