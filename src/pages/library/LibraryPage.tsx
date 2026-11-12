@@ -238,7 +238,7 @@ export const LibraryPage: React.FC = () => {
     const teacherGmail = emailService.getTeacherConfiguredEmail();
     emailService.sendManualDirectEmail({
       senderEmail: teacherGmail,
-      senderName: user?.name || 'Prof. Clara Evans',
+      senderName: user?.name || 'Ahmad WebCore',
       recipientEmail: studentGmail,
       recipientName: 'Bilal Ahmad (Student)',
       subject: `📖 New Weekly Study Roadmap: ${data.title}`,
@@ -268,7 +268,7 @@ export const LibraryPage: React.FC = () => {
     const teacherGmail = emailService.getTeacherConfiguredEmail();
     emailService.sendManualDirectEmail({
       senderEmail: teacherGmail,
-      senderName: 'Prof. Clara Evans',
+      senderName: 'Ahmad WebCore',
       recipientEmail: studentGmail,
       recipientName: 'Bilal Ahmad (Student)',
       subject: `📖 Study Target Assigned: ${b.title}`,

@@ -241,7 +241,7 @@ export const studentService = {
           email: 'bilal.student@gmail.com',
           role: 'student',
           token,
-          invitedBy: 'Prof. Clara Evans',
+          invitedBy: 'Ahmad WebCore',
           academicClass: 'Grade 11',
           course: 'Advanced Mathematics & STEM',
           board: 'Cambridge International (CIE)',

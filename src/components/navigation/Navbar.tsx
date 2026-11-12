@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Menu, Search, ChevronDown, LogOut, Lock, UserCheck } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { GmailNotificationModal } from './GmailNotificationModal';
 import { emailService } from '../../services/emailService';
 import { Badge } from '../ui/Badge';
 import { useNavigate, Link } from 'react-router-dom';
@@ -14,11 +13,9 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const { role, profile, toggleDemoRole, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const unreadMails = emailService.getEmails().filter((e) => !e.read).length;
   const configuredTeacher = emailService.getTeacherConfiguredEmail();
   const configuredStudent = emailService.getStudentConfiguredEmail();
 
@@ -89,25 +86,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           </span>
         </button>
 
-        {/* Gmail Alerts Pill Button */}
-        <button
-          onClick={() => setIsGmailModalOpen(true)}
-          className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100/70 text-rose-800 text-xs font-bold transition-all shadow-subtle"
-          title="View Gmail Alerts & Automated Messages"
-        >
-          <svg className="w-3.5 h-3.5 text-rose-600" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.262H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" fill="#EA4335" />
-          </svg>
-          <span className="hidden sm:inline">Gmail Desk</span>
-          {unreadMails > 0 ? (
-            <span className="bg-rose-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-extrabold animate-pulse">
-              {unreadMails}
-            </span>
-          ) : (
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          )}
-        </button>
-
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 
@@ -130,7 +108,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
             />
             <div className="hidden lg:flex flex-col text-left">
               <span className="text-xs font-bold text-[#142D27] leading-tight flex items-center gap-1">
-                {role === 'teacher' ? 'Prof. Clara Evans' : 'Bilal Ahmad'}
+                {role === 'teacher' ? 'Ahmad WebCore' : 'Bilal Ahmad'}
               </span>
               <span className="text-[10px] text-[#557067] leading-tight">
                 {role === 'teacher' ? configuredTeacher : configuredStudent}
@@ -146,7 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
             >
               <div className="p-3 border-b border-[#e1ede7]/80">
                 <p className="text-xs font-bold text-[#142D27]">
-                  {role === 'teacher' ? 'Prof. Clara Evans' : 'Bilal Ahmad'}
+                  {role === 'teacher' ? 'Ahmad WebCore' : 'Bilal Ahmad'}
                 </p>
                 <p className="text-[11px] text-[#14B866] font-mono truncate">
                   {role === 'teacher' ? configuredTeacher : configuredStudent}
@@ -210,12 +188,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           )}
         </div>
       </div>
-
-      {/* Gmail Inbox Modal */}
-      <GmailNotificationModal
-        isOpen={isGmailModalOpen}
-        onClose={() => setIsGmailModalOpen(false)}
-      />
     </header>
   );
 };

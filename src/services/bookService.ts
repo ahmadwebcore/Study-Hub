@@ -119,7 +119,7 @@ export const bookService = {
         fileType: ext,
         version: 1,
         uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        uploadedBy: 'Dr. Clara Evans',
+        uploadedBy: 'Ahmad WebCore',
       };
       return { book: mockBook, error: null };
     }

@@ -30,7 +30,7 @@ export const ComposeEmailModal: React.FC<ComposeEmailModalProps> = ({
 }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [senderEmail, setSenderEmail] = useState('');
-  const [senderName, setSenderName] = useState('Prof. Clara Evans');
+  const [senderName, setSenderName] = useState('Ahmad WebCore');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [subject, setSubject] = useState('');
@@ -167,7 +167,7 @@ export const ComposeEmailModal: React.FC<ComposeEmailModalProps> = ({
                 type="text"
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
-                placeholder="Prof. Clara Evans"
+                placeholder="Ahmad WebCore"
                 className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
               />
             </div>

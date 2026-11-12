@@ -107,62 +107,62 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Plain Metrics Row (Linear / Stripe Minimal Style) */}
+      {/* Plain Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
-            Today's Tasks
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+            Today's Target
           </span>
-          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
             {todayTasks.length}
           </span>
         </div>
         <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
             Weekly Total
           </span>
-          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
             {tasks.length}
           </span>
         </div>
         <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
             Awaiting Review
           </span>
-          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-3xl font-bold text-amber-600 mt-1 block tracking-tight">
             {awaitingTasks.length}
           </span>
         </div>
         <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-medium text-zinc-500 uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
             Verified Complete
           </span>
-          <span className="text-2xl font-semibold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-3xl font-bold text-emerald-600 mt-1 block tracking-tight">
             {verifiedTasks.length}
           </span>
         </div>
       </div>
 
       {/* Plain Tasks Table / Desk */}
-      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
         {/* Filter Bar */}
-        <div className="p-3 border-b border-zinc-200 flex items-center gap-1 bg-zinc-50/50 overflow-x-auto">
+        <div className="p-3 border-b border-zinc-200 flex items-center gap-1.5 bg-zinc-50/70 overflow-x-auto">
           {[
             { id: 'today', label: "Today's Target", count: todayTasks.length },
             { id: 'week', label: 'All Tasks', count: tasks.length },
-            { id: 'awaiting', label: 'Awaiting Gate', count: awaitingTasks.length },
+            { id: 'awaiting', label: 'Awaiting Review', count: awaitingTasks.length },
             { id: 'verified', label: 'Verified', count: verifiedTasks.length },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                 activeTab === tab.id
                   ? 'bg-zinc-900 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
               }`}
             >
-              {tab.label} <span className="opacity-70 text-[10px]">({tab.count})</span>
+              {tab.label} <span className="opacity-70 text-[11px]">({tab.count})</span>
             </button>
           ))}
         </div>
@@ -209,19 +209,19 @@ export const StudentDashboard: React.FC = () => {
                   )}
 
                   {task.status === 'submitted_for_approval' && (
-                    <span className="px-2 py-0.5 text-[10px] font-medium text-amber-700 bg-amber-50 rounded border border-amber-200/80">
-                      Awaiting Gate
+                    <span className="px-2.5 py-1 text-[11px] font-semibold text-amber-700 bg-amber-50 rounded-lg border border-amber-200">
+                      Awaiting Review
                     </span>
                   )}
 
                   {task.status === 'approved' && (
-                    <span className="px-2 py-0.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 rounded border border-emerald-200/80">
+                    <span className="px-2.5 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
                       Verified
                     </span>
                   )}
 
                   {(task.isSundayOff || task.isPakistanHoliday) && (
-                    <span className="px-2 py-0.5 text-[10px] font-medium text-zinc-600 bg-zinc-100 rounded border border-zinc-200">
+                    <span className="px-2.5 py-1 text-[11px] font-semibold text-zinc-600 bg-zinc-100 rounded-lg border border-zinc-200">
                       🇵🇰 Rest Day
                     </span>
                   )}

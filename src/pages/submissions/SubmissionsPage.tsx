@@ -110,7 +110,7 @@ export const SubmissionsPage: React.FC = () => {
     emailService.sendGradeResultEmail({
       studentEmail: 'bilal.student@gmail.com',
       studentName: studentName,
-      teacherName: user?.name || 'Prof. Clara Evans',
+      teacherName: user?.name || 'Ahmad WebCore',
       testTitle: gradingSubmission.assignmentTitle,
       subjectName: gradingSubmission.subjectName || 'Academic Assessment',
       score: scoreVal,

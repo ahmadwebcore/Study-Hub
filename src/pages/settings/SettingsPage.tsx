@@ -287,7 +287,7 @@ export const SettingsPage: React.FC = () => {
                         type="email"
                         value={teacherEmailInput}
                         onChange={(e) => setTeacherEmailInput(e.target.value)}
-                        placeholder="clara.evans.faculty@gmail.com"
+                        placeholder="ahmadwebcore@gmail.com"
                         className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                       />
                     </div>
@@ -301,7 +301,7 @@ export const SettingsPage: React.FC = () => {
                       type="text"
                       value={teacherDisplayName}
                       onChange={(e) => setTeacherDisplayName(e.target.value)}
-                      placeholder="Prof. Clara Evans — Lead Faculty"
+                      placeholder="Ahmad WebCore — Lead Faculty"
                       className="w-full px-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                     />
                   </div>

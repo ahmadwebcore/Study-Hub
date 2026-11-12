@@ -99,7 +99,7 @@ export const WeeklyTasksPage: React.FC = () => {
     if (!approvingTask) return;
     setIsApproving(true);
     await new Promise((r) => setTimeout(r, 400));
-    taskService.approveTask(approvingTask.id, user?.name || 'Prof. Clara Evans', teacherFeedback);
+    taskService.approveTask(approvingTask.id, user?.name || 'Ahmad WebCore', teacherFeedback);
     setIsApproving(false);
     setApprovingTask(null);
     loadData();

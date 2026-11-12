@@ -206,7 +206,7 @@ export const TestsPage: React.FC = () => {
     emailService.sendNewTestAlert({
       studentEmail: targetEmail,
       studentName: targetName,
-      teacherName: user?.name || 'Prof. Clara Evans',
+      teacherName: user?.name || 'Ahmad WebCore',
       testTitle: data.title,
       subjectName: selectedSubj?.name || 'Advanced Mathematics',
       date: data.date,

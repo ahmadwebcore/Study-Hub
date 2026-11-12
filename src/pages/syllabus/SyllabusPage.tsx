@@ -206,7 +206,7 @@ export const SyllabusPage: React.FC = () => {
       const teacherGmail = emailService.getTeacherConfiguredEmail();
       emailService.sendManualDirectEmail({
         senderEmail: teacherGmail,
-        senderName: user?.name || 'Prof. Clara Evans',
+        senderName: user?.name || 'Ahmad WebCore',
         recipientEmail: studentGmail,
         recipientName: 'Bilal Ahmad (Student)',
         subject: `📋 Syllabus Daily Tasks Assigned: ${data.title}`,

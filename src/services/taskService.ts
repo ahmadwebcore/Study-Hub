@@ -77,7 +77,7 @@ const SEED_TASKS: DailyTask[] = [
       notes: 'Completed all 5 surface integral exercises with complete working calculations.',
     },
     approval: {
-      approvedBy: 'Prof. Clara Evans',
+      approvedBy: 'Ahmad WebCore',
       approvedAt: 'Nov 09, 2026 at 08:30 PM',
       feedback: 'Verified. Working calculations are rigorous and notation is exact.',
     },
@@ -105,7 +105,7 @@ const SEED_TASKS: DailyTask[] = [
       notes: 'Attached scanned notes on Stokes theorem proof.',
     },
     approval: {
-      approvedBy: 'Prof. Clara Evans',
+      approvedBy: 'Ahmad WebCore',
       approvedAt: 'Nov 10, 2026 at 07:15 PM',
       feedback: 'Good proof steps. Well done.',
     },
@@ -470,7 +470,7 @@ class TaskService {
       ...this.tasks[taskIndex],
       status: 'approved',
       approval: {
-        approvedBy: teacherName || 'Prof. Clara Evans',
+        approvedBy: teacherName || 'Ahmad WebCore',
         approvedAt: new Date().toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',

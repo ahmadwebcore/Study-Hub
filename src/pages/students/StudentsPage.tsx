@@ -165,7 +165,7 @@ export const StudentsPage: React.FC = () => {
     emailService.sendInvitationEmail({
       studentEmail: data.email,
       studentName: data.name,
-      teacherName: user?.name || 'Prof. Clara Evans',
+      teacherName: user?.name || 'Ahmad WebCore',
       inviteToken: token,
       course: data.course,
       board: data.board,

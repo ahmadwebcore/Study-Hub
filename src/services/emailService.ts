@@ -36,8 +36,8 @@ const INITIAL_EMAILS: EmailMessage[] = [
     id: 'em_001',
     recipientEmail: 'bilal.student@gmail.com',
     recipientName: 'Bilal Ahmad',
-    senderName: 'Prof. Clara Evans',
-    senderEmail: 'faculty.evans@studyhub.edu',
+    senderName: 'Ahmad WebCore',
+    senderEmail: 'ahmadwebcore@gmail.com',
     subject: '🎓 Exam Graded: Advanced Differential Forms - PASSED (48/50)',
     previewText: 'Congratulations! Your submission has been certified with 96% and Grade A+.',
     category: 'grade_result',
@@ -50,7 +50,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
       maxScore: 50,
       passingMarks: 25,
       isPassed: true,
-      teacherName: 'Prof. Clara Evans',
+      teacherName: 'Ahmad WebCore',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
@@ -65,7 +65,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Exam Results Certified: Advanced Differential Forms</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
             Dear <strong>Bilal Ahmad</strong>,<br/>
-            Your faculty evaluator <strong>Prof. Clara Evans</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
+            Your faculty evaluator <strong>Ahmad WebCore</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
             <table style="width: 100%; border-collapse: collapse;">
@@ -89,7 +89,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <div style="background: #ffffff; border-left: 4px solid #14B866; padding: 14px 16px; margin-bottom: 24px; background-color: #fafcfb;">
             <p style="margin: 0; color: #142D27; font-size: 13px; font-style: italic;">
-              "Exceptional mathematical rigor. The step-by-step vector integration across the surface boundary was mathematically flawless." — Prof. Clara Evans
+              "Exceptional mathematical rigor. The step-by-step vector integration across the surface boundary was mathematically flawless." — Ahmad WebCore
             </p>
           </div>
           <div style="text-align: center;">
@@ -121,7 +121,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
       testTitle: 'Quantum Mechanics Mid-Term Examination',
       subjectName: 'Physics (PHY-201)',
       dueDate: 'Tomorrow at 04:00 PM',
-      teacherName: 'Prof. Clara Evans',
+      teacherName: 'Ahmad WebCore',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
@@ -159,16 +159,16 @@ const INITIAL_EMAILS: EmailMessage[] = [
     id: 'em_003',
     recipientEmail: 'bilal.student@gmail.com',
     recipientName: 'Bilal Ahmad',
-    senderName: 'Prof. Clara Evans',
-    senderEmail: 'faculty.evans@studyhub.edu',
+    senderName: 'Ahmad WebCore',
+    senderEmail: 'ahmadwebcore@gmail.com',
     subject: '✉️ Faculty Invitation: Join Advanced STEM Cohort on StudyHub',
-    previewText: 'Prof. Clara Evans has invited you to join StudyHub LMS as a verified student.',
+    previewText: 'Ahmad WebCore has invited you to join StudyHub LMS as a verified student.',
     category: 'invitation',
     sentAt: 'Nov 10, 2026',
     read: true,
     meta: {
       inviteToken: 'sh_inv_984392_alpha',
-      teacherName: 'Prof. Clara Evans',
+      teacherName: 'Ahmad WebCore',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden;">
@@ -178,7 +178,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
         <div style="padding: 28px;">
           <h2 style="color: #142D27; margin: 0 0 12px 0;">Official Faculty Student Invitation</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6;">
-            <strong>Prof. Clara Evans</strong> has enrolled you into the <strong>Advanced STEM (2026-2027)</strong> cohort under Cambridge International board.
+            <strong>Ahmad WebCore</strong> has enrolled you into the <strong>Advanced STEM (2026-2027)</strong> cohort under Cambridge International board.
           </p>
           <div style="background: #e8f8f0; border: 1px solid rgba(20,184,102,0.3); border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0;">
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #142D27; font-weight: 600;">YOUR SECURE INVITATION TOKEN</p>

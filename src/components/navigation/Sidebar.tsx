@@ -15,11 +15,9 @@ import {
   ShieldCheck,
   UserCheck,
   Library,
-  Home,
   CheckCircle2,
   FileText,
   Clock,
-  Mail,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
 import { cn } from '../../lib/utils';
@@ -71,9 +69,9 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    title: 'Communications',
+    title: 'Preferences',
     items: [
-      { name: 'Gmail Dispatch & Settings', path: '/settings', icon: Mail, badge: 'Connected', badgeVariant: 'primary' },
+      { name: 'Settings & 2FA', path: '/settings', icon: ShieldCheck },
     ],
   },
 ];
@@ -226,29 +224,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           </p>
         </div>
 
-        {/* Gmail Link Widget */}
+        {/* User Account Session Info */}
         <NavLink
           to="/settings"
-          className="flex items-center justify-between p-2 rounded-xl text-[11px] font-semibold text-[#263B35] hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all"
+          className="flex items-center justify-between p-2 rounded-xl text-[11px] font-semibold text-zinc-700 hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all"
         >
           <div className="flex items-center gap-2 min-w-0">
-            <Mail className="w-3.5 h-3.5 text-[#14B866]" />
-            <span className="truncate text-[10px]">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#14B866] shrink-0" />
+            <span className="truncate text-[11px]">
               {role === 'teacher' ? configuredSender : configuredStudent}
             </span>
           </div>
-          <ChevronRight className="w-3 h-3 text-[#7d9990] shrink-0" />
-        </NavLink>
-
-        <NavLink
-          to="/welcome"
-          className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-bold text-[#142D27] hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all"
-        >
-          <div className="flex items-center gap-2">
-            <Home className="w-3.5 h-3.5 text-[#14B866]" />
-            <span className="text-xs">Get Started / Welcome</span>
-          </div>
-          <ChevronRight className="w-3 h-3 text-[#7d9990]" />
+          <ChevronRight className="w-3 h-3 text-zinc-400 shrink-0" />
         </NavLink>
       </div>
     </aside>

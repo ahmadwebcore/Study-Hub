@@ -103,7 +103,7 @@ export const CompletedWorkPage: React.FC = () => {
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-base font-extrabold text-[#142D27] mt-2 truncate">Prof. Clara Evans</p>
+          <p className="text-base font-extrabold text-[#142D27] mt-2 truncate">Ahmad WebCore</p>
           <p className="text-[11px] text-[#557067] mt-0.5">Faculty Lead Evaluator</p>
         </div>
       </div>
