@@ -740,11 +740,11 @@ export const SettingsPage: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-[11px] font-mono font-bold text-[#142D27] select-all">
-                        STUDY-HUB-7892-SECURE-KEY
+                        JBSWY3DPEHPK3PXP
                       </span>
                       <button
                         type="button"
-                        onClick={() => navigator.clipboard.writeText('STUDY-HUB-7892-SECURE-KEY')}
+                        onClick={() => navigator.clipboard.writeText('JBSWY3DPEHPK3PXP')}
                         className="p-1 rounded hover:bg-[#e1ede7] text-[#557067] hover:text-[#142D27]"
                         title="Copy Key"
                       >

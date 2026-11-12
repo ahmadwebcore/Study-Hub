@@ -102,7 +102,7 @@ export const AcceptInvitePage: React.FC = () => {
     if (error) {
       setSubmitError(error.message);
     } else {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   };
 
@@ -150,6 +150,16 @@ export const AcceptInvitePage: React.FC = () => {
                     className="w-full h-11 pl-10 pr-4 rounded-xl border border-[#e1ede7] bg-white text-xs sm:text-sm font-mono text-[#263B35] focus:outline-none focus:border-[#14B866]"
                   />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue('token', 'INV-STUDYHUB-2026-MATH');
+                    verifyToken('INV-STUDYHUB-2026-MATH');
+                  }}
+                  className="text-[11px] text-[#14B866] hover:underline font-semibold mt-1 text-right block w-full"
+                >
+                  ⚡ Click to load sample test invite (INV-STUDYHUB-2026-MATH)
+                </button>
               </div>
 
               {verificationError && (
