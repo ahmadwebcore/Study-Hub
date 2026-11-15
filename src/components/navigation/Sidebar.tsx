@@ -139,21 +139,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
               <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#7d9990]">
                 {section.title}
               </p>
-              {visibleItems.map((item) => (
-                <NavLink
-                  key={item.name}
-                  to={item.path}
-                  end={item.path === '/'}
-                  onClick={onCloseMobile}
-                  className={({ isActive }) =>
-                    cn(
-                      'group flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150',
-                      isActive
-                        ? 'bg-[#142D27] text-white shadow-sm'
-                        : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27]'
-                    )
-                  }
-                >
+              {visibleItems.map((item) => {
+                const targetPath = item.name === 'Submitted Tests' && role === 'student' ? '/completed-work' : item.path;
+                return (
+                  <NavLink
+                    key={item.name}
+                    to={targetPath}
+                    end={targetPath === '/'}
+                    onClick={onCloseMobile}
+                    className={({ isActive }) =>
+                      cn(
+                        'group flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-150',
+                        isActive
+                          ? 'bg-[#142D27] text-white shadow-sm'
+                          : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27]'
+                      )
+                    }
+                  >
                   {({ isActive }) => (
                     <>
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -187,7 +189,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                     </>
                   )}
                 </NavLink>
-              ))}
+                );
+              })}
             </div>
           );
         })}
