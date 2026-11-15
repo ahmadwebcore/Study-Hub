@@ -2,10 +2,28 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { BookItem } from '../types';
 import { SAMPLE_BOOKS } from '../data/sampleData';
 
+const BOOKS_STORAGE_KEY = 'studyhub_custom_books_v3';
+
+export function getLocalBooks(): BookItem[] {
+  try {
+    const raw = localStorage.getItem(BOOKS_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalBooks(books: BookItem[]) {
+  try {
+    localStorage.setItem(BOOKS_STORAGE_KEY, JSON.stringify(books));
+  } catch {}
+}
+
+
 export const bookService = {
   async fetchBooks(filters?: { subjectId?: string; category?: string; search?: string }): Promise<BookItem[]> {
     if (!isSupabaseConfigured()) {
-      let result = [...SAMPLE_BOOKS];
+      let result = getLocalBooks();
       if (filters?.subjectId && filters.subjectId !== 'all') {
         result = result.filter((b) => b.subjectId === filters.subjectId);
       }
@@ -110,8 +128,8 @@ export const bookService = {
         title: params.title,
         description: params.description,
         subjectId: params.subjectId,
-        subjectName: 'Computer Science',
-        subjectCode: 'FSC-CSC-11',
+        subjectName: '1st Year FA-IT',
+        subjectCode: 'FAIT-101',
         category: params.category,
         fileName: params.file.name,
         fileUrl: `books/${params.file.name}`,
@@ -121,6 +139,8 @@ export const bookService = {
         uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         uploadedBy: 'Ahmad',
       };
+      const existing = getLocalBooks();
+      saveLocalBooks([mockBook, ...existing]);
       return { book: mockBook, error: null };
     }
 
@@ -253,6 +273,9 @@ export const bookService = {
 
   async deleteBook(bookId: string): Promise<{ success: boolean; error: Error | null }> {
     if (!isSupabaseConfigured()) {
+      const existing = getLocalBooks();
+      const updated = existing.filter((b) => b.id !== bookId);
+      saveLocalBooks(updated);
       return { success: true, error: null };
     }
 

@@ -44,12 +44,17 @@ export const StudentDashboard: React.FC = () => {
   const loadData = () => {
     setTasks(taskService.getTasks());
     testService.fetchTests(user?.id).then((t) => {
-      if (t && t.length > 0) setTests(t);
+      setTests(t || []);
     });
   };
 
   useEffect(() => {
     loadData();
+
+    const handleUpdate = () => loadData();
+    window.addEventListener('studyhub_tests_updated', handleUpdate);
+    window.addEventListener('studyhub_tasks_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
 
     // Check if daily welcome modal has already been shown today
     const welcomeKey = `gsa_daily_welcome_${todayStr}`;
@@ -57,6 +62,12 @@ export const StudentDashboard: React.FC = () => {
     if (!alreadyShown) {
       setIsDailyWelcomeOpen(true);
     }
+
+    return () => {
+      window.removeEventListener('studyhub_tests_updated', handleUpdate);
+      window.removeEventListener('studyhub_tasks_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, [todayStr]);
 
   const handleDismissDailyWelcome = () => {
@@ -67,6 +78,8 @@ export const StudentDashboard: React.FC = () => {
   const todayTasks = tasks.filter(
     (t) => t.dueDate === todayStr || (!t.isSundayOff && !t.isPakistanHoliday && t.status === 'pending')
   );
+  const activeTodayTask = todayTasks[0];
+  const activeTodayTest = tests.find((t) => t.status === 'ongoing' || t.status === 'scheduled');
 
   const handleQuickCompleteQuota = (task?: DailyTask) => {
     const targetTask = task || todayTasks[0];
@@ -181,32 +194,48 @@ export const StudentDashboard: React.FC = () => {
                 </span>
                 <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
-                  ~45 Mins (2.5 Pgs)
+                  {activeTodayTask ? `~${activeTodayTask.estimatedMinutes || 45} Mins` : '~45 Mins (2.5 Pgs)'}
                 </span>
               </div>
               <h3 className="text-base font-bold text-zinc-900 font-serif">
-                Computer Science: Read Pages 96–98
+                {activeTodayTask
+                  ? `${activeTodayTask.subjectName}: ${activeTodayTask.title}`
+                  : 'No Daily Reading Task Scheduled'}
               </h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Chapter 2: Information Networks &bull; Carefully study Network Topologies (Bus, Star, Ring, Mesh) and review diagram annotations.
+                {activeTodayTask
+                  ? activeTodayTask.description
+                  : 'Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate daily study targets and page quotas (Sundays OFF).'}
               </p>
             </div>
 
             <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
-              <Link
-                to="/syllabus"
-                className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-colors"
-              >
-                View Syllabus Notes
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleQuickCompleteQuota()}
-                className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
-              >
-                <Check className="w-3.5 h-3.5" />
-                <span>Mark Done</span>
-              </button>
+              {activeTodayTask ? (
+                <>
+                  <Link
+                    to="/weekly-tasks"
+                    className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-colors"
+                  >
+                    View Weekly Schedule
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickCompleteQuota(activeTodayTask)}
+                    className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Mark Done</span>
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/library"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-all shadow-xs"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Upload Book PDF in Library</span>
+                </Link>
+              )}
             </div>
           </div>
 
@@ -219,26 +248,37 @@ export const StudentDashboard: React.FC = () => {
                 </span>
                 <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
                   <Award className="w-3.5 h-3.5" />
-                  Pass: 15/30 Marks
+                  {activeTodayTest ? `Pass: ${activeTodayTest.passingMarks}/${activeTodayTest.totalMarks} Marks` : 'Pass: 15/30 Marks'}
                 </span>
               </div>
               <h3 className="text-base font-bold text-zinc-900 font-serif">
-                Chapter 2 Network Topologies Assessment
+                {activeTodayTest ? activeTodayTest.title : 'No 30-Mark Test Scheduled'}
               </h3>
               <p className="text-xs text-zinc-600 leading-relaxed">
-                Official 30-mark diagnostic test with 10 MCQs and 4 short-response questions mapped to BISE DG Khan board scheme.
+                {activeTodayTest
+                  ? activeTodayTest.syllabusCoverage || activeTodayTest.instructions
+                  : 'Upload your textbook PDF to break chapters into weekly 30-mark assessments mapped to BISE DG Khan pattern.'}
               </p>
             </div>
 
             <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
-              <Link
-                to="/test-submit"
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
-              >
-                <FileCheck2 className="w-3.5 h-3.5 text-white" />
-                <span>Start Today's 30-Mark Test</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-              </Link>
+              {activeTodayTest ? (
+                <Link
+                  to={`/test-submit?testId=${activeTodayTest.id}`}
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                >
+                  <FileCheck2 className="w-3.5 h-3.5 text-white" />
+                  <span>Start 30-Mark Test</span>
+                  <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+                </Link>
+              ) : (
+                <Link
+                  to="/library"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all"
+                >
+                  <span>⚡ Schedule Tests from Book PDF</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

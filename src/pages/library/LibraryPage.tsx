@@ -27,6 +27,8 @@ import { useRole } from '../../hooks/useRole';
 import { bookService } from '../../services/bookService';
 import { subjectService } from '../../services/subjectService';
 import { taskService } from '../../services/taskService';
+import { testService } from '../../services/testService';
+import { targetPlannerService } from '../../services/targetPlannerService';
 import { emailService } from '../../services/emailService';
 import { SAMPLE_BOOKS, SAMPLE_SUBJECTS } from '../../data/sampleData';
 
@@ -230,10 +232,33 @@ export const LibraryPage: React.FC = () => {
       sourceTitle: data.title,
       subjectId: data.subjectId,
       subjectName: selectedSubj?.name || 'Academic Subject',
-      subjectCode: selectedSubj?.code || 'SUBJ-101',
-      totalPagesOrTopics: 120,
+      subjectCode: selectedSubj?.code || 'FAIT-101',
+      totalPagesOrTopics: 180,
       startPage: 1,
     });
+
+    // Auto-schedule 12-week 30-mark diagnostic test series
+    testService.scheduleDailyTestsForBook({
+      subjectId: data.subjectId,
+      subjectName: selectedSubj?.name || 'Academic Subject',
+      subjectCode: selectedSubj?.code || 'FAIT-101',
+      bookTitle: data.title,
+      totalWeeks: 12,
+    });
+
+    // Register with February 28 Quota Sprint
+    targetPlannerService.registerBook({
+      subjectId: data.subjectId,
+      subjectName: selectedSubj?.name || 'Academic Subject',
+      code: selectedSubj?.code || 'FAIT-101',
+      bookTitle: data.title,
+      totalPages: 180,
+    });
+
+    // Live UI reactivity
+    window.dispatchEvent(new Event('studyhub_tests_updated'));
+    window.dispatchEvent(new Event('studyhub_tasks_updated'));
+    window.dispatchEvent(new Event('storage'));
 
     // Automated email roadmap dispatch to student Gmail
     const studentGmail = emailService.getStudentConfiguredEmail();
@@ -251,7 +276,7 @@ export const LibraryPage: React.FC = () => {
     setIsUploadModalOpen(false);
     reset();
     setSelectedFile(null);
-    setSuccessToast(`"${data.title}" added & daily study tasks automated with Sunday OFF! Gmail dispatched.`);
+    setSuccessToast(`"${data.title}" broken into daily reading tasks & 30-mark test series (Sundays OFF)! Gmail dispatched.`);
     setTimeout(() => setSuccessToast(null), 5000);
   };
 
@@ -262,9 +287,29 @@ export const LibraryPage: React.FC = () => {
       subjectId: b.subjectId,
       subjectName: b.subjectName,
       subjectCode: b.subjectCode,
-      totalPagesOrTopics: b.totalPages || 120,
+      totalPagesOrTopics: b.totalPages || 180,
       startPage: b.currentPage || 1,
     });
+
+    testService.scheduleDailyTestsForBook({
+      subjectId: b.subjectId,
+      subjectName: b.subjectName,
+      subjectCode: b.subjectCode,
+      bookTitle: b.title,
+      totalWeeks: 12,
+    });
+
+    targetPlannerService.registerBook({
+      subjectId: b.subjectId,
+      subjectName: b.subjectName,
+      code: b.subjectCode,
+      bookTitle: b.title,
+      totalPages: b.totalPages || 180,
+    });
+
+    window.dispatchEvent(new Event('studyhub_tests_updated'));
+    window.dispatchEvent(new Event('studyhub_tasks_updated'));
+    window.dispatchEvent(new Event('storage'));
 
     const studentGmail = emailService.getStudentConfiguredEmail();
     const teacherGmail = emailService.getTeacherConfiguredEmail();
@@ -278,7 +323,7 @@ export const LibraryPage: React.FC = () => {
       category: 'system',
     });
 
-    setSuccessToast(`Daily study tasks generated for "${b.title}" (Sunday OFF)! Gmail notification sent.`);
+    setSuccessToast(`Daily study tasks & 30-mark test series generated for "${b.title}" (Sunday OFF)!`);
     setTimeout(() => setSuccessToast(null), 4500);
   };
 
@@ -455,7 +500,26 @@ export const LibraryPage: React.FC = () => {
       </div>
 
       {/* Books Bento Grid */}
-      {filteredBooks.length > 0 ? (
+      {books.length === 0 ? (
+        <div className="p-8 sm:p-12 rounded-3xl bg-white border border-dashed border-zinc-300 text-center space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+            <BookOpen className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-zinc-900 font-serif">Curriculum Book Library is Clean &amp; Ready</h3>
+          <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
+            All demo books have been cleared. Upload your 1st Year FA-IT textbook PDF below. StudyHub will automatically analyze the chapters, schedule daily reading targets (~2.5 pgs/day, Sundays OFF), and construct your 12-week 30-mark test series!
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Upload className="w-4 h-4 text-emerald-400" />
+              <span>⚡ Upload Book PDF &amp; Break into Series</span>
+            </button>
+          </div>
+        </div>
+      ) : filteredBooks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredBooks.map((book) => (
             <Card key={book.id} hoverable className="p-5 flex flex-col justify-between">
@@ -699,9 +763,9 @@ export const LibraryPage: React.FC = () => {
               variant="primary"
               size="sm"
               isLoading={isUploading}
-              loadingText="Uploading Document..."
+              loadingText="Analyzing PDF & Generating Series..."
             >
-              Upload Document
+              ⚡ Break into Series &amp; Generate Schedule
             </Button>
           </div>
         </form>

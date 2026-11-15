@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,6 +28,7 @@ import {
   FileCheck2,
   ShieldCheck,
   Check,
+  Upload,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -586,7 +588,26 @@ export const TestsPage: React.FC = () => {
       </div>
 
       {/* Tests Grid */}
-      {filteredTests.length > 0 ? (
+      {tests.length === 0 ? (
+        <div className="p-8 sm:p-12 rounded-3xl bg-white border border-dashed border-zinc-300 text-center space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+            <FileQuestion className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-zinc-900 font-serif">No 30-Mark Tests in Series Yet</h3>
+          <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
+            All demo assessments have been cleared. Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate the 12-week 30-mark chapter assessment test series!
+          </p>
+          <div className="pt-2">
+            <Link
+              to="/library"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-sm active:scale-95 cursor-pointer"
+            >
+              <Upload className="w-4 h-4 text-emerald-400" />
+              <span>⚡ Upload Book PDF &amp; Generate Series</span>
+            </Link>
+          </div>
+        </div>
+      ) : filteredTests.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredTests.map((test) => (
             <Card key={test.id} hoverable className="p-5 flex flex-col justify-between">

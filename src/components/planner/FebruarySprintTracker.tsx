@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Calendar,
   CheckCircle2,
@@ -10,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
+  Upload,
 } from 'lucide-react';
 import {
   targetPlannerService,
@@ -222,8 +224,26 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {stats.subjectsQuota.map((quota: SubjectTargetQuota) => {
+          {stats.subjectsQuota.length === 0 ? (
+            <div className="p-8 text-center bg-zinc-50/70 rounded-2xl border border-dashed border-zinc-200 space-y-2.5">
+              <BookOpen className="w-8 h-8 text-emerald-600 mx-auto opacity-70" />
+              <h4 className="text-sm font-bold text-zinc-900 font-serif">No Books Added to February Quota Sprint</h4>
+              <p className="text-xs text-zinc-500 max-w-md mx-auto">
+                Upload your 1st Year FA-IT textbook PDF in Book Library. StudyHub will break it into daily reading targets and calculate exact daily quotas targeting Feb 28th!
+              </p>
+              <div className="pt-2">
+                <Link
+                  to="/library"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors shadow-2xs"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload Book PDF in Library</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {stats.subjectsQuota.map((quota: SubjectTargetQuota) => {
               const progressPct = Math.round((quota.completedPages / quota.totalPages) * 100);
               const remainingPages = quota.totalPages - quota.completedPages;
               const isExpanded = expandedSubject === quota.subjectId;
@@ -338,7 +358,8 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
               );
             })}
           </div>
-        </div>
+        )}
+      </div>
       )}
     </div>
   );

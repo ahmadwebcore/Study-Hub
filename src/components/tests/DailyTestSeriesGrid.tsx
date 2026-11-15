@@ -1,5 +1,6 @@
 import { useRole } from '../../hooks/useRole';
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
   Lock,
@@ -16,6 +17,7 @@ import {
   FileCheck2,
   X,
   Plus,
+  Upload,
 } from 'lucide-react';
 import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
@@ -346,7 +348,26 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       </div>
 
       {/* Row of 5 Small Boxes (grid-cols-2 sm:grid-cols-3 lg:grid-cols-5) */}
-      {filteredTests.length === 0 ? (
+      {tests.length === 0 ? (
+        <div className="p-8 sm:p-10 rounded-3xl bg-white border border-dashed border-zinc-300 text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+            <BookOpen className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-zinc-900 font-serif">No 30-Mark Tests Scheduled Yet</h3>
+          <p className="text-xs text-zinc-600 max-w-md mx-auto leading-relaxed">
+            Your 30-mark diagnostic test series will appear here once you upload your textbook PDF. StudyHub will break your book into weekly chapter assessments (Sundays OFF).
+          </p>
+          <div className="pt-2">
+            <Link
+              to="/library"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors shadow-2xs"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>⚡ Upload Book PDF &amp; Generate Series</span>
+            </Link>
+          </div>
+        </div>
+      ) : filteredTests.length === 0 ? (
         <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-2">
           <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
           <h3 className="text-sm font-bold text-zinc-900">No Tests Found in this Filter</h3>

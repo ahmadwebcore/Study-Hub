@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   CalendarDays,
   CheckCircle2,
@@ -518,7 +519,26 @@ export const WeeklyTasksPage: React.FC = () => {
 
       {/* Task Cards List */}
       <div className="space-y-3">
-        {filteredTasks.length === 0 ? (
+        {tasks.length === 0 ? (
+          <div className="text-center py-12 sm:py-16 bg-white rounded-3xl border border-dashed border-zinc-300 p-8 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+              <CalendarDays className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-zinc-900 font-serif">No Daily Tasks Scheduled Yet</h3>
+            <p className="text-xs text-zinc-600 max-w-md mx-auto leading-relaxed">
+              Upload your 1st Year FA-IT textbook PDF in the Book Library to break it down into daily reading targets (Sundays strictly OFF).
+            </p>
+            <div className="pt-2">
+              <Link
+                to="/library"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors shadow-2xs"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>⚡ Upload Book PDF in Library</span>
+              </Link>
+            </div>
+          </div>
+        ) : filteredTasks.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-2xl border border-[#e1ede7] p-6">
             <CalendarDays className="w-10 h-10 text-[#7d9990] mx-auto mb-2 opacity-50" />
             <h3 className="text-sm font-bold text-[#142D27]">No Tasks Found</h3>

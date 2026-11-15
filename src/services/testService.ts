@@ -3,7 +3,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
 
-const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v2';
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v3';
 
 function getCustomTests(): TestItem[] {
   try {
@@ -20,8 +20,8 @@ function saveCustomTests(tests: TestItem[]) {
 }
 
 
-const SUBMITTED_ATTEMPTS_KEY = 'studyhub_submitted_attempts_v3';
-const TEST_STATUSES_KEY = 'studyhub_test_statuses_v2';
+const SUBMITTED_ATTEMPTS_KEY = 'studyhub_submitted_attempts_v4';
+const TEST_STATUSES_KEY = 'studyhub_test_statuses_v3';
 const CERTIFIED_RESULTS_KEY = 'studyhub_certified_results_v3';
 
 export function getLocalSubmittedAttempts(): Record<string, TestAttempt> {
@@ -1070,7 +1070,7 @@ export const testService = {
    */
   async fetchResults(studentId?: string): Promise<ResultRecord[]> {
     if (!isSupabaseConfigured()) {
-      return SAMPLE_RESULTS;
+      return getLocalCertifiedResults();
     }
 
     try {
