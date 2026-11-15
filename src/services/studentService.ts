@@ -241,7 +241,7 @@ export const studentService = {
           email: 'student@studyhub.edu',
           role: 'student',
           token,
-          invitedBy: 'Ahmad WebCore',
+          invitedBy: 'Ahmad',
           academicClass: 'Grade 11',
           course: 'Advanced Mathematics & STEM',
           board: 'Cambridge International (CIE)',

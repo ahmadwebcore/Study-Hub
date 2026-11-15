@@ -34,6 +34,7 @@ import { subjectService } from '../../services/subjectService';
 import { syllabusService } from '../../services/syllabusService';
 import { studentService } from '../../services/studentService';
 import { SAMPLE_TODAY_SCHEDULE, SAMPLE_STUDY_PLANS, SAMPLE_SUBJECTS, SAMPLE_STUDENTS_LIST } from '../../data/sampleData';
+import { FebruarySprintTracker } from '../../components/planner/FebruarySprintTracker';
 
 // Form Schemas
 const sessionSchema = z.object({
@@ -419,6 +420,9 @@ export const StudyPlannerPage: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* 3-Month Target Sprint & Daily Book Quota Engine */}
+      <FebruarySprintTracker />
 
       {/* Navigation Tabs: Calendar vs Study Plans */}
       <div className="flex items-center justify-between gap-4 border-b border-[#e1ede7] pb-1">

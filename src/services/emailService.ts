@@ -28,7 +28,7 @@ export interface EmailMessage {
   read: boolean;
 }
 
-const STORAGE_KEY = 'studyhub_dispatched_emails';
+const STORAGE_KEY = 'studyhub_dispatched_emails_v3';
 
 // Initial pre-loaded realistic Gmail notifications
 const INITIAL_EMAILS: EmailMessage[] = [
@@ -36,21 +36,21 @@ const INITIAL_EMAILS: EmailMessage[] = [
     id: 'em_001',
     recipientEmail: 'student@studyhub.edu',
     recipientName: 'Student Scholar',
-    senderName: 'Ahmad WebCore',
+    senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
-    subject: '🎓 Exam Graded: Advanced Differential Forms - PASSED (48/50)',
-    previewText: 'Congratulations! Your submission has been certified with 96% and Grade A+.',
+    subject: '🎓 Exam Graded: Computer Science Networks - PASSED (28/30)',
+    previewText: 'Congratulations! Your submission has been certified with 93% and Grade A+.',
     category: 'grade_result',
     sentAt: 'Today at 02:30 PM',
     read: false,
     meta: {
-      testTitle: 'Advanced Differential Forms & Stokes Theorem',
-      subjectName: 'Advanced Calculus & Vectors (MATH-301)',
-      score: 48,
-      maxScore: 50,
-      passingMarks: 25,
+      testTitle: 'Computer Science Architecture & Networks Assessment',
+      subjectName: 'Computer Science (FSC-CSC-11)',
+      score: 28,
+      maxScore: 30,
+      passingMarks: 15,
       isPassed: true,
-      teacherName: 'Ahmad WebCore',
+      teacherName: 'Ahmad',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
@@ -62,24 +62,24 @@ const INITIAL_EMAILS: EmailMessage[] = [
           <div style="display: inline-block; background: #e8f8f0; color: #14B866; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 9999px; border: 1px solid rgba(20,184,102,0.3); margin-bottom: 16px;">
             Certified Passing Grade
           </div>
-          <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Exam Results Certified: Advanced Differential Forms</h2>
+          <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Exam Results Certified: Computer Science Architecture & Networks</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
             Dear <strong>Student Scholar</strong>,<br/>
-            Your faculty evaluator <strong>Ahmad WebCore</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
+            Your faculty evaluator <strong>Ahmad</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; color: #557067; font-size: 13px;">Course Subject:</td>
-                <td style="padding: 8px 0; color: #142D27; font-size: 13px; font-weight: 700; text-align: right;">Advanced Calculus (MATH-301)</td>
+                <td style="padding: 8px 0; color: #142D27; font-size: 13px; font-weight: 700; text-align: right;">Computer Science (FSC-CSC-11)</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #557067; font-size: 13px;">Score Achieved:</td>
-                <td style="padding: 8px 0; color: #14B866; font-size: 16px; font-weight: 800; text-align: right;">48 / 50 Marks (96%)</td>
+                <td style="padding: 8px 0; color: #14B866; font-size: 16px; font-weight: 800; text-align: right;">28 / 30 Marks (93%)</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #557067; font-size: 13px;">Passing Threshold:</td>
-                <td style="padding: 8px 0; color: #142D27; font-size: 13px; font-weight: 600; text-align: right;">25 Marks (50%)</td>
+                <td style="padding: 8px 0; color: #142D27; font-size: 13px; font-weight: 600; text-align: right;">15 Marks (50%)</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #557067; font-size: 13px;">Academic Grade:</td>
@@ -89,7 +89,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <div style="background: #ffffff; border-left: 4px solid #14B866; padding: 14px 16px; margin-bottom: 24px; background-color: #fafcfb;">
             <p style="margin: 0; color: #142D27; font-size: 13px; font-style: italic;">
-              "Exceptional mathematical rigor. The step-by-step vector integration across the surface boundary was mathematically flawless." — Ahmad WebCore
+              "Exceptional mathematical rigor. The step-by-step vector integration across the surface boundary was mathematically flawless." — Ahmad
             </p>
           </div>
           <div style="text-align: center;">
@@ -121,7 +121,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
       testTitle: 'Quantum Mechanics Mid-Term Examination',
       subjectName: 'Physics (PHY-201)',
       dueDate: 'Tomorrow at 04:00 PM',
-      teacherName: 'Ahmad WebCore',
+      teacherName: 'Ahmad',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
@@ -159,16 +159,16 @@ const INITIAL_EMAILS: EmailMessage[] = [
     id: 'em_003',
     recipientEmail: 'student@studyhub.edu',
     recipientName: 'Student Scholar',
-    senderName: 'Ahmad WebCore',
+    senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
     subject: '✉️ Faculty Invitation: Join Advanced STEM Cohort on StudyHub',
-    previewText: 'Ahmad WebCore has invited you to join StudyHub LMS as a verified student.',
+    previewText: 'Ahmad has invited you to join StudyHub LMS as a verified student.',
     category: 'invitation',
     sentAt: 'Nov 10, 2026',
     read: true,
     meta: {
       inviteToken: 'sh_inv_984392_alpha',
-      teacherName: 'Ahmad WebCore',
+      teacherName: 'Ahmad',
     },
     htmlBody: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; overflow: hidden;">
@@ -178,7 +178,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
         <div style="padding: 28px;">
           <h2 style="color: #142D27; margin: 0 0 12px 0;">Official Faculty Student Invitation</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6;">
-            <strong>Ahmad WebCore</strong> has enrolled you into the <strong>Advanced STEM (2026-2027)</strong> cohort under Cambridge International board.
+            <strong>Ahmad</strong> has enrolled you into the <strong>Advanced STEM (2026-2027)</strong> cohort under Cambridge International board.
           </p>
           <div style="background: #e8f8f0; border: 1px solid rgba(20,184,102,0.3); border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0;">
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #142D27; font-weight: 600;">YOUR SECURE INVITATION TOKEN</p>
@@ -204,9 +204,29 @@ class EmailService {
 
   private loadEmails() {
     try {
+      // Clear legacy storage keys
+      localStorage.removeItem('studyhub_dispatched_emails');
+      localStorage.removeItem('studyhub_dispatched_emails_v1');
+      localStorage.removeItem('studyhub_dispatched_emails_v2');
+
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        this.emails = JSON.parse(stored);
+        const parsed = JSON.parse(stored) as EmailMessage[];
+        this.emails = parsed.map((e) => {
+          const sanitized = { ...e };
+          if (sanitized.recipientEmail && sanitized.recipientEmail.includes('bilal')) {
+            sanitized.recipientEmail = 'student@studyhub.edu';
+            sanitized.recipientName = 'Student Scholar';
+          }
+          if (sanitized.senderName && (sanitized.senderName.includes('Clara') || sanitized.senderName.includes('clara'))) {
+            sanitized.senderName = 'Ahmad';
+            sanitized.senderEmail = 'ahmadwebcore@gmail.com';
+          }
+          if (sanitized.senderEmail && sanitized.senderEmail.includes('clara')) {
+            sanitized.senderEmail = 'ahmadwebcore@gmail.com';
+          }
+          return sanitized;
+        });
       } else {
         this.emails = [...INITIAL_EMAILS];
         this.saveEmails();
@@ -583,7 +603,7 @@ class EmailService {
   public getTeacherConfiguredEmail(): string {
     try {
       const stored = localStorage.getItem('studyhub_teacher_configured_gmail');
-      if (stored) return stored;
+      if (stored && !stored.includes('clara')) return stored;
     } catch {}
     return 'ahmadwebcore@gmail.com';
   }
@@ -597,7 +617,7 @@ class EmailService {
   public getStudentConfiguredEmail(): string {
     try {
       const stored = localStorage.getItem('studyhub_student_configured_gmail');
-      if (stored) return stored;
+      if (stored && !stored.includes('bilal')) return stored;
     } catch {}
     return 'student@studyhub.edu';
   }
@@ -766,6 +786,35 @@ class EmailService {
       `,
     };
 
+    this.emails.unshift(newEmail);
+    this.saveEmails();
+    return newEmail;
+  }
+  // 9. Dispatch Manual / Automated Notification to Gmail
+  public dispatchManualNotification(params: {
+    recipientEmail: string;
+    recipientName: string;
+    subject: string;
+    message: string;
+  }): EmailMessage {
+    const newEmail: EmailMessage = {
+      id: `em_notice_${Date.now()}`,
+      recipientEmail: params.recipientEmail,
+      recipientName: params.recipientName,
+      senderName: 'Ahmad',
+      senderEmail: 'ahmadwebcore@gmail.com',
+      subject: params.subject,
+      previewText: params.message.slice(0, 100),
+      category: 'manual_notice',
+      sentAt: 'Just now',
+      read: false,
+      htmlBody: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e1ede7; padding: 24px;">
+          <h2 style="color: #142D27; margin: 0 0 12px 0;">${params.subject}</h2>
+          <p style="color: #557067; font-size: 14px; line-height: 1.6;">${params.message}</p>
+        </div>
+      `,
+    };
     this.emails.unshift(newEmail);
     this.saveEmails();
     return newEmail;

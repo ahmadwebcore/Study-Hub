@@ -287,7 +287,7 @@ export const SettingsPage: React.FC = () => {
                         type="email"
                         value={teacherEmailInput}
                         onChange={(e) => setTeacherEmailInput(e.target.value)}
-                        placeholder="ahmadwebcore@gmail.com"
+                        placeholder="faculty@example.com"
                         className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                       />
                     </div>
@@ -301,7 +301,7 @@ export const SettingsPage: React.FC = () => {
                       type="text"
                       value={teacherDisplayName}
                       onChange={(e) => setTeacherDisplayName(e.target.value)}
-                      placeholder="Ahmad WebCore — Lead Faculty"
+                      placeholder="Ahmad — Lead Faculty"
                       className="w-full px-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                     />
                   </div>
@@ -334,7 +334,7 @@ export const SettingsPage: React.FC = () => {
                         type="email"
                         value={studentEmailInput}
                         onChange={(e) => setStudentEmailInput(e.target.value)}
-                        placeholder="student@studyhub.edu"
+                        placeholder="student@example.com"
                         className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                       />
                     </div>
@@ -348,7 +348,7 @@ export const SettingsPage: React.FC = () => {
                       type="email"
                       value={guardianEmailInput}
                       onChange={(e) => setGuardianEmailInput(e.target.value)}
-                      placeholder="parent.ahmad@gmail.com"
+                      placeholder="guardian@example.com"
                       className="w-full px-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
                     />
                   </div>

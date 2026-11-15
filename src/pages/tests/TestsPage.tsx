@@ -15,12 +15,15 @@ import {
   Upload,
   Eye,
   Search,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
 import {
   TestItem,
   TestAnswer,
@@ -65,6 +68,7 @@ export const TestsPage: React.FC = () => {
   const [units, setUnits] = useState<SyllabusUnit[]>([]);
   const [filter, setFilter] = useState<'all' | 'scheduled' | 'graded'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewLayout, setViewLayout] = useState<'boxes' | 'cards'>('boxes');
 
   // Modals state
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -93,24 +97,21 @@ export const TestsPage: React.FC = () => {
     { text: 'Option D', isCorrect: false },
   ]);
 
-  // Load Data
-  useEffect(() => {
-    let mounted = true;
+  const loadData = () => {
     Promise.all([
       testService.fetchTests(role === 'student' ? user.id : undefined),
       subjectService.fetchSubjects(),
       studentService.fetchStudents(),
     ]).then(([testsData, subjectsData, studentsData]) => {
-      if (mounted) {
-        if (testsData && testsData.length > 0) setTests(testsData);
-        if (subjectsData && subjectsData.length > 0) setSubjects(subjectsData);
-        if (studentsData && studentsData.length > 0) setStudents(studentsData);
-      }
+      if (testsData && testsData.length > 0) setTests(testsData);
+      if (subjectsData && subjectsData.length > 0) setSubjects(subjectsData);
+      if (studentsData && studentsData.length > 0) setStudents(studentsData);
     });
+  };
 
-    return () => {
-      mounted = false;
-    };
+  // Load Data
+  useEffect(() => {
+    loadData();
   }, [role, user.id]);
 
   // Schedule Test Form
@@ -127,11 +128,11 @@ export const TestsPage: React.FC = () => {
       subjectId: subjects[0]?.id || '',
       date: '2026-11-28',
       time: '10:00 AM – 11:30 AM',
-      durationMinutes: 90,
-      totalMarks: 50,
-      passingMarks: 25,
-      syllabusCoverage: 'Differential forms, vector fields, and Stokes theorem.',
-      instructions: 'Calculators allowed. Maintain working calculations for written questions.',
+      durationMinutes: 45,
+      totalMarks: 30,
+      passingMarks: 15,
+      syllabusCoverage: 'Board short questions and theoretical definitions.',
+      instructions: 'Attempt all objective and subjective sections. Total Marks: 30. Passing marks: 15.',
     },
   });
 
@@ -360,7 +361,10 @@ export const TestsPage: React.FC = () => {
   };
 
   const filteredTests = tests.filter((t) => {
-    const matchesFilter = filter === 'all' || t.status === filter;
+    const matchesFilter =
+      filter === 'all' ||
+      t.status === filter ||
+      (filter === 'scheduled' && t.status === 'ongoing');
     const matchesSearch =
       t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -413,7 +417,47 @@ export const TestsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Filter and Search Ribbon */}
+      {/* View Mode Toggle: Compact Day Boxes vs Detailed Cards */}
+      <div className="flex items-center justify-between gap-3 p-1.5 bg-[#F7F9F8] border border-[#e1ede7] rounded-2xl">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setViewLayout('boxes')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              viewLayout === 'boxes'
+                ? 'bg-[#142D27] text-white shadow-xs'
+                : 'text-[#557067] hover:text-[#142D27]'
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Compact Day Boxes (Daily Series)</span>
+          </button>
+          <button
+            onClick={() => setViewLayout('cards')}
+            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              viewLayout === 'cards'
+                ? 'bg-[#142D27] text-white shadow-xs'
+                : 'text-[#557067] hover:text-[#142D27]'
+            }`}
+          >
+            <List className="w-3.5 h-3.5" />
+            <span>Detailed Examination Cards</span>
+          </button>
+        </div>
+
+        <span className="hidden sm:inline text-[11px] font-semibold text-[#557067] px-3">
+          30 Marks per Test &bull; Sunday Off Policy
+        </span>
+      </div>
+
+      {viewLayout === 'boxes' ? (
+        <DailyTestSeriesGrid
+          tests={tests}
+          onTakeTest={handleStartExam}
+          onRefreshTests={loadData}
+        />
+      ) : (
+        <>
+          {/* Filter and Search Ribbon */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {(['all', 'scheduled', 'graded'] as const).map((tab) => (
@@ -571,6 +615,8 @@ export const TestsPage: React.FC = () => {
             setSearchTerm('');
           }}
         />
+      )}
+        </>
       )}
 
       {/* STUDENT EXAMINATION RUNNER (LIVE EXAM MODAL) */}

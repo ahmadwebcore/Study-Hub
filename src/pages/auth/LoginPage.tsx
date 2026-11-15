@@ -203,11 +203,10 @@ export const LoginPage: React.FC = () => {
   // ==========================================
   // STEP 2A: GOOGLE AUTHENTICATOR (VERIFY)
   // ==========================================
-  const handleVerifyAuthenticatorCode = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const executeVerification = async (codeToVerify: string) => {
     setAuthError(null);
 
-    if (!totpCode || totpCode.trim().length !== 6) {
+    if (!codeToVerify || codeToVerify.trim().length !== 6) {
       setAuthError('Please enter a valid 6-digit code from Google Authenticator.');
       return;
     }
@@ -220,7 +219,7 @@ export const LoginPage: React.FC = () => {
       if (!isEnrolled) {
         // ENROLLMENT CONFIRMATION FLOW:
         // Teacher confirms setup with their first 6-digit code
-        const res = await twoFactorService.confirmAndEnroll(verifiedEmail, totpCode);
+        const res = await twoFactorService.confirmAndEnroll(verifiedEmail, codeToVerify);
         if (!res.success) {
           setIsSubmitting(false);
           setAuthError(res.error || 'Verification failed. Please check the code in Google Authenticator.');
@@ -228,7 +227,7 @@ export const LoginPage: React.FC = () => {
         }
       } else {
         // ACTIVE 2FA VERIFICATION FLOW:
-        const res = await twoFactorService.verifyCode(verifiedEmail, totpCode);
+        const res = await twoFactorService.verifyCode(verifiedEmail, codeToVerify);
         if (!res.success) {
           setIsSubmitting(false);
           setAuthError(res.error || 'Incorrect code. Please enter the current code from Google Authenticator.');
@@ -243,6 +242,20 @@ export const LoginPage: React.FC = () => {
     } catch {
       setIsSubmitting(false);
       setAuthError('Failed to verify Authenticator code. Please try again.');
+    }
+  };
+
+  const handleVerifyAuthenticatorCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await executeVerification(totpCode);
+  };
+
+  const handleTotpCodeChange = (raw: string) => {
+    const val = raw.replace(/\D/g, '').slice(0, 6);
+    setTotpCode(val);
+    setAuthError(null);
+    if (val.length === 6) {
+      executeVerification(val);
     }
   };
 
@@ -452,8 +465,8 @@ export const LoginPage: React.FC = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={
                         roleMode === 'teacher'
-                          ? 'ahmadwebcore@gmail.com'
-                          : 'student@studyhub.edu'
+                          ? 'faculty@example.com'
+                          : 'student@example.com'
                       }
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
@@ -707,9 +720,11 @@ export const LoginPage: React.FC = () => {
                               <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                               <input
                                 type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
                                 maxLength={6}
                                 value={totpCode}
-                                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
+                                onChange={(e) => handleTotpCodeChange(e.target.value)}
                                 placeholder="000000"
                                 className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#14B866] shadow-xs"
                                 autoFocus

@@ -15,6 +15,7 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { studentService } from '../../services/studentService';
+import { notificationService } from '../../services/notificationService';
 import { useAuth } from '../../contexts/AuthContext';
 import { StudentInvitation } from '../../types';
 
@@ -102,6 +103,11 @@ export const AcceptInvitePage: React.FC = () => {
     if (error) {
       setSubmitError(error.message);
     } else {
+      notificationService.addNotification({
+        title: `🎉 Welcome to StudyHub!`,
+        message: `Your account is active. Mentorship with Ahmad WebCore is live.`,
+        category: 'system',
+      });
       navigate('/dashboard', { replace: true });
     }
   };

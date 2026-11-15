@@ -17,6 +17,11 @@ import { NotFoundPage } from '../pages/NotFoundPage';
 import { WeeklyTasksPage } from '../pages/tasks/WeeklyTasksPage';
 import { CompletedWorkPage } from '../pages/tasks/CompletedWorkPage';
 import { TestSubmissionPage } from '../pages/tests/TestSubmissionPage';
+import { DirectChatPage } from '../pages/chat/DirectChatPage';
+import { MediaCenterPage } from '../pages/media/MediaCenterPage';
+import { GrammarHubPage } from '../pages/grammar/GrammarHubPage';
+import { AITeacherPage } from '../pages/ai/AITeacherPage';
+import { IntegrationsPage } from '../pages/integrations/IntegrationsPage';
 
 // Authentication Pages
 import { LoginPage } from '../pages/auth/LoginPage';
@@ -57,7 +62,11 @@ export const AppRoutes: React.FC = () => {
           }
         />
         <Route path="/subjects" element={<SubjectsPage />} />
+        <Route path="/media" element={<MediaCenterPage />} />
         <Route path="/library" element={<LibraryPage />} />
+        <Route path="/grammar" element={<GrammarHubPage />} />
+        <Route path="/chat" element={<DirectChatPage />} />
+        <Route path="/ai-teacher" element={<AITeacherPage />} />
         <Route path="/syllabus" element={<SyllabusPage />} />
         <Route path="/planner" element={<StudyPlannerPage />} />
         <Route path="/weekly-tasks" element={<WeeklyTasksPage />} />
@@ -75,6 +84,7 @@ export const AppRoutes: React.FC = () => {
         />
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/integrations" element={<IntegrationsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/404" element={<NotFoundPage />} />
 

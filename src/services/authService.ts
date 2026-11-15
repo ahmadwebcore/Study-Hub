@@ -71,7 +71,12 @@ export const authService = {
         };
       }
 
-      if (password !== 'password123' && password !== 'Ahmad@2026') {
+      const customTeacherPass = localStorage.getItem('studyhub_teacher_custom_password');
+      const isTeacherPassValid = customTeacherPass
+        ? password === customTeacherPass
+        : (password === 'password123' || password === 'Ahmad@2026');
+
+      if (!isTeacherPassValid) {
         return {
           valid: false,
           user: null,
@@ -116,7 +121,12 @@ export const authService = {
       cleanEmail === 'student@gmail.com';
 
     if (isStudent) {
-      if (password !== 'password123') {
+      const customStudentPass = localStorage.getItem('studyhub_student_custom_password');
+      const isStudentPassValid = customStudentPass
+        ? password === customStudentPass
+        : password === 'password123';
+
+      if (!isStudentPassValid) {
         return {
           valid: false,
           user: null,
@@ -265,5 +275,55 @@ export const authService = {
     return await supabase.auth.updateUser({
       password: newPassword,
     });
+  },
+
+  /**
+   * Change user password with current password verification
+   */
+  async changePassword(
+    email: string,
+    currentPass: string,
+    newPass: string,
+    role: UserRole = 'teacher'
+  ): Promise<{ success: boolean; error?: string }> {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' ||
+      cleanEmail === 'teacher@studyhub.edu' ||
+      role === 'teacher';
+
+    if (isTeacher) {
+      const storedTeacherPass = localStorage.getItem('studyhub_teacher_custom_password');
+      const validCurrent = storedTeacherPass
+        ? currentPass === storedTeacherPass
+        : currentPass === 'password123' || currentPass === 'Ahmad@2026';
+
+      if (!validCurrent) {
+        return { success: false, error: 'Current faculty password is incorrect.' };
+      }
+
+      if (newPass.length < 6) {
+        return { success: false, error: 'New password must be at least 6 characters long.' };
+      }
+
+      localStorage.setItem('studyhub_teacher_custom_password', newPass);
+      return { success: true };
+    } else {
+      const storedStudentPass = localStorage.getItem('studyhub_student_custom_password');
+      const validCurrent = storedStudentPass
+        ? currentPass === storedStudentPass
+        : currentPass === 'password123';
+
+      if (!validCurrent) {
+        return { success: false, error: 'Current student password is incorrect.' };
+      }
+
+      if (newPass.length < 6) {
+        return { success: false, error: 'New password must be at least 6 characters long.' };
+      }
+
+      localStorage.setItem('studyhub_student_custom_password', newPass);
+      return { success: true };
+    }
   },
 };

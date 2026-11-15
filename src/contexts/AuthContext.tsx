@@ -36,8 +36,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const configured = isSupabaseConfigured();
   const isDemoMode = !configured || user === null;
 
+  const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
+    if (!p) return fallbackRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
+    const clean = { ...p };
+    if (clean.email && clean.email.toLowerCase().includes('bilal')) {
+      clean.email = 'student@studyhub.edu';
+      clean.name = 'Student Scholar';
+    }
+    if (clean.name && clean.name.toLowerCase().includes('bilal')) {
+      clean.name = 'Student Scholar';
+      clean.email = 'student@studyhub.edu';
+    }
+    if (clean.email && clean.email.toLowerCase().includes('clara')) {
+      clean.email = 'ahmadwebcore@gmail.com';
+      clean.name = 'Ahmad';
+    }
+    if (clean.name && clean.name.toLowerCase().includes('clara')) {
+      clean.name = 'Ahmad';
+      clean.email = 'ahmadwebcore@gmail.com';
+    }
+    return clean;
+  };
+
   useEffect(() => {
     let mounted = true;
+
+    // Purge any legacy localStorage keys containing bilal or clara
+    try {
+      const studentEmail = localStorage.getItem('studyhub_student_configured_gmail');
+      if (studentEmail && studentEmail.includes('bilal')) {
+        localStorage.setItem('studyhub_student_configured_gmail', 'student@studyhub.edu');
+      }
+      const teacherEmail = localStorage.getItem('studyhub_teacher_configured_gmail');
+      if (teacherEmail && teacherEmail.includes('clara')) {
+        localStorage.setItem('studyhub_teacher_configured_gmail', 'ahmadwebcore@gmail.com');
+      }
+    } catch {}
 
     async function initAuth() {
       if (!configured) {
@@ -53,7 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(initialSession.user);
           const userProfile = await authService.fetchUserProfile(initialSession.user.id);
           if (mounted) {
-            setProfile(userProfile);
+            setProfile(sanitizeProfile(userProfile, demoRole));
           }
         }
       } catch {
@@ -77,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (currentSession?.user) {
             const userProfile = await authService.fetchUserProfile(currentSession.user.id);
-            if (mounted) setProfile(userProfile);
+            if (mounted) setProfile(sanitizeProfile(userProfile, demoRole));
           } else {
             if (mounted) setProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
           }

@@ -40,7 +40,7 @@ export const TestSubmissionPage: React.FC = () => {
   }, [user]);
 
   const availableTests = tests
-    .filter((t) => t.status === 'scheduled')
+    .filter((t) => t.status === 'scheduled' || t.status === 'ongoing')
     .filter((t) =>
       searchTerm
         ? t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

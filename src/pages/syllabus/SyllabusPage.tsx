@@ -28,6 +28,7 @@ import { syllabusService } from '../../services/syllabusService';
 import { subjectService } from '../../services/subjectService';
 import { taskService } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
+import { mediaService } from '../../services/mediaService';
 
 const chapterSchema = z.object({
   title: z.string().min(3, 'Chapter title must be at least 3 characters'),
@@ -66,7 +67,7 @@ export const SyllabusPage: React.FC = () => {
   // Student Syllabus Upload & Auto-Scheduler State
   const [uploadedSyllabusName, setUploadedSyllabusName] = useState<string>('');
   const [taskDurationChoice, setTaskDurationChoice] = useState<number>(45); // 30, 45, 60, 90 mins
-  const [paceTargetChoice, setPaceTargetChoice] = useState<'2_weeks' | '4_weeks' | '8_weeks'>('4_weeks');
+  const [paceTargetChoice, setPaceTargetChoice] = useState<'entire_book' | '2_weeks' | '4_weeks' | '8_weeks'>('entire_book');
   const [isGeneratingPlan, setIsGeneratingPlan] = useState<boolean>(false);
   const [isManualTaskModalOpen, setIsManualTaskModalOpen] = useState<boolean>(false);
   const [manualTaskTitle, setManualTaskTitle] = useState<string>('');
@@ -319,7 +320,28 @@ export const SyllabusPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadedSyllabusName(file.name);
-    setSuccessToast(`Syllabus "${file.name}" loaded. Pick your daily study duration below to automate tasks.`);
+
+    // Save to Media Center immediately
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const isImage = ['png', 'jpg', 'jpeg', 'webp'].includes(ext || '');
+    const isDoc = ['doc', 'docx'].includes(ext || '');
+
+    mediaService.addMediaItem({
+      name: file.name,
+      originalName: file.name,
+      category: isImage ? 'image' : 'syllabus',
+      fileType: isImage ? 'image' : isDoc ? 'docx' : 'pdf',
+      fileSizeBytes: file.size,
+      uploadedBy: role === 'teacher' ? 'Ahmad WebCore' : 'Student Scholar',
+      uploadedByRole: role,
+      subjectId: selectedSubjectId,
+      subjectName: currentSubject.name,
+      subjectCode: currentSubject.code,
+      description: `Syllabus / course roadmap uploaded for ${currentSubject.name}.`,
+      tasksGenerated: false,
+    });
+
+    setSuccessToast(`"${file.name}" saved to Media Center! Select daily pace below to generate monthly schedule.`);
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
@@ -327,20 +349,45 @@ export const SyllabusPage: React.FC = () => {
     setIsGeneratingPlan(true);
     await new Promise((r) => setTimeout(r, 600));
 
-    syllabusList.forEach((unit, idx) => {
-      taskService.generateDailyTasksFromSource({
-        sourceType: 'syllabus',
-        sourceTitle: `${currentSubject.name}: ${unit.title}`,
+    if (paceTargetChoice === 'entire_book') {
+      const res = taskService.generateEntireBookTasksAndDailyTests({
         subjectId: selectedSubjectId,
         subjectName: currentSubject.name,
         subjectCode: currentSubject.code,
-        totalPagesOrTopics: unit.topics.length || 6,
-        startPage: idx * 10 + 1,
+        bookTitle: uploadedSyllabusName || `${currentSubject.name} Textbook & Syllabus`,
+        sourceType: uploadedSyllabusName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'syllabus',
+        totalPages: 240,
+        totalChapters: syllabusList.length || 10,
+        studentName: 'Student Scholar',
       });
+
+      setIsGeneratingPlan(false);
+      setSuccessToast(`🎉 Entire Book daily tasks (${res.tasks.length} tasks) & Daily Test Series (${res.testsCount} assessments) scheduled for ${currentSubject.name} through February 28th!`);
+      setTimeout(() => setSuccessToast(null), 6000);
+      return;
+    }
+
+    // Extract all topics from syllabus chapters
+    const topicsList = syllabusList.flatMap((unit) =>
+      unit.topics.map((t) => `${unit.title}: ${t.title}`)
+    );
+
+    const weeks = paceTargetChoice === '2_weeks' ? 2 : paceTargetChoice === '8_weeks' ? 8 : 4;
+
+    taskService.generateMonthlyTasksFromSource({
+      sourceType: uploadedSyllabusName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'syllabus',
+      sourceTitle: uploadedSyllabusName || `${currentSubject.name} Official Syllabus`,
+      subjectId: selectedSubjectId,
+      subjectName: currentSubject.name,
+      subjectCode: currentSubject.code,
+      studentName: 'Student Scholar',
+      totalWeeks: weeks,
+      dailyMinutes: taskDurationChoice,
+      customTopics: topicsList.length > 0 ? topicsList : undefined,
     });
 
     setIsGeneratingPlan(false);
-    setSuccessToast(`Automated daily ${taskDurationChoice}-minute study tasks generated for ${currentSubject.name} with Sundays OFF!`);
+    setSuccessToast(`Automated ${weeks}-Week daily study schedule created for ${currentSubject.name} (Sundays strictly OFF)! Check Weekly Tasks.`);
     setTimeout(() => setSuccessToast(null), 5000);
   };
 
@@ -528,12 +575,12 @@ export const SyllabusPage: React.FC = () => {
             <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-zinc-200 rounded-lg bg-white hover:border-emerald-500 hover:bg-emerald-50/20 cursor-pointer transition-colors text-center">
               <Upload className="w-5 h-5 text-zinc-400 mb-1" />
               <span className="text-xs font-semibold text-zinc-700 truncate max-w-[200px]">
-                {uploadedSyllabusName || 'Choose PDF or Syllabus Image'}
+                {uploadedSyllabusName || 'Choose PDF, Doc or Screenshot'}
               </span>
-              <span className="text-[10px] text-zinc-400">PDF, JPG, PNG up to 25MB</span>
+              <span className="text-[10px] text-zinc-400">PDF, Word Doc, PNG, JPG up to 25MB</span>
               <input
                 type="file"
-                accept=".pdf,image/*"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,image/*"
                 onChange={handleFileUpload}
                 className="hidden"
               />
@@ -579,6 +626,7 @@ export const SyllabusPage: React.FC = () => {
                 onChange={(e) => setPaceTargetChoice(e.target.value as any)}
                 className="w-full h-8 px-2 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-800 font-medium focus:outline-none"
               >
+                <option value="entire_book">Entire Book + Daily Tests (Feb 28 Sprint)</option>
                 <option value="2_weeks">2 Weeks (Exam Sprint)</option>
                 <option value="4_weeks">4 Weeks (Standard Semester)</option>
                 <option value="8_weeks">8 Weeks (Comprehensive Review)</option>

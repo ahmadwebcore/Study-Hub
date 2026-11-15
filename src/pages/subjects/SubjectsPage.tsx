@@ -30,7 +30,7 @@ const subjectSchema = z.object({
   code: z.string().min(3, 'Subject code must be at least 3 characters').max(10, 'Code too long'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   totalModules: z.number().min(1, 'Minimum 1 module').max(30, 'Maximum 30 modules'),
-  category: z.enum(['1st Year FSc', '2nd Year FSc', 'STEM', 'Humanities', 'Languages', 'Commerce']),
+  category: z.enum(['1st Year FA-IT', 'FA-IT', '1st Year FSc', '2nd Year FSc', 'STEM', 'Humanities', 'Languages', 'Commerce']),
   course: z.string().min(2, 'Course stream is required'),
   academicSession: z.string().min(4, 'Session is required'),
   accentColor: z.string().min(4, 'Color is required'),

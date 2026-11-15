@@ -9,15 +9,22 @@ import {
   Check,
   Search,
   UserPlus,
+  Upload,
+  KeyRound,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { ComposeEmailModal } from '../../components/mail/ComposeEmailModal';
+import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
 import { useRole } from '../../hooks/useRole';
 import { testService } from '../../services/testService';
 import { taskService, DailyTask } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
 import { studentService } from '../../services/studentService';
+import { notificationService } from '../../services/notificationService';
+import { FebruarySprintTracker } from '../../components/planner/FebruarySprintTracker';
+import { BISEDGKhanBoardWidget } from '../../components/board/BISEDGKhanBoardWidget';
 
 const testSchema = z.object({
   title: z.string().min(3, 'Test title must be at least 3 characters'),
@@ -36,16 +43,16 @@ export const TeacherDashboard: React.FC = () => {
   const [isScheduleTestOpen, setIsScheduleTestOpen] = useState(false);
   const [isComposeEmailOpen, setIsComposeEmailOpen] = useState(false);
   const [isInviteStudentOpen, setIsInviteStudentOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [newStudentName, setNewStudentName] = useState('Student Scholar');
   const [newStudentEmail, setNewStudentEmail] = useState('student@studyhub.edu');
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [approvingTask, setApprovingTask] = useState<DailyTask | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState('Work verified and approved.');
-  const [taskMarks, setTaskMarks] = useState<number>(45);
-  const [taskMaxMarks, setTaskMaxMarks] = useState<number>(50);
+  const [taskMarks, setTaskMarks] = useState<number>(27);
+  const [taskMaxMarks, setTaskMaxMarks] = useState<number>(30);
 
   const configuredStudent = emailService.getStudentConfiguredEmail();
-  const teacherEmail = 'ahmadwebcore@gmail.com';
 
   const loadTasks = () => {
     setTasks(taskService.getTasks());
@@ -63,23 +70,23 @@ export const TeacherDashboard: React.FC = () => {
   } = useForm<TestFormData>({
     resolver: zodResolver(testSchema),
     defaultValues: {
-      title: 'Unit 3 Comprehensive Assessment',
-      subject: 'Advanced Mathematics',
+      title: 'Physical Education Unit 1 Assessment',
+      subject: 'Physical Education (صحت و جسمانی تعلیم)',
       date: '2026-11-20',
-      durationMinutes: 60,
+      durationMinutes: 45,
     },
   });
 
   const onScheduleTest = async (data: TestFormData) => {
     await testService.scheduleTest({
       title: data.title,
-      subjectId: 'sub-math-101',
+      subjectId: 'sub_01',
       subjectName: data.subject,
-      subjectCode: 'MATH-101',
+      subjectCode: 'FSC-PED-11',
       date: data.date,
       time: '09:00',
       durationMinutes: data.durationMinutes,
-      totalMarks: 50,
+      totalMarks: 30,
       syllabusCoverage: 'Full Diagnostic',
     });
 
@@ -92,27 +99,35 @@ export const TeacherDashboard: React.FC = () => {
   const handleSendInvite = async () => {
     if (!newStudentEmail || !newStudentEmail.includes('@')) return;
 
+    const token = `INV-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
     await studentService.createInvitation(
       newStudentEmail,
       user.id || 'usr_t_01',
       'Grade 11',
-      'Advanced STEM',
-      'Cambridge International',
+      '1st Year Intermediate',
+      'Punjab & Federal Board',
       '2026-2027'
     );
 
     emailService.sendInvitationEmail({
       studentEmail: newStudentEmail,
       studentName: newStudentName,
-      teacherName: 'Ahmad WebCore',
-      inviteToken: 'INV-STUDYHUB-2026-MATH',
-      course: 'Advanced STEM',
-      board: 'Cambridge International',
+      teacherName: 'Ahmad',
+      inviteToken: token,
+      course: '1st Year Intermediate',
+      board: 'Punjab & Federal Board',
+    });
+
+    notificationService.addNotification({
+      title: `✉️ Student Invitation Dispatched`,
+      message: `Invitation token ${token} sent to ${newStudentEmail}. Direct link issued.`,
+      category: 'system',
     });
 
     emailService.setStudentConfiguredEmail(newStudentEmail);
     setIsInviteStudentOpen(false);
-    setSuccessToast(`Invitation sent to ${newStudentEmail} with token INV-STUDYHUB-2026-MATH.`);
+    setSuccessToast(`Invitation sent to ${newStudentEmail} with token ${token}.`);
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
@@ -121,7 +136,7 @@ export const TeacherDashboard: React.FC = () => {
 
     const taskPercentage = taskMaxMarks > 0 ? Math.round((taskMarks / taskMaxMarks) * 100) : 100;
     const finalNote = `${approvalFeedback} [Marks Awarded: ${taskMarks}/${taskMaxMarks} (${taskPercentage}%)]`;
-    taskService.approveTask(approvingTask.id, 'Ahmad WebCore', finalNote);
+    taskService.approveTask(approvingTask.id, 'Ahmad', finalNote);
     loadTasks();
     setApprovingTask(null);
     setSuccessToast(`Task "${approvingTask.title}" approved with ${taskMarks}/${taskMaxMarks} Marks (${taskPercentage}%).`);
@@ -168,11 +183,25 @@ export const TeacherDashboard: React.FC = () => {
             Faculty Overview
           </h1>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Faculty Lead: <strong className="text-zinc-800">Ahmad WebCore</strong> &bull; {teacherEmail}
+            Faculty Lead: <strong className="text-zinc-800">Ahmad</strong> (Academic Director)
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/weekly-tasks"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors shadow-xs"
+          >
+            <Upload className="w-3.5 h-3.5 text-emerald-600" />
+            Upload Syllabus & Schedule Tasks
+          </Link>
+          <button
+            onClick={() => setIsChangePasswordOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
+          >
+            <KeyRound className="w-3.5 h-3.5 text-zinc-500" />
+            Change Password
+          </button>
           <button
             onClick={() => setIsInviteStudentOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors shadow-xs"
@@ -196,6 +225,12 @@ export const TeacherDashboard: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* 3-Month Target Sprint & Daily Book Quota Engine */}
+      <FebruarySprintTracker />
+
+      {/* BISE DG Khan Official Board Widget */}
+      <BISEDGKhanBoardWidget />
 
       {/* Plain Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -567,6 +602,16 @@ export const TeacherDashboard: React.FC = () => {
         onClose={() => setIsComposeEmailOpen(false)}
         defaultRecipientEmail={configuredStudent}
         defaultRecipientName="Student Scholar"
+      />
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        onSuccess={() => {
+          setSuccessToast('Account password updated successfully.');
+          setTimeout(() => setSuccessToast(null), 3500);
+        }}
       />
     </div>
   );

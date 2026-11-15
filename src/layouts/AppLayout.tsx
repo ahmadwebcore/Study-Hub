@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { Navbar } from '../components/navigation/Navbar';
+import { StudyBotWidget } from '../components/ai/StudyBotWidget';
 import { X } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
@@ -47,6 +48,9 @@ export const AppLayout: React.FC = () => {
           <main className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
+
+          {/* Floating AI Study Assistant & CS Urdu Explainer */}
+          <StudyBotWidget />
 
           {/* Minimalist 2026 Footer */}
           <footer className="py-4 px-6 border-t border-[#e1ede7] text-center text-xs text-[#7d9990] bg-white/50">

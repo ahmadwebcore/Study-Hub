@@ -24,21 +24,35 @@ export const twoFactorService = {
     const cleanEmail = email.trim().toLowerCase();
     const stored = localStorage.getItem(`${STORAGE_PREFIX}${cleanEmail}`);
 
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' ||
+      cleanEmail === 'teacher@studyhub.edu';
+
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as TwoFactorConfig;
+        // Teacher is always permanently enrolled with established AHMADWEBCORE2345 secret
+        if (isTeacher) {
+          parsed.isEnrolled = true;
+          parsed.secret = 'AHMADWEBCORE2345';
+        }
         return parsed;
       } catch {
         // Fall through to default setup
       }
     }
 
-    // Default: Not enrolled yet, generate initial secret for enrollment
     const newConfig: TwoFactorConfig = {
       email: cleanEmail,
-      isEnrolled: false,
-      secret: generateTOTPSecret(),
-      recoveryCodes: generateRecoveryCodes(4),
+      isEnrolled: isTeacher, // Teacher is already enrolled with their established secret
+      secret: isTeacher ? 'AHMADWEBCORE2345' : generateTOTPSecret(),
+      recoveryCodes: [
+        'SH-8492-3819',
+        'SH-4920-8172',
+        'SH-9281-3719',
+        'SH-3819-9482',
+      ],
+      enrolledAt: isTeacher ? '2026-11-12T12:00:00.000Z' : undefined,
     };
 
     localStorage.setItem(`${STORAGE_PREFIX}${cleanEmail}`, JSON.stringify(newConfig));

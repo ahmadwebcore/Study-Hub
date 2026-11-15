@@ -71,7 +71,7 @@ export interface Subject {
   nextClassTime: string;
   scheduleDays: string[];
   progress: number;
-  category: 'STEM' | 'Humanities' | 'Languages' | 'Commerce' | '1st Year FSc' | '2nd Year FSc';
+  category: 'STEM' | 'Humanities' | 'Languages' | 'Commerce' | '1st Year FSc' | '2nd Year FSc' | '1st Year FA-IT' | 'FA-IT';
   course?: string;
   academicSession?: string;
   description?: string;
@@ -379,7 +379,33 @@ export interface NotificationItem {
   message: string;
   timestamp: string;
   read: boolean;
-  category: 'assignment' | 'test' | 'grade' | 'schedule' | 'system';
+  category: 'assignment' | 'test' | 'grade' | 'schedule' | 'system' | 'board' | 'chat';
+  actionUrl?: string;
+  actionLabel?: string;
+  badge?: string;
+  urgent?: boolean;
+}
+
+export interface BISEDGKhanUpdate {
+  id: string;
+  title: string;
+  category: 'Date Sheet' | 'Pairing Scheme' | 'Roll Number' | 'Syllabus Circular' | 'Model Paper';
+  date: string;
+  isNew: boolean;
+  urgent: boolean;
+  summary: string;
+  pdfUrl?: string;
+  targetClass: string;
+}
+
+export interface PairingSchemeItem {
+  subjectId: string;
+  subjectName: string;
+  totalMarks: number;
+  mcqsBreakdown: { chapter: string; mcqsCount: number }[];
+  shortQuestions: { questionNum: string; attempt: number; total: number; chapters: string }[];
+  longQuestions: { questionNum: string; attempt: number; total: number; chapters: string }[];
+  notes: string;
 }
 
 export interface PerformanceMetric {

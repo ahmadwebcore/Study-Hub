@@ -110,8 +110,8 @@ export const bookService = {
         title: params.title,
         description: params.description,
         subjectId: params.subjectId,
-        subjectName: 'Advanced Calculus & Vectors',
-        subjectCode: 'MATH-301',
+        subjectName: 'Computer Science (کمپیوٹر سائنس)',
+        subjectCode: 'FSC-CSC-11',
         category: params.category,
         fileName: params.file.name,
         fileUrl: `books/${params.file.name}`,
@@ -119,7 +119,7 @@ export const bookService = {
         fileType: ext,
         version: 1,
         uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        uploadedBy: 'Ahmad WebCore',
+        uploadedBy: 'Ahmad',
       };
       return { book: mockBook, error: null };
     }

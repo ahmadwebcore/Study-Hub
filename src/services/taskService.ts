@@ -3,6 +3,8 @@
 // manages Teacher Approval Gate, and triggers automatic late alerts.
 
 import { emailService } from './emailService';
+import { testService } from './testService';
+import { notificationService } from './notificationService';
 import { getPakistanHoliday } from '../data/pakistanHolidays';
 
 export interface DailyTask {
@@ -10,7 +12,7 @@ export interface DailyTask {
   subjectId: string;
   subjectName: string;
   subjectCode: string;
-  sourceType: 'syllabus' | 'book_pdf' | 'manual';
+  sourceType: 'syllabus' | 'book_pdf' | 'manual' | 'document' | 'screenshot';
   sourceTitle: string;
   title: string;
   description: string;
@@ -59,137 +61,137 @@ const SEED_TASKS: DailyTask[] = [
   {
     id: 'tsk_01',
     subjectId: 'sub_01',
-    subjectName: 'Advanced Calculus & Vectors',
-    subjectCode: 'MATH-301',
+    subjectName: 'Physical Education (صحت و جسمانی تعلیم)',
+    subjectCode: 'FSC-PED-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Stewart Calculus (9th Edition)',
-    title: 'Differential Operators & Surface Integrals',
-    description: 'Read pages 340-355 and solve fundamental vector field boundary equations.',
+    sourceTitle: 'Physical Education 1st Year (PTB)',
+    title: 'نظام دورانِ خون و ۴۰۰ میٹر ٹریک کے امتحانی اصول',
+    description: 'انسانی دل کی ساخت، خون کی گردش، اور ۴۰۰ میٹر ٹریک کے بیٹن ایکسچینج زون کے اصول پڑھیں اور مختصر سوالات حل کریں۔',
     assignedDate: '2026-11-09',
     dueDate: '2026-11-09',
     dayOfWeek: 'Monday',
     isSundayOff: false,
-    pagesRange: 'Pages 340 - 355',
+    pagesRange: 'صفحات ۱۲ - ۱۸',
     estimatedMinutes: 60,
     status: 'approved',
     studentSubmission: {
       submittedAt: 'Nov 09, 2026 at 06:15 PM',
-      notes: 'Completed all 5 surface integral exercises with complete working calculations.',
+      notes: 'دل کی ڈایاگرام اور ٹریک قوانین کے نوٹس مکمل کر کے اپلوڈ کر دیے ہیں۔',
     },
     approval: {
-      approvedBy: 'Ahmad WebCore',
+      approvedBy: 'Ahmad',
       approvedAt: 'Nov 09, 2026 at 08:30 PM',
-      feedback: 'Verified. Working calculations are rigorous and notation is exact.',
+      feedback: 'بہترین کام! ڈایاگرام صاف ہے اور امتحانی خاکہ مکمل ہے۔ مارکس: 28/30',
     },
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_02',
-    subjectId: 'sub_01',
-    subjectName: 'Advanced Calculus & Vectors',
-    subjectCode: 'MATH-301',
+    subjectId: 'sub_02',
+    subjectName: 'Urdu & Grammar (اردو لازمی و قواعد)',
+    subjectCode: 'FSC-URD-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Stewart Calculus (9th Edition)',
-    title: 'Stokes Theorem & Curl Fields Formulation',
-    description: 'Read pages 356-370 and complete the curl field parameterization exercise.',
+    sourceTitle: 'سرمایہ اردو - سال اول',
+    title: 'سبق اسوہ حسنہؐ کا خلاصہ و دوست کے نام خط',
+    description: 'مولانا شبلی نعمانی کا سبق اسوہ حسنہؐ کا ایک تہائی خلاصہ تحریر کریں اور دوست کے نام خط کی امتحانی مشق کریں۔',
     assignedDate: '2026-11-10',
     dueDate: '2026-11-10',
     dayOfWeek: 'Tuesday',
     isSundayOff: false,
-    pagesRange: 'Pages 356 - 370',
+    pagesRange: 'صفحات ۵ - ۱۲',
     estimatedMinutes: 75,
     status: 'approved',
     studentSubmission: {
       submittedAt: 'Nov 10, 2026 at 05:40 PM',
-      notes: 'Attached scanned notes on Stokes theorem proof.',
+      notes: 'خلاصہ اور خط کے امتحانی اصولوں کے مطابق لکھ لیا ہے۔',
     },
     approval: {
-      approvedBy: 'Ahmad WebCore',
+      approvedBy: 'Ahmad',
       approvedAt: 'Nov 10, 2026 at 07:15 PM',
-      feedback: 'Good proof steps. Well done.',
+      feedback: 'خوبصورت لکھائی اور درست املا۔ خلاصے کا سائز بہترین ہے۔ مارکس: 29/30',
     },
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_03',
-    subjectId: 'sub_02',
-    subjectName: 'Quantum Physics & Mechanics',
-    subjectCode: 'PHYS-202',
-    sourceType: 'syllabus',
-    sourceTitle: 'Syllabus Unit 2: Wave Mechanics',
-    title: 'Time-Independent Schrödinger Equation Derivation',
-    description: 'Study syllabus unit 2.1 notes and write out particle in a box wave function.',
+    subjectId: 'sub_03',
+    subjectName: 'English & Grammar (انگریزی لازمی)',
+    subjectCode: 'FSC-ENG-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'English Book 1 & Board Grammar',
+    title: 'Button, Button Short Questions & Direct/Indirect Drill',
+    description: 'Solve 5 board short questions from Button Button and convert 10 sentences to Indirect speech.',
     assignedDate: '2026-11-11',
     dueDate: '2026-11-11',
     dayOfWeek: 'Wednesday',
     isSundayOff: false,
-    pagesRange: 'Pages 45 - 60',
+    pagesRange: 'Pages 1 - 8',
     estimatedMinutes: 90,
     status: 'submitted_for_approval',
     studentSubmission: {
       submittedAt: 'Nov 11, 2026 at 07:00 PM',
-      notes: 'Submitted wave equation solutions. Awaiting teacher review.',
+      notes: 'Completed all 5 short answers and punctuation rules. Ready for evaluation.',
     },
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_04',
-    subjectId: 'sub_02',
-    subjectName: 'Quantum Physics & Mechanics',
-    subjectCode: 'PHYS-202',
+    subjectId: 'sub_04',
+    subjectName: 'Computer Science (کمپیوٹر سائنس)',
+    subjectCode: 'FSC-CSC-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Principles of Quantum Mechanics (Griffiths)',
-    title: 'Harmonic Oscillator & Ladder Operators',
-    description: 'Read Griffiths pages 120-135 and derive algebraic raising and lowering operators.',
+    sourceTitle: 'Computer Science 1st Year PTB',
+    title: 'Network Topologies & Bus Architecture in Urdu',
+    description: 'Understand Bus, Star, and Ring topologies. Use AI Chatbot (استاد AI) for Urdu analogies and complete diagrams.',
     assignedDate: '2026-11-12',
     dueDate: '2026-11-12',
     dayOfWeek: 'Thursday',
     isSundayOff: false,
-    pagesRange: 'Pages 120 - 135',
+    pagesRange: 'Pages 24 - 35',
     estimatedMinutes: 80,
     status: 'pending',
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_05',
-    subjectId: 'sub_03',
-    subjectName: 'Organic & Analytical Chemistry',
-    subjectCode: 'CHEM-205',
+    subjectId: 'sub_05',
+    subjectName: 'Islamiyat & Tarjuma (اسلامیات و ترجمۃ القرآن)',
+    subjectCode: 'FSC-ISL-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Organic Chemistry Lab Manual',
-    title: 'Electrophilic Aromatic Substitution Reaction Steps',
-    description: 'Review mechanism steps for benzene nitration and halogenation in lab manual.',
+    sourceTitle: 'اسلامیات لازمی و ترجمۃ القرآن سال اول',
+    title: 'عقیدہ توحید کے اثرات اور سورۃ البقرہ رکوع ۱',
+    description: 'عقیدہ توحید کا انسانی زندگی پر عملی اثر اور سورۃ البقرہ آیات ۱-۷ کا سلیس با محاورہ ترجمہ نوٹ کریں۔',
     assignedDate: '2026-11-13',
     dueDate: '2026-11-13',
     dayOfWeek: 'Friday',
     isSundayOff: false,
-    pagesRange: 'Pages 80 - 95',
+    pagesRange: 'صفحات ۱ - ۱۰',
     estimatedMinutes: 60,
     status: 'pending',
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_06',
-    subjectId: 'sub_04',
-    subjectName: 'Data Structures & Algorithms',
-    subjectCode: 'CS-401',
-    sourceType: 'syllabus',
-    sourceTitle: 'Syllabus Unit 3: Dynamic Programming',
-    title: 'Longest Common Subsequence & Memoization Table',
-    description: 'Implement DP bottom-up tabular approach for LCS problem.',
+    subjectId: 'sub_06',
+    subjectName: 'Economics (اصول معاشیات)',
+    subjectCode: 'FSC-ECO-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'اصول معاشیات سال اول (پنجاب بورڈ)',
+    title: 'قانون طلب اور اس کے مفروضات مع ڈایاگرام',
+    description: 'قانون طلب کی تعریف، گوشوارہ بنائیں اور خط طلب کا منفی جھکاؤ پنسل سے صاف ڈرا کریں۔',
     assignedDate: '2026-11-14',
     dueDate: '2026-11-14',
     dayOfWeek: 'Saturday',
     isSundayOff: false,
-    pagesRange: 'Pages 210 - 225',
-    estimatedMinutes: 90,
+    pagesRange: 'صفحات ۱۸ - ۲۶',
+    estimatedMinutes: 75,
     status: 'pending',
-    studentId: 'usr_student_demo',
+    studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
@@ -470,6 +472,365 @@ class TaskService {
     return created;
   }
 
+  // Generate 1-Month (4-Week) Daily Tasks from an Uploaded PDF, Doc, or Screenshot Image
+  // Strictly enforces: Monday-Saturday Active Study, Sundays OFF, Pakistan Holidays OFF
+  public generateMonthlyTasksFromSource(params: {
+    sourceType: 'syllabus' | 'book_pdf' | 'document' | 'screenshot';
+    sourceTitle: string;
+    subjectId: string;
+    subjectName: string;
+    subjectCode: string;
+    studentId?: string;
+    studentName?: string;
+    totalWeeks?: number;
+    dailyMinutes?: number;
+    customTopics?: string[];
+    startDate?: string;
+    enforceSundayOff?: boolean;
+    enforcePakistanHolidays?: boolean;
+    tasksPerDay?: number;
+  }): DailyTask[] {
+    this.loadTasks();
+    const created: DailyTask[] = [];
+    const studentId = params.studentId || 'usr_student_demo';
+    const studentName = params.studentName || 'Student Scholar';
+    const numWeeks = params.totalWeeks || 4;
+    const totalDays = numWeeks * 7;
+    const dailyMinutes = params.dailyMinutes || 45;
+    const enforceSunday = params.enforceSundayOff !== false;
+    const enforceHolidays = params.enforcePakistanHolidays !== false;
+    const tasksPerDay = params.tasksPerDay || 1;
+
+    // Start date setup
+    let baseDate: Date;
+    if (params.startDate) {
+      baseDate = new Date(params.startDate);
+    } else {
+      baseDate = new Date();
+      const day = baseDate.getDay();
+      const diff = baseDate.getDate() - day + (day === 0 ? -6 : 1);
+      baseDate.setDate(diff);
+    }
+
+    let studyDayCounter = 1;
+
+    for (let i = 0; i < totalDays; i++) {
+      const taskDate = new Date(baseDate);
+      taskDate.setDate(baseDate.getDate() + i);
+
+      const year = taskDate.getFullYear();
+      const month = String(taskDate.getMonth() + 1).padStart(2, '0');
+      const dateNum = String(taskDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${dateNum}`;
+      const dayName = DAY_NAMES[taskDate.getDay()];
+
+      const isSunday = taskDate.getDay() === 0;
+      const pkHoliday = getPakistanHoliday(dateStr);
+      const weekNumber = Math.floor(i / 7) + 1;
+
+      if (isSunday && enforceSunday) {
+        // Enforce Sunday OFF!
+        const sundayTask: DailyTask = {
+          id: `tsk_month_sun_${Date.now()}_${i}`,
+          subjectId: params.subjectId,
+          subjectName: params.subjectName,
+          subjectCode: params.subjectCode,
+          sourceType: params.sourceType,
+          sourceTitle: params.sourceTitle,
+          title: `Sunday Off — Week ${weekNumber} Rest & Revision`,
+          description: `Mandatory rest day for ${params.sourceTitle}. Zero tasks or submissions required on Sundays. Consolidate weekly notes.`,
+          assignedDate: dateStr,
+          dueDate: dateStr,
+          dayOfWeek: 'Sunday',
+          isSundayOff: true,
+          estimatedMinutes: 0,
+          status: 'approved',
+          studentId,
+          studentName,
+        };
+        created.push(sundayTask);
+      } else if (pkHoliday && pkHoliday.isOffDay && enforceHolidays) {
+        // Pakistan Gazetted Holiday OFF!
+        const holidayTask: DailyTask = {
+          id: `tsk_month_pk_${Date.now()}_${i}`,
+          subjectId: params.subjectId,
+          subjectName: params.subjectName,
+          subjectCode: params.subjectCode,
+          sourceType: params.sourceType,
+          sourceTitle: params.sourceTitle,
+          title: `🇵🇰 Public Holiday — ${pkHoliday.name} (Off Day)`,
+          description: `${pkHoliday.description} Official Gazetted holiday observed across Pakistan. Zero tasks or exams scheduled.`,
+          assignedDate: dateStr,
+          dueDate: dateStr,
+          dayOfWeek: dayName,
+          isSundayOff: false,
+          isPakistanHoliday: true,
+          holidayName: pkHoliday.name,
+          urduName: pkHoliday.urduName,
+          estimatedMinutes: 0,
+          status: 'approved',
+          studentId,
+          studentName,
+        };
+        created.push(holidayTask);
+      } else {
+        const topicSuffix = params.customTopics && params.customTopics.length > 0
+          ? params.customTopics[(studyDayCounter - 1) % params.customTopics.length]
+          : `Module ${studyDayCounter}: Key Concepts & Numerical Problem Set`;
+
+        for (let t = 0; t < tasksPerDay; t++) {
+          const isSecond = t === 1;
+          const taskTitle = isSecond
+            ? `W${weekNumber} D${studyDayCounter} Practice: ${topicSuffix} (Exercises)`
+            : `W${weekNumber} D${studyDayCounter}: ${topicSuffix}`;
+
+          const regularTask: DailyTask = {
+            id: `tsk_month_${Date.now()}_${i}_${t}`,
+            subjectId: params.subjectId,
+            subjectName: params.subjectName,
+            subjectCode: params.subjectCode,
+            sourceType: params.sourceType,
+            sourceTitle: params.sourceTitle,
+            title: taskTitle,
+            description: isSecond
+              ? `Solve end-of-chapter numerical questions and exercise problems for ${topicSuffix}. Submit work for teacher verification.`
+              : `Daily syllabus study target derived from ${params.sourceTitle}. Study assigned section, solve practice questions, and submit your handwritten or typed solution for teacher evaluation.`,
+            assignedDate: dateStr,
+            dueDate: dateStr,
+            dayOfWeek: dayName,
+            isSundayOff: false,
+            pagesRange: `Target Unit ${Math.ceil(studyDayCounter / 3)}`,
+            estimatedMinutes: isSecond ? Math.round(dailyMinutes * 0.75) : dailyMinutes,
+            status: 'pending',
+            studentId,
+            studentName,
+          };
+          created.push(regularTask);
+        }
+        studyDayCounter++;
+      }
+    }
+
+    this.tasks = [...created, ...this.tasks];
+    this.saveTasks();
+    return created;
+  }
+
+  // Generate Daily Tasks for ENTIRE BOOK & Schedule Daily Test Series (Nov -> Feb 28 Target Deadline)
+  public generateEntireBookTasksAndDailyTests(params: {
+    subjectId: string;
+    subjectName: string;
+    subjectCode: string;
+    bookTitle: string;
+    sourceType?: 'book_pdf' | 'syllabus' | 'document' | 'screenshot';
+    totalPages?: number;
+    totalChapters?: number;
+    studentName?: string;
+    startDate?: string;
+  }): { tasks: DailyTask[]; testsCount: number } {
+    this.loadTasks();
+    const createdTasks: DailyTask[] = [];
+    const studentId = 'usr_student_demo';
+    const studentName = params.studentName || 'Student Scholar';
+    const totalPages = params.totalPages || 200;
+    const totalChapters = params.totalChapters || 10;
+    const pagesPerChapter = Math.max(12, Math.round(totalPages / totalChapters));
+
+    // Timetable mapping: Mon: Phys Ed, Tue: Urdu, Wed: English, Thu: Computer, Fri: Islamiyat, Sat: Economics
+    const subjectDayMap: Record<string, DailyTask['dayOfWeek']> = {
+      'sub_01': 'Monday',
+      'sub_02': 'Tuesday',
+      'sub_03': 'Wednesday',
+      'sub_04': 'Thursday',
+      'sub_05': 'Friday',
+      'sub_06': 'Saturday',
+    };
+    const designatedDay = subjectDayMap[params.subjectId] || 'Thursday';
+
+    const baseDate = params.startDate ? new Date(params.startDate) : new Date();
+    // 14 weeks to complete before Feb 28th
+    const totalWeeks = 14;
+
+    for (let w = 0; w < totalWeeks; w++) {
+      const chapterNum = Math.min(totalChapters, w + 1);
+      const chStartPage = ((chapterNum - 1) * pagesPerChapter) + 1;
+      const chEndPage = Math.min(totalPages, chapterNum * pagesPerChapter);
+
+      for (let d = 0; d < 7; d++) {
+        const taskDate = new Date(baseDate);
+        taskDate.setDate(baseDate.getDate() + (w * 7) + d);
+
+        const year = taskDate.getFullYear();
+        const month = String(taskDate.getMonth() + 1).padStart(2, '0');
+        const dateNum = String(taskDate.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${dateNum}`;
+        const dayName = DAY_NAMES[taskDate.getDay()];
+
+        const isSunday = taskDate.getDay() === 0;
+        const pkHoliday = getPakistanHoliday(dateStr);
+
+        if (isSunday) {
+          // Mandatory Sunday Rest Policy
+          createdTasks.push({
+            id: `tsk_eb_sun_${w}_${d}_${Date.now()}`,
+            subjectId: params.subjectId,
+            subjectName: params.subjectName,
+            subjectCode: params.subjectCode,
+            sourceType: params.sourceType || 'book_pdf',
+            sourceTitle: params.bookTitle,
+            title: `Sunday Off — Scheduled Rest & Light Revision`,
+            description: `Zero new assignments from ${params.bookTitle}. Rest day for mental consolidation and past week review.`,
+            assignedDate: dateStr,
+            dueDate: dateStr,
+            dayOfWeek: 'Sunday',
+            isSundayOff: true,
+            estimatedMinutes: 0,
+            status: 'approved',
+            studentId,
+            studentName,
+          });
+        } else if (pkHoliday && pkHoliday.isOffDay) {
+          createdTasks.push({
+            id: `tsk_eb_pk_${w}_${d}_${Date.now()}`,
+            subjectId: params.subjectId,
+            subjectName: params.subjectName,
+            subjectCode: params.subjectCode,
+            sourceType: params.sourceType || 'book_pdf',
+            sourceTitle: params.bookTitle,
+            title: `🇵🇰 Public Holiday — ${pkHoliday.name} (Off Day)`,
+            description: `${pkHoliday.description} Observed across Pakistan. Zero tasks scheduled.`,
+            assignedDate: dateStr,
+            dueDate: dateStr,
+            dayOfWeek: dayName,
+            isSundayOff: false,
+            isPakistanHoliday: true,
+            holidayName: pkHoliday.name,
+            urduName: pkHoliday.urduName,
+            estimatedMinutes: 0,
+            status: 'approved',
+            studentId,
+            studentName,
+          });
+        } else if (dayName === designatedDay) {
+          // Primary Intensive Chapter Day (e.g. Thursday for Computer Science)
+          createdTasks.push({
+            id: `tsk_eb_core_${w}_${d}_${Date.now()}`,
+            subjectId: params.subjectId,
+            subjectName: params.subjectName,
+            subjectCode: params.subjectCode,
+            sourceType: params.sourceType || 'book_pdf',
+            sourceTitle: params.bookTitle,
+            title: `Week ${w + 1} Deep Study: Chapter ${chapterNum} (Pages ${chStartPage}–${chEndPage})`,
+            description: `Primary subject study day for ${params.subjectName}. Read chapter ${chapterNum} in ${params.bookTitle}, complete numericals & practice questions, then prepare for the 50-mark Daily Test.`,
+            assignedDate: dateStr,
+            dueDate: dateStr,
+            dayOfWeek: dayName,
+            isSundayOff: false,
+            pagesRange: `Pages ${chStartPage} – ${chEndPage}`,
+            estimatedMinutes: 60,
+            priority: 'high',
+            status: 'pending',
+            studentId,
+            studentName,
+          });
+        } else {
+          // Daily Reading Quota Day (~2.5 pages / day to hit Feb 28 deadline)
+          const dailySubPage = chStartPage + Math.min(pagesPerChapter, d * 3);
+          createdTasks.push({
+            id: `tsk_eb_quota_${w}_${d}_${Date.now()}`,
+            subjectId: params.subjectId,
+            subjectName: params.subjectName,
+            subjectCode: params.subjectCode,
+            sourceType: params.sourceType || 'book_pdf',
+            sourceTitle: params.bookTitle,
+            title: `Daily Reading Quota: ${params.subjectName} (Target: ~2.5 Pages)`,
+            description: `Review Chapter ${chapterNum} key definitions and 3 board exam short questions from ${params.bookTitle} (Page ~${dailySubPage}).`,
+            assignedDate: dateStr,
+            dueDate: dateStr,
+            dayOfWeek: dayName,
+            isSundayOff: false,
+            pagesRange: `Page ~${dailySubPage}`,
+            estimatedMinutes: 30,
+            status: 'pending',
+            studentId,
+            studentName,
+          });
+        }
+      }
+    }
+
+    // Schedule Daily Test Series in testService
+    const scheduledTests = testService.scheduleDailyTestsForBook({
+      subjectId: params.subjectId,
+      subjectName: params.subjectName,
+      subjectCode: params.subjectCode,
+      bookTitle: params.bookTitle,
+      assignedDay: designatedDay as any,
+      totalWeeks: 12,
+      startDate: params.startDate,
+    });
+
+    // Save newly created tasks
+    this.tasks = [...createdTasks, ...this.tasks];
+    this.saveTasks();
+
+    // Dispatch Student Gmail Alert
+    emailService.dispatchManualNotification({
+      recipientEmail: 'student@studyhub.edu',
+      recipientName: studentName,
+      subject: `📚 Entire Book Loaded: Daily Tasks & Test Series for ${params.subjectName}`,
+      message: `Faculty Lead Ahmad uploaded "${params.bookTitle}". The entire book has been broken into daily targets and a 30-mark Daily Test Series scheduled every ${designatedDay} through February 28th.`,
+    });
+
+    // Dispatch In-App Notification
+    notificationService.addNotification({
+      title: `📚 Entire Book Loaded: ${params.subjectName}`,
+      message: `All chapters and daily tasks scheduled through Feb 28th + 30-mark Daily Tests created for ${designatedDay}s.`,
+      category: 'assignment',
+    });
+
+    return { tasks: createdTasks, testsCount: scheduledTests.length };
+  }
+
+  // Delete a task manually
+  public deleteTask(id: string): boolean {
+    this.loadTasks();
+    const prevLen = this.tasks.length;
+    this.tasks = this.tasks.filter((t) => t.id !== id);
+    if (this.tasks.length !== prevLen) {
+      this.saveTasks();
+      return true;
+    }
+    return false;
+  }
+
+  // Update a task manually (Title, Due Date, Duration, Priority, Description)
+  public updateTask(id: string, updates: Partial<DailyTask>): DailyTask | null {
+    this.loadTasks();
+    const index = this.tasks.findIndex((t) => t.id === id);
+    if (index === -1) return null;
+
+    let dayOfWeek = this.tasks[index].dayOfWeek;
+    let isSundayOff = this.tasks[index].isSundayOff;
+
+    if (updates.dueDate) {
+      const d = new Date(updates.dueDate);
+      const dayName = DAY_NAMES[d.getDay()] || 'Monday';
+      dayOfWeek = dayName;
+      isSundayOff = d.getDay() === 0;
+    }
+
+    this.tasks[index] = {
+      ...this.tasks[index],
+      ...updates,
+      dayOfWeek,
+      isSundayOff: updates.isSundayOff !== undefined ? updates.isSundayOff : isSundayOff,
+    };
+
+    this.saveTasks();
+    return this.tasks[index];
+  }
+
   // Student submits work (Enters "Awaiting Teacher Approval" gate)
   public submitTaskForApproval(
     taskId: string,
@@ -510,7 +871,7 @@ class TaskService {
       ...this.tasks[taskIndex],
       status: 'approved',
       approval: {
-        approvedBy: teacherName || 'Ahmad WebCore',
+        approvedBy: teacherName || 'Ahmad',
         approvedAt: new Date().toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',

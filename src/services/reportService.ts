@@ -26,8 +26,8 @@ export const reportService = {
         attendanceIndex: 96.8,
         submissionRate: 98.2,
         syllabusCompletion: 74.0,
-        strongSubjects: ['Advanced Calculus & Vectors (MATH-301)', 'Data Structures (CS-401)'],
-        weakSubjects: ['Analytical Chemistry (CHEM-205)'],
+        strongSubjects: ['Computer Science (FSC-CSC-11)', 'Urdu & Grammar (FSC-URD-11)'],
+        weakSubjects: ['Economics (FSC-ECO-11)'],
         upcomingDeadlines: 3,
       };
     }
@@ -57,8 +57,8 @@ export const reportService = {
         attendanceIndex: 96.8,
         submissionRate: 95.4,
         syllabusCompletion: 76.5,
-        strongSubjects: ['Advanced Calculus & Vectors (MATH-301)', 'Data Structures (CS-401)'],
-        weakSubjects: ['Analytical Chemistry (CHEM-205)'],
+        strongSubjects: ['Computer Science (FSC-CSC-11)', 'Urdu & Grammar (FSC-URD-11)'],
+        weakSubjects: ['Economics (FSC-ECO-11)'],
         upcomingDeadlines: upcoming || 3,
       };
     } catch {
@@ -67,8 +67,8 @@ export const reportService = {
         attendanceIndex: 96.8,
         submissionRate: 98.2,
         syllabusCompletion: 74.0,
-        strongSubjects: ['Advanced Calculus & Vectors (MATH-301)', 'Data Structures (CS-401)'],
-        weakSubjects: ['Analytical Chemistry (CHEM-205)'],
+        strongSubjects: ['Computer Science (FSC-CSC-11)', 'Urdu & Grammar (FSC-URD-11)'],
+        weakSubjects: ['Economics (FSC-ECO-11)'],
         upcomingDeadlines: 3,
       };
     }

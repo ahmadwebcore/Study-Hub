@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Menu, Search, ChevronDown, LogOut, Lock } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
-import { emailService } from '../../services/emailService';
 import { Badge } from '../ui/Badge';
 import { useNavigate, Link } from 'react-router-dom';
+import { BISEDGKhanModal } from '../board/BISEDGKhanModal';
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
@@ -13,10 +13,9 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const { role, profile, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  const configuredTeacher = emailService.getTeacherConfiguredEmail();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -60,6 +59,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
 
       {/* Right: Actions, Notifications, Profile */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* BISE DG Khan Quick Pill */}
+        <button
+          type="button"
+          onClick={() => setIsBoardModalOpen(true)}
+          className="hidden md:inline-flex items-center gap-1.5 h-10 px-3 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors shadow-2xs"
+          title="BISE D.G. Khan Board Updates & Pairing Scheme"
+        >
+          <span className="text-xs">🇵🇰</span>
+          <span>BISE DG Khan</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+        </button>
+
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 
@@ -82,10 +93,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
             />
             <div className="hidden lg:flex flex-col text-left">
               <span className="text-xs font-bold text-zinc-900 leading-tight">
-                {role === 'teacher' ? 'Ahmad WebCore' : (profile?.name || 'Student Scholar')}
+                {role === 'teacher' ? 'Ahmad' : (profile?.name && !profile.name.toLowerCase().includes('bilal') ? profile.name : 'Student Scholar')}
               </span>
               <span className="text-[10px] text-zinc-500 leading-tight">
-                {role === 'teacher' ? configuredTeacher : (profile?.email || 'student@studyhub.edu')}
+                {role === 'teacher' ? 'Faculty Lead' : '1st Year Scholar'}
               </span>
             </div>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hidden lg:block" />
@@ -96,10 +107,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
             <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-zinc-200 shadow-xl z-50 p-2 animate-in fade-in zoom-in-95 duration-150">
               <div className="p-3 border-b border-zinc-100">
                 <p className="text-xs font-bold text-zinc-900">
-                  {role === 'teacher' ? 'Ahmad WebCore' : (profile?.name || 'Student Scholar')}
+                  {role === 'teacher' ? 'Ahmad' : (profile?.name && !profile.name.toLowerCase().includes('bilal') ? profile.name : 'Student Scholar')}
                 </p>
                 <p className="text-[11px] text-zinc-500 truncate mt-0.5">
-                  {role === 'teacher' ? configuredTeacher : (profile?.email || 'student@studyhub.edu')}
+                  {role === 'teacher' ? 'Faculty Lead & Academic Director' : 'Enrolled Scholar (1st Year FSc)'}
                 </p>
                 <div className="mt-2 flex items-center gap-1.5">
                   <Badge variant={role === 'teacher' ? 'primary' : 'info'} size="sm" dot>
@@ -136,6 +147,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           )}
         </div>
       </div>
+
+      {/* BISE DG Khan Modal Accessible from Anywhere */}
+      <BISEDGKhanModal
+        isOpen={isBoardModalOpen}
+        onClose={() => setIsBoardModalOpen(false)}
+      />
     </header>
   );
 };

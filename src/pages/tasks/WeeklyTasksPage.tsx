@@ -9,12 +9,17 @@ import {
   Check,
   PlusCircle,
   Search,
+  Upload,
+  Edit3,
+  Trash2,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { taskService, DailyTask } from '../../services/taskService';
 import { subjectService } from '../../services/subjectService';
+import { mediaService } from '../../services/mediaService';
 import { Subject } from '../../types';
 import { useRole } from '../../hooks/useRole';
 
@@ -37,11 +42,40 @@ export const WeeklyTasksPage: React.FC = () => {
   const [teacherFeedback, setTeacherFeedback] = useState('Excellent attention to detail and rigorous step working. Certified complete.');
   const [isApproving, setIsApproving] = useState(false);
 
+  // PDF Upload & Auto-Schedule Modal State
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
-  const [genSourceTitle, setGenSourceTitle] = useState('Stewart Calculus (9th Edition)');
+  const [uploadedPdfFile, setUploadedPdfFile] = useState<File | null>(null);
+  const [uploadedPdfName, setUploadedPdfName] = useState('');
+  const [genScopeMode, setGenScopeMode] = useState<'entire_book' | 'custom_weeks'>('entire_book');
+  const [genSourceTitle, setGenSourceTitle] = useState('Intermediate Computer Science Textbook');
   const [genSubjectId, setGenSubjectId] = useState('sub_01');
-  const [genPagesCount, setGenPagesCount] = useState(120);
+  const [genWeeksScope, setGenWeeksScope] = useState<number>(4); // 1, 2, 4, 8
+  const [genDailyMinutes, setGenDailyMinutes] = useState<number>(45);
+  const [genTasksPerDay, setGenTasksPerDay] = useState<number>(1);
+  const [genStartDate, setGenStartDate] = useState<string>(() => {
+    const today = new Date();
+    return today.toISOString().slice(0, 10);
+  });
+  const [genEnforceSundayOff, setGenEnforceSundayOff] = useState<boolean>(true);
+  const [genEnforceHolidays, setGenEnforceHolidays] = useState<boolean>(true);
+  const [genCustomTopicsText, setGenCustomTopicsText] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Manual Task Creation Modal State
+  const [isManualTaskModalOpen, setIsManualTaskModalOpen] = useState(false);
+  const [manualTitle, setManualTitle] = useState('');
+  const [manualSubjectId, setManualSubjectId] = useState('');
+  const [manualDueDate, setManualDueDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [manualMinutes, setManualMinutes] = useState(45);
+  const [manualPriority, setManualPriority] = useState<'low' | 'normal' | 'high'>('normal');
+  const [manualDescription, setManualDescription] = useState('');
+
+  // Edit Task Modal State
+  const [editingTask, setEditingTask] = useState<DailyTask | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDueDate, setEditDueDate] = useState('');
+  const [editMinutes, setEditMinutes] = useState(45);
+  const [editDescription, setEditDescription] = useState('');
 
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
@@ -53,7 +87,11 @@ export const WeeklyTasksPage: React.FC = () => {
   useEffect(() => {
     loadData();
     subjectService.fetchSubjects().then((data) => {
-      if (data && data.length > 0) setSubjects(data);
+      if (data && data.length > 0) {
+        setSubjects(data);
+        setGenSubjectId(data[0].id);
+        setManualSubjectId(data[0].id);
+      }
     });
   }, []);
 
@@ -94,7 +132,7 @@ export const WeeklyTasksPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  // Teacher Approves Work (Gate: Work is ONLY done when teacher approves!)
+  // Teacher Approves Work
   const handleConfirmApprove = async () => {
     if (!approvingTask) return;
     setIsApproving(true);
@@ -119,25 +157,152 @@ export const WeeklyTasksPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  // Auto-generate weekly schedule from Book / Syllabus
+  // File Upload Handler for Modal
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadedPdfFile(file);
+    setUploadedPdfName(file.name);
+    setGenSourceTitle(file.name.replace(/\.[^/.]+$/, ''));
+  };
+
+  // Auto-generate weekly / monthly schedule from PDF or Syllabus with Full Manual Controls
   const handleConfirmGenerate = async () => {
     setIsGenerating(true);
     await new Promise((r) => setTimeout(r, 500));
     const selectedSubj = subjects.find((s) => s.id === genSubjectId);
-    taskService.generateDailyTasksFromSource({
-      sourceType: 'book_pdf',
-      sourceTitle: genSourceTitle,
+
+    // Save to Media Center if a real file was uploaded
+    if (uploadedPdfFile) {
+      const ext = uploadedPdfFile.name.split('.').pop()?.toLowerCase();
+      const isImg = ['png', 'jpg', 'jpeg', 'webp'].includes(ext || '');
+      const isDoc = ['doc', 'docx'].includes(ext || '');
+
+      mediaService.addMediaItem({
+        name: uploadedPdfFile.name,
+        originalName: uploadedPdfFile.name,
+        category: isImg ? 'image' : 'syllabus',
+        fileType: isImg ? 'image' : isDoc ? 'docx' : 'pdf',
+        fileSizeBytes: uploadedPdfFile.size,
+        uploadedBy: user?.name || (role === 'teacher' ? 'Ahmad WebCore' : 'Student Scholar'),
+        uploadedByRole: role,
+        subjectId: genSubjectId,
+        subjectName: selectedSubj?.name || 'Academic Subject',
+        subjectCode: selectedSubj?.code || 'SUBJ',
+        description: `Uploaded PDF / Syllabus generating ${genWeeksScope}-week daily schedule.`,
+        tasksGenerated: true,
+      });
+    }
+
+    if (genScopeMode === 'entire_book') {
+      const res = taskService.generateEntireBookTasksAndDailyTests({
+        subjectId: genSubjectId,
+        subjectName: selectedSubj?.name || 'Academic Subject',
+        subjectCode: selectedSubj?.code || 'SUBJ',
+        bookTitle: uploadedPdfName || genSourceTitle || `${selectedSubj?.name} Book`,
+        sourceType: uploadedPdfName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'book_pdf',
+        totalPages: 240,
+        totalChapters: 12,
+        studentName: role === 'student' ? (user?.name || 'Student Scholar') : 'Student Scholar',
+        startDate: genStartDate || undefined,
+      });
+
+      setIsGenerating(false);
+      setIsGenerateModalOpen(false);
+      setUploadedPdfFile(null);
+      setUploadedPdfName('');
+      setGenCustomTopicsText('');
+      loadData();
+      setSuccessToast(
+        `🎉 Entire Book daily study tasks (${res.tasks.length} tasks) & Daily Test Series (${res.testsCount} assessments) scheduled through February 28th! Check your schedule & tests desk.`
+      );
+      setTimeout(() => setSuccessToast(null), 6000);
+      return;
+    }
+
+    const customTopics = genCustomTopicsText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    taskService.generateMonthlyTasksFromSource({
+      sourceType: uploadedPdfName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'book_pdf',
+      sourceTitle: uploadedPdfName || genSourceTitle,
       subjectId: genSubjectId,
-      subjectName: selectedSubj?.name || 'Advanced Calculus & Vectors',
-      subjectCode: selectedSubj?.code || 'MATH-301',
-      totalPagesOrTopics: genPagesCount,
-      startPage: 1,
+      subjectName: selectedSubj?.name || '1st Year Subject',
+      subjectCode: selectedSubj?.code || 'FSC-PED-11',
+      studentName: role === 'student' ? (user?.name || 'Student Scholar') : 'Student Scholar',
+      totalWeeks: genWeeksScope,
+      dailyMinutes: genDailyMinutes,
+      tasksPerDay: genTasksPerDay,
+      startDate: genStartDate || undefined,
+      enforceSundayOff: genEnforceSundayOff,
+      enforcePakistanHolidays: genEnforceHolidays,
+      customTopics: customTopics.length > 0 ? customTopics : undefined,
     });
+
     setIsGenerating(false);
     setIsGenerateModalOpen(false);
+    setUploadedPdfFile(null);
+    setUploadedPdfName('');
+    setGenCustomTopicsText('');
     loadData();
-    setSuccessToast(`Weekly schedule generated from "${genSourceTitle}" (Monday-Saturday active, Sunday OFF)!`);
+    setSuccessToast(
+      `Automated ${genWeeksScope}-Week daily study schedule created from "${uploadedPdfName || genSourceTitle}" with Sundays strictly OFF!`
+    );
     setTimeout(() => setSuccessToast(null), 5000);
+  };
+
+  // Create Manual Task
+  const handleConfirmCreateManualTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualTitle.trim()) return;
+
+    const selectedSubj = subjects.find((s) => s.id === manualSubjectId) || subjects[0];
+    taskService.createCustomTask({
+      title: manualTitle.trim(),
+      description: manualDescription.trim() || `Manual daily task for ${selectedSubj?.name || 'Subject'}`,
+      subjectId: selectedSubj?.id || 'sub_01',
+      subjectName: selectedSubj?.name || 'Subject',
+      dueDate: manualDueDate,
+      estimatedMinutes: manualMinutes,
+      studentName: role === 'student' ? (user?.name || 'Student Scholar') : 'Student Scholar',
+    });
+
+    setIsManualTaskModalOpen(false);
+    setManualTitle('');
+    setManualDescription('');
+    loadData();
+    setSuccessToast(`Manual task "${manualTitle}" scheduled successfully.`);
+    setTimeout(() => setSuccessToast(null), 4000);
+  };
+
+  // Edit Task
+  const handleSaveEditTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTask || !editTitle.trim()) return;
+
+    taskService.updateTask(editingTask.id, {
+      title: editTitle.trim(),
+      dueDate: editDueDate,
+      estimatedMinutes: editMinutes,
+      description: editDescription.trim(),
+    });
+
+    setEditingTask(null);
+    loadData();
+    setSuccessToast(`Task updated successfully.`);
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
+  // Delete Task
+  const handleDeleteTask = (task: DailyTask) => {
+    if (window.confirm(`Are you sure you want to remove "${task.title}"?`)) {
+      taskService.deleteTask(task.id);
+      loadData();
+      setSuccessToast(`Task "${task.title}" deleted.`);
+      setTimeout(() => setSuccessToast(null), 3000);
+    }
   };
 
   const daysList = [
@@ -153,7 +318,7 @@ export const WeeklyTasksPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Toast */}
+      {/* Toast Notification */}
       {successToast && (
         <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-[#142D27] flex items-center justify-between text-xs font-semibold animate-in fade-in">
           <span className="flex items-center gap-2">
@@ -180,7 +345,8 @@ export const WeeklyTasksPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -188,19 +354,35 @@ export const WeeklyTasksPage: React.FC = () => {
             onClick={handleScanLateAlerts}
             title="Scan for overdue tasks and trigger automatic email alerts"
           >
-            Check Late Alerts
+            Late Scan
           </Button>
 
-          {role === 'teacher' && (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<PlusCircle className="w-3.5 h-3.5" />}
-              onClick={() => setIsGenerateModalOpen(true)}
-            >
-              Generate from Source
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<PlusCircle className="w-3.5 h-3.5 text-zinc-600" />}
+            onClick={() => {
+              setManualTitle('');
+              setManualSubjectId(subjects[0]?.id || 'sub_01');
+              setManualDueDate(new Date().toISOString().slice(0, 10));
+              setManualMinutes(45);
+              setManualDescription('');
+              setIsManualTaskModalOpen(true);
+            }}
+          >
+            + Add Task Manually
+          </Button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            icon={<Upload className="w-3.5 h-3.5" />}
+            onClick={() => setIsGenerateModalOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xs"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 mr-1" />
+            Upload PDF & Auto-Schedule
+          </Button>
         </div>
       </div>
 
@@ -258,89 +440,90 @@ export const WeeklyTasksPage: React.FC = () => {
       {/* Overdue Alert Strip */}
       {overdueCount > 0 && (
         <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span className="font-semibold">
-              {overdueCount} task{overdueCount > 1 ? 's are' : ' is'} overdue past the daily deadline. Automated reminder dispatches are active.
+            <span>
+              <strong>{overdueCount} Task(s) Overdue:</strong> Student Gmail addresses have been notified with deadline reminders.
             </span>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
-            Overdue Alert
-          </span>
+          <button
+            onClick={handleScanLateAlerts}
+            className="text-[11px] font-bold underline hover:text-amber-950"
+          >
+            Re-scan Now
+          </button>
         </div>
       )}
 
-      {/* Filter and Day Ribbon */}
-      <div className="flex flex-col md:flex-row gap-3">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7d9990]" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search daily tasks, topics, chapter or book..."
-            className="w-full h-10 pl-10 pr-4 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
-          />
+      {/* Filters Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#e1ede7]">
+        {/* Days Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          {daysList.map((d) => (
+            <button
+              key={d.value}
+              onClick={() => setSelectedDay(d.value)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                selectedDay === d.value
+                  ? 'bg-[#142D27] text-white shadow-xs'
+                  : d.value === 'sunday'
+                  ? 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-100'
+                  : 'bg-zinc-50 text-zinc-600 hover:bg-zinc-100'
+              }`}
+            >
+              {d.label}
+            </button>
+          ))}
         </div>
 
-        {/* Subject Filter */}
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          aria-label="Filter tasks by subject"
-          className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
-        >
-          <option value="all">All Subjects</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name} ({s.code})
-            </option>
-          ))}
-        </select>
+        {/* Search & Subject filter */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 sm:w-48">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search targets..."
+              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
+            />
+          </div>
 
-        {/* Status Filter */}
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          aria-label="Filter tasks by status"
-          className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
-        >
-          <option value="all">All Statuses</option>
-          <option value="pending">In Progress (Pending)</option>
-          <option value="submitted_for_approval">Awaiting Teacher Approval</option>
-          <option value="approved">Teacher Approved & Verified</option>
-          <option value="overdue">Overdue / Late Alert</option>
-        </select>
-      </div>
-
-      {/* Days of Week Strip */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-        {daysList.map((d) => (
-          <button
-            key={d.value}
-            onClick={() => setSelectedDay(d.value)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
-              selectedDay === d.value
-                ? 'bg-[#142D27] text-white'
-                : d.value === 'sunday'
-                ? 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-100'
-                : 'bg-white border border-[#e1ede7] text-[#557067] hover:bg-[#F7F9F8]'
-            }`}
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl px-2.5 py-1.5 text-[#263B35] font-semibold focus:outline-none"
           >
-            {d.label}
-          </button>
-        ))}
+            <option value="all">All Subjects</option>
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.code}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl px-2.5 py-1.5 text-[#263B35] font-semibold focus:outline-none"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="submitted_for_approval">Awaiting Gate</option>
+            <option value="approved">Approved</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
       </div>
 
       {/* Task Cards List */}
       <div className="space-y-3">
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-2xl border border-[#e1ede7] p-8">
+          <div className="text-center py-12 bg-white rounded-2xl border border-[#e1ede7] p-6">
             <CalendarDays className="w-10 h-10 text-[#7d9990] mx-auto mb-2 opacity-50" />
             <h3 className="text-sm font-bold text-[#142D27]">No Tasks Found</h3>
             <p className="text-xs text-[#557067] mt-1">
-              There are no tasks matching your selected filters.
+              There are no tasks matching your selected filters. Click "Upload PDF & Auto-Schedule" or "+ Add Task Manually" to create some.
             </p>
           </div>
         ) : (
@@ -505,7 +688,7 @@ export const WeeklyTasksPage: React.FC = () => {
                 </div>
 
                 {/* Right: Status Pill & Action Buttons */}
-                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#e1ede7]">
+                <div className="flex flex-wrap items-center justify-between md:justify-end gap-2.5 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#e1ede7]">
                   {/* Status Badge */}
                   <div>
                     {task.status === 'approved' ? (
@@ -531,7 +714,7 @@ export const WeeklyTasksPage: React.FC = () => {
                   </div>
 
                   {/* Actions based on Role and Status */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     {/* Student Action: Submit Work */}
                     {task.status !== 'approved' && (
                       <Button
@@ -561,6 +744,31 @@ export const WeeklyTasksPage: React.FC = () => {
                         Approve Work
                       </Button>
                     )}
+
+                    {/* Manual Task Controls: Edit & Delete */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingTask(task);
+                        setEditTitle(task.title);
+                        setEditDueDate(task.dueDate);
+                        setEditMinutes(task.estimatedMinutes);
+                        setEditDescription(task.description);
+                      }}
+                      className="p-1.5 rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                      title="Edit Task Manually"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTask(task)}
+                      className="p-1.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                      title="Delete Task"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -599,19 +807,15 @@ export const WeeklyTasksPage: React.FC = () => {
 
             <div>
               <label className="block text-xs font-semibold text-[#142D27] mb-1">
-                Attach Document or Solution PDF (Optional):
+                Attached Exercise Solutions Sheet / PDF:
               </label>
               <input
                 type="text"
                 value={submissionFileName}
                 onChange={(e) => setSubmissionFileName(e.target.value)}
-                placeholder="e.g. daily_solutions_stokes_theorem.pdf"
-                className="w-full h-10 px-3 rounded-xl border border-[#e1ede7] text-xs"
+                placeholder="stewart_calculus_ch4_solutions.pdf"
+                className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
               />
-            </div>
-
-            <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 leading-relaxed">
-              <strong>Teacher Approval Policy:</strong> Your submission will enter the faculty review gate. Your progress will not be marked as complete until your teacher reviews and approves the work.
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
@@ -625,40 +829,45 @@ export const WeeklyTasksPage: React.FC = () => {
                 isLoading={isSubmittingWork}
                 loadingText="Submitting..."
               >
-                Send for Teacher Approval
+                Submit for Teacher Approval
               </Button>
             </div>
           </div>
         )}
       </Modal>
 
-      {/* Teacher Approve Modal */}
+      {/* Teacher Approve Work Modal */}
       <Modal
         isOpen={!!approvingTask}
         onClose={() => setApprovingTask(null)}
-        title="Teacher Approval Gate"
-        description={approvingTask ? `Review and certify student work for "${approvingTask.title}"` : ''}
+        title="Teacher Verification Gate"
+        description={approvingTask ? `Reviewing submission for "${approvingTask.title}"` : ''}
       >
         {approvingTask && (
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7]">
-              <p className="text-xs text-[#557067]">Student Submission:</p>
-              <p className="text-xs font-bold text-[#142D27] mt-0.5">
-                "{approvingTask.studentSubmission?.notes || 'Completed assigned daily reading.'}"
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+              <span className="text-[10px] font-bold text-amber-800 uppercase tracking-wider block">
+                Student Submission Received:
+              </span>
+              <p className="text-xs text-[#263B35] font-semibold mt-1">
+                "{approvingTask.studentSubmission?.notes || 'Student marked exercises completed.'}"
               </p>
-              <p className="text-[11px] text-[#7d9990] mt-1">
-                Submitted at: {approvingTask.studentSubmission?.submittedAt}
-              </p>
+              {approvingTask.studentSubmission?.attachmentName && (
+                <p className="text-[11px] text-amber-900 mt-1">
+                  📎 File: <strong>{approvingTask.studentSubmission.attachmentName}</strong>
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-[#142D27] mb-1">
-                Teacher Verification Remarks:
+                Teacher Feedback & Evaluation Remarks:
               </label>
               <textarea
-                rows={2}
+                rows={3}
                 value={teacherFeedback}
                 onChange={(e) => setTeacherFeedback(e.target.value)}
+                placeholder="Enter evaluation notes..."
                 className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
               />
             </div>
@@ -672,45 +881,301 @@ export const WeeklyTasksPage: React.FC = () => {
                 size="sm"
                 onClick={handleConfirmApprove}
                 isLoading={isApproving}
-                loadingText="Approving..."
-                icon={<Check className="w-3.5 h-3.5" />}
+                loadingText="Certifying..."
               >
-                Approve & Mark Complete
+                Approve & Certify Complete
               </Button>
             </div>
           </div>
         )}
       </Modal>
 
-      {/* Auto-Generate Weekly Schedule Modal */}
+      {/* ======================================================== */}
+      {/* ADVANCED MODAL: Upload PDF & Auto-Schedule (Manual Controls) */}
+      {/* ======================================================== */}
       <Modal
         isOpen={isGenerateModalOpen}
         onClose={() => setIsGenerateModalOpen(false)}
-        title="Auto-Generate Weekly Task Schedule"
-        description="Breaks down textbook or syllabus content into daily weekday tasks with Sunday OFF."
+        title="Upload PDF & Auto-Schedule Daily Tasks"
+        description="Upload your textbook PDF, syllabus document, or photo. Configure manual controls to automate structured daily study tasks."
+        maxWidth="lg"
       >
         <div className="space-y-4">
+          {/* Step 1: File Dropzone */}
           <div>
-            <label className="block text-xs font-semibold text-[#142D27] mb-1">
-              Source Material (PDF / Syllabus Title):
+            <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">
+              1. Select Syllabus / Textbook PDF or Photo
+            </label>
+            <label className="flex flex-col items-center justify-center p-5 border-2 border-dashed border-zinc-200 rounded-2xl bg-zinc-50 hover:bg-emerald-50/20 hover:border-emerald-500 cursor-pointer transition-colors text-center">
+              <Upload className="w-7 h-7 text-zinc-400 mb-1.5" />
+              <span className="text-xs font-bold text-zinc-800">
+                {uploadedPdfName || 'Click to select or drag & drop PDF / Doc / Image'}
+              </span>
+              <span className="text-[11px] text-zinc-400 mt-0.5">
+                Supports .pdf, .docx, .doc, .png, .jpg, .jpeg, .webp (up to 25MB)
+              </span>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          {/* Fallback title input */}
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 mb-1">
+              Source Name / Course Reference:
             </label>
             <input
               type="text"
               value={genSourceTitle}
               onChange={(e) => setGenSourceTitle(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-[#e1ede7] text-xs font-bold"
+              className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium focus:outline-none focus:border-emerald-500"
+              placeholder="e.g. Physics 1st Year Punjab Board Syllabus"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Strategy Mode Selector */}
+          <div>
+            <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-1.5">
+              2. Choose Auto-Scheduling Mode:
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={() => setGenScopeMode('entire_book')}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  genScopeMode === 'entire_book'
+                    ? 'bg-emerald-50 border-emerald-500 ring-1 ring-emerald-500/20 text-emerald-950 shadow-xs'
+                    : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs flex items-center gap-1.5 text-zinc-900">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    Entire Book + Daily Test Series
+                  </span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white uppercase">
+                    Feb 28 Sprint
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-600 mt-1 leading-relaxed">
+                  Automates all chapters through Feb 28th + creates 50-mark Daily Tests on the subject's designated timetable day.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGenScopeMode('custom_weeks')}
+                className={`p-3 rounded-xl border text-left transition-all ${
+                  genScopeMode === 'custom_weeks'
+                    ? 'bg-emerald-50 border-emerald-500 ring-1 ring-emerald-500/20 text-emerald-950 shadow-xs'
+                    : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-zinc-900">
+                    ⏱️ Custom Weeks (1 to 8 Weeks)
+                  </span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-200 text-zinc-700">
+                    Sprint
+                  </span>
+                </div>
+                <p className="text-[11px] text-zinc-600 mt-1 leading-relaxed">
+                  Customize the duration, number of tasks per day, and specify manual custom topics override.
+                </p>
+              </button>
+            </div>
+          </div>
+
+          {/* Subject & Time Horizon */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#142D27] mb-1">
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
                 Target Subject:
               </label>
               <select
                 value={genSubjectId}
                 onChange={(e) => setGenSubjectId(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border border-[#e1ede7] text-xs"
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium bg-white focus:outline-none focus:border-emerald-500"
+              >
+                {subjects.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {genScopeMode === 'custom_weeks' ? (
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                  Schedule Time Scope:
+                </label>
+                <select
+                  value={genWeeksScope}
+                  onChange={(e) => setGenWeeksScope(parseInt(e.target.value) || 4)}
+                  className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium bg-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value={1}>1 Week (7 Days Sprint)</option>
+                  <option value={2}>2 Weeks (14 Days Intensive)</option>
+                  <option value={4}>4 Weeks / 1 Month (28 Days - Standard)</option>
+                  <option value={8}>8 Weeks (Full Semester Blueprint)</option>
+                </select>
+              </div>
+            ) : (
+              <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs flex flex-col justify-center">
+                <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide">
+                  Timetable Active
+                </span>
+                <span className="font-semibold text-emerald-950 mt-0.5">
+                  14 Weeks &bull; Nov 2026 to Feb 28, 2027
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Duration & Tasks per day */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Daily Duration:
+              </label>
+              <select
+                value={genDailyMinutes}
+                onChange={(e) => setGenDailyMinutes(parseInt(e.target.value) || 45)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium bg-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value={30}>30 Mins (Quick Review)</option>
+                <option value={45}>45 Mins (Standard)</option>
+                <option value={60}>60 Mins (Deep Study)</option>
+                <option value={90}>90 Mins (Intensive Prep)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Tasks Per Study Day:
+              </label>
+              <select
+                value={genTasksPerDay}
+                onChange={(e) => setGenTasksPerDay(parseInt(e.target.value) || 1)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium bg-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value={1}>1 Task (Theory Reading)</option>
+                <option value={2}>2 Tasks (Theory + Exercises)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Schedule Start Date:
+              </label>
+              <input
+                type="date"
+                value={genStartDate}
+                onChange={(e) => setGenStartDate(e.target.value)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs font-medium bg-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* Manual Control Checkboxes */}
+          <div className="space-y-2 p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs">
+              <input
+                type="checkbox"
+                checked={genEnforceSundayOff}
+                onChange={(e) => setGenEnforceSundayOff(e.target.checked)}
+                className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300"
+              />
+              <span className="font-semibold text-zinc-900">
+                Sundays Strictly OFF (Mandatory Rest & Notes Revision)
+              </span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs">
+              <input
+                type="checkbox"
+                checked={genEnforceHolidays}
+                onChange={(e) => setGenEnforceHolidays(e.target.checked)}
+                className="h-4 w-4 rounded text-emerald-600 focus:ring-emerald-500 border-zinc-300"
+              />
+              <span className="font-semibold text-zinc-900">
+                🇵🇰 Observe Pakistan Gazetted Public Holidays (Zero Homework)
+              </span>
+            </label>
+          </div>
+
+          {/* Optional Topic Breakdown Override */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-zinc-700">
+                Custom Topic Breakdown (Optional Manual Override):
+              </label>
+              <span className="text-[10px] text-zinc-400">One topic per line</span>
+            </div>
+            <textarea
+              rows={3}
+              value={genCustomTopicsText}
+              onChange={(e) => setGenCustomTopicsText(e.target.value)}
+              placeholder="Module 1: Vectors & Equilibrium&#10;Module 2: Newton's Laws & Friction&#10;Module 3: Work, Energy & Power Theorem&#10;Module 4: Circular Dynamics & Centripetal Acceleration"
+              className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 bg-white font-mono focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+            <Button variant="ghost" size="sm" onClick={() => setIsGenerateModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleConfirmGenerate}
+              isLoading={isGenerating}
+              loadingText="Automating Schedule..."
+            >
+              Generate Daily Tasks (Sundays OFF)
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ======================================================== */}
+      {/* MODAL: + Add Custom Task Manually */}
+      {/* ======================================================== */}
+      <Modal
+        isOpen={isManualTaskModalOpen}
+        onClose={() => setIsManualTaskModalOpen(false)}
+        title="Add Custom Daily Task Manually"
+        description="Schedule a specific target for any subject with custom due date and study duration."
+      >
+        <form onSubmit={handleConfirmCreateManualTask} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 mb-1">
+              Task Title:
+            </label>
+            <input
+              type="text"
+              value={manualTitle}
+              onChange={(e) => setManualTitle(e.target.value)}
+              placeholder="e.g., Solve Integration by Parts practice problems 1 to 10"
+              className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-emerald-500"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Subject:
+              </label>
+              <select
+                value={manualSubjectId}
+                onChange={(e) => setManualSubjectId(e.target.value)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-emerald-500"
               >
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -721,39 +1186,149 @@ export const WeeklyTasksPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#142D27] mb-1">
-                Total Pages / Chapters:
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Due Date:
               </label>
               <input
-                type="number"
-                min="10"
-                max="500"
-                value={genPagesCount}
-                onChange={(e) => setGenPagesCount(parseInt(e.target.value) || 60)}
-                className="w-full h-10 px-3 rounded-xl border border-[#e1ede7] text-xs font-bold"
+                type="date"
+                value={manualDueDate}
+                onChange={(e) => setManualDueDate(e.target.value)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-emerald-500"
+                required
               />
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
-            ✨ <strong>Automated Schedule:</strong> Creates daily weekday assignments (Monday through Saturday). <strong>Sunday is explicitly configured as a scheduled rest day (Sunday OFF)</strong>.
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Estimated Duration (Mins):
+              </label>
+              <input
+                type="number"
+                min="15"
+                max="240"
+                value={manualMinutes}
+                onChange={(e) => setManualMinutes(parseInt(e.target.value) || 45)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Priority:
+              </label>
+              <select
+                value={manualPriority}
+                onChange={(e) => setManualPriority(e.target.value as any)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value="normal">Normal Priority</option>
+                <option value="high">High Priority (Exam Milestone)</option>
+                <option value="low">Low Priority (Optional Revision)</option>
+              </select>
+            </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" size="sm" onClick={() => setIsGenerateModalOpen(false)}>
+          <div>
+            <label className="block text-xs font-semibold text-zinc-700 mb-1">
+              Task Instructions / Notes:
+            </label>
+            <textarea
+              rows={2}
+              value={manualDescription}
+              onChange={(e) => setManualDescription(e.target.value)}
+              placeholder="Add specific instructions for this study session..."
+              className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+            <Button variant="ghost" size="sm" type="button" onClick={() => setIsManualTaskModalOpen(false)}>
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleConfirmGenerate}
-              isLoading={isGenerating}
-              loadingText="Generating Schedule..."
-            >
-              Generate Weekly Tasks
+            <Button variant="primary" size="sm" type="submit">
+              Save Task
             </Button>
           </div>
-        </div>
+        </form>
+      </Modal>
+
+      {/* ======================================================== */}
+      {/* MODAL: Edit Task Manually */}
+      {/* ======================================================== */}
+      <Modal
+        isOpen={!!editingTask}
+        onClose={() => setEditingTask(null)}
+        title="Edit Daily Task"
+        description="Update target title, scheduled date, or required duration."
+      >
+        {editingTask && (
+          <form onSubmit={handleSaveEditTask} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Task Title:
+              </label>
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-emerald-500"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                  Scheduled Date:
+                </label>
+                <input
+                  type="date"
+                  value={editDueDate}
+                  onChange={(e) => setEditDueDate(e.target.value)}
+                  className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs bg-white focus:outline-none focus:border-emerald-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                  Duration (Mins):
+                </label>
+                <input
+                  type="number"
+                  min="15"
+                  max="240"
+                  value={editMinutes}
+                  onChange={(e) => setEditMinutes(parseInt(e.target.value) || 45)}
+                  className="w-full h-9 px-3 rounded-xl border border-zinc-200 text-xs focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                Description / Target Notes:
+              </label>
+              <textarea
+                rows={3}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+              <Button variant="ghost" size="sm" type="button" onClick={() => setEditingTask(null)}>
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" type="submit">
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        )}
       </Modal>
     </div>
   );

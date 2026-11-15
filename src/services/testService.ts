@@ -2,13 +2,30 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
 
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v2';
+
+function getCustomTests(): TestItem[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_TESTS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function saveCustomTests(tests: TestItem[]) {
+  try {
+    localStorage.setItem(CUSTOM_TESTS_KEY, JSON.stringify(tests));
+  } catch {}
+}
+
 export const testService = {
   /**
    * Fetch all scheduled and completed tests with relation joins
    */
   async fetchTests(studentId?: string): Promise<TestItem[]> {
     if (!isSupabaseConfigured()) {
-      return SAMPLE_TESTS;
+      const custom = getCustomTests();
+      return [...custom, ...SAMPLE_TESTS];
     }
 
     try {
@@ -42,8 +59,8 @@ export const testService = {
           id: item.id,
           title: item.title,
           subjectId: item.subject_id,
-          subjectName: item.subjects?.name || 'Advanced Subject',
-          subjectCode: item.subjects?.code || 'MATH-301',
+          subjectName: item.subjects?.name || '1st Year Intermediate',
+          subjectCode: item.subjects?.code || 'FSC-PED-11',
           unitId: item.unit_id,
           unitTitle: item.units?.title,
           assignedTo: item.assigned_to,
@@ -168,8 +185,8 @@ export const testService = {
         id: data.id,
         title: data.title,
         subjectId: data.subject_id,
-        subjectName: data.subjects?.name || 'Advanced Subject',
-        subjectCode: data.subjects?.code || 'MATH-301',
+        subjectName: data.subjects?.name || '1st Year Intermediate',
+        subjectCode: data.subjects?.code || 'FSC-PED-11',
         unitId: data.unit_id,
         unitTitle: data.units?.title,
         date: new Date(data.date).toLocaleDateString('en-US', {
@@ -224,6 +241,77 @@ export const testService = {
     } catch {
       return SAMPLE_TESTS.find((t) => t.id === testId) || null;
     }
+  },
+
+  /**
+   * Schedule automated daily test series for an entire book across the semester (through Feb 28)
+   */
+  scheduleDailyTestsForBook(params: {
+    subjectId: string;
+    subjectName: string;
+    subjectCode: string;
+    bookTitle: string;
+    assignedDay?: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
+    totalWeeks?: number;
+    startDate?: string;
+  }): TestItem[] {
+    const existing = getCustomTests();
+    const created: TestItem[] = [];
+    const weeks = params.totalWeeks || 14;
+
+    const subjectDayMap: Record<string, 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday'> = {
+      'sub_01': 'Monday',
+      'sub_02': 'Tuesday',
+      'sub_03': 'Wednesday',
+      'sub_04': 'Thursday',
+      'sub_05': 'Friday',
+      'sub_06': 'Saturday',
+    };
+    const targetDay = params.assignedDay || subjectDayMap[params.subjectId] || 'Thursday';
+
+    const dayOffsets: Record<string, number> = {
+      'Monday': 1,
+      'Tuesday': 2,
+      'Wednesday': 3,
+      'Thursday': 4,
+      'Friday': 5,
+      'Saturday': 6,
+    };
+    const targetDayNum = dayOffsets[targetDay] || 4;
+
+    const baseDate = params.startDate ? new Date(params.startDate) : new Date();
+    const currentDay = baseDate.getDay();
+    let daysUntilTarget = (targetDayNum - currentDay + 7) % 7;
+    if (daysUntilTarget === 0) daysUntilTarget = 7;
+
+    for (let w = 0; w < Math.min(weeks, 12); w++) {
+      const testDate = new Date(baseDate);
+      testDate.setDate(baseDate.getDate() + daysUntilTarget + (w * 7));
+      const dateStr = testDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      const newTest: TestItem = {
+        id: `test_daily_${params.subjectId}_${w + 1}_${Date.now()}`,
+        title: `Daily Test Series: Chapter ${w + 1} (${params.subjectName})`,
+        subjectId: params.subjectId,
+        subjectName: params.subjectName,
+        subjectCode: params.subjectCode,
+        date: dateStr,
+        time: '02:00 PM',
+        durationMinutes: 45,
+        totalMarks: 30,
+        passingMarks: 15,
+        type: 'Unit Assessment',
+        syllabusCoverage: `${params.bookTitle} — Chapter ${w + 1} Board Short Questions & Theory Problems`,
+        instructions: 'Attempt all objective and subjective sections within 45 minutes. Total Marks: 30. Passing benchmark: 15/30 (50%).',
+        status: w === 0 ? 'ongoing' : 'scheduled',
+        assignedStudentName: 'Student Scholar',
+      };
+      created.push(newTest);
+    }
+
+    const merged = [...created, ...existing];
+    saveCustomTests(merged);
+    return created;
   },
 
   /**
@@ -662,8 +750,8 @@ export const testService = {
           id: item.id,
           testId: item.test_id,
           testTitle: item.tests?.title || 'Academic Assessment',
-          subjectName: item.tests?.subjects?.name || 'STEM Course',
-          subjectCode: item.tests?.subjects?.code || 'MATH-301',
+          subjectName: item.tests?.subjects?.name || '1st Year Intermediate',
+          subjectCode: item.tests?.subjects?.code || 'FSC-CSC-11',
           date: item.tests?.date
             ? new Date(item.tests.date).toLocaleDateString('en-US', {
                 month: 'short',
