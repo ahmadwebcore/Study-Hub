@@ -290,7 +290,7 @@ export const DirectChatPage: React.FC = () => {
                 <div
                   className={`p-3.5 rounded-2xl text-xs sm:text-[13px] leading-relaxed shadow-2xs ${
                     isMe
-                      ? 'bg-[#14B866] text-white rounded-tr-xs'
+                      ? 'bg-gradient-to-r from-emerald-700 to-teal-800 text-white rounded-tr-xs'
                       : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-tl-xs'
                   }`}
                 >
@@ -392,7 +392,7 @@ export const DirectChatPage: React.FC = () => {
           <button
             type="submit"
             disabled={!inputText.trim() && !attachedFile}
-            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 text-xs font-semibold text-white bg-[#14B866] hover:bg-emerald-600 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-xs active:scale-95"
+            className="inline-flex items-center justify-center p-2.5 sm:px-4 sm:py-2.5 text-xs font-semibold text-white bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] ring-1 ring-white/15 hover:from-[#193e33] hover:to-[#0c201a] rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-xs active:scale-95"
           >
             <Send className="w-4 h-4 sm:mr-1.5" />
             <span className="hidden sm:inline">Send</span>

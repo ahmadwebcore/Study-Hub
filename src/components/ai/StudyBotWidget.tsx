@@ -413,7 +413,7 @@ export const StudyBotWidget: React.FC = () => {
             <button
               type="submit"
               disabled={!inputQuery.trim() || isLoading}
-              className="p-2.5 rounded-xl bg-[#14B866] hover:bg-[#109552] disabled:opacity-50 text-white transition-colors"
+              className="p-2.5 rounded-xl bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] ring-1 ring-white/15 hover:from-[#193e33] hover:to-[#0c201a] disabled:opacity-50 text-white transition-all shadow-xs active:scale-95"
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />

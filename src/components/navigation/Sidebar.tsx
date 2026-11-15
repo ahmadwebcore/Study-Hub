@@ -198,7 +198,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                           className={cn(
                             'ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0',
                             isActive
-                              ? 'bg-[#14B866] text-white'
+                              ? 'bg-emerald-700 text-white'
                               : item.badgeVariant === 'warning'
                               ? 'bg-amber-100 text-amber-800'
                               : item.badgeVariant === 'info'

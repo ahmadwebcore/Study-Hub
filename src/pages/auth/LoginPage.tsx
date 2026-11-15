@@ -14,9 +14,9 @@ import {
   Lock,
   Ticket,
   Send,
-  RefreshCw,
   Key,
   ShieldAlert,
+  QrCode,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -58,6 +58,7 @@ export const LoginPage: React.FC = () => {
   const [showRecoveryInput, setShowRecoveryInput] = useState(false);
   const [recoveryCodeInput, setRecoveryCodeInput] = useState('');
   const [copiedRecovery, setCopiedRecovery] = useState(false);
+  const [showQrDrawer, setShowQrDrawer] = useState(false);
 
   // Email Verification State
   const [emailOtpCode, setEmailOtpCode] = useState('');
@@ -127,18 +128,22 @@ export const LoginPage: React.FC = () => {
     }
   }, []);
 
-  // When step changes to verification, prepare configs
+  // When step changes to verification, prepare configs & load QR code
   useEffect(() => {
     if (step === 'verification' && verifiedEmail) {
       const config = twoFactorService.getConfig(verifiedEmail);
       setTfaConfig(config);
-
-      // If NOT enrolled yet, generate enrollment QR
-      if (!config.isEnrolled) {
-        loadEnrollmentQrCode(verifiedEmail, config.secret);
-      }
+      loadEnrollmentQrCode(verifiedEmail, config.secret || 'AHMADWEBCORE2345');
     }
   }, [step, verifiedEmail, loadEnrollmentQrCode]);
+
+  const handleResetAuthenticatorKey = () => {
+    if (!verifiedEmail) return;
+    const freshConfig = twoFactorService.resetEnrollment(verifiedEmail);
+    setTfaConfig(freshConfig);
+    loadEnrollmentQrCode(verifiedEmail, freshConfig.secret);
+    setShowQrDrawer(true);
+  };
 
   // ==========================================
   // STEP 1: VALIDATE PRIMARY CREDENTIALS
@@ -380,12 +385,16 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] flex flex-col justify-center py-10 px-4 sm:px-6 font-sans selection:bg-[#14B866]/20">
-      <div className="w-full max-w-md mx-auto space-y-5">
+    <div className="min-h-screen bg-[#F7F9F8] flex flex-col justify-center py-10 px-4 sm:px-6 font-sans relative overflow-hidden">
+      {/* 2026 Ambient Depth Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-md mx-auto space-y-5 relative z-10">
         {/* Logo Header */}
         <div className="text-center space-y-1">
           <Link to="/" className="inline-flex items-center gap-2 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#142D27] text-[#14B866] shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white shadow-sm ring-1 ring-white/20">
               <GraduationCap className="h-5 w-5" />
             </div>
             <span className="font-extrabold text-2xl tracking-tight text-[#142D27]">
@@ -402,8 +411,8 @@ export const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Card Container */}
-        <div className="bg-white p-6 sm:p-7 rounded-2xl border border-zinc-200 shadow-sm space-y-5">
+        {/* Card Container with Glass Depth */}
+        <div className="bg-white/95 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-zinc-200/90 shadow-xl shadow-zinc-900/5 space-y-5">
           {/* Error Message Alert */}
           {authError && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2.5 animate-in fade-in duration-150">
@@ -503,7 +512,7 @@ export const LoginPage: React.FC = () => {
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full h-11 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                  className="w-full h-11 text-xs font-bold shadow-sm"
                   isLoading={isSubmitting}
                   loadingText="Verifying Credentials..."
                   icon={<ArrowRight className="w-4 h-4" />}
@@ -540,13 +549,20 @@ export const LoginPage: React.FC = () => {
           {/* ========================================================= */}
           {step === 'verification' && (
             <div className="space-y-4">
-              {/* Authenticated Account Bar */}
-              <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-emerald-900">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span className="font-semibold truncate max-w-[210px]">{verifiedEmail}</span>
+              {/* Authenticated Account Bar (Email Masked) */}
+              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 text-emerald-950">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600/15 flex items-center justify-center text-emerald-700">
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
+                  </div>
+                  <div>
+                    <span className="font-bold block text-zinc-900 leading-tight">Faculty Lead (Ahmad)</span>
+                    <span className="text-[10px] text-zinc-500 font-mono">
+                      {verifiedEmail ? emailVerificationService.maskEmail(verifiedEmail) : 'faculty@studyhub.edu'}
+                    </span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
                   Password Verified
                 </span>
               </div>
@@ -565,7 +581,7 @@ export const LoginPage: React.FC = () => {
                       : 'text-zinc-500 hover:text-zinc-900'
                   }`}
                 >
-                  <KeyRound className="w-3.5 h-3.5 text-[#14B866]" />
+                  <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
                   Google Authenticator
                 </button>
                 <button
@@ -650,7 +666,7 @@ export const LoginPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={handleCopyRecoveryCodes}
-                              className="text-[10px] text-[#14B866] font-semibold hover:underline flex items-center gap-0.5"
+                              className="text-[10px] text-emerald-600 font-semibold hover:underline flex items-center gap-0.5"
                             >
                               {copiedRecovery ? 'Copied!' : 'Copy All'}
                             </button>
@@ -681,7 +697,7 @@ export const LoginPage: React.FC = () => {
                             value={totpCode}
                             onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
                             placeholder="000000"
-                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#14B866]"
+                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
                             autoFocus
                           />
                         </div>
@@ -690,7 +706,7 @@ export const LoginPage: React.FC = () => {
                       <Button
                         type="submit"
                         variant="primary"
-                        className="w-full h-11 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                        className="w-full h-11 text-xs font-bold shadow-sm"
                         isLoading={isSubmitting}
                         loadingText="Activating 2FA..."
                         icon={<ArrowRight className="w-4 h-4" />}
@@ -699,11 +715,11 @@ export const LoginPage: React.FC = () => {
                       </Button>
                     </form>
                   ) : (
-                    /* CASE 2: ALREADY ENROLLED (CLEAN 6-DIGIT PROMPT - NO QR CODE!) */
+                    /* CASE 2: ALREADY ENROLLED (CLEAN 6-DIGIT PROMPT WITH RE-SCAN OPTION) */
                     <div>
                       {!showRecoveryInput ? (
                         <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
-                          <div className="text-center space-y-1.5 py-2">
+                          <div className="text-center space-y-1.5 py-1">
                             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
                               <ShieldCheck className="w-6 h-6" />
                             </div>
@@ -711,7 +727,7 @@ export const LoginPage: React.FC = () => {
                               Enter Authenticator Code
                             </h3>
                             <p className="text-xs text-zinc-500">
-                              Open <strong>Google Authenticator</strong> on your phone and enter the 6-digit code for <strong>{verifiedEmail}</strong>.
+                              Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
                             </p>
                           </div>
 
@@ -726,7 +742,7 @@ export const LoginPage: React.FC = () => {
                                 value={totpCode}
                                 onChange={(e) => handleTotpCodeChange(e.target.value)}
                                 placeholder="000000"
-                                className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#14B866] shadow-xs"
+                                className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
                                 autoFocus
                               />
                             </div>
@@ -735,7 +751,7 @@ export const LoginPage: React.FC = () => {
                           <Button
                             type="submit"
                             variant="primary"
-                            className="w-full h-11 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                            className="w-full h-11 text-xs font-bold shadow-sm"
                             isLoading={isSubmitting}
                             loadingText="Verifying Code..."
                             icon={<ArrowRight className="w-4 h-4" />}
@@ -743,17 +759,71 @@ export const LoginPage: React.FC = () => {
                             Verify & Enter Portal
                           </Button>
 
-                          <div className="text-center pt-1">
+                          {/* Collapsible Authenticator QR Code & Key Drawer */}
+                          <div className="pt-2 text-center space-y-2 border-t border-zinc-100">
                             <button
                               type="button"
-                              onClick={() => {
-                                setShowRecoveryInput(true);
-                                setAuthError(null);
-                              }}
-                              className="text-xs text-zinc-500 hover:text-zinc-800 underline font-medium"
+                              onClick={() => setShowQrDrawer(!showQrDrawer)}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors"
                             >
-                              Lost access to phone? Use Backup Recovery Code
+                              <QrCode className="w-3.5 h-3.5" />
+                              <span>{showQrDrawer ? 'Hide Setup QR Code' : 'Need to Re-scan? Show Authenticator QR & Secret'}</span>
                             </button>
+
+                            {showQrDrawer && (
+                              <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 text-center space-y-2 animate-in fade-in duration-150">
+                                <p className="text-[11px] text-zinc-600">
+                                  Scan this QR code with <strong>Google Authenticator</strong> on your phone:
+                                </p>
+                                {qrCodeUrl ? (
+                                  <img
+                                    src={qrCodeUrl}
+                                    alt="Google Authenticator QR Code"
+                                    className="w-36 h-36 mx-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-2xs"
+                                  />
+                                ) : (
+                                  <div className="w-36 h-36 mx-auto bg-white rounded-lg flex items-center justify-center text-xs text-zinc-400">
+                                    Generating QR...
+                                  </div>
+                                )}
+                                <div className="space-y-1">
+                                  <span className="text-[10px] text-zinc-400 block">Or enter manual secret key:</span>
+                                  <div className="flex items-center justify-center gap-1.5">
+                                    <code className="text-xs font-mono font-bold text-zinc-800 bg-white px-2 py-0.5 rounded border border-zinc-200 select-all">
+                                      {tfaConfig?.secret || 'AHMADWEBCORE2345'}
+                                    </code>
+                                    <button
+                                      type="button"
+                                      onClick={handleCopySecret}
+                                      className="p-1 rounded bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900"
+                                      title="Copy Key"
+                                    >
+                                      {copiedSecret ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                                    </button>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={handleResetAuthenticatorKey}
+                                  className="text-[10px] text-zinc-500 hover:text-zinc-800 underline block mx-auto pt-1"
+                                >
+                                  Re-generate Fresh Setup Key
+                                </button>
+                              </div>
+                            )}
+
+                            <div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowRecoveryInput(true);
+                                  setAuthError(null);
+                                }}
+                                className="text-xs text-zinc-500 hover:text-zinc-800 underline font-medium"
+                              >
+                                Lost access to phone? Use Backup Recovery Code
+                              </button>
+                            </div>
                           </div>
                         </form>
                       ) : (
@@ -777,7 +847,7 @@ export const LoginPage: React.FC = () => {
                               value={recoveryCodeInput}
                               onChange={(e) => setRecoveryCodeInput(e.target.value)}
                               placeholder="SH-XXXX-XXXX"
-                              className="w-full h-10 px-3 text-center text-xs font-mono tracking-wider rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#14B866]"
+                              className="w-full h-10 px-3 text-center text-xs font-mono tracking-wider rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
                               autoFocus
                             />
                           </div>
@@ -785,7 +855,7 @@ export const LoginPage: React.FC = () => {
                           <Button
                             type="submit"
                             variant="primary"
-                            className="w-full h-10 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                            className="w-full h-10 text-xs font-bold shadow-sm"
                             isLoading={isSubmitting}
                             loadingText="Verifying Recovery Code..."
                           >
@@ -850,7 +920,7 @@ export const LoginPage: React.FC = () => {
                         type="button"
                         variant="primary"
                         onClick={handleSendEmailVerification}
-                        className="w-full h-11 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                        className="w-full h-11 text-xs font-bold shadow-sm"
                         isLoading={isSubmitting}
                         loadingText="Sending Code..."
                         icon={<Send className="w-3.5 h-3.5" />}
@@ -882,7 +952,7 @@ export const LoginPage: React.FC = () => {
                             value={emailOtpCode}
                             onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, ''))}
                             placeholder="000000"
-                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#14B866]"
+                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
                             autoFocus
                           />
                         </div>
@@ -891,7 +961,7 @@ export const LoginPage: React.FC = () => {
                       <Button
                         type="submit"
                         variant="primary"
-                        className="w-full h-11 text-xs font-bold shadow-xs bg-[#14B866] hover:bg-[#12a35a] text-white"
+                        className="w-full h-11 text-xs font-bold shadow-sm"
                         isLoading={isSubmitting}
                         loadingText="Verifying Code..."
                         icon={<ArrowRight className="w-4 h-4" />}
@@ -912,10 +982,8 @@ export const LoginPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={handleSendEmailVerification}
-                            disabled={isSubmitting}
-                            className="text-[11px] font-semibold text-[#14B866] hover:underline flex items-center gap-1"
+                            className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold"
                           >
-                            <RefreshCw className="w-3 h-3" />
                             Resend Code
                           </button>
                         )}

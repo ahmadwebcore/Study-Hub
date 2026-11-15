@@ -477,7 +477,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
                     <div className="flex items-start gap-3 min-w-0">
                       <div
                         className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${
-                          !em.read ? 'bg-[#14B866]' : 'bg-transparent'
+                          !em.read ? 'bg-emerald-600' : 'bg-transparent'
                         }`}
                       />
                       <div className="min-w-0">

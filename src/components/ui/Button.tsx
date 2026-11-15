@@ -23,19 +23,19 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium transition-colors duration-150 select-none focus:outline-none focus:ring-1 focus:ring-[#14B866] disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+    'inline-flex items-center justify-center font-semibold tracking-tight transition-all duration-200 ease-out select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
   const variants = {
     primary:
-      'bg-[#14B866] hover:bg-[#109653] text-white',
+      'bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] text-white ring-1 ring-white/15 shadow-sm hover:shadow-md hover:shadow-emerald-950/25 hover:from-[#193e33] hover:via-[#133027] hover:to-[#0c201a] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
     secondary:
-      'bg-[#E7EFEA] hover:bg-[#d9e6de] text-[#142D27]',
+      'bg-zinc-100 hover:bg-zinc-200/80 text-zinc-900 border border-zinc-200/80 shadow-2xs hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
     outline:
-      'border border-[#e1ede7] bg-white hover:bg-[#F7F9F8] text-[#263B35] hover:border-[#14B866]',
+      'border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-800 hover:border-zinc-400 shadow-2xs hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
     ghost:
-      'text-[#557067] hover:text-[#142D27] hover:bg-[#E7EFEA]/60',
+      'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70 active:scale-[0.98]',
     danger:
-      'bg-rose-600 hover:bg-rose-700 text-white',
+      'bg-gradient-to-b from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white ring-1 ring-white/20 shadow-sm hover:shadow-rose-950/20 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]',
   };
 
   const sizes = {

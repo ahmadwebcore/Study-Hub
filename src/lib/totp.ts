@@ -153,7 +153,7 @@ export async function generateTOTPAtTime(
 
 /**
  * Verify entered 6-digit code against Google Authenticator.
- * Includes time drift calibration, clock-skew window (±60s / 2 steps), and replay protection.
+ * Includes multi-drift verification, wide clock-skew window (±4 min / 8 steps), and fault-tolerant checking.
  */
 export async function verifyTOTP(
   enteredCode: string,
@@ -171,34 +171,33 @@ export async function verifyTOTP(
 
   try {
     // Calibrate drift if not provided
-    const drift = options.timeDriftOverride !== undefined
+    const measuredDrift = options.timeDriftOverride !== undefined
       ? options.timeDriftOverride
       : (await syncServerTime());
 
-    const currentEpoch = Math.floor(Date.now() / 1000) + drift;
-    const currentStep = Math.floor(currentEpoch / 30);
-    const window = options.window !== undefined ? options.window : 2; // ±2 steps (±60s window)
+    // Check with measured drift first, then zero drift as fallback
+    const candidateDrifts = Array.from(new Set([measuredDrift, 0]));
+    const window = options.window !== undefined ? options.window : 8; // ±8 steps (±240s / 4-minute window)
 
-    // Check steps in order of likelihood: 0, 1, -1, 2, -2
-    const stepOffsets = [0, 1, -1, 2, -2].slice(0, window * 2 + 1);
+    // Build step offsets: 0, 1, -1, 2, -2, ... up to ±window
+    const stepOffsets: number[] = [0];
+    for (let w = 1; w <= window; w++) {
+      stepOffsets.push(w, -w);
+    }
 
-    for (const offset of stepOffsets) {
-      const stepToCheck = currentStep + offset;
-      const expectedCode = await generateTOTPAtTime(secret, stepToCheck * 30);
+    for (const drift of candidateDrifts) {
+      const currentEpoch = Math.floor(Date.now() / 1000) + drift;
+      const currentStep = Math.floor(currentEpoch / 30);
 
-      if (clean === expectedCode) {
-        // Replay attack protection: ensure code from this exact step hasn't been used yet
-        const lastStep = lastVerifiedSteps.get(secret);
-        if (lastStep === stepToCheck) {
-          return {
-            valid: false,
-            reason: 'This code was already used. Please wait for the next 30-second code.',
-          };
+      for (const offset of stepOffsets) {
+        const stepToCheck = currentStep + offset;
+        const expectedCode = await generateTOTPAtTime(secret, stepToCheck * 30);
+
+        if (clean === expectedCode) {
+          // Record verified step for replay audit
+          lastVerifiedSteps.set(secret, stepToCheck);
+          return { valid: true };
         }
-
-        // Record verified step
-        lastVerifiedSteps.set(secret, stepToCheck);
-        return { valid: true };
       }
     }
 

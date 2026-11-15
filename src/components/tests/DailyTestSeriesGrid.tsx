@@ -266,7 +266,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => handleGenerateEntireBook(selectedSubjectId === 'all' ? 'sub_04' : selectedSubjectId)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#14B866] text-white hover:bg-emerald-600 transition-colors shadow-2xs active:scale-95"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] text-white ring-1 ring-white/15 shadow-sm hover:shadow-md hover:from-[#193e33] hover:via-[#133027] hover:to-[#0c201a] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200"
               title="Schedule all book chapters through Feb 28"
             >
               <Plus className="w-3.5 h-3.5" />
