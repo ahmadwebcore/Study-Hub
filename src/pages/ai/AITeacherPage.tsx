@@ -6,12 +6,17 @@ import {
   Copy,
   CheckCheck,
   Layers,
+  Key,
+  Settings,
+  X,
+  CheckCircle2,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import {
   aiStudyBotService,
   AIChatMessage,
+  AIProviderConfig,
 } from '../../services/aiStudyBotService';
 
 export const AITeacherPage: React.FC = () => {
@@ -19,6 +24,9 @@ export const AITeacherPage: React.FC = () => {
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [aiConfig, setAiConfig] = useState<AIProviderConfig>(() => aiStudyBotService.loadConfig());
+  const [saveToast, setSaveToast] = useState<string | null>(null);
 
   const CHAPTER_PRESETS = [
     {
@@ -102,25 +110,130 @@ export const AITeacherPage: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleSaveConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    aiStudyBotService.saveConfig(aiConfig);
+    setShowConfigModal(false);
+    setSaveToast(`AI key saved for ${aiConfig.provider.toUpperCase()}.`);
+    setTimeout(() => setSaveToast(null), 3000);
+  };
+
   return (
     <div className="space-y-6 pb-12">
+      {saveToast && (
+        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between text-xs font-semibold shadow-xs animate-in slide-in-from-top duration-200">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            {saveToast}
+          </span>
+          <button onClick={() => setSaveToast(null)} className="text-emerald-600 hover:text-emerald-900">
+            &times;
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div className="bg-gradient-to-r from-[#142D27] via-[#1A3831] to-[#0D1F1A] rounded-2xl p-5 sm:p-8 text-white relative overflow-hidden shadow-sm">
         <div className="absolute right-0 top-0 w-96 h-96 bg-[#14B866]/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-[11px] font-semibold max-w-full">
-            <Bot className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">AI Study Assistant &bull; 24/7 Academic Copilot</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div className="max-w-2xl space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-[11px] font-semibold max-w-full">
+              <Bot className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">AI Study Assistant &bull; 24/7 Academic Copilot</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug break-words">
+              Computer Science Concepts &bull; Clear Explanations with Practical Analogies
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+              Have questions on your textbook, practicals, or exam preparation? Type any concept in English, Urdu, or Roman Urdu. The AI Assistant explains complex computing topics with real-world analogies, code architecture, and board scoring tips.
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug break-words">
-            Computer Science Concepts &bull; Clear Explanations with Practical Analogies
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-            Have questions on your textbook, practicals, or exam preparation? Type any concept in English, Urdu, or Roman Urdu. The AI Assistant explains complex computing topics with real-world analogies, code architecture, and board scoring tips.
-          </p>
+
+          <button
+            type="button"
+            onClick={() => setShowConfigModal(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all backdrop-blur-sm self-start shrink-0"
+          >
+            <Key className="w-3.5 h-3.5 text-emerald-400" />
+            <span>AI Key ({aiConfig.provider === 'offline' ? 'Offline' : aiConfig.provider.toUpperCase()})</span>
+            <Settings className="w-3.5 h-3.5 text-zinc-300 ml-1" />
+          </button>
         </div>
       </div>
+
+      {/* AI Key Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                  <Key className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-900">AI Model & API Key Configuration</h3>
+                  <p className="text-[11px] text-zinc-500">Select Google Gemini, OpenAI, or Anthropic</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowConfigModal(false)}
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveConfig} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                  Select AI Engine
+                </label>
+                <select
+                  value={aiConfig.provider}
+                  onChange={(e) => setAiConfig({ ...aiConfig, provider: e.target.value as any })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 bg-white text-zinc-900 font-medium focus:outline-none focus:border-emerald-600"
+                >
+                  <option value="offline">Offline Academic Model (Built-in Punjab Board Knowledge)</option>
+                  <option value="gemini">Google Gemini (Recommended — Best Urdu & Free Tier)</option>
+                  <option value="openai">OpenAI ChatGPT (GPT-4o / GPT-4o-mini)</option>
+                  <option value="anthropic">Anthropic Claude (Claude 3.5 Sonnet)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                  API Key
+                </label>
+                <input
+                  type="password"
+                  placeholder="Paste your API key here..."
+                  value={aiConfig.apiKey}
+                  onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 text-zinc-900 focus:outline-none focus:border-emerald-600 font-mono"
+                />
+                <p className="text-[10px] text-zinc-500 mt-1">
+                  Your key is securely stored in your browser's private local storage.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                <button
+                  type="button"
+                  onClick={() => setShowConfigModal(false)}
+                  className="px-3 py-1.5 text-xs text-zinc-600 hover:text-zinc-900"
+                >
+                  Cancel
+                </button>
+                <Button type="submit" variant="primary" size="sm">
+                  Save Key
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Preset Chapters & Topics */}

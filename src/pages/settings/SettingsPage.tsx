@@ -206,17 +206,19 @@ export const SettingsPage: React.FC = () => {
           <User className="w-4 h-4" />
           Profile Credentials
         </button>
-        <button
-          onClick={() => setActiveTab('roles')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-            activeTab === 'roles'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
-          }`}
-        >
-          <ShieldCheck className="w-4 h-4" />
-          Role Switcher
-        </button>
+        {role === 'teacher' && (
+          <button
+            onClick={() => setActiveTab('roles')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === 'roles'
+                ? 'bg-[#142D27] text-white shadow-sm'
+                : 'text-[#557067] hover:bg-[#E7EFEA]'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            Role Switcher
+          </button>
+        )}
         <button
           onClick={() => setActiveTab('notifications')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
@@ -525,8 +527,8 @@ export const SettingsPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Tab 2: Role Switcher */}
-      {activeTab === 'roles' && (
+      {/* Tab 2: Role Switcher (Teacher Only) */}
+      {activeTab === 'roles' && role === 'teacher' && (
         <Card className="space-y-6">
           <CardHeader className="pb-3">
             <div>
@@ -564,25 +566,14 @@ export const SettingsPage: React.FC = () => {
 
             {/* Student Option */}
             <div
-              onClick={() => {
-                if (role !== 'student') toggleRole();
-              }}
-              className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
-                role === 'student'
-                  ? 'border-[#14B866] bg-[#e8f8f0]/40 shadow-card'
-                  : 'border-[#e1ede7] bg-white hover:border-[#14B866]/40'
-              }`}
+              onClick={() => toggleRole()}
+              className="p-5 rounded-2xl border-2 transition-all cursor-pointer border-[#e1ede7] bg-white hover:border-[#14B866]/40"
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#142D27]">Student Role</span>
-                {role === 'student' && (
-                  <Badge variant="primary" size="sm">
-                    Active
-                  </Badge>
-                )}
+                <span className="font-bold text-sm text-[#142D27]">Preview Student Perspective</span>
               </div>
               <p className="text-xs text-[#557067] mt-2 leading-relaxed">
-                Learner perspective: view today's study schedule, track syllabus checklists, submit homework, inspect test marks, and review teacher feedback.
+                Learner perspective: preview how enrolled scholars view today's study schedule, 5-box daily tests, homework submissions, and teacher feedback.
               </p>
             </div>
           </div>

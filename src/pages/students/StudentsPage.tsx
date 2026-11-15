@@ -9,7 +9,7 @@ import {
   Mail,
   CheckCircle,
   Eye,
-  ShieldAlert,
+  GraduationCap,
   Copy,
   Link as LinkIcon,
   Edit3,
@@ -55,7 +55,7 @@ const editStudentSchema = z.object({
 type EditStudentFormData = z.infer<typeof editStudentSchema>;
 
 export const StudentsPage: React.FC = () => {
-  const { role, toggleRole, user } = useRole();
+  const { role, user } = useRole();
   const [students, setStudents] = useState<Student[]>(SAMPLE_STUDENTS_LIST);
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
   const [searchTerm, setSearchTerm] = useState('');
@@ -310,18 +310,15 @@ export const StudentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Role banner if in student mode */}
+      {/* Student View Banner - View Only (No Switch Button) */}
       {role === 'student' && (
-        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900">
+        <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-zinc-700">
           <div className="flex items-center gap-2.5">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
+            <GraduationCap className="w-5 h-5 text-emerald-600 shrink-0" />
             <span>
-              <strong>Faculty Management Console:</strong> You are viewing the student roster as a Student. Switch to Teacher View to enroll students, assign subjects, or edit profiles.
+              <strong>Enrolled Scholar Roster:</strong> You are viewing your enrolled 1st Year FA-IT cohort profile under Faculty Lead <strong>Ahmad</strong>.
             </span>
           </div>
-          <Button variant="secondary" size="sm" onClick={toggleRole}>
-            Switch to Teacher
-          </Button>
         </div>
       )}
 

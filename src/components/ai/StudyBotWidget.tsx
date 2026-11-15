@@ -217,8 +217,9 @@ export const StudyBotWidget: React.FC = () => {
                     className="px-2 py-1.5 rounded-lg border border-zinc-300 text-xs bg-white text-zinc-800 focus:outline-none"
                   >
                     <option value="offline">Offline Academic Model</option>
-                    <option value="gemini">Google Gemini API</option>
-                    <option value="openai">OpenAI ChatGPT</option>
+                    <option value="gemini">Google Gemini (Recommended)</option>
+                    <option value="openai">OpenAI ChatGPT (GPT-4o)</option>
+                    <option value="anthropic">Anthropic Claude (Claude 3.5)</option>
                   </select>
 
                   <input

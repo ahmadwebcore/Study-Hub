@@ -24,7 +24,7 @@ export interface AIChatMessage {
 }
 
 export interface AIProviderConfig {
-  provider: 'gemini' | 'openai' | 'offline';
+  provider: 'gemini' | 'openai' | 'anthropic' | 'offline';
   apiKey: string;
   model: string;
 }
@@ -349,13 +349,15 @@ export class AIStudyBotService {
       };
     }
 
-    // 2. External API Provider (Gemini / OpenAI) if configured
+    // 2. External API Provider (Gemini / OpenAI / Anthropic) if configured
     if (this.config.apiKey && this.config.apiKey.trim().length > 5) {
       try {
         if (this.config.provider === 'gemini') {
           return await this.callGeminiAPI(query);
         } else if (this.config.provider === 'openai') {
           return await this.callOpenAIAPI(query);
+        } else if (this.config.provider === 'anthropic') {
+          return await this.callAnthropicAPI(query);
         }
       } catch (err) {
         console.warn('External AI failed, using offline engine:', err);
@@ -531,6 +533,41 @@ Offer actionable advice, practical real-world analogies, and board exam tips.`;
       actions: [
         { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
         { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
+      ],
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+  }
+
+  private async callAnthropicAPI(prompt: string): Promise<AIChatMessage> {
+    const url = 'https://api.anthropic.com/v1/messages';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.config.apiKey,
+        'anthropic-version': '2023-06-01',
+        'dangerously-allow-browser': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        system:
+          'You are StudyHub AI Study Assistant, a senior academic tutor for Pakistani 1st Year FA-IT students under Faculty Lead Ahmad. Answer fluently in the user\'s language (English, Urdu, or Roman Urdu). Provide clear real-world analogies, step-by-step logic, and BISE DG Khan board exam tips.',
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    const data = await response.json();
+    const content = data?.content?.[0]?.text || '';
+
+    return {
+      id: `msg_${Date.now()}`,
+      sender: 'assistant',
+      text: content,
+      actions: [
+        { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
+        { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
+        { id: 'act_scr', label: 'Check Certified Marks', actionType: 'check_marks' },
       ],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
