@@ -43,7 +43,11 @@ export interface DailyTask {
   studentName: string;
 }
 
-const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v6';
+const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v8';
+
+try {
+  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'].forEach(v => localStorage.removeItem('studyhub_weekly_daily_tasks_' + v));
+} catch {}
 
 // Helpers to format dates and get day of week
 const DAY_NAMES: DailyTask['dayOfWeek'][] = [
@@ -57,7 +61,146 @@ const DAY_NAMES: DailyTask['dayOfWeek'][] = [
 ];
 
 // Initial realistic seed tasks for 1st Year FA-IT (BISE DG Khan)
-const SEED_TASKS: DailyTask[] = [];
+const SEED_TASKS: DailyTask[] = [
+  {
+    id: 'tsk_henza_ped_01',
+    subjectId: 'sub_01',
+    subjectName: 'Physical Education',
+    subjectCode: 'FAIT-PED-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'ہیلتھ اینڈ فزیکل ایجوکیشن (پروفیسر سید بشارت حسین گیلانی)',
+    title: 'ہیلتھ اینڈ فزیکل ایجوکیشن: انسانی ڈھانچہ و ہڈیوں کی اقسام',
+    description: 'پروفیسر سید بشارت حسین گیلانی (صفحہ 1 تا 3): انسانی ڈھانچے کی ساخت، ہڈیوں کی اقسام، اور جوڑوں کی درجہ بندی کا بغور مطالعہ کریں۔',
+    assignedDate: '2026-11-17',
+    dueDate: '2026-11-17',
+    dayOfWeek: 'Tuesday',
+    isSundayOff: false,
+    priority: 'high',
+    pagesRange: 'pp. 1–3',
+    estimatedMinutes: 60,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_urd_01',
+    subjectId: 'sub_02',
+    subjectName: 'Urdu & Grammar',
+    subjectCode: 'FAIT-URD-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'اُردو 11 لازمی و شرح سرمایہ اردو (پروفیسر راؤ خالد محمود)',
+    title: 'اُردو 11 و شرح سرمایہ: سبق اسوہ حسنہ خلاصہ و خط نویسی',
+    description: 'پروفیسر راؤ خالد محمود شرح سرمایہ (صفحہ 1 تا 3): مولانا شبلی نعمانی کے سبق اسوہ حسنہ کا ایک تہائی خلاصہ اور دوست کے نام خط کے امتحانی اصول تیار کریں۔',
+    assignedDate: '2026-11-18',
+    dueDate: '2026-11-18',
+    dayOfWeek: 'Wednesday',
+    isSundayOff: false,
+    priority: 'high',
+    pagesRange: 'pp. 1–3',
+    estimatedMinutes: 60,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_eng_01',
+    subjectId: 'sub_03',
+    subjectName: 'English & Grammar',
+    subjectCode: 'FAIT-ENG-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'English 11 Textbook & Sunshine English (Prof. Musarrat Hussain)',
+    title: 'English & Sunshine Grammar: Button Button & Master Tenses Drill',
+    description: 'Prof. Musarrat Hussain Sunshine English (pp. 1–3): Read Story 1 "Button, Button", write 5 board short questions, and practice 10 Present/Past tense transformations.',
+    assignedDate: '2026-11-19',
+    dueDate: '2026-11-19',
+    dayOfWeek: 'Thursday',
+    isSundayOff: false,
+    priority: 'high',
+    pagesRange: 'pp. 1–3',
+    estimatedMinutes: 60,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_tqm_01',
+    subjectId: 'sub_05',
+    subjectName: 'Tarjuma-tul-Quran',
+    subjectCode: 'FAIT-TQM-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'ترجمۃ القرآن المجید (ہمدرد نوٹس سیریز)',
+    title: 'ترجمۃ القرآن المجید: سورۃ البقرہ رکوع 1 تا 2 با محاورہ ترجمہ',
+    description: 'ہمدرد نوٹس سیریز (صفحہ 1 تا 2): سورۃ البقرہ کی آیات 1 تا 16 کا لفظی و با محاورہ ترجمہ اور متقین و منافقین کی صفات کے اہم نکات یاد کریں۔',
+    assignedDate: '2026-11-20',
+    dueDate: '2026-11-20',
+    dayOfWeek: 'Friday',
+    isSundayOff: false,
+    priority: 'high',
+    pagesRange: 'pp. 1–2',
+    estimatedMinutes: 45,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_isl_01',
+    subjectId: 'sub_06',
+    subjectName: 'Islamiyat Lazmi',
+    subjectCode: 'FAIT-ISL-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'اسلامیات لازمی 11 (PECTAA پنجاب کریکولم)',
+    title: 'اسلامیات لازمی: عقیدہ توحید، رسالت اور نظام زکوٰۃ',
+    description: 'اسلامیات 11 لازمی (صفحہ 1 تا 3): عقیدہ توحید اور رسالت کا انسانی زندگی پر اثر، اور اسلام میں زکوٰۃ کا معاشی و معاشرتی نظام۔',
+    assignedDate: '2026-11-21',
+    dueDate: '2026-11-21',
+    dayOfWeek: 'Saturday',
+    isSundayOff: false,
+    priority: 'normal',
+    pagesRange: 'pp. 1–3',
+    estimatedMinutes: 45,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_sun_01',
+    subjectId: 'sub_off',
+    subjectName: 'Mandatory Rest Day',
+    subjectCode: 'REST-DAY',
+    sourceType: 'manual',
+    sourceTitle: 'National Academic Policy',
+    title: 'Sunday Off — Scheduled Rest & Consolidation (Zero Tasks)',
+    description: 'Strictly zero assignments, zero tests, and zero study quotas according to National Academic Policy. Light revision and mental relaxation.',
+    assignedDate: '2026-11-22',
+    dueDate: '2026-11-22',
+    dayOfWeek: 'Sunday',
+    isSundayOff: true,
+    estimatedMinutes: 0,
+    status: 'approved',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+  {
+    id: 'tsk_henza_rev_01',
+    subjectId: 'sub_01',
+    subjectName: 'Weekly Revision Drill',
+    subjectCode: 'FAIT-REV-11',
+    sourceType: 'syllabus',
+    sourceTitle: 'BISE DG Khan Past Papers Collection',
+    title: 'ہفتہ وار جائزہ و 5 سالہ ماضی پیپرز مشق (Weekly Past Papers Drill)',
+    description: 'BISE DG Khan بورڈ کے گزشتہ 5 سالہ پرچہ جات سے کثیر الانتخابی (MCQs) اور مختصر سوالات کی 30 نمبری مشق مکمل کریں۔',
+    assignedDate: '2026-11-23',
+    dueDate: '2026-11-23',
+    dayOfWeek: 'Monday',
+    isSundayOff: false,
+    priority: 'high',
+    pagesRange: 'Past Papers pp. 1–4',
+    estimatedMinutes: 60,
+    status: 'pending',
+    studentId: 'usr_s_01',
+    studentName: 'Henza Noor',
+  },
+];
 
 class TaskService {
   private tasks: DailyTask[] = [];
@@ -459,12 +602,12 @@ class TaskService {
 
     // Timetable mapping: Mon: Phys Ed, Tue: Urdu, Wed: English, Thu: Computer, Fri: Islamiyat, Sat: Economics
     const subjectDayMap: Record<string, DailyTask['dayOfWeek']> = {
-      'sub_01': 'Monday',
-      'sub_02': 'Tuesday',
-      'sub_03': 'Wednesday',
-      'sub_04': 'Thursday',
+      'sub_01': 'Tuesday',
+      'sub_02': 'Wednesday',
+      'sub_03': 'Thursday',
       'sub_05': 'Friday',
       'sub_06': 'Saturday',
+      'sub_04': 'Tuesday',
     };
     const designatedDay = subjectDayMap[params.subjectId] || 'Thursday';
 

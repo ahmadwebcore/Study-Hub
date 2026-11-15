@@ -3,14 +3,126 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
 
-const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v3';
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v5';
+
+try {
+  ['v1', 'v2', 'v3', 'v4'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
+} catch {}
+
+const INITIAL_HENZA_TESTS: TestItem[] = [
+  {
+    id: 'test_henza_ped_01',
+    title: 'Physical Education: Human Anatomy & 400m Track Specifications',
+    subjectId: 'sub_01',
+    subjectName: 'Physical Education',
+    subjectCode: 'FAIT-PED-11',
+    date: 'Nov 17, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'ہیلتھ اینڈ فزیکل ایجوکیشن (پروفیسر سید بشارت حسین گیلانی) — باب 1: انسانی ہڈیاں اور 400m ٹریک رولز',
+    instructions: 'Attempt all objective and subjective sections within 45 minutes. Total Marks: 30. Passing marks: 15/30.',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+  {
+    id: 'test_henza_urd_01',
+    title: 'Urdu Lazmi & Sharh Sarmaya: Uswa-e-Hasna & Ilm-e-Bayan',
+    subjectId: 'sub_02',
+    subjectName: 'Urdu & Grammar',
+    subjectCode: 'FAIT-URD-11',
+    date: 'Nov 18, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'اُردو 11 لازمی و شرح سرمایہ (پروفیسر راؤ خالد محمود) — سبق اسوہ حسنہ اور تشبیہ و استعارہ کے اصول',
+    instructions: 'Attempt all sections. Write application clearly and upload handwritten sheet via Camera/Gallery. Passing: 15/30.',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+  {
+    id: 'test_henza_eng_01',
+    title: 'English & Sunshine Grammar: Button Button & Active/Passive Voice',
+    subjectId: 'sub_03',
+    subjectName: 'English & Grammar',
+    subjectCode: 'FAIT-ENG-11',
+    date: 'Nov 19, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'English Book-1 & Sunshine English (Prof. Musarrat Hussain) — Story 1 "Button, Button", Active/Passive, and Pairs of Words',
+    instructions: 'Complete 5 MCQs, 2 short answers, and upload handwritten formal letter via camera. Passing: 15/30.',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+  {
+    id: 'test_henza_tqm_01',
+    title: 'ترجمۃ القرآن المجید: سورۃ البقرہ آیات 1 تا 25 لفظی و با محاورہ ترجمہ',
+    subjectId: 'sub_05',
+    subjectName: 'Tarjuma-tul-Quran',
+    subjectCode: 'FAIT-TQM-11',
+    date: 'Nov 20, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'ترجمۃ القرآن المجید مختصر (ہمدرد نوٹس سیریز) — سورۃ البقرہ رکوع 1 تا 2 اور متقین و منافقین کی خصوصیات',
+    instructions: 'سورۃ البقرہ کا لفظی و با محاورہ ترجمہ تحریر کریں۔ کل نمبر: 30۔ پاسنگ مارکس: 15۔',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+  {
+    id: 'test_henza_isl_01',
+    title: 'اسلامیات لازمی: عقیدہ توحید، رسالت اور نظام زکوٰۃ',
+    subjectId: 'sub_06',
+    subjectName: 'Islamiyat Lazmi',
+    subjectCode: 'FAIT-ISL-11',
+    date: 'Nov 21, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'اسلامیات 11 لازمی (PECTAA درسی کتاب) — باب اول عقائد و عبادات: عقیدہ توحید و رسالت اور زکوٰۃ کا نظام',
+    instructions: 'عقائد و عبادات پر تمام سوالات حل کریں۔ جوابی کاپی کیمرہ سے اپلوڈ کریں۔ پاسنگ: 15/30۔',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+  {
+    id: 'test_henza_rev_01',
+    title: 'ہفتہ وار جائزہ: BISE DG Khan 5 سالہ ماضی ماڈل پیپرز کمپلیشن',
+    subjectId: 'sub_01',
+    subjectName: 'Weekly Revision Drill',
+    subjectCode: 'FAIT-REV-11',
+    date: 'Nov 23, 2026',
+    time: '10:00 AM',
+    durationMinutes: 45,
+    totalMarks: 30,
+    passingMarks: 15,
+    type: 'Unit Assessment',
+    syllabusCoverage: 'BISE DG Khan FA-IT تمام 6 مضامین کے بورڈ ماڈل پیپرز کی ہفتہ وار نظر ثانی و مشق',
+    instructions: 'Attempt 30-mark past papers synthesis. Passing benchmark: 15/30.',
+    status: 'scheduled',
+    assignedStudentName: 'Henza Noor',
+  },
+];
 
 function getCustomTests(): TestItem[] {
   try {
     const raw = localStorage.getItem(CUSTOM_TESTS_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch {}
-  return [];
+  return [...INITIAL_HENZA_TESTS];
 }
 
 function saveCustomTests(tests: TestItem[]) {
@@ -251,6 +363,117 @@ export function generateStandardFAITQuestions(subjectCode: string, testTitle: st
         id: `${testId}_q3`,
         testId,
         questionText: 'Write a formal letter to your younger brother advising him on board exam time management and daily study quotas. Upload your handwritten sheet via camera or gallery.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+      },
+    ];
+  }
+
+  if (code.includes('TQM') || title.toLowerCase().includes('tarjuma') || title.toLowerCase().includes('quran') || title.toLowerCase().includes('baqarah')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'سورۃ البقرہ کا شمار قرآن مجید کی کس نوعیت کی سورتوں میں ہوتا ہے اور یہ کتنے رکوعات پر مشتمل ہے؟',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        explanation: 'سورۃ البقرہ مدنی سورت ہے اور اس میں 40 رکوعات اور 286 آیات ہیں۔',
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'مدنی سورت (40 رکوعات اور 286 آیات)', isCorrect: true, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'مکی سورت (25 رکوعات)', isCorrect: false, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'مدنی سورت (15 رکوعات)', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'مکی سورت (50 رکوعات)', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'سورۃ البقرہ کی ابتدائی پانچ آیات کی روشنی میں "المتقین" (پرہیزگاروں) کی تین بنیادی صفات تحریر کریں۔',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+        explanation: 'غیب پر ایمان، اقامتِ نماز، اور اللہ کے دیئے ہوئے رزق میں سے خرچ کرنا۔',
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'مندرجہ ذیل قرآنی آیت کا لفظی اور بامحاورہ ترجمہ تحریر کریں: "ذٰلِكَ الْكِتٰبُ لَا رَيْبَ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ" اور خلاصہ تحریر کریں۔ اپنے ہاتھ سے لکھی جوابی کاپی کیمرہ یا گیلری سے اپلوڈ کریں۔',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+        explanation: 'Handwritten test sheet with complete word-by-word and contextual translation.',
+      },
+    ];
+  }
+
+  if (code.includes('ISL') || title.toLowerCase().includes('islami') || title.toLowerCase().includes('tauheed') || title.toLowerCase().includes('zakat')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'اسلامیات لازمی کے نصاب کے مطابق عقیدہ توحید کا بنیادی مفہوم کیا ہے؟',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        explanation: 'اللہ تعالیٰ کو ذات، صفات اور اختیارات میں یکتا و لاشریک ماننا۔',
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'اللہ تعالیٰ کو ذات و صفات میں یکتا و بے مثل تسلیم کرنا', isCorrect: true, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'صرف کائنات کے خالق کو ماننا', isCorrect: false, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'فرشتوں کی عبادت کرنا', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'مادیت پسندی', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'اسلام میں نظامِ زکوٰۃ کے معاشرتی و معاشی فوائد پر دو مختصر نکات بیان کریں۔',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+        explanation: 'دولت کے ارتکاز کا خاتمہ، غربت میں کمی اور معاشرتی ہمدردی و اخوت کا فروغ۔',
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'عقیدہ ختم نبوت ﷺ پر تفصیلی نوٹ تحریر کریں اور قرآنی آیات کا حوالہ دیں۔ اپنے ہاتھ سے لکھی شیٹ کیمرہ یا گیلری کے ذریعے اپلوڈ کریں۔',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+        explanation: 'Handwritten test paper covering Khatam-e-Nabuwwat and economic impact of Zakat.',
+      },
+    ];
+  }
+
+  if (code.includes('REV') || title.toLowerCase().includes('revision') || title.toLowerCase().includes('past paper')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'BISE DG Khan Past Paper Drill: Identify the official passing percentage required for 1st Year Intermediate Board examinations.',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: '33% passing benchmark (10/30 or 33/100)', isCorrect: true, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: '50% passing benchmark', isCorrect: false, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: '25% passing benchmark', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: '60% passing benchmark', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'Explain the 3 core time-management guidelines for attempting BISE DG Khan subjective question papers within the allocated 2.5 hours.',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Solve Section B & Section C from the 5-Year DG Khan Board Past Papers model set. Upload your handwritten answer sheets via Camera or Gallery.',
         questionType: 'file_upload',
         marks: 15,
         questionOrder: 3,
@@ -551,12 +774,12 @@ export const testService = {
     const weeks = params.totalWeeks || 14;
 
     const subjectDayMap: Record<string, 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday'> = {
-      'sub_01': 'Monday',
-      'sub_02': 'Tuesday',
-      'sub_03': 'Wednesday',
-      'sub_04': 'Thursday',
+      'sub_01': 'Tuesday',
+      'sub_02': 'Wednesday',
+      'sub_03': 'Thursday',
       'sub_05': 'Friday',
       'sub_06': 'Saturday',
+      'sub_04': 'Tuesday',
     };
     const targetDay = params.assignedDay || subjectDayMap[params.subjectId] || 'Thursday';
 

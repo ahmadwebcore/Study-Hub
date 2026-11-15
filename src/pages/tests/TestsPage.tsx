@@ -935,7 +935,7 @@ export const TestsPage: React.FC = () => {
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-bold text-[#142D27]">
                                   Question {currentQuestionIndex + 1} of{' '}
-                                  {activeExamTest.questions?.length}
+                                  {effectiveQuestions.length}
                                 </span>
                                 <Badge variant="neutral" size="sm">
                                   {q.questionType.replace('_', ' ').toUpperCase()}

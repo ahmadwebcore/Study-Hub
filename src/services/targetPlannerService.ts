@@ -34,7 +34,11 @@ export interface TargetPlannerStats {
   subjectsQuota: SubjectTargetQuota[];
 }
 
-const STORAGE_KEY = 'studyhub_target_planner_v5';
+const STORAGE_KEY = 'studyhub_target_planner_v6';
+
+try {
+  ['v1', 'v2', 'v3', 'v4', 'v5'].forEach(v => localStorage.removeItem('studyhub_target_planner_' + v));
+} catch {}
 
 try {
   localStorage.removeItem('studyhub_target_planner_v1');
@@ -87,12 +91,12 @@ class TargetPlannerService {
     totalPages?: number;
   }): void {
     const dayMap: Record<string, SubjectTargetQuota['assignedDay']> = {
-      'sub_01': 'Monday',
-      'sub_02': 'Tuesday',
-      'sub_03': 'Wednesday',
-      'sub_04': 'Thursday',
+      'sub_01': 'Tuesday',
+      'sub_02': 'Wednesday',
+      'sub_03': 'Thursday',
       'sub_05': 'Friday',
       'sub_06': 'Saturday',
+      'sub_04': 'Tuesday',
     };
     const colorMap: Record<string, string> = {
       'sub_01': '#10B981',

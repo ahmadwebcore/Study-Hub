@@ -102,6 +102,7 @@ export interface BookItem {
   version: number;
   uploadedAt: string;
   uploadedBy?: string;
+  coverUrl?: string;
   totalPages?: number;
   currentPage?: number;
   weeklyPagesRead?: number;

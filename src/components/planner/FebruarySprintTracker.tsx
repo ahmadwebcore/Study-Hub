@@ -166,13 +166,13 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
           {[
-            { day: 'Monday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FAIT-PED' },
-            { day: 'Tuesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FAIT-URD' },
-            { day: 'Wednesday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FAIT-ENG' },
-            { day: 'Thursday', subject: 'Computer Science', focus: 'Computing & Networks', color: '#0EA5E9', code: 'FAIT-CS' },
-            { day: 'Friday', subject: 'Islamiyat & Tarjuma', focus: 'Quranic Translation', color: '#059669', code: 'FAIT-ISL' },
-            { day: 'Saturday', subject: 'Economics', focus: 'Microeconomics & Graphs', color: '#F59E0B', code: 'FAIT-ECO' },
-            { day: 'Sunday', subject: 'Rest & Revision', focus: 'Mandatory Weekly Rest', color: '#EF4444', isOff: true },
+            { day: 'Tuesday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FAIT-PED' },
+            { day: 'Wednesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FAIT-URD' },
+            { day: 'Thursday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FAIT-ENG' },
+            { day: 'Friday', subject: 'Tarjuma-tul-Quran', focus: 'Quranic Translation', color: '#0EA5E9', code: 'FAIT-TQM' },
+            { day: 'Saturday', subject: 'Islamiyat Lazmi', focus: 'Creed & Zakat System', color: '#14B866', code: 'FAIT-ISL' },
+            { day: 'Sunday', subject: 'Rest & Consolidation', focus: 'Mandatory Weekly Rest', color: '#EF4444', isOff: true },
+            { day: 'Monday', subject: 'Weekly Synthesis', focus: '5-Year Past Papers Drill', color: '#6366F1', code: 'FAIT-REV' },
           ].map((item) => {
             const isToday = todayName.toLowerCase() === item.day.toLowerCase();
             return (

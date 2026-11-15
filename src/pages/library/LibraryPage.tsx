@@ -539,11 +539,22 @@ export const LibraryPage: React.FC = () => {
                 </div>
 
                 <div className="mt-3 flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#e8f8f0] border border-[#14B866]/30 flex items-center justify-center shrink-0 text-[#14B866]">
-                    <BookOpen className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-[#142D27] line-clamp-1">{book.title}</h3>
+                  {book.coverUrl ? (
+                    <img
+                      src={book.coverUrl}
+                      alt={book.title}
+                      className="w-12 h-16 rounded-xl object-cover border border-[#e1ede7] shadow-xs shrink-0 bg-zinc-50"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl bg-[#e8f8f0] border border-[#14B866]/30 flex items-center justify-center shrink-0 text-[#14B866]">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-[#142D27] line-clamp-2 leading-snug">{book.title}</h3>
                     <p className="text-xs text-[#557067] mt-0.5">{book.subjectName}</p>
                   </div>
                 </div>
