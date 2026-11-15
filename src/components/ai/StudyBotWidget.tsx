@@ -117,29 +117,44 @@ export const StudyBotWidget: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-40">
       {/* Floating Launcher Button */}
       {!isOpen && (
-        <button
-          type="button"
-          onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-400/30"
-          aria-label="Open AI Study Assistant"
-        >
-          <div className="relative">
-            <Bot className="w-5 h-5 text-emerald-300" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          </div>
-          <div className="text-left">
-            <span className="block text-xs font-bold tracking-tight">AI Study Assistant</span>
-            <span className="block text-[10px] text-emerald-200">24/7 Academic Copilot</span>
-          </div>
-        </button>
+        <>
+          {/* Mobile Compact Circular FAB */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="sm:hidden flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl active:scale-90 transition-all border border-emerald-400/40 relative"
+            aria-label="Open AI Study Assistant"
+          >
+            <Bot className="w-5 h-5 text-emerald-200" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27] animate-ping" />
+            <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27]" />
+          </button>
+
+          {/* Desktop Full Pill */}
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="hidden sm:flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-400/30"
+            aria-label="Open AI Study Assistant"
+          >
+            <div className="relative">
+              <Bot className="w-5 h-5 text-emerald-300" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            </div>
+            <div className="text-left">
+              <span className="block text-xs font-bold tracking-tight">AI Study Assistant</span>
+              <span className="block text-[10px] text-emerald-200">24/7 Academic Copilot</span>
+            </div>
+          </button>
+        </>
       )}
 
       {/* Slide-over Chat Box */}
       {isOpen && (
-        <div className="w-[92vw] sm:w-[420px] h-[580px] max-h-[85vh] bg-white rounded-2xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[420px] sm:h-[580px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-white rounded-2xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50">
           {/* Header */}
           <div className="p-3.5 bg-gradient-to-r from-[#142D27] to-[#1A3831] text-white flex items-center justify-between border-b border-emerald-900/30">
             <div className="flex items-center gap-2.5">

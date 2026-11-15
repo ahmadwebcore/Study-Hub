@@ -105,18 +105,18 @@ export const AITeacherPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#142D27] via-[#1A3831] to-[#0D1F1A] rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden shadow-sm">
+      <div className="bg-gradient-to-r from-[#142D27] via-[#1A3831] to-[#0D1F1A] rounded-2xl p-5 sm:p-8 text-white relative overflow-hidden shadow-sm">
         <div className="absolute right-0 top-0 w-96 h-96 bg-[#14B866]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
-            <Bot className="w-3.5 h-3.5" />
-            <span>AI Study Assistant &bull; 24/7 Academic Copilot & Teacher Guide</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-[11px] font-semibold max-w-full">
+            <Bot className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">AI Study Assistant &bull; 24/7 Academic Copilot</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight leading-snug break-words">
             Computer Science Concepts &bull; Clear Explanations with Practical Analogies
           </h1>
-          <p className="text-sm text-zinc-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             Have questions on your textbook, practicals, or exam preparation? Type any concept in English, Urdu, or Roman Urdu. The AI Assistant explains complex computing topics with real-world analogies, code architecture, and board scoring tips.
           </p>
         </div>

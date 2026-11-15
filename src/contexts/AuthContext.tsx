@@ -22,6 +22,7 @@ interface AuthContextType {
   updatePassword: (password: string) => Promise<{ error: Error | null }>;
   toggleDemoRole: () => void;
   setRole: (role: UserRole) => void;
+  updateAvatar: (avatarUrl: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +40,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
     if (!p) return fallbackRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
     const clean = { ...p };
+    try {
+      const savedTeacherAvatar = localStorage.getItem('studyhub_custom_avatar_ahmad');
+      const savedStudentAvatar = localStorage.getItem('studyhub_custom_avatar_student');
+      if (fallbackRole === 'teacher' && savedTeacherAvatar) {
+        clean.avatar = savedTeacherAvatar;
+      } else if (fallbackRole === 'student' && savedStudentAvatar) {
+        clean.avatar = savedStudentAvatar;
+      }
+    } catch {}
     if (clean.email && clean.email.toLowerCase().includes('bilal')) {
       clean.email = 'student@studyhub.edu';
       clean.name = 'Student Scholar';
@@ -56,6 +66,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       clean.email = 'ahmadwebcore@gmail.com';
     }
     return clean;
+  };
+
+  const updateAvatar = (avatarUrl: string) => {
+    const cleanUrl = avatarUrl.trim();
+    try {
+      const activeRole = profile?.role || demoRole;
+      if (activeRole === 'teacher') {
+        localStorage.setItem('studyhub_custom_avatar_ahmad', cleanUrl);
+      } else {
+        localStorage.setItem('studyhub_custom_avatar_student', cleanUrl);
+      }
+    } catch {}
+    setProfile((prev) => (prev ? { ...prev, avatar: cleanUrl } : prev));
   };
 
   useEffect(() => {
@@ -234,6 +257,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatePassword,
         toggleDemoRole,
         setRole,
+        updateAvatar,
       }}
     >
       {children}

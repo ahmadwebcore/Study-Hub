@@ -11,6 +11,7 @@ import {
   MessageSquare,
   ExternalLink,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { NotificationItem } from '../../types';
 import { notificationService } from '../../services/notificationService';
@@ -139,33 +140,49 @@ export const NotificationDropdown: React.FC = () => {
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-[340px] sm:w-[420px] rounded-2xl bg-white border border-zinc-200 shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            {/* Header */}
-            <div className="p-3.5 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-xs text-zinc-900 tracking-tight">
-                  Academic Alerts & Board Feed
-                </h4>
-                {unreadCount > 0 && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    {unreadCount} new
-                  </span>
-                )}
-              </div>
+          <>
+            {/* Mobile Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 sm:hidden"
+              onClick={() => setIsOpen(false)}
+            />
 
-              <div className="flex items-center gap-2">
-                {unreadCount > 0 && (
+            {/* Notification Drawer / Dropdown */}
+            <div className="fixed inset-x-2.5 top-16 max-h-[82vh] sm:max-h-[600px] sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:absolute sm:w-[420px] rounded-2xl bg-white border border-zinc-200 shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              {/* Header */}
+              <div className="p-3.5 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-bold text-xs sm:text-sm text-zinc-900 tracking-tight">
+                    Academic Alerts & Board Feed
+                  </h4>
+                  {unreadCount > 0 && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      {unreadCount} new
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllAsRead}
+                      className="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-50"
+                    >
+                      <Check className="w-3 h-3" />
+                      <span className="hidden sm:inline">Mark all read</span>
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={markAllAsRead}
-                    className="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-50"
+                    onClick={() => setIsOpen(false)}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 transition-colors"
+                    aria-label="Close notification panel"
                   >
-                    <Check className="w-3 h-3" />
-                    Mark all read
+                    <X className="w-4 h-4" />
                   </button>
-                )}
+                </div>
               </div>
-            </div>
 
             {/* Filter Category Tabs */}
             <div className="flex items-center gap-1 p-2 bg-zinc-100/60 border-b border-zinc-200 overflow-x-auto text-[11px]">
@@ -321,7 +338,8 @@ export const NotificationDropdown: React.FC = () => {
               </button>
             </div>
           </div>
-        )}
+        </>
+      )}
       </div>
 
       {/* BISE DG Khan Board Modal */}

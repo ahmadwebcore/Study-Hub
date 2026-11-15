@@ -30,7 +30,7 @@ export const SAMPLE_TEACHER: UserProfile = {
   email: 'ahmadwebcore@gmail.com',
   role: 'teacher',
   title: 'Faculty Lead & Academic Director',
-  avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=256&auto=format&fit=crop',
+  avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=256&auto=format&fit=crop',
   institution: 'StudyHub Learning Portal',
   phone: '+92 300 1234567',
 };

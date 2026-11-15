@@ -654,24 +654,24 @@ export const SyllabusPage: React.FC = () => {
             <Card key={unit.id} className="p-5 sm:p-6">
               {/* Chapter Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#e1ede7]">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#14B866] bg-[#e8f8f0] px-2.5 py-0.5 rounded-full">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-bold text-[#14B866] bg-[#e8f8f0] px-2.5 py-0.5 rounded-full shrink-0">
                       Chapter {unit.unitNumber}
                     </span>
-                    <h3 className="text-base font-bold text-[#142D27]">{unit.title}</h3>
+                    <h3 className="text-sm sm:text-base font-bold text-[#142D27] break-words">{unit.title}</h3>
                   </div>
                   {unit.description && (
-                    <p className="text-xs text-[#557067] mt-1">{unit.description}</p>
+                    <p className="text-xs text-[#557067] mt-1 leading-relaxed">{unit.description}</p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
+                <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 shrink-0">
+                  <div className="text-left sm:text-right">
                     <span className="text-xs font-bold text-[#142D27]">{unit.progress}%</span>
                     <span className="text-[10px] text-[#7d9990] block">Chapter Mastery</span>
                   </div>
-                  <div className="w-16 bg-[#E7EFEA] rounded-full h-2 overflow-hidden">
+                  <div className="w-16 bg-[#E7EFEA] rounded-full h-2 overflow-hidden shrink-0">
                     <div
                       className="h-full bg-[#14B866] rounded-full"
                       style={{ width: `${unit.progress}%` }}
@@ -707,7 +707,7 @@ export const SyllabusPage: React.FC = () => {
 
               {/* Topics Checkpoints List */}
               <div className="mt-4 space-y-2.5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                   <p className="text-[11px] font-semibold text-[#7d9990] uppercase tracking-wider">
                     {unit.topics.length} Checkpoints &bull; Click status pill or row to update progress
                   </p>
@@ -721,7 +721,7 @@ export const SyllabusPage: React.FC = () => {
                         setTopicValue('estimatedHours', 4);
                         setTopicValue('notesContent', '');
                       }}
-                      className="text-xs font-semibold text-[#14B866] hover:underline flex items-center gap-1"
+                      className="text-xs font-semibold text-[#14B866] hover:underline flex items-center gap-1 self-start sm:self-auto"
                     >
                       <PlusCircle className="w-3.5 h-3.5" />
                       Add Topic
@@ -735,7 +735,7 @@ export const SyllabusPage: React.FC = () => {
                     <div
                       key={topic.id}
                       onClick={() => handleToggleTopic(unit.id, topic)}
-                      className={`p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer select-none ${
+                      className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer select-none ${
                         status === 'completed'
                           ? 'bg-[#e8f8f0]/40 border-[#14B866]/30 text-[#142D27]'
                           : status === 'in_progress'
@@ -743,28 +743,28 @@ export const SyllabusPage: React.FC = () => {
                           : 'bg-[#F7F9F8] border-[#e1ede7] text-[#557067] hover:bg-white'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-start gap-2.5 flex-1 min-w-0">
                         {status === 'completed' ? (
-                          <CheckCircle2 className="w-5 h-5 text-[#14B866] shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-[#14B866] shrink-0 mt-0.5" />
                         ) : status === 'in_progress' ? (
-                          <div className="w-5 h-5 rounded-full border-2 border-amber-500 border-t-transparent animate-spin shrink-0" />
+                          <div className="w-4 h-4 rounded-full border-2 border-amber-500 border-t-transparent animate-spin shrink-0 mt-0.5" />
                         ) : (
-                          <Circle className="w-5 h-5 text-[#7d9990] shrink-0" />
+                          <Circle className="w-4 h-4 text-[#7d9990] shrink-0 mt-0.5" />
                         )}
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <p
-                            className={`text-xs font-semibold ${
+                            className={`text-xs sm:text-sm font-semibold leading-snug break-words ${
                               status === 'completed' ? 'line-through text-[#7d9990]' : 'text-[#142D27]'
                             }`}
                           >
                             {topic.title}
                           </p>
-                          <span className="text-[10px] text-[#7d9990] flex items-center gap-1 mt-0.5">
-                            <Clock className="w-3 h-3" />
+                          <span className="text-[10px] text-[#7d9990] flex items-center gap-1 mt-1">
+                            <Clock className="w-3 h-3 shrink-0" />
                             Est. {topic.estimatedHours} Hours
                             {topic.attachmentName && (
-                              <span className="text-[#14B866] font-medium ml-2 flex items-center gap-0.5">
-                                <Paperclip className="w-3 h-3" />
+                              <span className="text-[#14B866] font-medium ml-2 flex items-center gap-0.5 truncate">
+                                <Paperclip className="w-3 h-3 shrink-0" />
                                 {topic.attachmentName}
                               </span>
                             )}
@@ -772,10 +772,10 @@ export const SyllabusPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 sm:border-none pl-6 sm:pl-0">
                         {/* Status Badge */}
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize shrink-0 ${
                             status === 'completed'
                               ? 'bg-emerald-100 text-emerald-800'
                               : status === 'in_progress'
@@ -792,7 +792,7 @@ export const SyllabusPage: React.FC = () => {
                               e.stopPropagation();
                               setActiveNotesTopic({ topic, unitTitle: unit.title });
                             }}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#14B866] hover:text-[#109653] bg-white px-2.5 py-1 rounded-lg border border-[#e1ede7] shadow-subtle shrink-0"
+                            className="flex items-center gap-1 text-[11px] font-semibold text-[#14B866] hover:text-[#109653] bg-white px-2 py-0.5 rounded-lg border border-[#e1ede7] shadow-xs shrink-0"
                           >
                             <FileText className="w-3 h-3" />
                             Notes
