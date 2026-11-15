@@ -92,12 +92,12 @@ export const StudentDashboard: React.FC = () => {
     <div className="space-y-7 font-sans max-w-5xl mx-auto pb-12">
       {/* Toast Notification */}
       {successToast && (
-        <div className="p-3.5 rounded-2xl bg-zinc-900 text-white flex items-center justify-between text-xs font-semibold shadow-lg animate-in fade-in duration-150">
+        <div className="p-3.5 rounded-2xl bg-white border border-emerald-300 text-zinc-900 flex items-center justify-between text-xs font-semibold shadow-md animate-in fade-in duration-150">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             {successToast}
           </span>
-          <button onClick={() => setSuccessToast(null)} className="text-zinc-400 hover:text-white text-sm">
+          <button onClick={() => setSuccessToast(null)} className="text-zinc-400 hover:text-zinc-700 text-sm">
             &times;
           </button>
         </div>
@@ -210,32 +210,32 @@ export const StudentDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Card 2: Today's 30-Mark Test (Rich Dark Prestige Card) */}
-          <div className="p-5 rounded-3xl bg-gradient-to-br from-[#142D27] to-[#0A1A16] text-white border border-emerald-500/20 shadow-md hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-4">
+          {/* Card 2: Today's 30-Mark Test (Mini Card Style Matching Test Series) */}
+          <div className="p-5 rounded-3xl bg-white border-2 border-emerald-500/80 shadow-xs hover:border-emerald-600 hover:shadow-sm transition-all flex flex-col justify-between space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/15">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                   Step 2 &bull; 30-Mark Test
                 </span>
-                <span className="text-xs font-bold text-emerald-300 flex items-center gap-1">
+                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
                   <Award className="w-3.5 h-3.5" />
                   Pass: 15/30 Marks
                 </span>
               </div>
-              <h3 className="text-base font-bold text-white font-serif">
+              <h3 className="text-base font-bold text-zinc-900 font-serif">
                 Chapter 2 Network Topologies Assessment
               </h3>
-              <p className="text-xs text-zinc-300 leading-relaxed">
+              <p className="text-xs text-zinc-600 leading-relaxed">
                 Official 30-mark diagnostic test with 10 MCQs and 4 short-response questions mapped to BISE DG Khan board scheme.
               </p>
             </div>
 
-            <div className="pt-2 border-t border-white/10 flex items-center gap-2">
+            <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
               <Link
                 to="/test-submit"
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-zinc-900 bg-white hover:bg-zinc-100 rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
               >
-                <FileCheck2 className="w-3.5 h-3.5 text-emerald-700" />
+                <FileCheck2 className="w-3.5 h-3.5 text-white" />
                 <span>Start Today's 30-Mark Test</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
               </Link>
@@ -396,12 +396,12 @@ export const StudentDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#142D27] text-white flex items-center justify-center shrink-0 mt-0.5">
-                    <Award className="w-4 h-4 text-emerald-300" />
+                <div className="p-4 rounded-2xl bg-white border border-emerald-200 flex items-start gap-3 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                    <Award className="w-4 h-4 text-emerald-700" />
                   </div>
                   <div className="flex-1 space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                       Today's Assessment: 30 Marks
                     </span>
                     <h4 className="text-xs font-bold text-zinc-900">
@@ -419,7 +419,7 @@ export const StudentDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleDismissDailyWelcome}
-                  className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] ring-1 ring-white/15 hover:from-[#193e33] hover:to-[#0c201a] transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Open Today's Workspace</span>
                   <ArrowRight className="w-4 h-4" />

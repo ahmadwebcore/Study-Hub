@@ -30,7 +30,7 @@ export interface AIProviderConfig {
 }
 
 const STORAGE_KEY_AI_CONFIG = 'studyhub_ai_config_v2';
-const STORAGE_KEY_CHAT_HISTORY = 'studyhub_ai_chat_history_v2';
+const STORAGE_KEY_CHAT_HISTORY = 'studyhub_ai_chat_history_v3';
 
 // 1st Year Intermediate Computer Science Academic Knowledge Base
 const CS_KNOWLEDGE = [
@@ -325,7 +325,7 @@ export class AIStudyBotService {
             parsed[0] = {
               id: 'msg_welcome',
               sender: 'assistant',
-              text: `Hi ${studentName}! How can we help you today?`,
+              text: `Hi ${studentName}, how can we help you?`,
               timestamp: 'Just now',
             };
             this.saveChatHistory(parsed);
@@ -339,9 +339,15 @@ export class AIStudyBotService {
     // Clean minimal default initial greeting - no suggestion buttons
     return [
       {
+        id: 'msg_hi',
+        sender: 'assistant',
+        text: 'Hi',
+        timestamp: 'Just now',
+      },
+      {
         id: 'msg_welcome',
         sender: 'assistant',
-        text: `Hi ${studentName}! How can we help you today?`,
+        text: `Hi ${studentName}, how can we help you?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ];
@@ -449,11 +455,11 @@ export class AIStudyBotService {
     // Simple Greeting Intent
     const isGreeting = /^(hi|hello|hey|salam|assalam|aoa|adaab|greetings)\b/i.test(qLower);
     if (isGreeting) {
-      const studentName = this.getActiveStudentName();
+      const studentName = this.getActiveStudentName() === 'Henza' ? 'Henza Noor' : this.getActiveStudentName();
       return {
         id: `msg_greet_${Date.now()}`,
         sender: 'assistant',
-        text: `Hi ${studentName}! How can we help you today?`,
+        text: `Hi ${studentName}, how can we help you?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
     }

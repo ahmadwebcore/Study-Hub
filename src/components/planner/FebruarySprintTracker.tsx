@@ -69,73 +69,71 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
   const todayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e1ede7] shadow-sm overflow-hidden mb-6">
-      {/* Target Header Banner */}
-      <div className="bg-gradient-to-r from-[#142D27] via-[#1A3831] to-[#0D1F1A] text-white p-5 sm:p-6 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#14B866]/10 rounded-full blur-3xl pointer-events-none" />
-        
+    <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden mb-6">
+      {/* Target Header Banner - Clean Test Series Mini-Card Aesthetic */}
+      <div className="bg-white text-zinc-900 p-5 sm:p-6 border-b border-zinc-200 relative">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
-                <CalendarCheck className="w-3.5 h-3.5" />
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
+                <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>3-Month Target Sprint &bull; Deadline: 28 Feb 2027</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-mono font-bold shadow-xs">
-                <Clock className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-bold shadow-2xs">
+                <Clock className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Today's 24H Window: {windowRemaining || 'Counting...'}</span>
               </div>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-              Syllabus Completion & Daily Quota Engine
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 font-serif flex items-center gap-2">
+              Syllabus Completion &amp; Daily Quota Engine
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-300 max-w-2xl">
-              Annual Board Examinations commence in <strong className="text-white">May 2027</strong>. Complete 100% of the syllabus across all 6 subjects by <strong className="text-emerald-400">February 28th</strong> with daily page targets.
+            <p className="text-xs sm:text-sm text-zinc-600 max-w-2xl leading-relaxed">
+              Annual Board Examinations commence in <strong className="text-zinc-900">May 2027</strong>. Complete 100% of the syllabus across all 6 subjects by <strong className="text-emerald-700 font-bold">February 28th</strong> with daily page targets.
             </p>
           </div>
 
-          {/* Key Metric Badges */}
+          {/* Key Metric Badges (Test Series Mini Card Style) */}
           <div className="grid grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
-              <span className="block text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Days to Feb 28</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-emerald-400 font-mono">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
+              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Days to Feb 28</span>
+              <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 font-mono">
                 {stats.daysToTarget}d
               </span>
-              <span className="block text-[9px] text-zinc-400">({stats.activeStudyDaysToTarget} study days)</span>
+              <span className="block text-[9px] text-zinc-500">({stats.activeStudyDaysToTarget} study days)</span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
-              <span className="block text-[10px] uppercase font-bold text-zinc-400 tracking-wider">May Exams</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-amber-400 font-mono">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
+              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">May Exams</span>
+              <span className="text-xl sm:text-2xl font-extrabold text-amber-700 font-mono">
                 {stats.daysToExams}d
               </span>
-              <span className="block text-[9px] text-zinc-400">Board Exam</span>
+              <span className="block text-[9px] text-zinc-500">Board Exam</span>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-3 text-center min-w-[90px]">
-              <span className="block text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Total Progress</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-[#14B866] font-mono">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
+              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Total Progress</span>
+              <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 font-mono">
                 {stats.overallCompletionPercentage}%
               </span>
-              <span className="block text-[9px] text-zinc-400">{stats.totalCompletedPages}/{stats.totalBookPages} pgs</span>
+              <span className="block text-[9px] text-zinc-500">{stats.totalCompletedPages}/{stats.totalBookPages} pgs</span>
             </div>
           </div>
         </div>
 
         {/* Live Overall Progress Bar */}
-        <div className="mt-5 pt-4 border-t border-white/10">
+        <div className="mt-5 pt-4 border-t border-zinc-100">
           <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-            <span className="text-zinc-300 flex items-center gap-1.5">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-zinc-700 flex items-center gap-1.5 font-semibold">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
               1st Year FA-IT Syllabus Completion:
             </span>
-            <span className="font-mono font-bold text-white">
+            <span className="font-mono font-bold text-emerald-800">
               {stats.overallCompletionPercentage}% Completed &bull; {stats.totalBookPages - stats.totalCompletedPages} Pages Remaining
             </span>
           </div>
-          <div className="w-full h-3 rounded-full bg-black/40 p-0.5 border border-white/10 overflow-hidden">
+          <div className="w-full h-3 rounded-full bg-zinc-100 p-0.5 border border-zinc-200 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-emerald-500 via-[#14B866] to-teal-400 rounded-full transition-all duration-500 shadow-sm"
+              className="h-full bg-emerald-600 rounded-full transition-all duration-500 shadow-2xs"
               style={{ width: `${stats.overallCompletionPercentage}%` }}
             />
           </div>

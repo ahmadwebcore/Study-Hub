@@ -132,7 +132,7 @@ export const GrammarHubPage: React.FC = () => {
               }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-[#0c0d10] border border-zinc-800 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-500 text-zinc-100 placeholder-zinc-500 shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-emerald-600 text-zinc-900 placeholder-zinc-400 shadow-2xs"
             />
           </div>
 
@@ -140,12 +140,12 @@ export const GrammarHubPage: React.FC = () => {
             <button
               type="button"
               onClick={handlePrint}
-              className="px-3.5 py-2 bg-[#0c0d10] border border-zinc-800 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900 flex items-center gap-1.5 transition-colors shadow-sm"
+              className="px-3.5 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-zinc-700 hover:text-zinc-900 hover:bg-zinc-50 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
             >
-              <Printer className="w-3.5 h-3.5 text-zinc-400" />
+              <Printer className="w-3.5 h-3.5 text-zinc-500" />
               <span>Print Notes</span>
             </button>
-            <span className="text-xs font-semibold text-zinc-400 bg-[#0c0d10] border border-zinc-800 px-3 py-2 rounded-xl shadow-sm">
+            <span className="text-xs font-semibold text-zinc-600 bg-zinc-50 border border-zinc-200 px-3 py-2 rounded-xl shadow-2xs">
               {filteredItems.length} Topics Available
             </span>
           </div>
@@ -161,7 +161,7 @@ export const GrammarHubPage: React.FC = () => {
               className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                 selectedCategory === cat.id
                   ? 'bg-emerald-600 text-white shadow-xs'
-                  : 'bg-[#0c0d10] text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700'
+                  : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 border border-zinc-200 hover:bg-zinc-200'
               }`}
             >
               {cat.label}
@@ -170,31 +170,31 @@ export const GrammarHubPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Grammar Cards Grid - Sleek Black Cards */}
+      {/* Grammar Cards Grid - Test Series Mini-Card Aesthetic */}
       <div className="grid grid-cols-1 gap-5">
         {filteredItems.map((item: GrammarItem) => (
           <div
             key={item.id}
-            className="bg-[#0c0d10] rounded-2xl border border-zinc-800 p-5 sm:p-6 hover:border-zinc-700 hover:shadow-xl transition-all space-y-4 text-zinc-100"
+            className="bg-white rounded-3xl border border-zinc-200 p-5 sm:p-6 hover:border-zinc-300 hover:shadow-md transition-all space-y-4 text-zinc-900 shadow-xs"
           >
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider font-mono">
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wider font-mono">
                     {item.category.replace('_', ' ').toUpperCase()}
                   </span>
                   {item.boardExamMarks && (
-                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-zinc-900 text-zinc-300 border border-zinc-700">
+                    <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
                       {item.boardExamMarks} Board Marks
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg font-bold text-white tracking-tight font-serif">
+                <h3 className="text-lg font-bold text-zinc-900 tracking-tight font-serif">
                   {item.title}
                 </h3>
                 {item.urduTitle && (
-                  <p className="text-sm text-emerald-400 font-urdu font-medium">
+                  <p className="text-sm text-emerald-700 font-urdu font-medium">
                     {item.urduTitle}
                   </p>
                 )}
@@ -205,11 +205,11 @@ export const GrammarHubPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleCopyContent(item)}
-                  className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900 border border-zinc-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                 >
                   {copiedId === item.id ? (
                     <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Copied!</span>
                     </>
                   ) : (
@@ -224,14 +224,14 @@ export const GrammarHubPage: React.FC = () => {
 
             {/* Content Body */}
             <div
-              className={`p-4 sm:p-5 rounded-xl border border-zinc-800/80 ${
+              className={`p-4 sm:p-5 rounded-2xl border border-zinc-200/90 ${
                 activeLang === 'urdu'
-                  ? 'bg-[#121317] text-right dir-rtl font-urdu'
-                  : 'bg-[#121317] text-left font-sans'
+                  ? 'bg-[#FAFCFB] text-right dir-rtl font-urdu'
+                  : 'bg-[#FAFCFB] text-left font-sans'
               }`}
             >
               <pre
-                className={`whitespace-pre-wrap leading-relaxed text-zinc-200 text-xs sm:text-sm font-sans ${
+                className={`whitespace-pre-wrap leading-relaxed text-zinc-800 text-xs sm:text-sm font-sans ${
                   activeLang === 'urdu' ? 'font-urdu font-medium text-[16px] leading-[2.2]' : 'font-sans'
                 }`}
               >
@@ -241,12 +241,12 @@ export const GrammarHubPage: React.FC = () => {
 
             {/* Board Rules & Examiner Criteria Box */}
             {item.rules && item.rules.length > 0 && (
-              <div className="p-3.5 rounded-xl bg-amber-950/20 border border-amber-800/30 space-y-1.5">
-                <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
+                <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-amber-700" />
                   Board Examiner Guidelines &amp; Official Marking Scheme:
                 </span>
-                <div className="space-y-1 text-xs text-amber-200">
+                <div className="space-y-1 text-xs text-amber-800">
                   {item.rules.map((r, rIdx) => (
                     <p key={rIdx} className="font-urdu leading-relaxed">
                       &bull; {r}
@@ -262,7 +262,7 @@ export const GrammarHubPage: React.FC = () => {
                 {item.tags.map((tag, tIdx) => (
                   <span
                     key={tIdx}
-                    className="text-[10px] font-semibold text-zinc-400 bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 rounded-full"
+                    className="text-[10px] font-semibold text-zinc-500 bg-zinc-50 border border-zinc-200 px-2.5 py-0.5 rounded-full"
                   >
                     #{tag}
                   </span>

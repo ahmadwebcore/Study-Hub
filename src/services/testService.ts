@@ -375,7 +375,8 @@ export const testService = {
         .single();
 
       if (error || !data) {
-        return SAMPLE_TESTS.find((t) => t.id === testId) || null;
+        const fallback = SAMPLE_TESTS.find((t) => t.id === testId) || null;
+        return fallback ? ensureQuestionsForTest(fallback) : null;
       }
 
       const myAtt = studentId

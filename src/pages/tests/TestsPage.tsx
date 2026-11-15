@@ -35,12 +35,14 @@ import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid'
 import {
   TestItem,
   TestAnswer,
+  TestQuestion,
+  TestOption,
   Subject,
   SyllabusUnit,
   Student,
 } from '../../types';
 import { useRole } from '../../hooks/useRole';
-import { testService, ensureQuestionsForTest } from '../../services/testService';
+import { testService, ensureQuestionsForTest, generateStandardFAITQuestions } from '../../services/testService';
 import { subjectService } from '../../services/subjectService';
 import { syllabusService } from '../../services/syllabusService';
 import { studentService } from '../../services/studentService';
@@ -699,8 +701,8 @@ export const TestsPage: React.FC = () => {
       {/* STUDENT EXAMINATION RUNNER (LIVE EXAM MODAL VIA PORTAL TO PREVENT ANY CUT-OFF) */}
       {activeExamTest &&
         createPortal(
-          <div className="fixed inset-0 z-[100] bg-[#090a0c]/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl w-full max-w-4xl h-[92vh] max-h-[92vh] flex flex-col shadow-2xl border border-zinc-200 overflow-hidden">
+          <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 pt-10 sm:pt-6 pb-6 animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200 overflow-hidden">
               {/* Exam Header */}
               <div className="px-5 py-3.5 bg-[#142D27] text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -794,71 +796,82 @@ export const TestsPage: React.FC = () => {
               )}
 
               {/* Exam Body */}
-              <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-                {/* Question Navigator Drawer */}
-                <div className="w-full md:w-56 p-4 border-b md:border-b-0 md:border-r border-[#e1ede7] bg-[#F7F9F8] overflow-y-auto shrink-0">
-                  <span className="text-xs font-bold text-[#142D27] block mb-3">
-                    Question Palette ({activeExamTest.questions?.length || 0})
-                  </span>
-
-                  <div className="grid grid-cols-4 md:grid-cols-3 gap-2">
-                    {(activeExamTest.questions || []).map((q, idx) => {
-                      const ans = examAnswers.find((a) => a.questionId === q.id);
-                      const isAnswered =
-                        ans &&
-                        (ans.selectedOptionId ||
-                          (ans.textAnswer && ans.textAnswer.length > 0) ||
-                          ans.fileUrl ||
-                          uploadedSheets.length > 0);
-                      const isCurrent = idx === currentQuestionIndex;
-                      const isFlagged = ans?.isFlaggedForReview;
-
-                      return (
-                        <button
-                          key={q.id}
-                          onClick={() => setCurrentQuestionIndex(idx)}
-                          className={`h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center relative ${
-                            isCurrent
-                              ? 'bg-[#142D27] text-white ring-2 ring-[#14B866]'
-                              : isFlagged
-                              ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                              : isAnswered
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                              : 'bg-white text-[#557067] border border-[#e1ede7] hover:bg-[#E7EFEA]'
-                          }`}
-                        >
-                          {idx + 1}
-                          {isFlagged && (
-                            <span className="w-2 h-2 rounded-full bg-amber-500 absolute -top-0.5 -right-0.5" />
-                          )}
-                        </button>
+              {(() => {
+                const effectiveQuestions =
+                  activeExamTest.questions && activeExamTest.questions.length > 0
+                    ? activeExamTest.questions
+                    : generateStandardFAITQuestions(
+                        activeExamTest.subjectCode,
+                        activeExamTest.title,
+                        activeExamTest.id
                       );
-                    })}
-                  </div>
 
-                  <div className="mt-6 pt-4 border-t border-[#e1ede7] space-y-2 text-[10px] text-[#7d9990]">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" />
-                      <span>Answered / Attached</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded bg-amber-100 border border-amber-300" />
-                      <span>Flagged for Review</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded bg-white border border-[#e1ede7]" />
-                      <span>Not Attempted</span>
-                    </div>
-                  </div>
-                </div>
+                return (
+                  <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                    {/* Question Navigator Drawer */}
+                    <div className="w-full md:w-56 p-4 border-b md:border-b-0 md:border-r border-[#e1ede7] bg-[#F7F9F8] overflow-y-auto shrink-0">
+                      <span className="text-xs font-bold text-[#142D27] block mb-3">
+                        Question Palette ({effectiveQuestions.length})
+                      </span>
 
-                {/* Active Question Panel */}
-                <div className="flex-1 p-5 sm:p-6 overflow-y-auto flex flex-col justify-between">
-                  {activeExamTest.questions && activeExamTest.questions.length > 0 ? (
-                    <div>
-                      {(() => {
-                        const q = activeExamTest.questions[currentQuestionIndex];
-                        const ans = examAnswers.find((a) => a.questionId === q.id);
+                      <div className="grid grid-cols-4 md:grid-cols-3 gap-2">
+                        {effectiveQuestions.map((q: TestQuestion, idx: number) => {
+                          const ans = examAnswers.find((a) => a.questionId === q.id);
+                          const isAnswered =
+                            ans &&
+                            (ans.selectedOptionId ||
+                              (ans.textAnswer && ans.textAnswer.length > 0) ||
+                              ans.fileUrl ||
+                              uploadedSheets.length > 0);
+                          const isCurrent = idx === currentQuestionIndex;
+                          const isFlagged = ans?.isFlaggedForReview;
+
+                          return (
+                            <button
+                              key={q.id}
+                              onClick={() => setCurrentQuestionIndex(idx)}
+                              className={`h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center relative ${
+                                isCurrent
+                                  ? 'bg-[#142D27] text-white ring-2 ring-[#14B866]'
+                                  : isFlagged
+                                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                  : isAnswered
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                  : 'bg-white text-[#557067] border border-[#e1ede7] hover:bg-[#E7EFEA]'
+                              }`}
+                            >
+                              {idx + 1}
+                              {isFlagged && (
+                                <span className="w-2 h-2 rounded-full bg-amber-500 absolute -top-0.5 -right-0.5" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="mt-6 pt-4 border-t border-[#e1ede7] space-y-2 text-[10px] text-[#7d9990]">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" />
+                          <span>Answered / Attached</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded bg-amber-100 border border-amber-300" />
+                          <span>Flagged for Review</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded bg-white border border-[#e1ede7]" />
+                          <span>Not Attempted</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Active Question Panel */}
+                    <div className="flex-1 p-5 sm:p-6 overflow-y-auto flex flex-col justify-between">
+                      {effectiveQuestions.length > 0 ? (
+                        <div>
+                          {(() => {
+                            const q = effectiveQuestions[currentQuestionIndex] || effectiveQuestions[0];
+                            const ans = examAnswers.find((a) => a.questionId === q.id);
 
                         return (
                           <div className="space-y-4">
@@ -902,7 +915,7 @@ export const TestsPage: React.FC = () => {
                             {/* Options or Answer Input */}
                             {q.questionType === 'mcq' && q.options && (
                               <div className="space-y-2.5 pt-2">
-                                {q.options.map((opt) => {
+                                {q.options.map((opt: TestOption) => {
                                   const isSelected = ans?.selectedOptionId === opt.id;
                                   return (
                                     <label
@@ -1083,13 +1096,13 @@ export const TestsPage: React.FC = () => {
                     </Button>
 
                     <div className="flex items-center gap-2">
-                      {currentQuestionIndex < (activeExamTest.questions?.length || 1) - 1 ? (
+                      {currentQuestionIndex < effectiveQuestions.length - 1 ? (
                         <Button
                           variant="primary"
                           size="sm"
                           onClick={() =>
                             setCurrentQuestionIndex((prev) =>
-                              Math.min((activeExamTest.questions?.length || 1) - 1, prev + 1)
+                              Math.min(effectiveQuestions.length - 1, prev + 1)
                             )
                           }
                         >
@@ -1110,6 +1123,8 @@ export const TestsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+                );
+              })()}
             </div>
           </div>,
           document.body

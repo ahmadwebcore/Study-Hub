@@ -305,7 +305,7 @@ export const StudyBotWidget: React.FC = () => {
           )}
 
           {/* Messages Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-[#FAFCFB]">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#FAFCFB]">
             {chatSource === 'ai' ? (
               // AI Messages
               messages.map((msg) => (
@@ -316,8 +316,8 @@ export const StudyBotWidget: React.FC = () => {
                   <div
                     className={`max-w-[92%] rounded-2xl p-3 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-[#142D27] text-white rounded-br-none shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-bl-none shadow-xs'
+                        ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
+                        : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-bl-xs shadow-2xs'
                     }`}
                   >
                     {/* Action Executed Banner */}
@@ -409,20 +409,26 @@ export const StudyBotWidget: React.FC = () => {
                   <div
                     className={`max-w-[90%] rounded-2xl p-3 text-xs leading-relaxed ${
                       msg.senderRole === 'student'
-                        ? 'bg-[#142D27] text-white rounded-br-none'
-                        : 'bg-white text-zinc-900 border border-blue-200 rounded-bl-none shadow-xs'
+                        ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
+                        : 'bg-white text-zinc-900 border border-zinc-200 rounded-bl-xs shadow-2xs'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1 text-[10px] text-zinc-500 font-semibold">
-                      <span>{msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}</span>
+                    <div className="flex items-center gap-1.5 mb-1 text-[10px] font-semibold">
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-600'}>
+                        {msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}
+                      </span>
                       {msg.senderRole === 'teacher' && (
-                        <span className="px-1 rounded bg-blue-100 text-blue-800 text-[8px] font-bold">
+                        <span className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[8px] font-bold">
                           Verified
                         </span>
                       )}
                     </div>
-                    <p className="font-semibold text-zinc-900 whitespace-pre-line text-xs">{msg.text}</p>
-                    <span className="block mt-1 text-[9px] text-zinc-400 text-right">{msg.timestamp}</span>
+                    <p className={`whitespace-pre-line text-xs font-medium leading-relaxed ${msg.senderRole === 'student' ? 'text-white' : 'text-zinc-900'}`}>
+                      {msg.text}
+                    </p>
+                    <span className={`block mt-1 text-[9px] text-right ${msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-400'}`}>
+                      {msg.timestamp}
+                    </span>
                   </div>
                 </div>
               ))

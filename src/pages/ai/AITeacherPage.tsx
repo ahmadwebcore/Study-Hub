@@ -318,29 +318,26 @@ export const AITeacherPage: React.FC = () => {
     <div className="space-y-6 pb-12">
       {/* Toast Alert */}
       {saveToast && (
-        <div className="p-3.5 rounded-xl bg-zinc-900 text-white border border-zinc-700 flex items-center justify-between text-xs font-semibold shadow-lg animate-in slide-in-from-top duration-200">
+        <div className="p-3.5 rounded-2xl bg-white text-zinc-900 border border-emerald-300 flex items-center justify-between text-xs font-semibold shadow-md animate-in slide-in-from-top duration-200">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             {saveToast}
           </span>
-          <button onClick={() => setSaveToast(null)} className="text-zinc-400 hover:text-white">
+          <button onClick={() => setSaveToast(null)} className="text-zinc-400 hover:text-zinc-700">
             &times;
           </button>
         </div>
       )}
 
-      {/* Top Level Bento Hero Banner (Linear / 2026 Style) */}
+      {/* Top Level Bento Hero Banner (Clean Test Series Mini-Card Aesthetic) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Bento Card 1: Active AI Mentor Terminal (Spans 2) */}
-        <div className="lg:col-span-2 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c1a16] via-[#12241e] to-[#0a1411] border border-emerald-500/25 p-5 sm:p-7 text-white shadow-xl flex flex-col justify-between">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
+        <div className="lg:col-span-2 relative overflow-hidden rounded-3xl bg-white border-2 border-emerald-500/80 p-5 sm:p-7 text-zinc-900 shadow-sm flex flex-col justify-between">
           <div className="relative z-10 space-y-3">
             {/* Top Indicator Row */}
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold backdrop-blur-md shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>
                   {aiConfig.provider === 'openai'
                     ? `OpenAI ${aiConfig.model || 'GPT-5 Mini'} • Live Engine Active`
@@ -356,29 +353,29 @@ export const AITeacherPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowConfigModal(true)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-colors backdrop-blur-xs cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-xl bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <Key className="w-3.5 h-3.5 text-emerald-400" />
+                  <Key className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Configure Key</span>
-                  <Settings className="w-3 h-3 text-zinc-300 ml-0.5" />
+                  <Settings className="w-3 h-3 text-zinc-400 ml-0.5" />
                 </button>
               </div>
             </div>
 
             {/* Display Title */}
             <div>
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight text-white">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight leading-tight text-zinc-900 font-serif">
                 24/7 AI Academic Mentor &amp; Exam Copilot
               </h1>
-              <p className="text-xs sm:text-sm text-zinc-300 mt-1 leading-relaxed max-w-2xl">
+              <p className="text-xs sm:text-sm text-zinc-600 mt-1 leading-relaxed max-w-2xl">
                 Master 1st Year FA-IT textbooks through real-world analogies, native Urdu breakdowns, and BISE DG Khan board exam scoring rubrics.
               </p>
             </div>
           </div>
 
           {/* Quick Model Selector Pills in Banner */}
-          <div className="relative z-10 pt-4 mt-2 border-t border-white/10 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-zinc-400 mr-1">Quick Model Switch:</span>
+          <div className="relative z-10 pt-4 mt-2 border-t border-zinc-100 flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] font-semibold text-zinc-500 mr-1">Quick Model Switch:</span>
             {[
               { provider: 'openai' as const, model: 'gpt-5-mini', label: 'GPT-5 Mini (Fastest)' },
               { provider: 'openai' as const, model: 'gpt-5', label: 'GPT-5 (Reasoning)' },
@@ -392,10 +389,10 @@ export const AITeacherPage: React.FC = () => {
                   key={btn.model}
                   type="button"
                   onClick={() => handleQuickSwitchModel(btn.provider, btn.model)}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded-xl transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-emerald-400 text-zinc-950 shadow-xs ring-2 ring-emerald-300/40'
-                      : 'bg-white/10 hover:bg-white/15 text-white/80 border border-white/10'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-700 border border-zinc-200'
                   }`}
                 >
                   {btn.label}
@@ -406,36 +403,36 @@ export const AITeacherPage: React.FC = () => {
         </div>
 
         {/* Bento Card 2: Academic Sprint & Board Stats (Spans 1) */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950/70 via-slate-900/80 to-[#121c24] border border-indigo-500/30 p-5 sm:p-6 text-white shadow-xl flex flex-col justify-between">
+        <div className="relative overflow-hidden rounded-3xl bg-white border border-zinc-200 p-5 sm:p-6 text-zinc-900 shadow-sm flex flex-col justify-between">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
-                <GraduationCap className="w-4 h-4 text-indigo-400" />
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-800 flex items-center gap-1.5">
+                <GraduationCap className="w-4 h-4 text-indigo-600" />
                 BISE DG Khan Target
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                 May 2027
               </span>
             </div>
 
             <div className="space-y-2">
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <span className="text-xs text-zinc-300">Daily Test Standard</span>
-                <span className="text-xs font-bold text-amber-300">30 Marks (Pass: 15)</span>
+              <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between shadow-2xs">
+                <span className="text-xs text-zinc-600">Daily Test Standard</span>
+                <span className="text-xs font-bold text-amber-700">30 Marks (Pass: 15)</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <span className="text-xs text-zinc-300">Syllabus Completion</span>
-                <span className="text-xs font-bold text-emerald-300">Feb 28 Sprint</span>
+              <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between shadow-2xs">
+                <span className="text-xs text-zinc-600">Syllabus Completion</span>
+                <span className="text-xs font-bold text-emerald-700">Feb 28 Sprint</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <span className="text-xs text-zinc-300">Faculty Director</span>
-                <span className="text-xs font-bold text-white">Sir Ahmad</span>
+              <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between shadow-2xs">
+                <span className="text-xs text-zinc-600">Faculty Director</span>
+                <span className="text-xs font-bold text-zinc-900">Ahmad</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/10 text-center">
-            <p className="text-[11px] text-zinc-400">
+          <div className="pt-3 border-t border-zinc-100 text-center">
+            <p className="text-[11px] text-zinc-500 font-medium">
               ⚡ Multilingual: Native Urdu, Roman Urdu &amp; English
             </p>
           </div>
@@ -606,8 +603,8 @@ export const AITeacherPage: React.FC = () => {
                 <div
                   className={`max-w-[90%] sm:max-w-[85%] rounded-2xl p-4 sm:p-5 text-xs sm:text-[13px] leading-relaxed transition-all shadow-xs ${
                     msg.sender === 'user'
-                      ? 'bg-zinc-900 text-white rounded-br-xs border border-zinc-800'
-                      : 'bg-zinc-50/70 text-zinc-900 border border-zinc-200 rounded-bl-xs'
+                      ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
+                      : 'bg-white text-zinc-900 border border-zinc-200 rounded-bl-xs shadow-2xs'
                   }`}
                 >
                   <p className="font-semibold whitespace-pre-wrap leading-relaxed">{msg.text}</p>

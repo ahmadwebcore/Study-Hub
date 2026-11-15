@@ -43,7 +43,7 @@ export interface DailyTask {
   studentName: string;
 }
 
-const STORAGE_KEY = 'studyhub_weekly_daily_tasks';
+const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v3';
 
 // Helpers to format dates and get day of week
 const DAY_NAMES: DailyTask['dayOfWeek'][] = [
