@@ -30,15 +30,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(SAMPLE_TEACHER);
-  const [demoRole, setDemoRole] = useState<UserRole>('teacher');
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const configured = isSupabaseConfigured();
-  const isDemoMode = !configured || user === null;
-
   const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
-    if (!p) return fallbackRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
+    if (!p) return fallbackRole === 'teacher' ? { ...SAMPLE_TEACHER } : { ...SAMPLE_STUDENT };
     const clean = { ...p };
     try {
       const savedTeacherAvatar = localStorage.getItem('studyhub_custom_avatar_ahmad');
@@ -67,6 +60,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return clean;
   };
+
+  const [profile, setProfile] = useState<UserProfile | null>(() => sanitizeProfile(SAMPLE_TEACHER, 'teacher'));
+  const [demoRole, setDemoRole] = useState<UserRole>('teacher');
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const configured = isSupabaseConfigured();
+  const isDemoMode = !configured || user === null;
 
   const updateAvatar = (avatarUrl: string) => {
     const cleanUrl = avatarUrl.trim();
@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     async function initAuth() {
       if (!configured) {
-        setProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+        setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
         setLoading(false);
         return;
       }
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch {
         // Fallback to demo profile if network or session fetch failed
         if (mounted) {
-          setProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+          setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
         }
       } finally {
         if (mounted) setLoading(false);
@@ -136,7 +136,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const userProfile = await authService.fetchUserProfile(currentSession.user.id);
             if (mounted) setProfile(sanitizeProfile(userProfile, demoRole));
           } else {
-            if (mounted) setProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+            if (mounted) setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
           }
           setLoading(false);
         }
@@ -227,12 +227,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleDemoRole = () => {
     const nextRole = demoRole === 'teacher' ? 'student' : 'teacher';
     setDemoRole(nextRole);
-    setProfile(nextRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+    setProfile(sanitizeProfile(nextRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, nextRole));
   };
 
   const setRole = (newRole: UserRole) => {
     setDemoRole(newRole);
-    setProfile(newRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+    setProfile(sanitizeProfile(newRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, newRole));
   };
 
   const currentRole: UserRole = profile?.role || demoRole;
