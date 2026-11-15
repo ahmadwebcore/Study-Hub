@@ -502,8 +502,8 @@ export const TeacherDashboard: React.FC = () => {
               <span className="text-[10px] text-zinc-400">PDF / Image Preview</span>
             </div>
             <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700/80 font-mono text-[11px] text-zinc-300 space-y-1">
-              <p className="text-emerald-300 font-bold">&bull; Worked Solution Problem Set (FSc):</p>
-              <p className="text-zinc-400 italic">"Step 1: Formula substituted correctly. Vector components resolved along X and Y axes. Boundary conditions satisfied."</p>
+              <p className="text-emerald-300 font-bold">&bull; Worked Solution Problem Set (FA-IT 1st Year):</p>
+              <p className="text-zinc-400 italic">"Student handwritten coursework submitted for BISE DG Khan examination standards. Key definitions, diagrams, and exercises completed."</p>
               <div className="pt-1 text-[10px] text-zinc-500">File: {approvingTask?.studentSubmission?.attachmentName || 'student_solution_notes.pdf'}</div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { notificationService } from './notificationService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
@@ -15,6 +16,62 @@ function getCustomTests(): TestItem[] {
 function saveCustomTests(tests: TestItem[]) {
   try {
     localStorage.setItem(CUSTOM_TESTS_KEY, JSON.stringify(tests));
+  } catch {}
+}
+
+
+const SUBMITTED_ATTEMPTS_KEY = 'studyhub_submitted_attempts_v3';
+const TEST_STATUSES_KEY = 'studyhub_test_statuses_v2';
+const CERTIFIED_RESULTS_KEY = 'studyhub_certified_results_v3';
+
+export function getLocalSubmittedAttempts(): Record<string, TestAttempt> {
+  try {
+    const raw = localStorage.getItem(SUBMITTED_ATTEMPTS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveLocalSubmittedAttempt(attempt: TestAttempt) {
+  try {
+    const all = getLocalSubmittedAttempts();
+    all[attempt.testId] = attempt;
+    localStorage.setItem(SUBMITTED_ATTEMPTS_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+export function getLocalTestStatuses(): Record<string, { status: string; score?: number }> {
+  try {
+    const raw = localStorage.getItem(TEST_STATUSES_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function saveLocalTestStatus(testId: string, status: string, score?: number) {
+  try {
+    const all = getLocalTestStatuses();
+    all[testId] = { status, score };
+    localStorage.setItem(TEST_STATUSES_KEY, JSON.stringify(all));
+  } catch {}
+}
+
+export function getLocalCertifiedResults(): ResultRecord[] {
+  try {
+    const raw = localStorage.getItem(CERTIFIED_RESULTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalCertifiedResult(result: ResultRecord) {
+  try {
+    const existing = getLocalCertifiedResults().filter((r) => r.testId !== result.testId);
+    existing.unshift(result);
+    localStorage.setItem(CERTIFIED_RESULTS_KEY, JSON.stringify(existing));
   } catch {}
 }
 
@@ -893,6 +950,69 @@ export const testService = {
         : 'F';
 
     if (!isSupabaseConfigured()) {
+      const attempts = getLocalSubmittedAttempts();
+      const existingAttempt = attempts[params.test.id] || {
+        id: params.attemptId,
+        testId: params.test.id,
+        studentId: params.studentId,
+        startedAt: new Date().toISOString(),
+        submittedAt: new Date().toISOString(),
+        answers: [],
+      };
+
+      const updatedAttempt: TestAttempt = {
+        ...existingAttempt,
+        id: params.attemptId,
+        testId: params.test.id,
+        studentId: params.studentId,
+        status: 'graded',
+        totalScore,
+        percentage,
+        grade,
+        passed,
+        feedback: params.overallFeedback,
+      };
+
+      saveLocalSubmittedAttempt(updatedAttempt);
+      saveLocalTestStatus(params.test.id, passed ? 'passed' : 'failed_retest', totalScore);
+
+      const resultRecord: ResultRecord = {
+        id: `res_${Date.now()}`,
+        testId: params.test.id,
+        testTitle: params.test.title,
+        subjectName: params.test.subjectName,
+        subjectCode: params.test.subjectCode,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        studentId: params.studentId,
+        studentName: params.studentName || 'Henza Noor',
+        studentAvatar: params.studentAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
+        score: totalScore,
+        maxScore: params.test.totalMarks,
+        percentage,
+        passingMarks: params.test.passingMarks || 15,
+        passed,
+        grade,
+        rank: percentage >= 90 ? 'Top Grade' : 'Passed',
+        feedback: params.overallFeedback,
+      };
+      saveLocalCertifiedResult(resultRecord);
+
+      notificationService.addNotification({
+        title: '🎓 Certified Grade Released by Sir Ahmad',
+        message: `${params.test.subjectName}: marked ${totalScore}/${params.test.totalMarks} (${grade} - ${passed ? 'PASSED' : 'RETEST'}). Remarks: "${params.overallFeedback}"`,
+        category: 'grade',
+        actionUrl: '/completed-work',
+        actionLabel: 'View Certified Record',
+        badge: `${totalScore}/${params.test.totalMarks}`,
+        urgent: true,
+      });
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('studyhub_tests_updated'));
+        window.dispatchEvent(new Event('studyhub_submissions_updated'));
+        window.dispatchEvent(new Event('studyhub_notification_update'));
+      }
+
       return { success: true, error: null };
     }
 

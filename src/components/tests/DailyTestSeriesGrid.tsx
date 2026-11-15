@@ -1,3 +1,4 @@
+import { useRole } from '../../hooks/useRole';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -24,6 +25,7 @@ import { integrationService } from '../../services/integrationService';
 interface DailyTestSeriesGridProps {
   tests: TestItem[];
   onTakeTest?: (test: TestItem) => void;
+  onGradeTest?: (test: TestItem) => void;
   onRefreshTests?: () => void;
 }
 
@@ -32,8 +34,10 @@ export type TestDisplayStatus = 'locked' | 'today' | 'passed' | 'failed_retest' 
 export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   tests,
   onTakeTest,
+  onGradeTest,
   onRefreshTests,
 }) => {
+  const { role } = useRole();
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
   const [selectedStatusFilter] = useState<string>('all');
@@ -596,15 +600,37 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 </div>
 
                 {!meta.isLocked && (
-                  <button
-                    type="button"
-                    onClick={() => handleAttemptFromModal(activePopupTest)}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors shadow-2xs"
-                  >
-                    <FileCheck2 className="w-3.5 h-3.5" />
-                    <span>{meta.status === 'failed_retest' ? 'Retake Test' : meta.status === 'passed' ? 'Review Submission' : 'Attempt Test'}</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
+                  meta.status === 'submitted' ? (
+                    role === 'teacher' ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActivePopupTest(null);
+                          if (onGradeTest) onGradeTest(activePopupTest);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
+                      >
+                        <FileCheck2 className="w-3.5 h-3.5" />
+                        <span>Check & Grade Submission</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
+                        <Clock className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Awaiting Teacher Evaluation by Ahmad</span>
+                      </span>
+                    )
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleAttemptFromModal(activePopupTest)}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
+                    >
+                      <FileCheck2 className="w-3.5 h-3.5" />
+                      <span>{meta.status === 'failed_retest' ? 'Retake Test' : meta.status === 'passed' ? 'Review Submission' : 'Attempt Test'}</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  )
                 )}
               </div>
             </div>

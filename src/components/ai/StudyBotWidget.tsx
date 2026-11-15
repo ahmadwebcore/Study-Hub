@@ -5,7 +5,6 @@ import {
   GraduationCap,
   Settings,
   Key,
-  RefreshCw,
   Copy,
   CheckCheck,
   Zap,
@@ -247,7 +246,7 @@ export const StudyBotWidget: React.FC = () => {
                     }
                     className="px-2 py-1.5 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-800 focus:outline-none focus:border-emerald-600"
                   >
-                    <option value="openai">OpenAI (GPT-5 Mini / GPT-5)</option>
+                    <option value="openai">OpenAI (GPT-4o Mini / GPT-4o)</option>
                     <option value="gemini">Google Gemini (Gemini 1.5)</option>
                     <option value="anthropic">Anthropic Claude</option>
                     <option value="offline">Offline Academic Model</option>
@@ -255,12 +254,12 @@ export const StudyBotWidget: React.FC = () => {
 
                   {config.provider === 'openai' && (
                     <select
-                      value={config.model || 'gpt-5-mini'}
+                      value={config.model || 'gpt-4o-mini'}
                       onChange={(e) => setConfig({ ...config, model: e.target.value })}
                       className="px-2 py-1.5 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-800 focus:outline-none"
                     >
-                      <option value="gpt-5-mini">gpt-5-mini (Fast)</option>
-                      <option value="gpt-5">gpt-5 (Deep)</option>
+                      <option value="gpt-4o-mini">gpt-4o-mini (Fast &amp; Accurate - Recommended)</option>
+                      <option value="gpt-4o">gpt-4o (Deep Reasoning)</option>
                     </select>
                   )}
 
@@ -316,8 +315,8 @@ export const StudyBotWidget: React.FC = () => {
                   <div
                     className={`max-w-[92%] rounded-2xl p-3 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-bl-xs shadow-2xs'
+                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
+                        : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-tl-xs shadow-2xs'
                     }`}
                   >
                     {/* Action Executed Banner */}
@@ -407,14 +406,14 @@ export const StudyBotWidget: React.FC = () => {
                   className={`flex flex-col ${msg.senderRole === 'student' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[90%] rounded-2xl p-3 text-xs leading-relaxed ${
+                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
                       msg.senderRole === 'student'
-                        ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200 rounded-bl-xs shadow-2xs'
+                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
+                        : 'bg-white text-zinc-900 border border-zinc-200 rounded-tl-xs shadow-2xs'
                     }`}
                   >
                     <div className="flex items-center gap-1.5 mb-1 text-[10px] font-semibold">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-600'}>
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-600 font-bold'}>
                         {msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}
                       </span>
                       {msg.senderRole === 'teacher' && (
@@ -426,18 +425,22 @@ export const StudyBotWidget: React.FC = () => {
                     <p className={`whitespace-pre-line text-xs font-medium leading-relaxed ${msg.senderRole === 'student' ? 'text-white' : 'text-zinc-900'}`}>
                       {msg.text}
                     </p>
-                    <span className={`block mt-1 text-[9px] text-right ${msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-400'}`}>
-                      {msg.timestamp}
-                    </span>
+                    <div className="mt-1 flex items-center justify-end text-[9px] gap-1">
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-400'}>
+                        {msg.timestamp}
+                      </span>
+                      {msg.senderRole === 'student' && <span className="text-white/90 font-bold">✓✓</span>}
+                    </div>
                   </div>
                 </div>
               ))
             )}
 
             {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-zinc-600 bg-white p-2.5 rounded-2xl border border-zinc-200 max-w-[70%] shadow-xs">
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600" />
-                <span>Formulating response...</span>
+              <div className="flex items-center gap-1.5 bg-white border border-zinc-200 px-3.5 py-2.5 rounded-2xl rounded-tl-xs shadow-2xs w-fit">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce"></span>
               </div>
             )}
             <div ref={messagesEndRef} />

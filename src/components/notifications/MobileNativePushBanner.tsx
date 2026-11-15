@@ -8,12 +8,51 @@ interface PushAlertState {
   id: string;
 }
 
+// Synthesize dual-tone pleasant audio chime using browser Web Audio API
+function playNotificationChime() {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(587.33, now); // D5
+    gain1.gain.setValueAtTime(0.12, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(880, now + 0.12); // A5
+    gain2.gain.setValueAtTime(0.14, now + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.12);
+    osc2.stop(now + 0.55);
+  } catch {}
+}
+
 export const MobileNativePushBanner: React.FC = () => {
   const navigate = useNavigate();
   const [activeAlert, setActiveAlert] = useState<PushAlertState | null>(null);
   const [isDismissing, setIsDismissing] = useState(false);
 
   useEffect(() => {
+    // Request notification permission smoothly if not asked before
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+    } catch {}
+
     const handlePushEvent = (e: Event) => {
       const customEvent = e as CustomEvent<NotificationItem>;
       if (customEvent.detail) {
@@ -28,10 +67,23 @@ export const MobileNativePushBanner: React.FC = () => {
   }, []);
 
   const triggerBanner = (notif: NotificationItem) => {
-    // Subtle mobile haptic vibration if supported
+    // Play pleasant audio chime
+    playNotificationChime();
+
+    // Native mobile haptic vibration
     try {
       if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([40, 60, 40]);
+        navigator.vibrate([100, 50, 100]);
+      }
+    } catch {}
+
+    // Native system/OS notification
+    try {
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification(notif.title, {
+          body: notif.message,
+          icon: '/vite.svg',
+        });
       }
     } catch {}
 
@@ -96,11 +148,11 @@ export const MobileNativePushBanner: React.FC = () => {
         <div className="relative flex items-center justify-between pb-1 border-b border-white/10 text-[11px]">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center font-extrabold text-[10px] text-zinc-950 shadow-xs">
-              SH
+              GSA
             </div>
-            <span className="font-bold tracking-tight text-white/90">StudyHub LMS</span>
+            <span className="font-bold tracking-tight text-white/90">Global Science Academy</span>
             <span className="text-white/40">&bull;</span>
-            <span className="text-emerald-400 font-medium">Just now</span>
+            <span className="text-emerald-400 font-medium">Fatehpur</span>
           </div>
 
           <div className="flex items-center gap-1.5">

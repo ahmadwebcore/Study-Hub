@@ -142,7 +142,8 @@ export class AIStudyBotService {
       const stored = localStorage.getItem(STORAGE_KEY_AI_CONFIG);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && (!parsed.apiKey || parsed.apiKey.trim().length < 5)) {
+        if (parsed && (!parsed.apiKey || parsed.apiKey.trim().length < 5 || parsed.model?.includes('gpt-5'))) {
+          parsed.model = 'gpt-4o-mini';
           parsed.apiKey = seedKey;
           parsed.provider = 'openai';
           parsed.model = DEFAULT_OPENAI_MODEL;

@@ -43,7 +43,7 @@ export interface DailyTask {
   studentName: string;
 }
 
-const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v3';
+const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v5';
 
 // Helpers to format dates and get day of week
 const DAY_NAMES: DailyTask['dayOfWeek'][] = [
@@ -73,16 +73,7 @@ const SEED_TASKS: DailyTask[] = [
     isSundayOff: false,
     pagesRange: 'Pages 24 - 35',
     estimatedMinutes: 60,
-    status: 'approved',
-    studentSubmission: {
-      submittedAt: 'Nov 09, 2026 at 06:15 PM',
-      notes: 'Completed all 5 network topology block diagrams and short questions.',
-    },
-    approval: {
-      approvedBy: 'Ahmad',
-      approvedAt: 'Nov 09, 2026 at 08:30 PM',
-      feedback: 'Excellent work! Topology diagrams are crisp and explanation is strictly as per DG Khan marking rubric. Marks: 28/30',
-    },
+    status: 'pending',
     studentId: 'usr_s_01',
     studentName: 'Henza Noor',
   },
@@ -101,16 +92,7 @@ const SEED_TASKS: DailyTask[] = [
     isSundayOff: false,
     pagesRange: 'Pages 5 - 12',
     estimatedMinutes: 75,
-    status: 'approved',
-    studentSubmission: {
-      submittedAt: 'Nov 10, 2026 at 05:40 PM',
-      notes: 'Written according to board summary length rules and letter format standards.',
-    },
-    approval: {
-      approvedBy: 'Ahmad',
-      approvedAt: 'Nov 10, 2026 at 07:15 PM',
-      feedback: 'Neat presentation and accurate Urdu spelling. Summary length is strictly adhering to board guidelines. Marks: 29/30',
-    },
+    status: 'pending',
     studentId: 'usr_s_01',
     studentName: 'Henza Noor',
   },
@@ -129,16 +111,7 @@ const SEED_TASKS: DailyTask[] = [
     isSundayOff: false,
     pagesRange: 'Pages 1 - 8',
     estimatedMinutes: 60,
-    status: 'approved',
-    studentSubmission: {
-      submittedAt: 'Nov 11, 2026 at 07:00 PM',
-      notes: 'Completed all 5 short answers and punctuation rules. Ready for evaluation.',
-    },
-    approval: {
-      approvedBy: 'Ahmad',
-      approvedAt: 'Nov 11, 2026 at 08:45 PM',
-      feedback: 'Accurate indirect conversions. Quotation marks and tense changes are properly handled. Marks: 27/30',
-    },
+    status: 'pending',
     studentId: 'usr_s_01',
     studentName: 'Henza Noor',
   },
@@ -157,16 +130,7 @@ const SEED_TASKS: DailyTask[] = [
     isSundayOff: false,
     pagesRange: 'Pages 1 - 10',
     estimatedMinutes: 60,
-    status: 'approved',
-    studentSubmission: {
-      submittedAt: 'Nov 12, 2026 at 06:30 PM',
-      notes: 'Tawheed bullet points and Surah Al-Baqarah ruku 1 word-to-word translation written.',
-    },
-    approval: {
-      approvedBy: 'Ahmad',
-      approvedAt: 'Nov 12, 2026 at 08:00 PM',
-      feedback: 'Flawless translation and beautiful handwriting. Full marks awarded. Marks: 30/30',
-    },
+    status: 'pending',
     studentId: 'usr_s_01',
     studentName: 'Henza Noor',
   },
@@ -184,34 +148,6 @@ const SEED_TASKS: DailyTask[] = [
     dayOfWeek: 'Friday',
     isSundayOff: false,
     pagesRange: 'Pages 12 - 18',
-    estimatedMinutes: 60,
-    status: 'approved',
-    studentSubmission: {
-      submittedAt: 'Nov 13, 2026 at 06:15 PM',
-      notes: 'Uploaded heart diagram and track rules notes with complete labels.',
-    },
-    approval: {
-      approvedBy: 'Ahmad',
-      approvedAt: 'Nov 13, 2026 at 08:30 PM',
-      feedback: 'Heart anatomy diagram is clear and exam outline is complete. Marks: 28/30',
-    },
-    studentId: 'usr_s_01',
-    studentName: 'Henza Noor',
-  },
-  {
-    id: 'tsk_05',
-    subjectId: 'sub_05',
-    subjectName: 'Islamiyat & Tarjuma',
-    subjectCode: 'FAIT-ISL-11',
-    sourceType: 'book_pdf',
-    sourceTitle: 'Islamiyat Compulsory & Tarjuma-tul-Quran (Part 1)',
-    title: 'Impact of Monotheism (Tawheed) & Surah Al-Baqarah Ruku 1',
-    description: 'Study the practical impact of Tawheed on human conduct and write fluent contextual translation of Surah Al-Baqarah Verses 1–7.',
-    assignedDate: '2026-11-13',
-    dueDate: '2026-11-13',
-    dayOfWeek: 'Friday',
-    isSundayOff: false,
-    pagesRange: 'Pages 1 - 10',
     estimatedMinutes: 60,
     status: 'pending',
     studentId: 'usr_s_01',
@@ -250,7 +186,7 @@ const SEED_TASKS: DailyTask[] = [
     dayOfWeek: 'Sunday',
     isSundayOff: true,
     estimatedMinutes: 0,
-    status: 'approved',
+    status: 'pending',
     studentId: 'usr_student_demo',
     studentName: 'Henza Noor',
   },
@@ -271,7 +207,7 @@ const SEED_TASKS: DailyTask[] = [
     holidayName: 'Iqbal Day',
     urduName: 'Youm-e-Iqbal',
     estimatedMinutes: 0,
-    status: 'approved',
+    status: 'pending',
     studentId: 'usr_student_demo',
     studentName: 'Henza Noor',
   },
@@ -292,7 +228,7 @@ const SEED_TASKS: DailyTask[] = [
     holidayName: 'Quaid-e-Azam Day & Christmas',
     urduName: 'Quaid-e-Azam Day & Christmas',
     estimatedMinutes: 0,
-    status: 'approved',
+    status: 'pending',
     studentId: 'usr_student_demo',
     studentName: 'Henza Noor',
   },

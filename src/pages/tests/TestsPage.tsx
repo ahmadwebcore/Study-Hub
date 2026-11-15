@@ -25,6 +25,8 @@ import {
   FileText,
   X,
   FileCheck2,
+  ShieldCheck,
+  Check,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -84,6 +86,11 @@ export const TestsPage: React.FC = () => {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
   const [inspectGradeTest, setInspectGradeTest] = useState<TestItem | null>(null);
+  const [gradingTest, setGradingTest] = useState<TestItem | null>(null);
+  const [gradingMarks, setGradingMarks] = useState<number>(28);
+  const [gradingRemarks, setGradingRemarks] = useState<string>(
+    'Excellent effort! Technical definitions and handwritten block diagram are properly constructed strictly as per BISE DG Khan examination marking rubrics.'
+  );
   const [activeExamTest, setActiveExamTest] = useState<TestItem | null>(null);
   const [addQuestionModalTest, setAddQuestionModalTest] = useState<TestItem | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -340,6 +347,32 @@ export const TestsPage: React.FC = () => {
   };
 
   // Submit Exam
+  const handleCertifyGrade = async () => {
+    if (!gradingTest) return;
+    const questions = gradingTest.questions || [];
+    const gradedQuestions = questions.map((q, idx) => ({
+      questionId: q.id,
+      marksAwarded: idx === 0 ? 5 : idx === 1 ? Math.min(10, Math.round(gradingMarks * 0.35)) : Math.max(0, gradingMarks - 5 - Math.min(10, Math.round(gradingMarks * 0.35))),
+      feedback: 'Verified according to board marking standard.',
+    }));
+
+    await testService.gradeAttempt({
+      attemptId: gradingTest.myAttempt?.id || `att_${Date.now()}`,
+      test: gradingTest,
+      studentId: 'usr_s_01',
+      studentName: 'Henza Noor',
+      gradedQuestions,
+      overallFeedback: gradingRemarks,
+      teacherId: user.id || 'usr_t_01',
+    });
+
+    const title = gradingTest.title;
+    setGradingTest(null);
+    setSuccessToast(`Official grade (${gradingMarks}/${gradingTest.totalMarks}) certified and released for "${title}"!`);
+    setTimeout(() => setSuccessToast(null), 4000);
+    loadData();
+  };
+
   const handleConfirmSubmitExam = async () => {
     if (!activeExamTest) return;
 
@@ -517,6 +550,7 @@ export const TestsPage: React.FC = () => {
         <DailyTestSeriesGrid
           tests={tests}
           onTakeTest={handleStartExam}
+          onGradeTest={(test) => setGradingTest(test)}
           onRefreshTests={loadData}
         />
       ) : (
@@ -1470,6 +1504,129 @@ export const TestsPage: React.FC = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* TEACHER GRADE MODAL */}
+      <Modal
+        isOpen={!!gradingTest}
+        onClose={() => setGradingTest(null)}
+        title="Check & Grade Student Submission"
+        description="Faculty Lead Evaluation Gate & Official Certification"
+      >
+        {gradingTest && (
+          <div className="space-y-4 text-xs">
+            {/* Student & Test Banner */}
+            <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-zinc-900 text-sm">{gradingTest.title}</span>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                  {gradingTest.subjectCode}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-zinc-500 text-[11px]">
+                <span className="font-semibold text-zinc-700">Student: Henza Noor (1st Year FA-IT)</span>
+                <span>&bull;</span>
+                <span>Max Marks: {gradingTest.totalMarks} (Passing: 15)</span>
+              </div>
+            </div>
+
+            {/* Student Solution Sheet & Answers Preview */}
+            <div className="p-3.5 rounded-2xl bg-zinc-900 text-white space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-emerald-400" />
+                  Submitted Solution Sheet (Handwritten Paper)
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                  BISE DG Khan Pattern
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-zinc-800 border border-zinc-700 font-mono text-[11px] text-zinc-300 space-y-1">
+                <p className="text-emerald-300 font-bold">&bull; Question 1 (MCQ Section): Option B Selected (Correct)</p>
+                <p className="text-zinc-300">&bull; Question 2 (Short Conceptual): "Differentiated Bus & Star topologies with single point of failure analysis."</p>
+                <p className="text-zinc-300">&bull; Question 3 (Handwritten Upload): Scanned answer sheet with neatly drawn topology diagrams and pinouts.</p>
+              </div>
+            </div>
+
+            {/* Marks Award Input */}
+            <div className="p-4 rounded-2xl bg-white border border-zinc-200 space-y-3 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-zinc-900 text-xs">Award Marks</label>
+                <span className="font-mono font-bold text-sm text-emerald-700">
+                  {gradingMarks} / {gradingTest.totalMarks} Marks ({Math.round((gradingMarks / gradingTest.totalMarks) * 100)}%)
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min={0}
+                  max={gradingTest.totalMarks}
+                  value={gradingMarks}
+                  onChange={(e) => setGradingMarks(Number(e.target.value))}
+                  className="flex-1 accent-emerald-600 cursor-pointer"
+                />
+                <input
+                  type="number"
+                  min={0}
+                  max={gradingTest.totalMarks}
+                  value={gradingMarks}
+                  onChange={(e) => setGradingMarks(Math.min(gradingTest.totalMarks, Math.max(0, Number(e.target.value))))}
+                  className="w-16 h-9 px-2 text-center text-sm font-mono font-bold rounded-xl border border-zinc-300 focus:outline-none focus:border-emerald-600 text-zinc-900"
+                />
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-1">
+                <span className="text-zinc-500">Benchmark: 15/30 to Pass</span>
+                <span className={`font-bold ${gradingMarks >= 15 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                  {gradingMarks >= 15 ? '✓ PASSED (Grade A*)' : '⚠ RETEST REQUIRED (<15)'}
+                </span>
+              </div>
+            </div>
+
+            {/* Teacher Remarks */}
+            <div>
+              <label className="block text-xs font-bold text-zinc-800 mb-1">
+                Teacher Remarks &amp; Feedback (Ahmad - Faculty Lead)
+              </label>
+              <textarea
+                rows={3}
+                value={gradingRemarks}
+                onChange={(e) => setGradingRemarks(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-emerald-600"
+                placeholder="Write specific feedback for Henza Noor..."
+              />
+            </div>
+
+            {/* Signature & Submit Action */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-zinc-200">
+              <div className="flex items-center gap-1.5 text-[11px] text-zinc-600">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Certified Evaluator: <strong>Ahmad</strong></span>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setGradingTest(null)}
+                  className="flex-1 sm:flex-none text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  icon={<Check className="w-4 h-4" />}
+                  onClick={handleCertifyGrade}
+                  className="flex-1 sm:flex-none bg-emerald-700 hover:bg-emerald-800 text-xs font-bold"
+                >
+                  Certify &amp; Release Grade
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* INSPECT RESULTS MODAL */}
