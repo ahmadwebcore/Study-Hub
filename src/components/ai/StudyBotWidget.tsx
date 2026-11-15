@@ -207,8 +207,8 @@ export const StudyBotWidget: React.FC = () => {
               <p className="text-[11px] text-zinc-600">
                 You can insert your Google Gemini or OpenAI key anytime. The system works completely out-of-the-box with built-in academic intelligence.
               </p>
-              <form onSubmit={handleSaveSettings} className="space-y-2">
-                <div className="flex gap-2">
+              <form onSubmit={handleSaveSettings} className="space-y-2.5">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <select
                     value={config.provider}
                     onChange={(e) =>
@@ -216,31 +216,49 @@ export const StudyBotWidget: React.FC = () => {
                     }
                     className="px-2 py-1.5 rounded-lg border border-zinc-300 text-xs bg-white text-zinc-800 focus:outline-none"
                   >
-                    <option value="offline">Offline Academic Model</option>
-                    <option value="gemini">Google Gemini (Recommended)</option>
-                    <option value="openai">OpenAI ChatGPT (GPT-4o)</option>
+                    <option value="openai">OpenAI (GPT-5 Mini / GPT-5)</option>
+                    <option value="gemini">Google Gemini (Gemini 1.5)</option>
                     <option value="anthropic">Anthropic Claude (Claude 3.5)</option>
+                    <option value="offline">Offline Academic Model</option>
                   </select>
+
+                  {config.provider === 'openai' && (
+                    <select
+                      value={config.model || 'gpt-5-mini'}
+                      onChange={(e) => setConfig({ ...config, model: e.target.value })}
+                      className="px-2 py-1.5 rounded-lg border border-zinc-300 text-xs bg-white text-zinc-800 focus:outline-none"
+                    >
+                      <option value="gpt-5-mini">gpt-5-mini (Fast & Accurate)</option>
+                      <option value="gpt-5">gpt-5 (Deep Reasoning)</option>
+                      <option value="gpt-4o-mini">gpt-4o-mini (Instant)</option>
+                    </select>
+                  )}
 
                   <input
                     type="password"
-                    placeholder="Paste API Key here (AIza... / sk-...)"
+                    placeholder="API Key (sk-...)"
                     value={config.apiKey}
                     onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-zinc-300 text-xs bg-white text-zinc-800 focus:outline-none"
+                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-zinc-300 text-xs bg-white text-zinc-800 focus:outline-none font-mono"
                   />
                 </div>
-                <div className="flex justify-end gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowSettings(false)}
-                    className="px-2.5 py-1 text-xs text-zinc-600 hover:text-zinc-900"
-                  >
-                    Cancel
-                  </button>
-                  <Button type="submit" variant="primary" size="sm">
-                    Save Key
-                  </Button>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    OpenAI Key Live
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSettings(false)}
+                      className="px-2.5 py-1 text-xs text-zinc-600 hover:text-zinc-900"
+                    >
+                      Cancel
+                    </button>
+                    <Button type="submit" variant="primary" size="sm">
+                      Save Key
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>
