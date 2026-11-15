@@ -110,7 +110,7 @@ export const bookService = {
         title: params.title,
         description: params.description,
         subjectId: params.subjectId,
-        subjectName: 'Computer Science (کمپیوٹر سائنس)',
+        subjectName: 'Computer Science',
         subjectCode: 'FSC-CSC-11',
         category: params.category,
         fileName: params.file.name,

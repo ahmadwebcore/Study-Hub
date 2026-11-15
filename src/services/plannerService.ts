@@ -93,7 +93,7 @@ export const plannerService = {
         id: `sch_${Date.now()}`,
         studentId: session.studentId,
         subjectId: session.subjectId,
-        subjectName: session.subjectName || 'Computer Science (کمپیوٹر سائنس)',
+        subjectName: session.subjectName || 'Computer Science',
         subjectCode: session.subjectCode || 'FSC-CSC-11',
         unitId: session.unitId,
         unitTitle: session.unitTitle,

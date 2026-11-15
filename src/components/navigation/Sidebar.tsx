@@ -47,7 +47,7 @@ const navSections: NavSection[] = [
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
       { name: 'Direct Chat (1-on-1)', path: '/chat', icon: MessageSquare, badge: 'Live', badgeVariant: 'primary' },
-      { name: 'استاد AI Teacher', path: '/ai-teacher', icon: Bot, badge: 'Urdu CS', badgeVariant: 'primary' },
+      { name: 'AI Study Assistant', path: '/ai-teacher', icon: Bot, badge: 'Multilingual', badgeVariant: 'primary' },
       { name: 'Grammar Hub', path: '/grammar', icon: BookMarked, badge: 'Urdu & Eng', badgeVariant: 'warning' },
     ],
   },

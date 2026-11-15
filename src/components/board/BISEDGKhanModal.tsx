@@ -287,7 +287,7 @@ export const BISEDGKhanModal: React.FC<BISEDGKhanModalProps> = ({
                 <div className="bg-white p-3.5 rounded-xl border border-zinc-200 space-y-2">
                   <h4 className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                    Section B: Short Questions (مختصر سوالات)
+                    Section B: Short Questions (Conceptual & Book Exercises)
                   </h4>
 
                   <div className="space-y-2 pt-1">
@@ -314,7 +314,7 @@ export const BISEDGKhanModal: React.FC<BISEDGKhanModalProps> = ({
                 <div className="bg-white p-3.5 rounded-xl border border-zinc-200 space-y-2">
                   <h4 className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                    Section C: Subjective Long Questions (انشائیہ و تفصیلی سوالات)
+                    Section C: Subjective Long Questions & Descriptive Theory
                   </h4>
 
                   <div className="space-y-2 pt-1">

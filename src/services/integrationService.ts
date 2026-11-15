@@ -94,7 +94,6 @@ class IntegrationService {
     feedback?: string;
   }): string {
     const statusEmoji = params.passed ? '✅ PASSED' : '⚠️ RETEST REQUIRED';
-    const statusTextUrdu = params.passed ? 'کامیاب' : 'دوبارہ ٹیسٹ کی ضرورت';
 
     return `🇵🇰 *StudyHub — BISE DG Khan FA-IT Academic Report*
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -106,12 +105,12 @@ class IntegrationService {
 📅 *Date:* ${params.date}
 ━━━━━━━━━━━━━━━━━━━━━━
 🎯 *Marks Awarded:* ${params.score}/${params.maxScore} (${params.percentage}%)
-🏆 *Grade:* ${params.grade} (${statusEmoji} / ${statusTextUrdu})
+🏆 *Grade:* ${params.grade} (${statusEmoji})
 📌 *Passing Benchmark:* 15/30 Marks (50%)
 ${params.feedback ? `\n👨‍🏫 *Ahmad (Faculty Lead) Remarks:*\n"${params.feedback}"\n` : ''}
 ━━━━━━━━━━━━━━━━━━━━━━
-🎯 *Academic Goal:* All 6 Books completion by Feb 28, 2027
-🌴 *Sunday Policy:* Strictly OFF (Zero Homework & Tests)
+🎯 *Academic Goal:* Complete all 6 Books by Feb 28, 2027
+🌴 *Sunday Policy:* Strictly OFF (Rest & Revision)
 🔗 *Portal:* StudyHub Private Learning Desk`;
   }
 
@@ -130,19 +129,19 @@ ${params.feedback ? `\n👨‍🏫 *Ahmad (Faculty Lead) Remarks:*\n"${params.fe
 👨‍🎓 *Student:* ${params.studentName}
 📚 *Group:* 1st Year FA-IT (BISE DG Khan)
 ━━━━━━━━━━━━━━━━━━━━━━
-1️⃣ *کتاب کا یومیہ کوٹہ (Daily Book Quota):*
+1️⃣ *Daily Book Quota:*
 📖 *Subject:* ${params.subject}
-📄 *Pages to Read:* ${params.quotaPages} (~2.5 صفحات)
+📄 *Pages to Read:* ${params.quotaPages} (~2.5 pages)
 
-2️⃣ *آج کا ۳۰ نمبری ٹیسٹ (Today's 30-Mark Test):*
+2️⃣ *Today's 30-Mark Test:*
 📝 *Test:* ${params.testTitle || 'Scheduled Daily Unit Assessment (30 Marks)'}
-⏱️ *Passing Benchmark:* 15/30 Marks
+⏱️ *Passing Benchmark:* 15/30 Marks (50%)
 
-3️⃣ *احمد سر سے رہنمائی (Teacher Support):*
-💬 پورٹل پر لائیو چیٹ یا استاد AI کی مدد لیں۔
+3️⃣ *Faculty Guidance:*
+💬 Direct messaging with Ahmad or AI Study Assistant in portal.
 
-4️⃣ *بورڈ ڈیٹ شیٹ:*
-🎯 سلیبس مکمل کرنے کا ہدف: ۲۸ فروری ۲۰۲۷
+4️⃣ *Board Target:*
+🎯 Complete entire syllabus by February 28, 2027
 ━━━━━━━━━━━━━━━━━━━━━━
 _Sent via StudyHub Learning Portal_`;
   }

@@ -111,13 +111,13 @@ export const AITeacherPage: React.FC = () => {
         <div className="relative z-10 max-w-3xl space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
             <Bot className="w-3.5 h-3.5" />
-            <span>استاد AI &bull; Computer Science Urdu Explainer & Teacher Guide</span>
+            <span>AI Study Assistant &bull; 24/7 Academic Copilot & Teacher Guide</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            English Computer Science &bull; Urdu Concepts with Practical Analogies
+            Computer Science Concepts &bull; Clear Explanations with Practical Analogies
           </h1>
           <p className="text-sm text-zinc-300 leading-relaxed">
-            آپ کے پاس انگلش کی کمپیوٹر سائنس کی کتاب ہے۔ جو بھی ٹاپک سمجھ نہ آ رہا ہو، یہاں لکھیں۔ استاد AI آپ کو بالکل آسان اردو، روزمرہ زندگی کی پریکٹیکل مثالوں، اور بورڈ امتحان کے 5/8 نمبر کے جواب کے سانچے میں سمجھائیں گے۔
+            Have questions on your textbook, practicals, or exam preparation? Type any concept in English, Urdu, or Roman Urdu. The AI Assistant explains complex computing topics with real-world analogies, code architecture, and board scoring tips.
           </p>
         </div>
       </div>
@@ -207,10 +207,10 @@ export const AITeacherPage: React.FC = () => {
                     <div className="mt-3 pt-2.5 border-t border-zinc-200 space-y-1.5">
                       <span className="font-bold text-emerald-700 text-xs flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5" />
-                        امتحانی رہنمائی و بورڈ کے اہم نکات:
+                        Board Exam Guidance & Scoring Tips:
                       </span>
                       {msg.boardExamTips.map((tip, i) => (
-                        <p key={i} className="text-zinc-700 text-xs font-urdu text-right dir-rtl pr-2 border-r-2 border-emerald-500">
+                        <p key={i} className="text-zinc-700 text-xs pr-2 border-l-2 border-emerald-500">
                           {tip}
                         </p>
                       ))}
@@ -247,7 +247,7 @@ export const AITeacherPage: React.FC = () => {
             {isLoading && (
               <div className="flex items-center gap-2.5 text-xs text-zinc-600 bg-white p-3.5 rounded-2xl border border-zinc-200 w-fit">
                 <span className="w-3 h-3 rounded-full bg-[#14B866] animate-ping" />
-                <span className="font-medium">استاد AI آپ کے سوال کی پریکٹیکل مثال تیار کر رہے ہیں...</span>
+                <span className="font-medium">AI Study Assistant is formulating your solution and exam tips...</span>
               </div>
             )}
           </div>
@@ -262,7 +262,7 @@ export const AITeacherPage: React.FC = () => {
           >
             <input
               type="text"
-              placeholder="کمپیوٹر سائنس کا کوئی بھی سوال یا ٹاپک انگلش میں لکھیں (مثلاً: Explain Bus Topology in simple Urdu)..."
+              placeholder="Ask any question in English, Urdu, or Roman Urdu (e.g. Explain Bus Topology or reschedule test)..."
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
               className="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-zinc-200 text-zinc-900 focus:outline-none focus:border-[#14B866]"

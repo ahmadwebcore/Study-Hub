@@ -124,7 +124,7 @@ export const StudentDashboard: React.FC = () => {
             to="/ai-teacher"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors shadow-xs"
           >
-            <span className="font-urdu">استاد AI</span> Explainer
+            AI Study Assistant
           </Link>
           <Link
             to="/grammar"
@@ -156,7 +156,7 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 4-Step Daily Routine Banner (Human-made, 15-year old friendly) */}
+      {/* 4-Step Daily Routine Banner (Clean English) */}
       <div className="bg-white rounded-2xl border border-zinc-200 p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-zinc-100">
           <div>
@@ -167,11 +167,11 @@ export const StudentDashboard: React.FC = () => {
               <span className="text-xs font-semibold text-zinc-600">1st Year FA-IT &bull; BISE DG Khan</span>
             </div>
             <h2 className="text-sm sm:text-base font-bold text-zinc-900 mt-1">
-              آج کی پڑھائی کا آسان روڈ میپ (Your 4-Step Daily Routine)
+              Daily Study Roadmap (Your 4-Step Daily Plan)
             </h2>
           </div>
           <span className="text-xs text-zinc-500">
-            ہدف: ۲۸ فروری تک مکمل نصاب &bull; بورڈ امتحانات مئی ۲۰۲۷
+            Target: Complete All 6 Books by Feb 28, 2027 &bull; Board Exams May 2027
           </span>
         </div>
 
@@ -181,11 +181,11 @@ export const StudentDashboard: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">1</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">~2.5 صفحات</span>
+                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">~2.5 Pages</span>
               </div>
-              <h3 className="text-xs font-bold text-zinc-900">کتاب کا یومیہ کوٹہ</h3>
+              <h3 className="text-xs font-bold text-zinc-900">Daily Book Quota</h3>
               <p className="text-[11px] text-zinc-600 leading-relaxed">
-                آج کے مضمون کے صرف ۲ سے ۳ صفحات غور سے پڑھیں اور نوٹس دیکھیں۔
+                Read today's 2 to 3 textbook pages carefully and review key concept notes.
               </p>
             </div>
             <Link
@@ -193,7 +193,7 @@ export const StudentDashboard: React.FC = () => {
               className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
             >
               <BookOpen className="w-3.5 h-3.5 text-zinc-500" />
-              <span>کوٹہ دیکھیں</span>
+              <span>Open Reading Quota</span>
             </Link>
           </div>
 
@@ -202,11 +202,11 @@ export const StudentDashboard: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">2</span>
-                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">30 نمبرز</span>
+                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">30 Marks</span>
               </div>
-              <h3 className="text-xs font-bold text-zinc-900">آج کا ۳۰ نمبری ٹیسٹ</h3>
+              <h3 className="text-xs font-bold text-zinc-900">Today's 30-Mark Test</h3>
               <p className="text-[11px] text-zinc-600 leading-relaxed">
-                روزانہ کا شیڈول ٹیسٹ حل کریں تاکہ بورڈ طرز کا خوف ختم ہو (اتوار چھٹی)۔
+                Complete today's scheduled assessment (passing benchmark: 15/30). Sundays off.
               </p>
             </div>
             <Link
@@ -214,7 +214,7 @@ export const StudentDashboard: React.FC = () => {
               className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-white shadow-2xs transition-colors"
             >
               <FileCheck2 className="w-3.5 h-3.5" />
-              <span>ٹیسٹ شروع کریں</span>
+              <span>Start Today's Test</span>
             </Link>
           </div>
 
@@ -223,11 +223,11 @@ export const StudentDashboard: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">3</span>
-                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">1-on-1 چیٹ</span>
+                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">1-on-1 Chat</span>
               </div>
-              <h3 className="text-xs font-bold text-zinc-900">احمد سر سے رہنمائی</h3>
+              <h3 className="text-xs font-bold text-zinc-900">Faculty Mentorship</h3>
               <p className="text-[11px] text-zinc-600 leading-relaxed">
-                مشکل سوال یا تھیوری سمجھنے کے لیے احمد سر کو میسج کریں یا استاد AI کھولیں۔
+                Message Ahmad directly with questions or use the AI Study Assistant for guidance.
               </p>
             </div>
             <Link
@@ -235,7 +235,7 @@ export const StudentDashboard: React.FC = () => {
               className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
             >
               <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-              <span>احمد سر سے پوچھیں</span>
+              <span>Message Ahmad</span>
             </Link>
           </div>
 
@@ -246,9 +246,9 @@ export const StudentDashboard: React.FC = () => {
                 <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">4</span>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">BISE DGK</span>
               </div>
-              <h3 className="text-xs font-bold text-zinc-900">بورڈ پیرنگ سکیم</h3>
+              <h3 className="text-xs font-bold text-zinc-900">DG Khan Pairing Scheme</h3>
               <p className="text-[11px] text-zinc-600 leading-relaxed">
-                ڈی جی خان بورڈ کے ماڈل پیپرز اور معروضی وانشائیہ نمبرات کی تقسیم دیکھیں۔
+                Review official board question distributions, model papers, and date sheet notices.
               </p>
             </div>
             <button
@@ -257,7 +257,7 @@ export const StudentDashboard: React.FC = () => {
               className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
             >
               <Layers className="w-3.5 h-3.5 text-emerald-600" />
-              <span>پیرنگ سکیم کھولیں</span>
+              <span>Open Pairing Scheme</span>
             </button>
           </div>
         </div>

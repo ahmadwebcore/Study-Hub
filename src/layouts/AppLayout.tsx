@@ -45,7 +45,7 @@ export const AppLayout: React.FC = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <Navbar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
 
-          <main className="flex-1 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl w-full mx-auto">
+          <main className="flex-1 w-full mx-auto max-w-7xl py-[40px] px-[10px] sm:py-[40px] sm:px-[20px] lg:py-[60px] lg:px-[10px]">
             <Outlet />
           </main>
 

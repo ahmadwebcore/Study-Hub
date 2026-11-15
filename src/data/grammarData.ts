@@ -18,9 +18,9 @@ export const URDU_GRAMMAR_ITEMS: GrammarItem[] = [
   {
     id: 'ug_01',
     category: 'urdu_letters',
-    title: 'دوست کے نام تعزیت اور تسلی کا خط',
-    urduTitle: 'خط نمبر ۱: دوست کی والدہ / والد کی وفات پر تعزیت',
-    subtitle: 'لاہور و راولپنڈی بورڈ میں بار بار پوچھا جانے والا خط',
+    title: 'Letter of Condolence to a Friend on Demise of Mother',
+    urduTitle: 'Formal Model Letter 1 (10 Marks)',
+    subtitle: 'Frequently tested Punjab and Federal Board 10-mark format',
     boardExamMarks: 10,
     content: `امتحانی مرکز
 ۱۵ نومبر ۲۰۲۶ء
@@ -48,8 +48,9 @@ export const URDU_GRAMMAR_ITEMS: GrammarItem[] = [
   {
     id: 'ug_02',
     category: 'urdu_letters',
-    title: 'والد کے نام تعلیمی کارکردگی کی اطلاع کا خط',
-    urduTitle: 'خط نمبر ۲: والد محترم کو دسمبر ٹیسٹ کے نتائج سے آگاہ کرنا',
+    title: 'Letter to Father Reporting Academic Progress & Test Scores',
+    urduTitle: 'Formal Model Letter 2 (10 Marks)',
+    subtitle: 'Standard 1st Year board structure informing father about marks',
     boardExamMarks: 10,
     content: `امتحانی مرکز
 ۲۰ نومبر ۲۰۲۶ء
@@ -67,13 +68,14 @@ export const URDU_GRAMMAR_ITEMS: GrammarItem[] = [
 آپ کا تابعدار بیٹا
 الف۔ ب۔ ج`,
     rules: ['القاب و آداب میں احترام کا خاص خیال رکھیں، خط تین پیراگراف پر مشتمل ہونا چاہیے۔'],
-    tags: ['والد کے نام خط', 'تعلیمی رپورٹ'],
+    tags: ['Letter to Father', 'Academic Report'],
   },
   {
     id: 'ug_03',
     category: 'urdu_dialogues',
-    title: 'دو دوستوں کے درمیان وقت کی پابندی پر مکالمہ',
-    urduTitle: 'مکالمہ ۱: وقت کی قدر و قیمت اور امتحانی تیاری',
+    title: 'Dialogue Between Two Friends on Punctuality & Exam Focus',
+    urduTitle: 'Solved Board Dialogue 1 (7 Marks)',
+    subtitle: '7-Mark dialogue format with natural colloquial phrasing',
     boardExamMarks: 7,
     content: `(منظر: کالج کے گراؤنڈ میں دو دوست عثمان اور حامد بیٹھے ہیں)
 
@@ -91,13 +93,14 @@ export const URDU_GRAMMAR_ITEMS: GrammarItem[] = [
       'مکالمے کے آغاز میں مختصر پس منظر بریکٹ میں ضرور لکھیں۔',
       'رموزِ اوقاف (سوالیہ، فجائیہ، رابطہ) کا خاص خیال رکھیں۔',
     ],
-    tags: ['مکالمہ نگاری', '7 نمبر'],
+    tags: ['Board Dialogue', '7 Marks'],
   },
   {
     id: 'ug_04',
     category: 'urdu_applications',
-    title: 'پرنسپل صاحب کے نام فیس معافی کی درخواست',
-    urduTitle: 'درخواست ۱: مالی مجبوری کے باعث فیس معافی',
+    title: 'Formal Application to College Principal for Fee Concession',
+    urduTitle: 'Official Board Application 1 (10 Marks)',
+    subtitle: 'Standard format with subject line, salutation, and closing',
     boardExamMarks: 10,
     content: `بخدمت جناب پرنسپل صاحب
 گورنمنٹ ڈگری کالج، لاہور۔
@@ -121,13 +124,14 @@ export const URDU_GRAMMAR_ITEMS: GrammarItem[] = [
       'عنوان کی سطر نمایاں اور مارکر سے لکھی جائے۔',
       'تاریخ درخواست کے بائیں جانب یا نیچے درج کی جاتی ہے۔',
     ],
-    tags: ['درخواست نویسی', 'فیس معافی'],
+    tags: ['Formal Application', 'Fee Concession'],
   },
   {
     id: 'ug_05',
     category: 'urdu_rhetoric',
-    title: 'علم بیان و شعری اصطلاحات (تشبیہ، استعارہ، تلمیح)',
-    urduTitle: 'شعری و ادبی اصطلاحات کی مکمل تفصیل مع امتحانی مثالیں',
+    title: 'Literary Rhetoric: Tashbeeh (Simile) & Istiara (Metaphor)',
+    urduTitle: 'Poetics and Rhetoric Rules with Examples (5 Marks)',
+    subtitle: 'Definitions and poetic examples for board questions',
     boardExamMarks: 5,
     content: `۱۔ تشبیہ (Simile):
 کسی ایک چیز کو کسی مشترک صفت کی بنا پر دوسری چیز کی مانند قرار دینا۔
@@ -152,7 +156,7 @@ export const ENGLISH_GRAMMAR_ITEMS: GrammarItem[] = [
     id: 'eg_01',
     category: 'eng_tenses',
     title: 'Master Tenses Formula & Conjugation Matrix',
-    urduTitle: 'انگریزی کے ۱۲ زمانوں کے مکمل کلیے مع اردو پہچان اور مثالیں',
+    urduTitle: '12 English Tenses Formula Matrix with Urdu Identifiers & Examples',
     boardExamMarks: 10,
     content: `1. Present Indefinite Tense:
 • اردو پہچان: تا ہے، تی ہے، تے ہیں، تا ہوں۔

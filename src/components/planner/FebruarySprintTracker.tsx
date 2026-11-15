@@ -142,13 +142,13 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
           {[
-            { day: 'Monday', subject: 'Physical Education', urdu: 'صحت و جسمانی تعلیم', color: '#10B981', code: 'FSC-PED' },
-            { day: 'Tuesday', subject: 'Urdu & Grammar', urdu: 'اردو لازمی و قواعد', color: '#8B5CF6', code: 'FSC-URD' },
-            { day: 'Wednesday', subject: 'English & Grammar', urdu: 'انگریزی و گرائمر', color: '#3B82F6', code: 'FSC-ENG' },
-            { day: 'Thursday', subject: 'Computer Science', urdu: 'کمپیوٹر سائنس', color: '#0EA5E9', code: 'FSC-CS' },
-            { day: 'Friday', subject: 'Islamiyat & Tarjuma', urdu: 'اسلامیات و ترجمۃ القرآن', color: '#059669', code: 'FSC-ISL' },
-            { day: 'Saturday', subject: 'Economics', urdu: 'معاشیات', color: '#F59E0B', code: 'FSC-ECO' },
-            { day: 'Sunday', subject: 'Rest & Revision', urdu: 'مکمل چھٹی / ریویژن', color: '#EF4444', isOff: true },
+            { day: 'Monday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FSC-PED' },
+            { day: 'Tuesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FSC-URD' },
+            { day: 'Wednesday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FSC-ENG' },
+            { day: 'Thursday', subject: 'Computer Science', focus: 'Computing & Networks', color: '#0EA5E9', code: 'FSC-CS' },
+            { day: 'Friday', subject: 'Islamiyat & Tarjuma', focus: 'Quranic Translation', color: '#059669', code: 'FSC-ISL' },
+            { day: 'Saturday', subject: 'Economics', focus: 'Microeconomics & Graphs', color: '#F59E0B', code: 'FSC-ECO' },
+            { day: 'Sunday', subject: 'Rest & Revision', focus: 'Mandatory Weekly Rest', color: '#EF4444', isOff: true },
           ].map((item) => {
             const isToday = todayName.toLowerCase() === item.day.toLowerCase();
             return (
@@ -178,7 +178,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                   )}
                 </div>
                 <p className="font-bold text-xs text-zinc-900 mt-1 line-clamp-1">{item.subject}</p>
-                <p className="text-[10px] text-zinc-500 font-urdu mt-0.5 truncate">{item.urdu}</p>
+                <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{item.focus}</p>
               </div>
             );
           })}
@@ -225,7 +225,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                           </span>
                         </div>
                         <h4 className="font-bold text-zinc-900 text-sm mt-0.5">{quota.subjectName}</h4>
-                        <p className="text-xs text-zinc-500 font-urdu">{quota.urduName}</p>
+                        <p className="text-xs text-zinc-500 font-mono">{quota.code} &bull; 11th Class</p>
                       </div>
                       <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
                         {progressPct}%

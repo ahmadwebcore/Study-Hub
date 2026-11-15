@@ -581,9 +581,6 @@ export const WeeklyTasksPage: React.FC = () => {
                         <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
                           🇵🇰 Pakistan Gazetted Holiday
                         </span>
-                        {task.urduName && (
-                          <span className="text-xs font-bold text-emerald-700">{task.urduName}</span>
-                        )}
                         <span className="text-xs font-semibold text-[#7d9990]">{task.assignedDate}</span>
                       </div>
                       <h4 className="text-sm font-bold text-[#142D27] mt-1">

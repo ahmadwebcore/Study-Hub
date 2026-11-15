@@ -18,7 +18,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_kashmir_day',
     name: 'Kashmir Solidarity Day',
-    urduName: 'یومِ یکجہتی کشمیر',
+    urduName: 'Youm-e-Kashmir',
     date: '2026-02-05',
     monthDay: '02-05',
     dayOfWeek: 'Thursday',
@@ -29,7 +29,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_pakistan_day',
     name: 'Pakistan Day (Resolution Day)',
-    urduName: 'یومِ پاکستان',
+    urduName: 'Youm-e-Pakistan',
     date: '2026-03-23',
     monthDay: '03-23',
     dayOfWeek: 'Monday',
@@ -40,7 +40,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_fitr_1',
     name: 'Eid-ul-Fitr (Day 1)',
-    urduName: 'عید الفطر - پہلا دن',
+    urduName: 'Eid-ul-Fitr (Day 1)',
     date: '2026-03-21',
     monthDay: '03-21',
     dayOfWeek: 'Saturday',
@@ -51,7 +51,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_fitr_2',
     name: 'Eid-ul-Fitr (Day 2)',
-    urduName: 'عید الفطر - دوسرا دن',
+    urduName: 'Eid-ul-Fitr (Day 2)',
     date: '2026-03-22',
     monthDay: '03-22',
     dayOfWeek: 'Sunday',
@@ -62,7 +62,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_fitr_3',
     name: 'Eid-ul-Fitr (Day 3)',
-    urduName: 'عید الفطر - تیسرا دن',
+    urduName: 'Eid-ul-Fitr (Day 3)',
     date: '2026-03-23',
     monthDay: '03-23',
     dayOfWeek: 'Monday',
@@ -73,7 +73,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_labour_day',
     name: 'Labour Day (May Day)',
-    urduName: 'یومِ مزدور',
+    urduName: 'Youm-e-Mazdoor',
     date: '2026-05-01',
     monthDay: '05-01',
     dayOfWeek: 'Friday',
@@ -84,7 +84,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_adha_1',
     name: 'Eid-ul-Adha (Day 1)',
-    urduName: 'عید الاضحیٰ - پہلا دن',
+    urduName: 'Eid-ul-Adha (Day 1)',
     date: '2026-05-27',
     monthDay: '05-27',
     dayOfWeek: 'Wednesday',
@@ -95,7 +95,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_adha_2',
     name: 'Eid-ul-Adha (Day 2)',
-    urduName: 'عید الاضحیٰ - دوسرا دن',
+    urduName: 'Eid-ul-Adha (Day 2)',
     date: '2026-05-28',
     monthDay: '05-28',
     dayOfWeek: 'Thursday',
@@ -106,7 +106,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_eid_adha_3',
     name: 'Eid-ul-Adha (Day 3)',
-    urduName: 'عید الاضحیٰ - تیسرا دن',
+    urduName: 'Eid-ul-Adha (Day 3)',
     date: '2026-05-29',
     monthDay: '05-29',
     dayOfWeek: 'Friday',
@@ -117,7 +117,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_ashura_1',
     name: 'Ashura (9th Muharram)',
-    urduName: 'یومِ عاشورہ - ۹ محرم',
+    urduName: 'Ashura (9th Muharram)',
     date: '2026-06-25',
     monthDay: '06-25',
     dayOfWeek: 'Thursday',
@@ -128,7 +128,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_ashura_2',
     name: 'Ashura (10th Muharram)',
-    urduName: 'یومِ عاشورہ - ۱۰ محرم',
+    urduName: 'Ashura (10th Muharram)',
     date: '2026-06-26',
     monthDay: '06-26',
     dayOfWeek: 'Friday',
@@ -139,7 +139,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_independence_day',
     name: 'Independence Day (Youm-e-Azadi)',
-    urduName: 'یومِ آزادی - ۱۴ اگست',
+    urduName: 'Youm-e-Azadi (14th August)',
     date: '2026-08-14',
     monthDay: '08-14',
     dayOfWeek: 'Friday',
@@ -150,7 +150,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_milad_un_nabi',
     name: 'Eid Milad-un-Nabi (12 Rabi-ul-Awwal)',
-    urduName: 'عید میلاد النبی ﷺ',
+    urduName: 'Eid Milad-un-Nabi',
     date: '2026-08-25',
     monthDay: '08-25',
     dayOfWeek: 'Tuesday',
@@ -161,7 +161,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_iqbal_day',
     name: 'Iqbal Day',
-    urduName: 'یومِ اقبال',
+    urduName: 'Youm-e-Iqbal',
     date: '2026-11-09',
     monthDay: '11-09',
     dayOfWeek: 'Monday',
@@ -172,7 +172,7 @@ export const PAKISTAN_HOLIDAYS_2026: PakistanHoliday[] = [
   {
     id: 'pk_quaid_day',
     name: 'Quaid-e-Azam Day & Christmas',
-    urduName: 'یومِ قائد اعظم و کرسمس',
+    urduName: 'Quaid-e-Azam Day & Christmas',
     date: '2026-12-25',
     monthDay: '12-25',
     dayOfWeek: 'Friday',
@@ -219,7 +219,7 @@ export function isAcademicOffDay(dateObjOrStr: Date | string): {
     return {
       isOff: true,
       reason: 'Sunday Off — Mandatory Weekly Rest & Light Revision',
-      urduReason: 'اتوار کی چھٹی - آرام اور ہلکا مطالعہ',
+      urduReason: 'Sunday Rest & Light Revision',
     };
   }
 

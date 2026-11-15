@@ -21,11 +21,11 @@ export const GrammarHubPage: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const urduCategories = [
-    { id: 'all', label: 'تمام قواعد (All Urdu)' },
-    { id: 'urdu_letters', label: 'خطوط نویسی (Letters - 10 Marks)' },
-    { id: 'urdu_dialogues', label: 'مکالمہ نگاری (Dialogues - 7 Marks)' },
-    { id: 'urdu_applications', label: 'درخواستیں (Applications - 10 Marks)' },
-    { id: 'urdu_rhetoric', label: 'علم بیان و اصطلاحات (تشبیہ و استعارہ)' },
+    { id: 'all', label: 'All Urdu Grammar' },
+    { id: 'urdu_letters', label: 'Formal Letters (Khatoot - 10 Marks)' },
+    { id: 'urdu_dialogues', label: 'Dialogue Writing (Mukalma - 7 Marks)' },
+    { id: 'urdu_applications', label: 'Applications (Darkhwast - 10 Marks)' },
+    { id: 'urdu_rhetoric', label: 'Literary Rhetoric & Figures of Speech' },
   ];
 
   const englishCategories = [
@@ -80,7 +80,7 @@ export const GrammarHubPage: React.FC = () => {
               Urdu & English Grammar Master Hub
             </h1>
             <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-              Complete Punjab & Federal Board examination preparation for 11th Class. Solved board letters, dialogues, formal applications, literary rhetoric (تشبیہ و استعارہ), 12 tenses formula matrix, active/passive voice, direct/indirect narration, 50 pairs of words, and idioms.
+              Complete Punjab & Federal Board examination preparation for 11th Class. Solved board letters, dialogues, formal applications, literary rhetoric (Tashbeeh & Istiara), 12 tenses formula matrix, active/passive voice, direct/indirect narration, 50 pairs of words, and idioms.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export const GrammarHubPage: React.FC = () => {
                   : 'text-zinc-300 hover:text-white'
               }`}
             >
-              اردو قواعد و انشا
+              Urdu Grammar & Insha
             </button>
             <button
               type="button"
@@ -128,7 +128,7 @@ export const GrammarHubPage: React.FC = () => {
               type="text"
               placeholder={
                 activeLang === 'urdu'
-                  ? 'قواعد، خط کا عنوان، یا اصطلاح تلاش کریں...'
+                  ? 'Search rules, letter topics, dialogues, or literary terms...'
                   : 'Search tenses, rules, pair of words, or idioms...'
               }
               value={searchTerm}
@@ -243,7 +243,7 @@ export const GrammarHubPage: React.FC = () => {
               <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
                 <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  بورڈ ممتحن کے خصوصی اصول و نمبروں کی تقسیم (Marking Criteria):
+                  Board Examiner Guidelines & Official Marking Criteria:
                 </span>
                 <div className="space-y-1 text-xs text-amber-950">
                   {item.rules.map((r, rIdx) => (

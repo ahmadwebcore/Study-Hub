@@ -173,7 +173,7 @@ export const DirectChatPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Channel 2: استاد AI Teacher Shortcut */}
+          {/* Channel 2: AI Study Assistant Shortcut */}
           <Link
             to="/ai-teacher"
             className="p-3 rounded-xl hover:bg-zinc-100 border border-transparent transition-all flex items-start gap-2.5 block"
@@ -183,13 +183,13 @@ export const DirectChatPage: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-1">
-                <span className="text-xs font-bold text-zinc-900 font-urdu truncate">
-                  استاد AI (Urdu Explainer)
+                <span className="text-xs font-bold text-zinc-900 truncate">
+                  AI Study Assistant (24/7 Explainer)
                 </span>
                 <span className="text-[10px] text-purple-600 font-bold shrink-0">AI Hub</span>
               </div>
               <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5">
-                کمپیوٹر سائنس تھیوری اور اردو گرائمر کا آسان فہم اسسٹنٹ
+                Computer Science theory, problem breakdown & exam revision
               </p>
             </div>
           </Link>
@@ -256,7 +256,7 @@ export const DirectChatPage: React.FC = () => {
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 font-medium text-xs transition-colors"
             >
               <Bot className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="hidden sm:inline">استاد AI</span>
+              <span className="hidden sm:inline">AI Assistant</span>
             </Link>
           </div>
         </div>

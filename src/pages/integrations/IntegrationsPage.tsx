@@ -87,7 +87,7 @@ export const IntegrationsPage: React.FC = () => {
   // Sample WhatsApp message for preview
   const sampleResultMsg = integrationService.formatTestResultForWhatsApp({
     studentName: SAMPLE_STUDENT.name,
-    subjectName: 'Computer Science (کمپیوٹر سائنس - FA IT)',
+    subjectName: 'Computer Science (FA-IT 11th)',
     testTitle: 'Chapter 2: Network Topologies (30 Marks)',
     score: 28,
     maxScore: 30,
@@ -95,13 +95,13 @@ export const IntegrationsPage: React.FC = () => {
     grade: 'A*',
     passed: true,
     date: 'Today',
-    feedback: 'شاندار تیاری اور صاف ڈایاگرامز۔ تمام شارٹ سوالات امتحانی اصولوں کے مطابق ہیں۔',
+    feedback: 'Outstanding preparation and clean diagrams. All short questions answered with board precision.',
   });
 
   const sampleQuotaMsg = integrationService.formatDailyQuotaForWhatsApp({
     studentName: SAMPLE_STUDENT.name,
     day: 'Thursday',
-    subject: 'Computer Science (کمپیوٹر سائنس)',
+    subject: 'Computer Science',
     quotaPages: 'Pages 96 to 98',
     testTitle: 'Chapter 2 Network Topologies Assessment (30 Marks)',
   });

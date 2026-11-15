@@ -71,7 +71,7 @@ export const TeacherDashboard: React.FC = () => {
     resolver: zodResolver(testSchema),
     defaultValues: {
       title: 'Physical Education Unit 1 Assessment',
-      subject: 'Physical Education (صحت و جسمانی تعلیم)',
+      subject: 'Physical Education',
       date: '2026-11-20',
       durationMinutes: 45,
     },

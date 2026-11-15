@@ -5,17 +5,20 @@ import {
   Send,
   Bot,
   Settings,
-  BookOpen,
   Key,
-  Compass,
   Cpu,
   RefreshCw,
   Copy,
   CheckCheck,
+  Calendar,
+  Award,
+  CheckCircle2,
+  Zap,
 } from 'lucide-react';
 import {
   aiStudyBotService,
   AIChatMessage,
+  AIChatAction,
   AIProviderConfig,
 } from '../../services/aiStudyBotService';
 import { Button } from '../ui/Button';
@@ -66,14 +69,31 @@ export const StudyBotWidget: React.FC = () => {
       const fallbackMsg: AIChatMessage = {
         id: `msg_err_${Date.now()}`,
         sender: 'assistant',
-        text: 'Could not connect to AI engine. Using local offline response:',
-        urduText: 'معذرت، انٹرنیٹ میں عارضی تعطل ہے۔ کمپیوٹر سائنس کا ٹاپک دوبارہ لکھیں یا نیچے دیے گئے بٹنز میں سے منتخب کریں۔',
+        text: 'Temporary network disconnect. Here is the offline academic assistant response:',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages([...updatedHistory, fallbackMsg]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleActionClick = (action: AIChatAction) => {
+    const result = aiStudyBotService.executeAction(action.actionType);
+    const actionMsg: AIChatMessage = {
+      id: `msg_act_${Date.now()}`,
+      sender: 'assistant',
+      text: result.messageText,
+      actionExecuted: result.actionExecuted,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actions: [
+        { id: 'act_check', label: 'View Certified Marks (28/30)', actionType: 'check_marks' },
+        { id: 'act_wa', label: 'Share Report on WhatsApp', actionType: 'share_whatsapp' },
+      ],
+    };
+    const updated = [...messages, actionMsg];
+    setMessages(updated);
+    aiStudyBotService.saveChatHistory(updated);
   };
 
   const handleSaveSettings = (e: React.FormEvent) => {
@@ -88,12 +108,12 @@ export const StudyBotWidget: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Quick prompt chips requested by user
+  // Quick Action / Prompt chips
   const PROMPT_CHIPS = [
-    { label: 'Bus Topology کیا ہے؟ آسان اردو اور پریکٹیکل مثال میں سمجھائیں', icon: Cpu },
-    { label: 'CPU کے ALU، Control Unit اور Registers کا کام اردو میں بتائیں', icon: Cpu },
-    { label: 'RAM اور ROM میں کیا بنیادی فرق ہے؟', icon: BookOpen },
-    { label: 'Guide as a teacher: فروری تک سلیبس ختم کرنے کا لائحہ عمل', icon: Compass },
+    { label: 'Explain Bus Topology with real-world analogy', icon: Cpu },
+    { label: 'Reschedule my upcoming test series', icon: Calendar },
+    { label: 'Check my certified marks & test scores', icon: Award },
+    { label: "Mark today's quota task as completed", icon: CheckCircle2 },
   ];
 
   return (
@@ -104,15 +124,15 @@ export const StudyBotWidget: React.FC = () => {
           type="button"
           onClick={() => setIsOpen(true)}
           className="group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-400/30"
-          aria-label="Open AI Teacher Chatbot"
+          aria-label="Open AI Study Assistant"
         >
           <div className="relative">
             <Bot className="w-5 h-5 text-emerald-300" />
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           </div>
           <div className="text-left">
-            <span className="block text-xs font-bold tracking-tight">استاد AI / StudyBot</span>
-            <span className="block text-[10px] text-emerald-200">CS Urdu Explainer</span>
+            <span className="block text-xs font-bold tracking-tight">AI Study Assistant</span>
+            <span className="block text-[10px] text-emerald-200">24/7 Academic Copilot</span>
           </div>
         </button>
       )}
@@ -128,13 +148,13 @@ export const StudyBotWidget: React.FC = () => {
               </div>
               <div>
                 <h4 className="text-xs font-bold flex items-center gap-1.5">
-                  استاد AI &bull; Computer Science Guide
+                  AI Study Assistant &bull; 24/7 Copilot
                   <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40">
-                    2026 Engine
+                    Live Actions
                   </span>
                 </h4>
                 <p className="text-[10px] text-zinc-300">
-                  English CS topics explained in easy Urdu with analogies
+                  English, Urdu & Roman Urdu with live automations
                 </p>
               </div>
             </div>
@@ -220,7 +240,7 @@ export const StudyBotWidget: React.FC = () => {
                 className="shrink-0 text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-emerald-50 text-zinc-700 hover:text-emerald-700 border border-zinc-200 transition-colors flex items-center gap-1"
               >
                 <chip.icon className="w-3 h-3 text-emerald-600" />
-                <span className="truncate max-w-[190px]">{chip.label}</span>
+                <span className="truncate max-w-[200px]">{chip.label}</span>
               </button>
             ))}
           </div>
@@ -239,8 +259,16 @@ export const StudyBotWidget: React.FC = () => {
                       : 'bg-white text-zinc-800 border border-zinc-200 rounded-bl-none shadow-xs'
                   }`}
                 >
-                  {/* English Header/Query */}
-                  <p className="font-semibold">{msg.text}</p>
+                  {/* Action Executed Banner */}
+                  {msg.actionExecuted && (
+                    <div className="mb-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
+                      <Zap className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span>{msg.actionExecuted}</span>
+                    </div>
+                  )}
+
+                  {/* Message Text */}
+                  <p className="font-semibold whitespace-pre-line">{msg.text}</p>
 
                   {/* Urdu Explanation */}
                   {msg.urduText && (
@@ -253,7 +281,7 @@ export const StudyBotWidget: React.FC = () => {
 
                   {/* Practical Analogy Box */}
                   {msg.analogy && (
-                    <div className="mt-2.5 p-2 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[12px] text-amber-950 font-urdu leading-relaxed text-right dir-rtl">
+                    <div className="mt-2.5 p-2 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[12px] text-amber-950 leading-relaxed whitespace-pre-line">
                       {msg.analogy}
                     </div>
                   )}
@@ -273,9 +301,26 @@ export const StudyBotWidget: React.FC = () => {
                         Board Exam Key Points:
                       </span>
                       {msg.boardExamTips.map((tip, i) => (
-                        <p key={i} className="text-zinc-600 pl-2 border-l-2 border-emerald-500 font-urdu text-right dir-rtl">
+                        <p key={i} className="text-zinc-600 pl-2 border-l-2 border-emerald-500">
                           &bull; {tip}
                         </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Interactive Action Buttons */}
+                  {msg.actions && msg.actions.length > 0 && (
+                    <div className="mt-3 pt-2 border-t border-zinc-100 flex flex-wrap gap-1.5">
+                      {msg.actions.map((act) => (
+                        <button
+                          key={act.id}
+                          type="button"
+                          onClick={() => handleActionClick(act)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold transition-all hover:scale-[1.02] flex items-center gap-1 shadow-xs"
+                        >
+                          <Zap className="w-3 h-3 text-emerald-600" />
+                          <span>{act.label}</span>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -286,7 +331,7 @@ export const StudyBotWidget: React.FC = () => {
                     {msg.sender === 'assistant' && (
                       <button
                         type="button"
-                        onClick={() => handleCopyText(msg.id, `${msg.urduText || ''}\n\n${msg.analogy || ''}`)}
+                        onClick={() => handleCopyText(msg.id, `${msg.text}\n\n${msg.urduText || ''}\n\n${msg.analogy || ''}`)}
                         className="text-zinc-400 hover:text-zinc-700 flex items-center gap-1"
                       >
                         {copiedId === msg.id ? (
@@ -310,7 +355,7 @@ export const StudyBotWidget: React.FC = () => {
             {isLoading && (
               <div className="flex items-center gap-2 text-xs text-zinc-500 bg-white p-3 rounded-2xl border border-zinc-200 max-w-[70%]">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#14B866]" />
-                <span>استاد AI تجزیہ کر رہے ہیں...</span>
+                <span>AI Study Assistant is formulating solution...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -326,7 +371,7 @@ export const StudyBotWidget: React.FC = () => {
           >
             <input
               type="text"
-              placeholder="English CS topic or question likhein..."
+              placeholder="Ask in English, Urdu, or Roman Urdu (e.g. 'reschedule test', 'my marks')..."
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
               className="flex-1 px-3 py-2 text-xs rounded-xl border border-zinc-300 focus:outline-none focus:border-[#14B866] text-zinc-900"
