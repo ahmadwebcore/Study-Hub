@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import {
-  CalendarDays,
   FileCheck2,
   CheckCircle2,
   Check,
-  KeyRound,
-  BookOpen,
   MessageSquare,
+  Sparkles,
   Layers,
+  ArrowRight,
+  Clock,
+  Award,
+  ChevronRight,
 } from 'lucide-react';
-import { Modal } from '../../components/ui/Modal';
-import { taskService, DailyTask } from '../../services/taskService';
-import { useRole } from '../../hooks/useRole';
 import { Link } from 'react-router-dom';
-import { FebruarySprintTracker } from '../../components/planner/FebruarySprintTracker';
-import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
-import { BISEDGKhanBoardWidget } from '../../components/board/BISEDGKhanBoardWidget';
-import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
-import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
-import { SAMPLE_TESTS } from '../../data/sampleData';
+import { useRole } from '../../hooks/useRole';
+import { taskService, DailyTask } from '../../services/taskService';
 import { testService } from '../../services/testService';
 import { TestItem } from '../../types';
+import { SAMPLE_TESTS } from '../../data/sampleData';
+import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
+import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
+import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
 
 export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
@@ -28,10 +27,6 @@ export const StudentDashboard: React.FC = () => {
 
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
-  const [activeTab, setActiveTab] = useState<'today' | 'week' | 'awaiting' | 'verified'>('today');
-  const [submittingTask, setSubmittingTask] = useState<DailyTask | null>(null);
-  const [submissionNotes, setSubmissionNotes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -47,42 +42,29 @@ export const StudentDashboard: React.FC = () => {
     loadData();
   }, []);
 
-  const handleConfirmSubmitWork = async () => {
-    if (!submittingTask) return;
-    setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 400));
-    taskService.submitTaskForApproval(
-      submittingTask.id,
-      submissionNotes,
-      'daily_work_notes.pdf'
-    );
-    setIsSubmitting(false);
-    setSubmittingTask(null);
-    setSubmissionNotes('');
-    loadData();
-    setSuccessToast(`Work submitted for "${submittingTask.title}".`);
-    setTimeout(() => setSuccessToast(null), 3000);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayTasks = tasks.filter(
+    (t) => t.dueDate === todayStr || (!t.isSundayOff && !t.isPakistanHoliday && t.status === 'pending')
+  );
+
+  const handleQuickCompleteQuota = (task?: DailyTask) => {
+    const targetTask = task || todayTasks[0];
+    if (targetTask) {
+      taskService.submitTaskForApproval(targetTask.id, 'Daily textbook quota completed.', 'daily_notes.pdf');
+      loadData();
+      setSuccessToast(`Reading marked completed for "${targetTask.title}".`);
+      setTimeout(() => setSuccessToast(null), 3000);
+    } else {
+      setSuccessToast("Today's 2.5 pages reading quota recorded as completed.");
+      setTimeout(() => setSuccessToast(null), 3000);
+    }
   };
 
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const todayTasks = tasks.filter((t) => t.dueDate === todayStr || (!t.isSundayOff && !t.isPakistanHoliday && t.status === 'pending'));
-  const awaitingTasks = tasks.filter((t) => t.status === 'submitted_for_approval');
-  const verifiedTasks = tasks.filter((t) => t.status === 'approved');
-
-  const currentDisplayTasks =
-    activeTab === 'today'
-      ? todayTasks
-      : activeTab === 'week'
-      ? tasks
-      : activeTab === 'awaiting'
-      ? awaitingTasks
-      : verifiedTasks;
-
   return (
-    <div className="space-y-6 font-sans max-w-6xl mx-auto">
+    <div className="space-y-7 font-sans max-w-5xl mx-auto pb-12">
       {/* Toast Notification */}
       {successToast && (
-        <div className="p-3 rounded-lg bg-zinc-900 text-white flex items-center justify-between text-xs font-medium">
+        <div className="p-3.5 rounded-2xl bg-zinc-900 text-white flex items-center justify-between text-xs font-semibold shadow-lg animate-in fade-in duration-150">
           <span className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
             {successToast}
@@ -93,353 +75,225 @@ export const StudentDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Top Level Plain Header */}
+      {/* 1. Header Greeting & Status */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900 tracking-tight">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>1st Year FA-IT &bull; BISE D.G. Khan Board</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight font-serif">
             Welcome back, {studentName}
           </h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Faculty Lead: <strong className="text-zinc-800">Ahmad</strong> (Academic Director)
+          <p className="text-xs text-zinc-600 mt-1">
+            Faculty Director: <strong className="text-zinc-900">Ahmad</strong> &bull; Complete today's reading and daily 30-mark test.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsBoardModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors shadow-2xs"
-          >
-            <span className="text-xs">🇵🇰</span>
-            BISE DG Khan
-          </button>
+        {/* Quick Teacher Actions */}
+        <div className="flex items-center gap-2">
           <Link
             to="/chat"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-            Chat with Ahmad
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Message Ahmad</span>
           </Link>
           <Link
             to="/ai-teacher"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50/80 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-all shadow-2xs"
           >
-            AI Study Assistant
-          </Link>
-          <Link
-            to="/grammar"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors"
-          >
-            Grammar Hub
-          </Link>
-          <button
-            onClick={() => setIsChangePasswordOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-zinc-500" />
-            Change Password
-          </button>
-          <Link
-            to="/test-submit"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors shadow-xs"
-          >
-            <FileCheck2 className="w-3.5 h-3.5" />
-            Exam Desk
-          </Link>
-          <Link
-            to="/weekly-tasks"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
-          >
-            <CalendarDays className="w-3.5 h-3.5 text-zinc-500" />
-            Schedule
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <span>AI Assistant</span>
           </Link>
         </div>
       </div>
 
-      {/* 4-Step Daily Routine Banner (Clean English) */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-4 sm:p-5 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-zinc-100">
+      {/* 2. Today's Core Work (Simple 2-Card Focus) */}
+      <div>
+        <div className="flex items-center justify-between pb-3">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
-                Simple Daily Routine
-              </span>
-              <span className="text-xs font-semibold text-zinc-600">1st Year FA-IT &bull; BISE DG Khan</span>
-            </div>
-            <h2 className="text-sm sm:text-base font-bold text-zinc-900 mt-1">
-              Daily Study Roadmap (Your 4-Step Daily Plan)
-            </h2>
+            <h2 className="text-lg font-bold text-zinc-900 font-serif">Today's Focus</h2>
+            <p className="text-xs text-zinc-500">Your two main academic goals for today.</p>
           </div>
-          <span className="text-xs text-zinc-500">
-            Target: Complete All 6 Books by Feb 28, 2027 &bull; Board Exams May 2027
+          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            Target: May 2027 Board Exams
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Step 1 */}
-          <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 transition-colors flex flex-col justify-between">
-            <div className="space-y-1.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Card 1: Daily Reading Quota */}
+          <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm hover:border-zinc-300 transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">1</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">~2.5 Pages</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Step 1 &bull; Daily Quota
+                </span>
+                <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  ~45 Mins
+                </span>
               </div>
-              <h3 className="text-xs font-bold text-zinc-900">Daily Book Quota</h3>
-              <p className="text-[11px] text-zinc-600 leading-relaxed">
-                Read today's 2 to 3 textbook pages carefully and review key concept notes.
+              <h3 className="text-base font-bold text-zinc-900 font-serif">
+                Computer Science: Read Pages 96–98
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Chapter 2: Information Networks &bull; Carefully study Network Topologies (Bus, Star, Ring, Mesh) and review diagram annotations.
               </p>
             </div>
-            <Link
-              to="/weekly-tasks"
-              className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Open Reading Quota</span>
-            </Link>
-          </div>
 
-          {/* Step 2 */}
-          <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 transition-colors flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">2</span>
-                <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">30 Marks</span>
-              </div>
-              <h3 className="text-xs font-bold text-zinc-900">Today's 30-Mark Test</h3>
-              <p className="text-[11px] text-zinc-600 leading-relaxed">
-                Complete today's scheduled assessment (passing benchmark: 15/30). Sundays off.
-              </p>
-            </div>
-            <Link
-              to="/test-submit"
-              className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-white shadow-2xs transition-colors"
-            >
-              <FileCheck2 className="w-3.5 h-3.5" />
-              <span>Start Today's Test</span>
-            </Link>
-          </div>
-
-          {/* Step 3 */}
-          <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 transition-colors flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">3</span>
-                <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">1-on-1 Chat</span>
-              </div>
-              <h3 className="text-xs font-bold text-zinc-900">Faculty Mentorship</h3>
-              <p className="text-[11px] text-zinc-600 leading-relaxed">
-                Message Ahmad directly with questions or use the AI Study Assistant for guidance.
-              </p>
-            </div>
-            <Link
-              to="/chat"
-              className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
-            >
-              <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-              <span>Message Ahmad</span>
-            </Link>
-          </div>
-
-          {/* Step 4 */}
-          <div className="p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 hover:bg-zinc-50 transition-colors flex flex-col justify-between">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="w-6 h-6 rounded-full bg-zinc-900 text-white text-xs font-bold flex items-center justify-center">4</span>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">BISE DGK</span>
-              </div>
-              <h3 className="text-xs font-bold text-zinc-900">DG Khan Pairing Scheme</h3>
-              <p className="text-[11px] text-zinc-600 leading-relaxed">
-                Review official board question distributions, model papers, and date sheet notices.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsBoardModalOpen(true)}
-              className="mt-3 inline-flex items-center justify-center gap-1 w-full py-1.5 px-2 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors"
-            >
-              <Layers className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Open Pairing Scheme</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 5-Box Daily Scheduled Tests Desk (1 Row of 5 Small Boxes) */}
-      <DailyTestSeriesGrid tests={tests} />
-
-      {/* BISE DG Khan Official Board Widget */}
-      <BISEDGKhanBoardWidget />
-
-      {/* 3-Month Target Sprint & Daily Book Quota Engine */}
-      <FebruarySprintTracker />
-
-      {/* Plain Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-            Today's Target
-          </span>
-          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
-            {todayTasks.length}
-          </span>
-        </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-            Weekly Total
-          </span>
-          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
-            {tasks.length}
-          </span>
-        </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-            Awaiting Review
-          </span>
-          <span className="text-3xl font-bold text-amber-600 mt-1 block tracking-tight">
-            {awaitingTasks.length}
-          </span>
-        </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-            Verified Complete
-          </span>
-          <span className="text-3xl font-bold text-emerald-600 mt-1 block tracking-tight">
-            {verifiedTasks.length}
-          </span>
-        </div>
-      </div>
-
-      {/* Plain Tasks Table / Desk */}
-      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
-        {/* Filter Bar */}
-        <div className="p-3 border-b border-zinc-200 flex items-center gap-1.5 bg-zinc-50/70 overflow-x-auto">
-          {[
-            { id: 'today', label: "Today's Target", count: todayTasks.length },
-            { id: 'week', label: 'All Tasks', count: tasks.length },
-            { id: 'awaiting', label: 'Awaiting Review', count: awaitingTasks.length },
-            { id: 'verified', label: 'Verified', count: verifiedTasks.length },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-zinc-900 text-white shadow-xs'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
-              }`}
-            >
-              {tab.label} <span className="opacity-70 text-[11px]">({tab.count})</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Task Rows List */}
-        <div className="divide-y divide-zinc-100">
-          {currentDisplayTasks.length === 0 ? (
-            <div className="p-8 text-center text-xs text-zinc-500">
-              No tasks found in this view.
-            </div>
-          ) : (
-            currentDisplayTasks.map((task) => (
-              <div
-                key={task.id}
-                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 transition-colors"
+            <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
+              <Link
+                to="/syllabus"
+                className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-colors"
               >
-                <div className="space-y-0.5 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-zinc-900 truncate">
-                      {task.title}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200">
-                      {task.subjectName}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-zinc-500 line-clamp-1">
-                    {task.description}
-                  </p>
-                </div>
+                View Syllabus Notes
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleQuickCompleteQuota()}
+                className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Mark Done</span>
+              </button>
+            </div>
+          </div>
 
-                <div className="flex items-center gap-3 shrink-0 text-xs">
-                  <span className="text-zinc-500 text-[11px]">
-                    {task.dueDate}
-                  </span>
-
-                  {task.status === 'pending' && !task.isSundayOff && !task.isPakistanHoliday && (
-                    <button
-                      onClick={() => setSubmittingTask(task)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-zinc-900 rounded-md hover:bg-zinc-800 transition-colors shadow-xs"
-                    >
-                      <Check className="w-3 h-3" />
-                      Submit for Review
-                    </button>
-                  )}
-
-                  {task.status === 'submitted_for_approval' && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-amber-700 bg-amber-50 rounded-lg border border-amber-200">
-                      Awaiting Review
-                    </span>
-                  )}
-
-                  {task.status === 'approved' && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
-                      Verified
-                    </span>
-                  )}
-
-                  {(task.isSundayOff || task.isPakistanHoliday) && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-zinc-600 bg-zinc-100 rounded-lg border border-zinc-200">
-                      🇵🇰 Rest Day
-                    </span>
-                  )}
-                </div>
+          {/* Card 2: Today's 30-Mark Test */}
+          <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50/50 via-white to-white border border-emerald-200/90 shadow-sm hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Step 2 &bull; 30-Mark Test
+                </span>
+                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5" />
+                  Pass: 15/30
+                </span>
               </div>
-            ))
-          )}
+              <h3 className="text-base font-bold text-zinc-900 font-serif">
+                Chapter 2 Network Topologies Assessment
+              </h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Official 30-mark diagnostic test with 10 MCQs and 4 short-response questions mapped to BISE DG Khan board scheme.
+              </p>
+            </div>
+
+            <div className="pt-2 border-t border-emerald-100/60 flex items-center gap-2">
+              <Link
+                to="/test-submit"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] ring-1 ring-white/15 hover:from-[#193e33] hover:to-[#0c201a] rounded-xl transition-all shadow-sm active:scale-95"
+              >
+                <FileCheck2 className="w-3.5 h-3.5" />
+                <span>Start Today's 30-Mark Test</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Modal: Submit Work */}
-      <Modal
-        isOpen={!!submittingTask}
-        onClose={() => setSubmittingTask(null)}
-        title="Submit Task for Faculty Review"
-      >
-        <div className="space-y-3.5">
-          <p className="text-xs text-zinc-600">
-            Submit work for: <strong className="text-zinc-900">{submittingTask?.title}</strong>
-          </p>
+      {/* 3. This Week's 5-Box Scheduled Tests Grid */}
+      <div className="space-y-2">
+        <DailyTestSeriesGrid tests={tests} />
+      </div>
 
+      {/* 4. Support & Board Hub (2 Equal Matched Cards) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* AI Tutor Card */}
+        <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm flex flex-col justify-between space-y-3">
+          <div className="space-y-1.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+              AI Academic Assistant (24/7 Copilot)
+            </h3>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Have doubts on Bus Topology, CPU registers, or Urdu grammar? Ask in English, Urdu, or Roman Urdu for clear analogies.
+            </p>
+          </div>
+          <Link
+            to="/ai-teacher"
+            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors"
+          >
+            <span>Ask: "Explain Bus Topology with real analogy"</span>
+            <ChevronRight className="w-4 h-4 text-zinc-400" />
+          </Link>
+        </div>
+
+        {/* BISE DG Khan Pairing Scheme Card */}
+        <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm flex flex-col justify-between space-y-3">
+          <div className="space-y-1.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+              🇵🇰
+            </div>
+            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+              BISE DG Khan Board Updates & Pairing
+            </h3>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Review question distributions for 1st Year FA-IT: MCQs, Short Questions, Long Questions, and 2026–2027 annual timetable.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsBoardModalOpen(true)}
+            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors"
+          >
+            <span>View 1st Year FA-IT Pairing Scheme</span>
+            <Layers className="w-4 h-4 text-emerald-600" />
+          </button>
+        </div>
+      </div>
+
+      {/* 5. Recent Verified Marks & Certified History */}
+      <div className="bg-white rounded-3xl border border-zinc-200 p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
           <div>
-            <label className="block text-xs font-medium text-zinc-700 mb-1">
-              Work Notes (Optional)
-            </label>
-            <textarea
-              value={submissionNotes}
-              onChange={(e) => setSubmissionNotes(e.target.value)}
-              placeholder="e.g. Completed questions 1 through 10."
-              rows={3}
-              className="w-full p-2.5 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
-            />
+            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+              Recent Certified Marks & Records
+            </h3>
+            <p className="text-[11px] text-zinc-500">
+              Evaluated and certified by faculty director Ahmad. Records are permanently preserved.
+            </p>
+          </div>
+          <Link
+            to="/results"
+            className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline"
+          >
+            View All Results &rarr;
+          </Link>
+        </div>
+
+        <div className="divide-y divide-zinc-100 text-xs">
+          <div className="py-2.5 flex items-center justify-between gap-3">
+            <div>
+              <span className="font-bold text-zinc-900 block">Chapter 1: Basics of IT & Hardware</span>
+              <span className="text-[11px] text-zinc-500">Computer Science &bull; Evaluated by Ahmad</span>
+            </div>
+            <div className="text-right">
+              <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                27 / 30 (Grade A)
+              </span>
+              <span className="block text-[10px] text-zinc-400 mt-0.5">Certified Passed</span>
+            </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => setSubmittingTask(null)}
-              className="px-3 py-1.5 text-xs font-medium text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={handleConfirmSubmitWork}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Submitting...' : 'Confirm Submission'}
-            </button>
+          <div className="py-2.5 flex items-center justify-between gap-3">
+            <div>
+              <span className="font-bold text-zinc-900 block">Urdu Prose: Uswa-e-Hasna Short Questions</span>
+              <span className="text-[11px] text-zinc-500">Urdu & Grammar &bull; Evaluated by Ahmad</span>
+            </div>
+            <div className="text-right">
+              <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                28 / 30 (Grade A*)
+              </span>
+              <span className="block text-[10px] text-zinc-400 mt-0.5">Certified Passed</span>
+            </div>
           </div>
         </div>
-      </Modal>
+      </div>
 
       {/* Change Password Modal */}
       <ChangePasswordModal

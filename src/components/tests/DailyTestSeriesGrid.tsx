@@ -250,8 +250,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-zinc-900 tracking-tight">
-                Daily Test Series Desk (5-Box Row Schedule)
+              <h2 className="text-base font-bold text-zinc-900 tracking-tight font-serif">
+                Daily Test Series (5 Daily Tests Row)
               </h2>
               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 30 Marks Each &bull; Pass: 15 (50%)

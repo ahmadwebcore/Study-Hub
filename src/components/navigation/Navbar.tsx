@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, Search, ChevronDown, LogOut, Lock, Camera, X } from 'lucide-react';
+import { Menu, Search, ChevronDown, LogOut, Lock, Camera, X, GraduationCap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { Badge } from '../ui/Badge';
@@ -65,24 +65,42 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
 
   return (
     <header className="h-16 bg-white/95 backdrop-blur-md border-b border-[#e1ede7] sticky top-0 z-30 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
-      {/* Left: Mobile hamburger & Global Search */}
-      <div className="flex items-center gap-3 flex-1 max-w-md">
+      {/* Left: Mobile hamburger & Logo & Global Search */}
+      <div className="flex items-center gap-2.5 sm:gap-3 flex-1 max-w-lg min-w-0">
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border border-[#e1ede7] text-[#557067] hover:bg-[#F7F9F8] hover:text-[#142D27] transition-colors focus:outline-none"
+          className="lg:hidden flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors focus:outline-none"
           aria-label="Open mobile navigation"
         >
           <Menu className="w-5 h-5" />
         </button>
 
+        {/* StudyHub Brand Logo in Header */}
+        <Link to="/dashboard" className="flex items-center gap-2 shrink-0 group py-1">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white shadow-2xs ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
+            <GraduationCap className="h-4.5 w-4.5" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-base sm:text-lg tracking-tight text-[#142D27] leading-none font-serif">
+              Study<span className="text-[#14B866]">Hub</span>
+            </span>
+            <span className="text-[9px] font-semibold text-zinc-400 tracking-wider uppercase leading-tight">
+              Academic Portal
+            </span>
+          </div>
+        </Link>
+
+        {/* Divider */}
+        <div className="h-5 w-[1px] bg-zinc-200 mx-1 hidden sm:block shrink-0" />
+
         {/* Global Search Bar */}
-        <div className="relative w-full hidden sm:block">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7d9990]" />
+        <div className="relative w-full hidden md:block">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400" />
           <input
             type="text"
             aria-label="Global search across subjects and assignments"
-            placeholder="Search subjects, assignments, tests, or topics..."
-            className="w-full h-10 pl-10 pr-4 rounded-xl border border-[#e1ede7] bg-[#F7F9F8] text-xs text-[#263B35] placeholder-[#7d9990] focus:bg-white focus:outline-none focus:border-[#14B866] transition-all"
+            placeholder="Search syllabus, tests, or topics..."
+            className="w-full h-9 pl-8 pr-3 rounded-xl border border-zinc-200 bg-zinc-50 text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:outline-none focus:border-emerald-600 transition-all"
           />
         </div>
       </div>

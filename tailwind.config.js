@@ -26,9 +26,10 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Open Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"Libre Baskerville"', 'Georgia', 'serif'],
+        display: ['"Libre Baskerville"', 'Georgia', 'serif'],
+        body: ['"Open Sans"', 'system-ui', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
         'subtle': 'none',

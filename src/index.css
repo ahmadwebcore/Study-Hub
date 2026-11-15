@@ -9,7 +9,14 @@
   body {
     background-color: #F7F9F8;
     color: #263B35;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+  }
+  h1, h2, h3, h4, .font-serif, .font-display {
+    font-family: 'Libre Baskerville', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+  p, span, button, input, select, textarea, label, td, th {
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
   }
 
   /* Universal single crisp border rule for all inputs - ZERO double borders */
