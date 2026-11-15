@@ -317,22 +317,36 @@ export const NotificationDropdown: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex items-center justify-between px-3.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsOpen(false);
-                  setIsBoardModalOpen(true);
-                }}
-                className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
-              >
-                <span>🇵🇰 Open BISE DG Khan Desk</span>
-                <ExternalLink className="w-3 h-3" />
-              </button>
+            <div className="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    notificationService.triggerTestPushAlert();
+                  }}
+                  className="text-[11px] font-bold text-zinc-900 bg-white hover:bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 transition-all"
+                >
+                  <Bell className="w-3 h-3 text-emerald-600 animate-bounce" />
+                  <span>Send Test Push Alert</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsBoardModalOpen(true);
+                  }}
+                  className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                >
+                  <span>🇵🇰 BISE Desk</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-xs text-zinc-500 hover:text-zinc-900 font-medium"
+                className="text-xs text-zinc-500 hover:text-zinc-900 font-medium self-end sm:self-auto"
               >
                 Close
               </button>

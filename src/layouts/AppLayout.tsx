@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { Navbar } from '../components/navigation/Navbar';
 import { StudyBotWidget } from '../components/ai/StudyBotWidget';
+import { MobileNativePushBanner } from '../components/notifications/MobileNativePushBanner';
 import { X } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const isAITeacherPage = location.pathname.startsWith('/ai-teacher');
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] flex flex-col font-sans">
+      {/* Real Mobile App Native Push Banner */}
+      <MobileNativePushBanner />
       <div className="flex-1 flex w-full">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block shrink-0 sticky top-0 h-screen">
@@ -49,8 +54,8 @@ export const AppLayout: React.FC = () => {
             <Outlet />
           </main>
 
-          {/* Floating AI Study Assistant & CS Urdu Explainer */}
-          <StudyBotWidget />
+          {/* Floating AI Study Assistant (Hidden when on dedicated AI Teacher page) */}
+          {!isAITeacherPage && <StudyBotWidget />}
 
           {/* Minimalist 2026 Footer */}
           <footer className="py-4 px-6 border-t border-[#e1ede7] text-center text-xs text-[#7d9990] bg-white/50">

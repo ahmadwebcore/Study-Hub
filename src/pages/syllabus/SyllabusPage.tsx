@@ -50,7 +50,7 @@ type TopicFormData = z.infer<typeof topicSchema>;
 export const SyllabusPage: React.FC = () => {
   const { role, user } = useRole();
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_01');
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_04');
   const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(SAMPLE_SYLLABUS);
   const [activeNotesTopic, setActiveNotesTopic] = useState<{ topic: SyllabusTopic; unitTitle: string } | null>(null);
 

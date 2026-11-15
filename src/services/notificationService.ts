@@ -63,7 +63,50 @@ class NotificationService {
     };
     this.notifications.unshift(newNotif);
     this.save();
+
+    // Trigger instant native mobile push banner
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('studyhub_native_push_alert', { detail: newNotif })
+      );
+    }
+
     return newNotif;
+  }
+
+  public triggerTestPushAlert(): NotificationItem {
+    const samples = [
+      {
+        title: '📋 30-Mark Daily Test: Chapter 2 Network Topologies',
+        message: 'Your Thursday assessment is live. Passing benchmark is 15/30 marks.',
+        category: 'test' as const,
+        actionUrl: '/test-submit',
+        actionLabel: 'Start Test Now',
+        badge: '30 Marks',
+        urgent: true,
+      },
+      {
+        title: '🇵🇰 BISE DG Khan: Annual Board Schedule Released',
+        message: '1st Year FA-IT Annual Exams commence May 2027. Full syllabus coverage strictly required by Feb 28.',
+        category: 'board' as const,
+        actionUrl: '/board',
+        actionLabel: 'View Circular',
+        badge: 'DG Khan Board',
+        urgent: true,
+      },
+      {
+        title: '🎓 Certified Grade Released by Sir Ahmad',
+        message: 'Computer Science: Network Topologies assessment marked: 28/30 (93% Grade A*).',
+        category: 'grade' as const,
+        actionUrl: '/results',
+        actionLabel: 'View Certificate',
+        badge: 'Passed A*',
+        urgent: false,
+      },
+    ];
+
+    const pick = samples[Math.floor(Math.random() * samples.length)];
+    return this.addNotification(pick);
   }
 
   public markAsRead(id: string): void {
