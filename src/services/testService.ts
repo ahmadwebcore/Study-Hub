@@ -18,6 +18,235 @@ function saveCustomTests(tests: TestItem[]) {
   } catch {}
 }
 
+export function generateStandardFAITQuestions(subjectCode: string, testTitle: string, testId: string = 'test_gen'): TestQuestion[] {
+  const code = (subjectCode || '').toUpperCase();
+  const title = testTitle || '';
+
+  if (code.includes('ECO') || title.toLowerCase().includes('economic') || title.toLowerCase().includes('utility') || title.toLowerCase().includes('demand')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'According to the Law of Diminishing Marginal Utility, as additional homogeneous units of a commodity are continuously consumed, Marginal Utility (MU):',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        explanation: 'The law states that extra utility derived from continuous consumption of successive identical units diminishes.',
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'Increases progressively with every unit consumed', isCorrect: false, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'Continuously diminishes and eventually reaches zero / negative', isCorrect: true, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'Remains strictly constant throughout', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'Becomes undefined at all levels', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'State two core assumptions of the Law of Diminishing Marginal Utility (e.g. continuous consumption and identical units) and define the "Point of Satiety".',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+        explanation: 'Point of Satiety is reached when total utility is maximum and marginal utility equals zero.',
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Construct a Marginal Utility Schedule (Units 1 to 6) and draw the downward sloping Marginal Utility Curve diagram with clear axis labels. Upload your handwritten sheet via Camera or Gallery.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+        explanation: 'Handwritten test sheet with complete schedule table and plotted curve.',
+      },
+    ];
+  }
+
+  if (code.includes('CSC') || title.toLowerCase().includes('computer') || title.toLowerCase().includes('topolog') || title.toLowerCase().includes('network')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'Which physical network topology connects all nodes to a single central cable terminated at both ends to avoid signal bounce?',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        explanation: 'Bus Topology utilizes a central trunk/backbone cable with terminators at both endpoints.',
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'Star Topology with central Switch', isCorrect: false, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'Linear Bus Topology with backbone cable', isCorrect: true, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'Token Ring Topology', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'Point-to-Point Mesh Topology', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'Differentiate between Bus Topology and Star Topology with respect to: (1) Single point of failure, and (2) Ease of adding new computer nodes.',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Draw a neat architectural diagram of Star Topology showing 4 workstations and a central Switch. Explain how data packets are routed without collision. Upload your handwritten sheet.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+      },
+    ];
+  }
+
+  if (code.includes('PED') || title.toLowerCase().includes('physical') || title.toLowerCase().includes('heart') || title.toLowerCase().includes('bone')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'How many total bones constitute the mature adult human skeletal framework according to health sciences?',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: '206 bones', isCorrect: true, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: '212 bones', isCorrect: false, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: '198 bones', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: '300 bones', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'Name the four chambers of the human heart (Right/Left Atrium, Right/Left Ventricle) and briefly trace the flow of oxygenated blood.',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Draw a labeled cross-sectional diagram of the human heart showing ventricles, atria, and valves, and outline 3 official sprint track rules. Upload your handwritten sheet.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+      },
+    ];
+  }
+
+  if (code.includes('URD') || title.toLowerCase().includes('urdu') || title.toLowerCase().includes('khat')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'According to Ilm-e-Bayan in 1st Year Urdu Grammar, how many fundamental components (Arkan-e-Tashbeeh) constitute Tashbeeh (Simile)?',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'Three components (Mushabbah, Mushabbah-Bih, Wajh-e-Shabah)', isCorrect: false, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'Five components (Mushabbah, Mushabbah-Bih, Wajh-e-Shabah, Gharz-e-Tashbeeh, Harf-e-Tashbeeh)', isCorrect: true, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'Four components', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'Two components', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'Explain the difference between Istiara (Metaphor) and Tashbeeh (Simile) with one contextual example from standard 1st Year Intermediate Urdu coursework.',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Write a formal application to the College Principal requesting full fee concession on merit basis, following official BISE DG Khan board exam formatting rules. Upload your handwritten sheet via Camera or Gallery.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+      },
+    ];
+  }
+
+  if (code.includes('ENG') || title.toLowerCase().includes('english') || title.toLowerCase().includes('tenses')) {
+    return [
+      {
+        id: `${testId}_q1`,
+        testId,
+        questionText: 'Select the grammatically correct passive voice conversion: "The invigilator distributed the 30-mark examination papers."',
+        questionType: 'mcq',
+        marks: 5,
+        questionOrder: 1,
+        options: [
+          { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'The 30-mark examination papers were distributed by the invigilator.', isCorrect: true, sortOrder: 1 },
+          { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'The papers had distributed by the invigilator.', isCorrect: false, sortOrder: 2 },
+          { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'The invigilator was distributed the papers.', isCorrect: false, sortOrder: 3 },
+          { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'Papers will be distributed by invigilator.', isCorrect: false, sortOrder: 4 },
+        ],
+      },
+      {
+        id: `${testId}_q2`,
+        testId,
+        questionText: 'Distinguish between the following pairs of words in meaningful sentences: (1) Principle vs Principal, and (2) Accept vs Except.',
+        questionType: 'short_answer',
+        marks: 10,
+        questionOrder: 2,
+      },
+      {
+        id: `${testId}_q3`,
+        testId,
+        questionText: 'Write a formal letter to your younger brother advising him on board exam time management and daily study quotas. Upload your handwritten sheet via camera or gallery.',
+        questionType: 'file_upload',
+        marks: 15,
+        questionOrder: 3,
+      },
+    ];
+  }
+
+  // Default FA-IT Board 30-Mark Question Template
+  return [
+    {
+      id: `${testId}_q1`,
+      testId,
+      questionText: `Objective Assessment: Key conceptual definitions for ${title} (BISE DG Khan FA-IT Curriculum).`,
+      questionType: 'mcq',
+      marks: 5,
+      questionOrder: 1,
+      options: [
+        { id: `${testId}_opt1`, questionId: `${testId}_q1`, optionText: 'Standard Board Definition A', isCorrect: true, sortOrder: 1 },
+        { id: `${testId}_opt2`, questionId: `${testId}_q1`, optionText: 'Alternative Theory B', isCorrect: false, sortOrder: 2 },
+        { id: `${testId}_opt3`, questionId: `${testId}_q1`, optionText: 'Inapplicable Option C', isCorrect: false, sortOrder: 3 },
+        { id: `${testId}_opt4`, questionId: `${testId}_q1`, optionText: 'None of the above', isCorrect: false, sortOrder: 4 },
+      ],
+    },
+    {
+      id: `${testId}_q2`,
+      testId,
+      questionText: `Short Conceptual Questions: Provide clear concise answers to two fundamental questions from ${title}.`,
+      questionType: 'short_answer',
+      marks: 10,
+      questionOrder: 2,
+    },
+    {
+      id: `${testId}_q3`,
+      testId,
+      questionText: `Subjective Long Question & Diagrams: Solve theoretical derivations and draw relevant diagrams for ${title}. Upload your handwritten test paper via Camera or Gallery.`,
+      questionType: 'file_upload',
+      marks: 15,
+      questionOrder: 3,
+    },
+  ];
+}
+
+export function ensureQuestionsForTest(test: TestItem): TestItem {
+  if (test.questions && test.questions.length > 0) {
+    return test;
+  }
+  const generated = generateStandardFAITQuestions(test.subjectCode, test.title, test.id);
+  return {
+    ...test,
+    questions: generated,
+  };
+}
+
 export const testService = {
   /**
    * Fetch all scheduled and completed tests with relation joins
@@ -25,7 +254,7 @@ export const testService = {
   async fetchTests(studentId?: string): Promise<TestItem[]> {
     if (!isSupabaseConfigured()) {
       const custom = getCustomTests();
-      return [...custom, ...SAMPLE_TESTS];
+      return [...custom, ...SAMPLE_TESTS].map(ensureQuestionsForTest);
     }
 
     try {
@@ -47,7 +276,7 @@ export const testService = {
 
       const { data, error } = await query;
       if (error || !data || data.length === 0) {
-        return SAMPLE_TESTS;
+        return SAMPLE_TESTS.map(ensureQuestionsForTest);
       }
 
       return data.map((item) => {
@@ -94,9 +323,9 @@ export const testService = {
               }
             : undefined,
         };
-      });
+      }).map(ensureQuestionsForTest);
     } catch {
-      return SAMPLE_TESTS;
+      return SAMPLE_TESTS.map(ensureQuestionsForTest);
     }
   },
 
@@ -105,7 +334,9 @@ export const testService = {
    */
   async fetchTestById(testId: string, studentId?: string): Promise<TestItem | null> {
     if (!isSupabaseConfigured()) {
-      return SAMPLE_TESTS.find((t) => t.id === testId) || SAMPLE_TESTS[0];
+      const custom = getCustomTests();
+      const match = [...custom, ...SAMPLE_TESTS].find((t) => t.id === testId) || SAMPLE_TESTS[0];
+      return ensureQuestionsForTest(match);
     }
 
     try {
@@ -181,7 +412,7 @@ export const testService = {
           })),
         }));
 
-      return {
+      const constructed: TestItem = {
         id: data.id,
         title: data.title,
         subjectId: data.subject_id,
@@ -238,8 +469,10 @@ export const testService = {
             }
           : undefined,
       };
+      return ensureQuestionsForTest(constructed);
     } catch {
-      return SAMPLE_TESTS.find((t) => t.id === testId) || null;
+      const match = SAMPLE_TESTS.find((t) => t.id === testId) || SAMPLE_TESTS[0];
+      return ensureQuestionsForTest(match);
     }
   },
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -42,18 +43,18 @@ export const Modal: React.FC<ModalProps> = ({
     xl: 'max-w-4xl',
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-[#142D27]/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-[#090a0c]/80 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
       <div
         className={cn(
-          'relative w-full rounded-2xl bg-white p-6 shadow-dropdown border border-[#e1ede7] z-10 transition-all transform animate-in zoom-in-95 duration-200',
+          'relative w-full rounded-2xl bg-white p-6 shadow-2xl border border-zinc-200 z-10 transition-all transform animate-in zoom-in-95 duration-200',
           maxWidths[maxWidth]
         )}
       >
@@ -72,6 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
 
         <div className="mt-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

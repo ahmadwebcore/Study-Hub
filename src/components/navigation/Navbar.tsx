@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Menu, Search, ChevronDown, LogOut, Lock, Camera, X, GraduationCap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
@@ -64,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
   const userInitials = role === 'teacher' ? 'A' : (userName ? userName[0].toUpperCase() : 'S');
 
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-[#e1ede7] sticky top-0 z-30 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-[#e1ede7] sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
       {/* Left: Mobile hamburger & Logo & Global Search */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-1 max-w-lg min-w-0">
         <button
@@ -75,13 +76,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* StudyHub Brand Logo in Header */}
-        <Link to="/dashboard" className="flex items-center gap-2 shrink-0 group py-1">
+        {/* StudyHub Brand Logo in Header (Mobile Only - Desktop has Sidebar) */}
+        <Link to="/dashboard" className="flex lg:hidden items-center gap-2 shrink-0 group py-1">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white shadow-2xs ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
             <GraduationCap className="h-4.5 w-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-base sm:text-lg tracking-tight text-[#142D27] leading-none font-serif">
+            <span className="font-bold text-base tracking-tight text-[#142D27] leading-none font-serif">
               Study<span className="text-[#14B866]">Hub</span>
             </span>
             <span className="text-[9px] font-semibold text-zinc-400 tracking-wider uppercase leading-tight">
@@ -90,8 +91,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           </div>
         </Link>
 
-        {/* Divider */}
-        <div className="h-5 w-[1px] bg-zinc-200 mx-1 hidden sm:block shrink-0" />
+        {/* Divider (Mobile Only) */}
+        <div className="h-5 w-[1px] bg-zinc-200 mx-1 lg:hidden shrink-0" />
 
         {/* Global Search Bar */}
         <div className="relative w-full hidden md:block">
@@ -227,97 +228,99 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
       </div>
 
       {/* Profile Photo Update Modal */}
-      {isAvatarModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
-                  <Camera className="w-4 h-4" />
+      {isAvatarModalOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <Camera className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-zinc-900">Change Profile Picture</h3>
+                    <p className="text-[11px] text-zinc-500">Paste your Gmail, Google, or direct image URL</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-zinc-900">Change Profile Picture</h3>
-                  <p className="text-[11px] text-zinc-500">Paste your Gmail, Google, or direct image URL</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsAvatarModalOpen(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Preview Box */}
-            <div className="flex items-center gap-3.5 p-3 rounded-xl bg-zinc-50 border border-zinc-200">
-              {avatarUrlInput.trim() ? (
-                <img
-                  src={avatarUrlInput}
-                  alt="Preview"
-                  onError={() => setImgLoadFailed(true)}
-                  className="w-14 h-14 rounded-xl object-cover ring-2 ring-emerald-500 shadow-xs"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white flex items-center justify-center font-bold text-lg ring-2 ring-emerald-500">
-                  {userInitials}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <span className="text-xs font-bold text-zinc-900 block truncate">{userName}</span>
-                <span className="text-[11px] text-zinc-500 block truncate">
-                  {role === 'teacher' ? 'Faculty Lead' : '1st Year Scholar'}
-                </span>
-                <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
-                  Live real-time preview
-                </span>
-              </div>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSaveAvatar} className="space-y-3">
-              <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  Image Address / URL
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://... (paste direct image URL)"
-                  value={avatarUrlInput}
-                  onChange={(e) => {
-                    setAvatarUrlInput(e.target.value);
-                    setImgLoadFailed(false);
-                  }}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 text-zinc-900 focus:outline-none focus:border-emerald-600"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
-                  onClick={handleResetToInitials}
-                  className="text-xs text-zinc-500 hover:text-zinc-800 underline"
+                  onClick={() => setIsAvatarModalOpen(false)}
+                  className="p-1 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
                 >
-                  Use Clean Initials ({userInitials})
+                  <X className="w-4 h-4" />
                 </button>
+              </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsAvatarModalOpen(false)}
-                    className="px-3 py-1.5 text-xs text-zinc-600 hover:text-zinc-900"
-                  >
-                    Cancel
-                  </button>
-                  <Button type="submit" variant="primary" size="sm">
-                    Save Picture
-                  </Button>
+              {/* Preview Box */}
+              <div className="flex items-center gap-3.5 p-3 rounded-xl bg-zinc-50 border border-zinc-200">
+                {avatarUrlInput.trim() ? (
+                  <img
+                    src={avatarUrlInput}
+                    alt="Preview"
+                    onError={() => setImgLoadFailed(true)}
+                    className="w-14 h-14 rounded-xl object-cover ring-2 ring-emerald-500 shadow-xs"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white flex items-center justify-center font-bold text-lg ring-2 ring-emerald-500">
+                    {userInitials}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-bold text-zinc-900 block truncate">{userName}</span>
+                  <span className="text-[11px] text-zinc-500 block truncate">
+                    {role === 'teacher' ? 'Faculty Lead' : '1st Year Scholar'}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-semibold block mt-0.5">
+                    Live real-time preview
+                  </span>
                 </div>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+              {/* Form */}
+              <form onSubmit={handleSaveAvatar} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                    Image Address / URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://... (paste direct image URL)"
+                    value={avatarUrlInput}
+                    onChange={(e) => {
+                      setAvatarUrlInput(e.target.value);
+                      setImgLoadFailed(false);
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 text-zinc-900 focus:outline-none focus:border-emerald-600"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    type="button"
+                    onClick={handleResetToInitials}
+                    className="text-xs text-zinc-500 hover:text-zinc-800 underline"
+                  >
+                    Use Clean Initials ({userInitials})
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAvatarModalOpen(false)}
+                      className="px-3 py-1.5 text-xs text-zinc-600 hover:text-zinc-900"
+                    >
+                      Cancel
+                    </button>
+                    <Button type="submit" variant="primary" size="sm">
+                      Save Picture
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>,
+          document.body
+        )}
 
       {/* BISE DG Khan Modal Accessible from Anywhere */}
       <BISEDGKhanModal

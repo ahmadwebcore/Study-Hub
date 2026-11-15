@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Lock,
   Unlock,
@@ -431,8 +432,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         const meta = getTestStatus(activePopupTest);
         const score = activePopupTest.studentScore ?? activePopupTest.myAttempt?.totalScore;
 
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+        return createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-150">
             <div className="relative w-full max-w-lg bg-white rounded-2xl border border-zinc-200 shadow-2xl overflow-hidden flex flex-col">
               {/* Modal Header */}
               <div className="p-4 sm:p-5 border-b border-zinc-200 bg-zinc-50 flex items-start justify-between gap-3">
@@ -607,7 +608,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 )}
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
     </div>
