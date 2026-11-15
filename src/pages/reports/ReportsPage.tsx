@@ -40,8 +40,8 @@ export const ReportsPage: React.FC = () => {
     attendanceIndex: 96.8,
     submissionRate: 98.2,
     syllabusCompletion: 74.0,
-    strongSubjects: ['Advanced Calculus & Vectors (MATH-301)', 'Data Structures (CS-401)'],
-    weakSubjects: ['Analytical Chemistry (CHEM-205)'],
+    strongSubjects: ['Computer Science (FAIT-CSC-11)', 'Urdu & Grammar (FAIT-URD-11)'],
+    weakSubjects: ['Economics (FAIT-ECO-11)'],
     upcomingDeadlines: 3,
   });
 
@@ -516,7 +516,7 @@ export const ReportsPage: React.FC = () => {
                 Enrolled Curriculum Modules:
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {(studentReportModal?.enrolledSubjects || ['MATH-301', 'PHYS-202', 'CHEM-205', 'CS-401']).map(
+                {(studentReportModal?.enrolledSubjects || ['FAIT-CSC-11', 'FAIT-ENG-11', 'FAIT-URD-11', 'FAIT-ISL-11', 'FAIT-ECO-11']).map(
                   (subj, i) => (
                     <span
                       key={i}

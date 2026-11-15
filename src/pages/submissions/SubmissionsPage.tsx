@@ -108,7 +108,7 @@ export const SubmissionsPage: React.FC = () => {
     emailService.sendGradeResultEmail({
       studentEmail: emailService.getStudentConfiguredEmail(),
       studentName: studentName,
-      teacherName: user?.name || 'Ahmad WebCore',
+      teacherName: user?.name || 'Ahmad',
       testTitle: gradingSubmission.assignmentTitle,
       subjectName: gradingSubmission.subjectName || 'Academic Assessment',
       score: scoreVal,

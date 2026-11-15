@@ -297,23 +297,41 @@ export class AIStudyBotService {
   public getChatHistory(): AIChatMessage[] {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_CHAT_HISTORY);
-      if (stored) return JSON.parse(stored);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // If legacy long welcome text exists in local storage, upgrade to clean greeting
+          if (
+            parsed[0]?.text?.includes('Explain a topic') ||
+            parsed[0]?.text?.includes('Welcome to StudyHub') ||
+            parsed[0]?.text?.includes('Academic Copilot')
+          ) {
+            parsed[0] = {
+              id: 'msg_welcome',
+              sender: 'assistant',
+              text: 'Hi! How can I assist you with your 1st Year FA-IT studies or daily schedule today?',
+              timestamp: 'Just now',
+              actions: [
+                { id: 'act_resched', label: 'Reschedule Today’s 30-Mark Test', actionType: 'reschedule_test' },
+              ],
+            };
+            this.saveChatHistory(parsed);
+          }
+          return parsed;
+        }
+      }
     } catch {
       // fallback
     }
-    // Clean English default initial greeting with live action pills
+    // Clean minimal default initial greeting
     return [
       {
         id: 'msg_welcome',
         sender: 'assistant',
-        text: 'Assalam-o-Alaikum! I am your AI Study Assistant & 24/7 Academic Copilot. I can explain any Computer Science or Grammar concept in clear English, Urdu, or Roman Urdu with real-world analogies. I can also execute live actions for you.',
+        text: 'Hi! How can I assist you with your 1st Year FA-IT studies or daily schedule today?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         actions: [
-          { id: 'act_topo', label: 'Explain Bus Topology', actionType: 'view_sprint_target' },
-          { id: 'act_resched', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-          { id: 'act_marks', label: 'Check My Exam Scores (28/30)', actionType: 'check_marks' },
-          { id: 'act_task', label: "Mark Today's Quota Task Complete", actionType: 'complete_today_task' },
-          { id: 'act_wa', label: 'Share Results to WhatsApp', actionType: 'share_whatsapp' },
+          { id: 'act_resched', label: 'Reschedule Today’s 30-Mark Test', actionType: 'reschedule_test' },
         ],
       },
     ];

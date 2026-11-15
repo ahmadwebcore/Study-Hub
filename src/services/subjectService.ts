@@ -233,7 +233,7 @@ export const subjectService = {
         return {
           id: unit.id,
           subjectId: unit.subject_id,
-          subjectName: 'Advanced Calculus',
+          subjectName: 'Computer Science',
           unitNumber: unit.unit_number,
           title: unit.title,
           description: unit.description || '',

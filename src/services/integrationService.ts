@@ -93,25 +93,20 @@ class IntegrationService {
     date: string;
     feedback?: string;
   }): string {
-    const statusEmoji = params.passed ? '✅ PASSED' : '⚠️ RETEST REQUIRED';
+    const statusEmoji = params.passed ? '✅ PASSED' : '⚠️ RETEST';
 
-    return `🇵🇰 *StudyHub — BISE DG Khan FA-IT Academic Report*
-━━━━━━━━━━━━━━━━━━━━━━
-👤 *Student:* ${params.studentName}
-📚 *Class:* 1st Year FA-IT (Intermediate Part-1)
-🏛️ *Board:* BISE D.G. Khan
-📘 *Subject:* ${params.subjectName}
-📝 *Test:* ${params.testTitle}
-📅 *Date:* ${params.date}
-━━━━━━━━━━━━━━━━━━━━━━
-🎯 *Marks Awarded:* ${params.score}/${params.maxScore} (${params.percentage}%)
-🏆 *Grade:* ${params.grade} (${statusEmoji})
-📌 *Passing Benchmark:* 15/30 Marks (50%)
-${params.feedback ? `\n👨‍🏫 *Ahmad (Faculty Lead) Remarks:*\n"${params.feedback}"\n` : ''}
-━━━━━━━━━━━━━━━━━━━━━━
-🎯 *Academic Goal:* Complete all 6 Books by Feb 28, 2027
-🌴 *Sunday Policy:* Strictly OFF (Rest & Revision)
-🔗 *Portal:* StudyHub Private Learning Desk`;
+    return `*StudyHub Academic Alert* 🎓
+━━━━━━━━━━━━━━━━━━━━
+👤 Student: ${params.studentName}
+📚 Class: 1st Year FA-IT (BISE DG Khan)
+📘 Subject: ${params.subjectName}
+📝 Test: ${params.testTitle}
+📅 Date: ${params.date}
+━━━━━━━━━━━━━━━━━━━━
+🎯 Marks: ${params.score}/${params.maxScore} (${params.percentage}%)
+🏆 Grade: ${params.grade} (${statusEmoji})
+${params.feedback ? `👨‍🏫 Evaluator (Ahmad): "${params.feedback}"\n` : ''}━━━━━━━━━━━━━━━━━━━━
+_StudyHub Learning Portal_`;
   }
 
   /**
@@ -124,25 +119,16 @@ ${params.feedback ? `\n👨‍🏫 *Ahmad (Faculty Lead) Remarks:*\n"${params.fe
     quotaPages: string;
     testTitle?: string;
   }): string {
-    return `🇵🇰 *StudyHub Daily Study Routine (${params.day})*
-━━━━━━━━━━━━━━━━━━━━━━
-👨‍🎓 *Student:* ${params.studentName}
-📚 *Group:* 1st Year FA-IT (BISE DG Khan)
-━━━━━━━━━━━━━━━━━━━━━━
-1️⃣ *Daily Book Quota:*
-📖 *Subject:* ${params.subject}
-📄 *Pages to Read:* ${params.quotaPages} (~2.5 pages)
-
-2️⃣ *Today's 30-Mark Test:*
-📝 *Test:* ${params.testTitle || 'Scheduled Daily Unit Assessment (30 Marks)'}
-⏱️ *Passing Benchmark:* 15/30 Marks (50%)
-
-3️⃣ *Faculty Guidance:*
-💬 Direct messaging with Ahmad or AI Study Assistant in portal.
-
-4️⃣ *Board Target:*
-🎯 Complete entire syllabus by February 28, 2027
-━━━━━━━━━━━━━━━━━━━━━━
+    return `*StudyHub Daily Routine* 📚
+━━━━━━━━━━━━━━━━━━━━
+👨‍🎓 Student: ${params.studentName} (${params.day})
+📚 1st Year FA-IT • BISE DG Khan
+━━━━━━━━━━━━━━━━━━━━
+📖 Reading Quota: ${params.subject} (${params.quotaPages})
+📝 Assessment: ${params.testTitle || 'Daily 30-Mark Test'}
+⏱️ Pass Benchmark: 15/30 Marks (50%)
+👨‍🏫 Evaluator: Ahmad
+━━━━━━━━━━━━━━━━━━━━
 _Sent via StudyHub Learning Portal_`;
   }
 

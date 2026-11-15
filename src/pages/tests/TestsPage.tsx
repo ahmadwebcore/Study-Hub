@@ -182,7 +182,7 @@ export const TestsPage: React.FC = () => {
       title: data.title,
       subjectId: data.subjectId,
       subjectName: selectedSubj?.name || 'Advanced Subject',
-      subjectCode: selectedSubj?.code || 'MATH-301',
+      subjectCode: selectedSubj?.code || 'FAIT-CSC-11',
       unitId: data.unitId,
       assignedTo: data.assignedTo && data.assignedTo !== 'all' ? data.assignedTo : undefined,
       date: data.date,
@@ -207,7 +207,7 @@ export const TestsPage: React.FC = () => {
     emailService.sendNewTestAlert({
       studentEmail: targetEmail,
       studentName: targetName,
-      teacherName: user?.name || 'Ahmad WebCore',
+      teacherName: user?.name || 'Ahmad',
       testTitle: data.title,
       subjectName: selectedSubj?.name || 'Advanced Mathematics',
       date: data.date,

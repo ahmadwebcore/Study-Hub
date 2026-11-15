@@ -2,24 +2,17 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Users,
-  BookOpen,
   ListTree,
   CalendarDays,
   GraduationCap,
   ClipboardList,
   Award,
-  BarChart3,
   ChevronRight,
   ShieldCheck,
   Library,
   CheckCircle2,
-  FileText,
-  Clock,
   FolderArchive,
-  Compass,
   BookMarked,
-  MessageSquare,
   Share2,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
@@ -43,46 +36,29 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: 'Workspace',
+    title: 'Core Workspace',
     items: [
       { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-      { name: 'Direct Chat (1-on-1)', path: '/chat', icon: MessageSquare, badge: 'Live', badgeVariant: 'primary' },
-      { name: 'AI Study Assistant', path: '/ai-teacher', icon: Compass, badge: 'Multilingual', badgeVariant: 'primary' },
-      { name: 'Grammar Hub', path: '/grammar', icon: BookMarked, badge: 'Urdu & Eng', badgeVariant: 'warning' },
-    ],
-  },
-  {
-    title: 'Daily Schedule & Tasks',
-    items: [
-      { name: 'Daily Tasks & Quota', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sun & PK Off', badgeVariant: 'holiday' },
-      { name: 'Daily Test Desk (Submit)', path: '/test-submit', icon: FileText, badge: 'Live 30M', badgeVariant: 'warning' },
+      { name: 'Daily Test Series', path: '/tests', icon: GraduationCap, badge: '30 Marks', badgeVariant: 'primary' },
+      { name: 'Submitted Tests', path: '/submissions', icon: ClipboardList, badge: 'Review', badgeVariant: 'warning' },
       { name: 'Completed Work', path: '/completed-work', icon: CheckCircle2, badge: 'Verified', badgeVariant: 'primary' },
-      { name: 'Study Planner', path: '/planner', icon: Clock, badge: 'Feb 28 Target', badgeVariant: 'info' },
+      { name: 'Grammar Hub', path: '/grammar', icon: BookMarked, badge: 'FA-IT', badgeVariant: 'warning' },
     ],
   },
   {
-    title: 'FA-IT 6 Books & Academics',
+    title: 'Academics & Schedule',
     items: [
-      { name: 'All 6 Subjects', path: '/subjects', icon: BookOpen },
-      { name: 'Book Library', path: '/library', icon: Library, badge: 'PTB Quota' },
-      { name: 'Official Syllabus', path: '/syllabus', icon: ListTree, badge: 'DGK Scheme' },
-      { name: 'Media Center', path: '/media', icon: FolderArchive, badge: 'Uploads' },
-      { name: 'Students Cohort', path: '/students', icon: Users, badge: 'FA-IT Group', teacherOnly: true },
+      { name: 'Daily Tasks & Quota', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sundays OFF', badgeVariant: 'holiday' },
+      { name: 'Syllabus & Targets', path: '/syllabus', icon: ListTree, badge: 'Feb 28' },
+      { name: 'Book Library', path: '/library', icon: Library, badge: 'DG Khan' },
+      { name: 'Media Center', path: '/media', icon: FolderArchive },
+      { name: 'Results & Report Cards', path: '/results', icon: Award },
     ],
   },
   {
-    title: 'Testing, Marks & Records',
+    title: 'System & Tools',
     items: [
-      { name: 'Tests & Quizzes (5-Box)', path: '/tests', icon: GraduationCap, badge: '30 Marks', badgeVariant: 'info' },
-      { name: 'Submissions Review', path: '/submissions', icon: ClipboardList, badge: 3, badgeVariant: 'warning', teacherOnly: true },
-      { name: 'Results & Report Cards', path: '/results', icon: Award, badge: 'Board Grade', badgeVariant: 'primary' },
-      { name: 'Reports & Analytics', path: '/reports', icon: BarChart3 },
-    ],
-  },
-  {
-    title: 'Integrations & Setup',
-    items: [
-      { name: 'Integrations (GSheets & WA)', path: '/integrations', icon: Share2, badge: 'Non-API', badgeVariant: 'primary' },
+      { name: 'Platform Integrations', path: '/integrations', icon: Share2, badge: 'WhatsApp', badgeVariant: 'primary' },
       { name: 'Settings & Security', path: '/settings', icon: ShieldCheck, badge: '2FA' },
     ],
   },

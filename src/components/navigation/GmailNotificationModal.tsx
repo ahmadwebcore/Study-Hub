@@ -70,13 +70,13 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
     const em = emailService.sendGradeResultEmail({
       studentEmail: testEmailAddress,
       studentName: 'Student Scholar',
-      teacherName: 'Ahmad WebCore',
-      testTitle: 'Vector Calculus & Multivariable Systems Exam',
-      subjectName: 'Advanced Calculus & Vectors (MATH-301)',
-      score: 47,
-      maxScore: 50,
-      passingMarks: 25,
-      feedback: 'Outstanding mastery of partial derivatives and surface integrals! Certified Passing Grade Awarded.',
+      teacherName: 'Ahmad',
+      testTitle: 'Chapter 2 Network Topologies Assessment',
+      subjectName: 'Computer Science (FAIT-CSC-11)',
+      score: 28,
+      maxScore: 30,
+      passingMarks: 15,
+      feedback: 'Outstanding mastery of network topologies and bus architecture! Certified Passing Grade Awarded.',
     });
     setDispatchFeedback(`Dispatched Passing Marks (47/50 - PASS) alert to ${testEmailAddress}!`);
     refreshEmails();
@@ -89,7 +89,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
     const em = emailService.sendNewTestAlert({
       studentEmail: testEmailAddress,
       studentName: 'Student Scholar',
-      teacherName: 'Ahmad WebCore',
+      teacherName: 'Ahmad',
       testTitle: 'Electrodynamics & Relativity Assessment',
       subjectName: 'Quantum Physics (PHY-201)',
       date: 'Nov 18, 2026',
@@ -128,7 +128,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
     const em = emailService.sendInvitationEmail({
       studentEmail: testEmailAddress,
       studentName: 'Student Scholar',
-      teacherName: 'Ahmad WebCore',
+      teacherName: 'Ahmad',
       inviteToken: `sh_inv_${Math.floor(100000 + Math.random() * 900000)}`,
       course: 'Advanced STEM Honors (2026-2027)',
       board: 'Cambridge International Examination (CIE)',

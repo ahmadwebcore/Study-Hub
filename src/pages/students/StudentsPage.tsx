@@ -138,7 +138,7 @@ export const StudentsPage: React.FC = () => {
       email: data.email,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop',
       grade: data.academicClass,
-      enrolledSubjects: ['Advanced Calculus & Vectors', 'Quantum Physics & Mechanics'],
+      enrolledSubjects: ['Computer Science (FA-IT)', 'Urdu & Grammar', 'English & Grammar'],
       assignedSubjectIds: ['sub_01', 'sub_02'],
       overallPerformance: 88.0,
       attendanceRate: 100,
@@ -165,7 +165,7 @@ export const StudentsPage: React.FC = () => {
     emailService.sendInvitationEmail({
       studentEmail: data.email,
       studentName: data.name,
-      teacherName: user?.name || 'Ahmad WebCore',
+      teacherName: user?.name || 'Ahmad',
       inviteToken: token,
       course: data.course,
       board: data.board,

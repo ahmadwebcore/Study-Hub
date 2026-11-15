@@ -56,32 +56,32 @@ const DAY_NAMES: DailyTask['dayOfWeek'][] = [
   'Saturday',
 ];
 
-// Initial realistic seed tasks
+// Initial realistic seed tasks for 1st Year FA-IT (BISE DG Khan)
 const SEED_TASKS: DailyTask[] = [
   {
     id: 'tsk_01',
-    subjectId: 'sub_01',
-    subjectName: 'Physical Education',
-    subjectCode: 'FSC-PED-11',
+    subjectId: 'sub_04',
+    subjectName: 'Computer Science',
+    subjectCode: 'FAIT-CSC-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Physical Education 1st Year (PTB)',
-    title: 'Circulatory System Anatomy & 400m Track Examination Rules',
-    description: 'Study human heart anatomy, blood circulation, and 400m track baton exchange zone rules. Solve textbook short questions.',
+    sourceTitle: 'Computer Science 1st Year PTB (BISE DG Khan)',
+    title: 'Network Topologies & Bus Architecture Deep Dive',
+    description: 'Understand Bus, Star, and Ring topologies. Complete block diagrams and textbook exercise short questions.',
     assignedDate: '2026-11-09',
     dueDate: '2026-11-09',
     dayOfWeek: 'Monday',
     isSundayOff: false,
-    pagesRange: 'Pages 12 - 18',
+    pagesRange: 'Pages 24 - 35',
     estimatedMinutes: 60,
     status: 'approved',
     studentSubmission: {
       submittedAt: 'Nov 09, 2026 at 06:15 PM',
-      notes: 'Uploaded heart diagram and track rules notes with complete labels.',
+      notes: 'Completed all 5 network topology block diagrams and short questions.',
     },
     approval: {
       approvedBy: 'Ahmad',
       approvedAt: 'Nov 09, 2026 at 08:30 PM',
-      feedback: 'Excellent work! Heart anatomy diagram is clear and exam outline is complete. Marks: 28/30',
+      feedback: 'Excellent work! Topology diagrams are crisp and explanation is strictly as per DG Khan marking rubric. Marks: 28/30',
     },
     studentId: 'usr_s_01',
     studentName: 'Student Scholar',
@@ -90,9 +90,9 @@ const SEED_TASKS: DailyTask[] = [
     id: 'tsk_02',
     subjectId: 'sub_02',
     subjectName: 'Urdu & Grammar',
-    subjectCode: 'FSC-URD-11',
+    subjectCode: 'FAIT-URD-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Sarmaya-e-Urdu (1st Year)',
+    sourceTitle: 'Sarmaya-e-Urdu (1st Year FA-IT)',
     title: 'Lesson Uswa-e-Hasna Summary & Formal Letter Writing',
     description: 'Write a one-third summary of Shibli Nomani’s Uswa-e-Hasna and practice board-format letter to a friend.',
     assignedDate: '2026-11-10',
@@ -109,7 +109,7 @@ const SEED_TASKS: DailyTask[] = [
     approval: {
       approvedBy: 'Ahmad',
       approvedAt: 'Nov 10, 2026 at 07:15 PM',
-      feedback: 'Neat presentation and accurate spelling. Summary length is strictly adhering to board guidelines. Marks: 29/30',
+      feedback: 'Neat presentation and accurate Urdu spelling. Summary length is strictly adhering to board guidelines. Marks: 29/30',
     },
     studentId: 'usr_s_01',
     studentName: 'Student Scholar',
@@ -118,9 +118,9 @@ const SEED_TASKS: DailyTask[] = [
     id: 'tsk_03',
     subjectId: 'sub_03',
     subjectName: 'English & Grammar',
-    subjectCode: 'FSC-ENG-11',
+    subjectCode: 'FAIT-ENG-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'English Book 1 & Board Grammar',
+    sourceTitle: 'English Book 1 & Board Grammar (FA-IT)',
     title: 'Button, Button Short Questions & Direct/Indirect Drill',
     description: 'Solve 5 board short questions from Button Button and convert 10 sentences to Indirect speech.',
     assignedDate: '2026-11-11',
@@ -128,31 +128,73 @@ const SEED_TASKS: DailyTask[] = [
     dayOfWeek: 'Wednesday',
     isSundayOff: false,
     pagesRange: 'Pages 1 - 8',
-    estimatedMinutes: 90,
-    status: 'submitted_for_approval',
+    estimatedMinutes: 60,
+    status: 'approved',
     studentSubmission: {
       submittedAt: 'Nov 11, 2026 at 07:00 PM',
       notes: 'Completed all 5 short answers and punctuation rules. Ready for evaluation.',
+    },
+    approval: {
+      approvedBy: 'Ahmad',
+      approvedAt: 'Nov 11, 2026 at 08:45 PM',
+      feedback: 'Accurate indirect conversions. Quotation marks and tense changes are properly handled. Marks: 27/30',
     },
     studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
   {
     id: 'tsk_04',
-    subjectId: 'sub_04',
-    subjectName: 'Computer Science',
-    subjectCode: 'FSC-CSC-11',
+    subjectId: 'sub_05',
+    subjectName: 'Islamiyat & Tarjuma',
+    subjectCode: 'FAIT-ISL-11',
     sourceType: 'book_pdf',
-    sourceTitle: 'Computer Science 1st Year PTB',
-    title: 'Network Topologies & Bus Architecture Deep Dive',
-    description: 'Understand Bus, Star, and Ring topologies. Use AI Study Assistant for practical analogies and complete block diagrams.',
+    sourceTitle: 'Islamiyat Compulsory & Tarjuma-tul-Quran (Part 1)',
+    title: 'Impact of Monotheism (Tawheed) & Surah Al-Baqarah Ruku 1',
+    description: 'Study the practical impact of Tawheed on human conduct and write fluent contextual translation of Surah Al-Baqarah Verses 1–7.',
     assignedDate: '2026-11-12',
     dueDate: '2026-11-12',
     dayOfWeek: 'Thursday',
     isSundayOff: false,
-    pagesRange: 'Pages 24 - 35',
-    estimatedMinutes: 80,
-    status: 'pending',
+    pagesRange: 'Pages 1 - 10',
+    estimatedMinutes: 60,
+    status: 'approved',
+    studentSubmission: {
+      submittedAt: 'Nov 12, 2026 at 06:30 PM',
+      notes: 'Tawheed bullet points and Surah Al-Baqarah ruku 1 word-to-word translation written.',
+    },
+    approval: {
+      approvedBy: 'Ahmad',
+      approvedAt: 'Nov 12, 2026 at 08:00 PM',
+      feedback: 'Flawless translation and beautiful handwriting. Full marks awarded. Marks: 30/30',
+    },
+    studentId: 'usr_s_01',
+    studentName: 'Student Scholar',
+  },
+  {
+    id: 'tsk_05',
+    subjectId: 'sub_01',
+    subjectName: 'Physical Education',
+    subjectCode: 'FAIT-PED-11',
+    sourceType: 'book_pdf',
+    sourceTitle: 'Physical Education 1st Year PTB',
+    title: 'Circulatory System Anatomy & 400m Track Examination Rules',
+    description: 'Study human heart anatomy, blood circulation, and 400m track baton exchange zone rules. Solve textbook short questions.',
+    assignedDate: '2026-11-13',
+    dueDate: '2026-11-13',
+    dayOfWeek: 'Friday',
+    isSundayOff: false,
+    pagesRange: 'Pages 12 - 18',
+    estimatedMinutes: 60,
+    status: 'approved',
+    studentSubmission: {
+      submittedAt: 'Nov 13, 2026 at 06:15 PM',
+      notes: 'Uploaded heart diagram and track rules notes with complete labels.',
+    },
+    approval: {
+      approvedBy: 'Ahmad',
+      approvedAt: 'Nov 13, 2026 at 08:30 PM',
+      feedback: 'Heart anatomy diagram is clear and exam outline is complete. Marks: 28/30',
+    },
     studentId: 'usr_s_01',
     studentName: 'Student Scholar',
   },
@@ -160,7 +202,7 @@ const SEED_TASKS: DailyTask[] = [
     id: 'tsk_05',
     subjectId: 'sub_05',
     subjectName: 'Islamiyat & Tarjuma',
-    subjectCode: 'FSC-ISL-11',
+    subjectCode: 'FAIT-ISL-11',
     sourceType: 'book_pdf',
     sourceTitle: 'Islamiyat Compulsory & Tarjuma-tul-Quran (Part 1)',
     title: 'Impact of Monotheism (Tawheed) & Surah Al-Baqarah Ruku 1',
@@ -179,7 +221,7 @@ const SEED_TASKS: DailyTask[] = [
     id: 'tsk_06',
     subjectId: 'sub_06',
     subjectName: 'Economics',
-    subjectCode: 'FSC-ECO-11',
+    subjectCode: 'FAIT-ECO-11',
     sourceType: 'book_pdf',
     sourceTitle: 'Principles of Economics 1st Year (Punjab Board)',
     title: 'Law of Demand Assumptions & Schedule Diagram',
@@ -267,7 +309,25 @@ class TaskService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        this.tasks = JSON.parse(stored);
+        let loaded = JSON.parse(stored) as DailyTask[];
+        // Sanitize legacy data: replace any legacy Math/FSc Pre-Engineering tasks with FA-IT & enforce "Ahmad"
+        const hasLegacyMath = loaded.some(
+          (t) => (t.subjectCode && t.subjectCode.includes('MATH')) || (t.title && t.title.includes('Calculus'))
+        );
+        if (hasLegacyMath) {
+          loaded = [...SEED_TASKS];
+        } else {
+          loaded = loaded.map((t) => {
+            if (t.approval && t.approval.approvedBy && t.approval.approvedBy.includes('WebCore')) {
+              t.approval.approvedBy = 'Ahmad';
+            }
+            if (t.subjectCode && t.subjectCode.startsWith('FSC-')) {
+              t.subjectCode = t.subjectCode.replace('FSC-', 'FAIT-');
+            }
+            return t;
+          });
+        }
+        this.tasks = loaded;
       } else {
         this.tasks = [...SEED_TASKS];
         this.saveTasks();

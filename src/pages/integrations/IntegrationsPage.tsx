@@ -78,10 +78,9 @@ export const IntegrationsPage: React.FC = () => {
         feedback: r.feedback,
       }))
     );
-    // Convert comma separated to tab separated for direct copy-paste into Google Sheets
     const tsv = csv.split('\n').map((row) => row.split(',').map((cell) => cell.replace(/^"|"$/g, '')).join('\t')).join('\n');
     navigator.clipboard.writeText(tsv);
-    showToast('Copied to clipboard! You can paste directly (Ctrl+V) into Google Sheets.');
+    showToast('Copied! Direct paste (Ctrl+V) ready for Google Sheets.');
   };
 
   // Sample WhatsApp message for preview
@@ -117,10 +116,10 @@ export const IntegrationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto font-sans pb-10">
+    <div className="space-y-6 max-w-5xl mx-auto font-sans pb-16">
       {/* Toast Alert */}
       {copiedToast && (
-        <div className="fixed bottom-6 right-6 z-50 p-3.5 rounded-xl bg-zinc-900 text-white flex items-center gap-2.5 text-xs font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 right-6 z-50 p-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white flex items-center gap-2.5 text-xs font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{copiedToast}</span>
         </div>
@@ -137,11 +136,11 @@ export const IntegrationsPage: React.FC = () => {
               1st Year FA-IT &bull; BISE DG Khan
             </span>
           </div>
-          <h1 className="text-xl font-bold text-zinc-900 tracking-tight mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight mt-1 font-serif">
             Platform Integrations
           </h1>
           <p className="text-xs text-zinc-500 mt-0.5">
-            Directly connect your academic portal with Google Sheets and WhatsApp (No API required).
+            Directly connect your academic portal with WhatsApp and Google Sheets (Zero API required).
           </p>
         </div>
 
@@ -153,38 +152,38 @@ export const IntegrationsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Integration 1: WhatsApp (No API Direct wa.me) */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+      {/* Integration 1: WhatsApp Direct Connector - Sleek Black Card */}
+      <div className="bg-[#0c0d10] text-zinc-100 rounded-2xl border border-zinc-800 p-5 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-zinc-900">
-                  WhatsApp Direct Connector (Non-API)
+                <h2 className="text-base font-bold text-white">
+                  WhatsApp Direct Connector
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
                   Free &bull; Ready
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Share 30-mark test results, daily book quotas, and Ahmad's remarks to student or parents with 1 click.
+              <p className="text-xs text-zinc-400 mt-0.5">
+                Share 30-mark test results, daily reading quotas, and Ahmad's remarks to student or parents with 1 click.
               </p>
             </div>
           </div>
 
-          <div className="text-xs text-zinc-500 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div className="text-xs text-zinc-400 flex items-center gap-1.5 shrink-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             Direct wa.me Instant Protocol
           </div>
         </div>
 
         {/* Configuration Form */}
-        <form onSubmit={handleSaveWhatsApp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-zinc-50/70 p-4 rounded-xl border border-zinc-200">
+        <form onSubmit={handleSaveWhatsApp} className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-[#121316] p-4 rounded-xl border border-zinc-800">
           <div>
-            <label className="block text-xs font-bold text-zinc-700 mb-1">
+            <label className="block text-xs font-bold text-zinc-300 mb-1">
               Recipient WhatsApp Number
             </label>
             <input
@@ -192,28 +191,28 @@ export const IntegrationsPage: React.FC = () => {
               value={customPhone}
               onChange={(e) => setCustomPhone(e.target.value)}
               placeholder="e.g. 923001234567"
-              className="w-full h-9 px-3 text-xs bg-white rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+              className="w-full h-9 px-3 text-xs bg-zinc-900 rounded-lg border border-zinc-700 text-white focus:outline-none focus:border-emerald-500"
             />
-            <span className="text-[10px] text-zinc-400 mt-0.5 block">Include country code without +, e.g. 92300...</span>
+            <span className="text-[10px] text-zinc-500 mt-0.5 block">Country code without +, e.g. 92300...</span>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-700 mb-1">
+            <label className="block text-xs font-bold text-zinc-300 mb-1">
               Recipient Label
             </label>
             <input
               type="text"
               value={waConfig.recipientName}
               onChange={(e) => setWaConfig({ ...waConfig, recipientName: e.target.value })}
-              placeholder="e.g. Student Scholar / Father"
-              className="w-full h-9 px-3 text-xs bg-white rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+              placeholder="e.g. Student Scholar / Parent"
+              className="w-full h-9 px-3 text-xs bg-zinc-900 rounded-lg border border-zinc-700 text-white focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           <div className="flex items-end">
             <button
               type="submit"
-              className="w-full h-9 inline-flex items-center justify-center gap-1.5 px-4 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg transition-colors shadow-2xs"
+              className="w-full h-9 inline-flex items-center justify-center gap-1.5 px-4 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors shadow-2xs"
             >
               <Save className="w-3.5 h-3.5" />
               Save Recipient
@@ -223,44 +222,44 @@ export const IntegrationsPage: React.FC = () => {
 
         {/* Action Triggers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <div className="p-4 rounded-xl border border-zinc-200 bg-white space-y-2 flex flex-col justify-between">
+          <div className="p-4 rounded-xl border border-zinc-800 bg-[#121316] space-y-2 flex flex-col justify-between">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
                 Action 1: Test Result Report
               </span>
-              <h3 className="text-xs font-bold text-zinc-900">
-                Send 30-Mark Test Result & Teacher Remarks
+              <h3 className="text-xs font-bold text-white mt-1">
+                Send 30-Mark Test Result &amp; Teacher Remarks
               </h3>
-              <p className="text-[11px] text-zinc-500 leading-relaxed">
-                Sends formatted report with student score, percentage, passed/fail status, and Ahmad's review note.
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Sends concise report with student score, percentage, passed/fail status, and Ahmad's review note.
               </p>
             </div>
             <button
               type="button"
               onClick={handleOpenWhatsAppTest}
-              className="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white transition-colors shadow-xs"
+              className="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-colors shadow-xs"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Open in WhatsApp (Result Card)</span>
             </button>
           </div>
 
-          <div className="p-4 rounded-xl border border-zinc-200 bg-white space-y-2 flex flex-col justify-between">
+          <div className="p-4 rounded-xl border border-zinc-800 bg-[#121316] space-y-2 flex flex-col justify-between">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                Action 2: Daily Quota & Schedule
+              <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/30">
+                Action 2: Daily Quota &amp; Schedule
               </span>
-              <h3 className="text-xs font-bold text-zinc-900">
-                Send Today's Book Quota & Timetable
+              <h3 className="text-xs font-bold text-white mt-1">
+                Send Today's Book Quota &amp; Timetable
               </h3>
-              <p className="text-[11px] text-zinc-500 leading-relaxed">
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
                 Sends today's ~2.5 pages reading quota, test time, and 3-month target reminder.
               </p>
             </div>
             <button
               type="button"
               onClick={handleOpenWhatsAppQuota}
-              className="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-xs font-semibold text-white transition-colors shadow-xs"
+              className="mt-3 inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition-colors border border-zinc-700"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Open in WhatsApp (Daily Quota)</span>
@@ -269,49 +268,50 @@ export const IntegrationsPage: React.FC = () => {
         </div>
 
         {/* Live Preview Box */}
-        <div className="mt-2 bg-zinc-900 text-zinc-100 p-4 rounded-xl font-mono text-[11px] leading-relaxed overflow-x-auto border border-zinc-800">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5">
-            WhatsApp Live Message Preview (No API required):
+        <div className="mt-2 bg-[#090a0c] text-zinc-100 p-3.5 rounded-xl font-mono text-[11px] leading-relaxed overflow-x-auto border border-zinc-800">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mb-1.5 flex items-center gap-1.5">
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span>WhatsApp Live Message Preview (Short &amp; Direct):</span>
           </div>
-          <pre className="whitespace-pre-wrap font-sans">{sampleResultMsg}</pre>
+          <pre className="whitespace-pre-wrap font-sans text-xs text-zinc-300">{sampleResultMsg}</pre>
         </div>
       </div>
 
-      {/* Integration 2: Google Sheets (GSheets) */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
+      {/* Integration 2: Google Sheets Synchronizer - Sleek Black Card */}
+      <div className="bg-[#0c0d10] text-zinc-100 rounded-2xl border border-zinc-800 p-5 shadow-xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-zinc-900">
-                  Google Sheets Synchronizer & Exporter
+                <h2 className="text-base font-bold text-white">
+                  Google Sheets Synchronizer &amp; Exporter
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/30 text-[10px] font-bold">
                   Active
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs text-zinc-400 mt-0.5">
                 Export and synchronize all 30-mark tests, student marks, and syllabus progress directly to Google Sheets.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={handleDownloadCSV}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-900 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-colors shadow-2xs"
             >
-              <Download className="w-3.5 h-3.5 text-zinc-600" />
+              <Download className="w-3.5 h-3.5 text-zinc-400" />
               <span>Download CSV Sheet</span>
             </button>
             <button
               type="button"
               onClick={handleCopyTableData}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-colors shadow-2xs"
             >
               <Copy className="w-3.5 h-3.5" />
               <span>Copy Data for GSheets</span>
@@ -320,10 +320,10 @@ export const IntegrationsPage: React.FC = () => {
         </div>
 
         {/* Google Sheets Link & Webhook Configuration */}
-        <form onSubmit={handleSaveGSheets} className="space-y-3 bg-zinc-50/70 p-4 rounded-xl border border-zinc-200">
+        <form onSubmit={handleSaveGSheets} className="space-y-3 bg-[#121316] p-4 rounded-xl border border-zinc-800">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-zinc-700 mb-1">
+              <label className="block text-xs font-bold text-zinc-300 mb-1">
                 Linked Google Sheet URL
               </label>
               <input
@@ -331,11 +331,11 @@ export const IntegrationsPage: React.FC = () => {
                 value={gsheetsConfig.sheetUrl || ''}
                 onChange={(e) => setGsheetsConfig({ ...gsheetsConfig, sheetUrl: e.target.value })}
                 placeholder="https://docs.google.com/spreadsheets/d/..."
-                className="w-full h-9 px-3 text-xs bg-white rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+                className="w-full h-9 px-3 text-xs bg-zinc-900 rounded-lg border border-zinc-700 text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-zinc-700 mb-1">
+              <label className="block text-xs font-bold text-zinc-300 mb-1">
                 Apps Script Webhook / Sync URL (Optional)
               </label>
               <input
@@ -343,15 +343,15 @@ export const IntegrationsPage: React.FC = () => {
                 value={gsheetsConfig.webhookUrl || ''}
                 onChange={(e) => setGsheetsConfig({ ...gsheetsConfig, webhookUrl: e.target.value })}
                 placeholder="https://script.google.com/macros/s/..."
-                className="w-full h-9 px-3 text-xs bg-white rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
+                className="w-full h-9 px-3 text-xs bg-zinc-900 rounded-lg border border-zinc-700 text-white focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-            <span className="text-xs text-zinc-500 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-zinc-400" />
-              Last Synced: <strong className="text-zinc-800">{gsheetsConfig.lastSyncedAt || 'Just now'}</strong>
+            <span className="text-xs text-zinc-400 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-zinc-500" />
+              Last Synced: <strong className="text-white">{gsheetsConfig.lastSyncedAt || 'Just now'}</strong>
             </span>
             <div className="flex items-center gap-2">
               {gsheetsConfig.sheetUrl && (
@@ -359,7 +359,7 @@ export const IntegrationsPage: React.FC = () => {
                   href={gsheetsConfig.sheetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-700 hover:text-emerald-800 bg-emerald-50 border border-emerald-200"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-300 hover:text-white bg-emerald-500/10 border border-emerald-500/30"
                 >
                   <span>Open Sheet</span>
                   <ExternalLink className="w-3 h-3" />
@@ -367,31 +367,31 @@ export const IntegrationsPage: React.FC = () => {
               )}
               <button
                 type="submit"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors border border-zinc-700"
               >
                 <Save className="w-3.5 h-3.5" />
-                <span>Save Google Sheets Settings</span>
+                <span>Save Settings</span>
               </button>
             </div>
           </div>
         </form>
 
         {/* Live Sheet Records Preview Table */}
-        <div className="rounded-xl border border-zinc-200 overflow-hidden">
-          <div className="p-3 bg-zinc-100/60 border-b border-zinc-200 flex items-center justify-between text-xs font-bold text-zinc-700">
+        <div className="rounded-xl border border-zinc-800 overflow-hidden bg-[#090a0c]">
+          <div className="p-3 bg-[#121316] border-b border-zinc-800 flex items-center justify-between text-xs font-bold text-zinc-200">
             <span>Recent Test Marks Export Table ({SAMPLE_RESULTS.length} Rows)</span>
-            <span className="text-[11px] font-normal text-zinc-500">Ready to copy/paste into Google Sheets</span>
+            <span className="text-[11px] font-normal text-zinc-400">Ready for Google Sheets paste</span>
           </div>
-          <div className="max-h-56 overflow-y-auto divide-y divide-zinc-100 text-xs">
+          <div className="max-h-56 overflow-y-auto divide-y divide-zinc-800/60 text-xs">
             {SAMPLE_RESULTS.map((row) => (
-              <div key={row.id} className="p-2.5 flex items-center justify-between hover:bg-zinc-50">
+              <div key={row.id} className="p-2.5 flex items-center justify-between hover:bg-zinc-900/60">
                 <div className="min-w-0 pr-2">
-                  <span className="font-bold text-zinc-900 block truncate">{row.testTitle}</span>
-                  <span className="text-[11px] text-zinc-500">{row.subjectName} &bull; {row.date}</span>
+                  <span className="font-bold text-white block truncate">{row.testTitle}</span>
+                  <span className="text-[11px] text-zinc-400">{row.subjectName} &bull; {row.date}</span>
                 </div>
                 <div className="text-right shrink-0">
-                  <span className="font-bold text-emerald-700 block">{row.score}/{row.maxScore} Marks</span>
-                  <span className="text-[10px] text-zinc-400">Grade {row.grade}</span>
+                  <span className="font-bold text-emerald-400 block">{row.score}/{row.maxScore} Marks</span>
+                  <span className="text-[10px] text-zinc-500">Grade {row.grade}</span>
                 </div>
               </div>
             ))}
@@ -399,18 +399,18 @@ export const IntegrationsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Integration 3: BISE DG Khan Official Synchronization Status */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Integration 3: BISE DG Khan Official Desk Status */}
+      <div className="bg-[#0c0d10] text-zinc-100 rounded-2xl border border-zinc-800 p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 text-white flex items-center justify-center text-lg font-bold shrink-0">
             🇵🇰
           </div>
           <div>
-            <h3 className="text-sm font-bold text-zinc-900">
-              {BISE_DG_KHAN_INFO.shortName} Live Portal Link
+            <h3 className="text-sm font-bold text-white">
+              {BISE_DG_KHAN_INFO.shortName} Official Board Portal Link
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Annual Examination May 2027 &bull; Syllabus Target: Feb 28, 2027 &bull; 6 Subjects Pairing
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Annual Examination May 2027 &bull; Syllabus Target: Feb 28, 2027 &bull; 6 Subjects FA-IT
             </p>
           </div>
         </div>
@@ -419,9 +419,9 @@ export const IntegrationsPage: React.FC = () => {
           href={BISE_DG_KHAN_INFO.officialWebsite}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors shadow-2xs self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-colors shadow-2xs self-start sm:self-auto"
         >
-          <FileCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <FileCheck className="w-3.5 h-3.5 text-emerald-400" />
           <span>Official Board Portal</span>
           <ExternalLink className="w-3 h-3" />
         </a>

@@ -52,7 +52,7 @@ export const studentService = {
             item.avatar_url ||
             'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
           grade: item.academic_class || 'Grade 11',
-          enrolledSubjects: assignedSubjects.length > 0 ? assignedSubjects : ['Advanced Calculus', 'Physics HL'],
+          enrolledSubjects: assignedSubjects.length > 0 ? assignedSubjects : ['Computer Science (FA-IT)', 'Urdu Lazmi', 'English Compulsory'],
           assignedSubjectIds: assignedSubjectIds.length > 0 ? assignedSubjectIds : ['sub_01', 'sub_02'],
           overallPerformance: 91.4,
           attendanceRate: 98,

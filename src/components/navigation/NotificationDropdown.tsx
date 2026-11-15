@@ -148,15 +148,15 @@ export const NotificationDropdown: React.FC = () => {
             />
 
             {/* Notification Drawer / Dropdown */}
-            <div className="fixed inset-x-2.5 top-16 max-h-[82vh] sm:max-h-[600px] sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:absolute sm:w-[420px] rounded-2xl bg-white border border-zinc-200 shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="fixed inset-x-2.5 top-16 max-h-[82vh] sm:max-h-[600px] sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:absolute sm:w-[420px] rounded-2xl bg-[#0c0d10] border border-zinc-800 shadow-2xl z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-zinc-100">
               {/* Header */}
-              <div className="p-3.5 border-b border-zinc-200 bg-zinc-50/80 flex items-center justify-between shrink-0">
+              <div className="p-3.5 border-b border-zinc-800 bg-[#090a0c] flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-xs sm:text-sm text-zinc-900 tracking-tight">
+                  <h4 className="font-bold text-xs sm:text-sm text-white tracking-tight">
                     Academic Alerts & Board Feed
                   </h4>
                   {unreadCount > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                       {unreadCount} new
                     </span>
                   )}
@@ -167,7 +167,7 @@ export const NotificationDropdown: React.FC = () => {
                     <button
                       type="button"
                       onClick={markAllAsRead}
-                      className="text-[11px] text-emerald-700 hover:text-emerald-800 font-semibold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-emerald-50"
+                      className="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-zinc-800"
                     >
                       <Check className="w-3 h-3" />
                       <span className="hidden sm:inline">Mark all read</span>
@@ -176,7 +176,7 @@ export const NotificationDropdown: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 transition-colors"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
                     aria-label="Close notification panel"
                   >
                     <X className="w-4 h-4" />
@@ -185,7 +185,7 @@ export const NotificationDropdown: React.FC = () => {
               </div>
 
             {/* Filter Category Tabs */}
-            <div className="flex items-center gap-1 p-2 bg-zinc-100/60 border-b border-zinc-200 overflow-x-auto text-[11px]">
+            <div className="flex items-center gap-1.5 p-2 bg-[#090a0c] border-b border-zinc-800 overflow-x-auto no-scrollbar text-[11px] whitespace-nowrap">
               {[
                 { id: 'all', label: 'All', count: notifications.length },
                 {
@@ -216,10 +216,10 @@ export const NotificationDropdown: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategory(tab.id as FilterCategory)}
-                  className={`px-2.5 py-1 rounded-md font-semibold whitespace-nowrap transition-colors flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1 shrink-0 ${
                     activeCategory === tab.id
-                      ? 'bg-zinc-900 text-white shadow-2xs'
-                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/80'
                   }`}
                 >
                   <span>{tab.label}</span>
@@ -229,11 +229,11 @@ export const NotificationDropdown: React.FC = () => {
             </div>
 
             {/* Notification items */}
-            <div className="max-h-96 overflow-y-auto divide-y divide-zinc-100">
+            <div className="max-h-96 overflow-y-auto divide-y divide-zinc-800/80 bg-[#0c0d10]">
               {filteredNotifications.length === 0 ? (
                 <div className="p-8 text-center space-y-2">
-                  <CheckCheck className="w-8 h-8 text-emerald-500 mx-auto" />
-                  <p className="text-xs font-semibold text-zinc-800">No alerts in this category</p>
+                  <CheckCheck className="w-8 h-8 text-emerald-400 mx-auto" />
+                  <p className="text-xs font-semibold text-white">No alerts in this category</p>
                   <p className="text-[11px] text-zinc-400">Everything is organized and up-to-date.</p>
                 </div>
               ) : (
@@ -244,12 +244,12 @@ export const NotificationDropdown: React.FC = () => {
                     className={`p-3.5 flex items-start gap-3 transition-colors cursor-pointer group text-left ${
                       !notif.read
                         ? notif.urgent
-                          ? 'bg-amber-50/40 hover:bg-amber-50/70'
-                          : 'bg-emerald-50/20 hover:bg-emerald-50/40'
-                        : 'bg-white hover:bg-zinc-50'
+                          ? 'bg-amber-950/20 hover:bg-amber-950/30 border-l-2 border-amber-500'
+                          : 'bg-emerald-950/20 hover:bg-emerald-950/30 border-l-2 border-emerald-500'
+                        : 'bg-[#0c0d10] hover:bg-zinc-900/60'
                     }`}
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white border border-zinc-200 mt-0.5 shadow-2xs group-hover:border-zinc-300">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 mt-0.5 shadow-2xs group-hover:border-zinc-700 text-emerald-400">
                       {getCategoryIcon(notif.category)}
                     </div>
 
@@ -257,18 +257,18 @@ export const NotificationDropdown: React.FC = () => {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 truncate">
                           {notif.urgent && (
-                            <span className="px-1.5 py-0.2 rounded bg-amber-500 text-white text-[9px] font-bold shrink-0">
+                            <span className="px-1.5 py-0.2 rounded bg-amber-500 text-zinc-950 text-[9px] font-bold shrink-0">
                               Urgent
                             </span>
                           )}
                           {notif.badge && (
-                            <span className="px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 text-[9px] font-semibold shrink-0">
+                            <span className="px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-300 border border-zinc-700 text-[9px] font-semibold shrink-0">
                               {notif.badge}
                             </span>
                           )}
                           <p
                             className={`text-xs font-bold truncate ${
-                              !notif.read ? 'text-zinc-900' : 'text-zinc-700'
+                              !notif.read ? 'text-white' : 'text-zinc-300'
                             }`}
                           >
                             {notif.title}
@@ -279,7 +279,7 @@ export const NotificationDropdown: React.FC = () => {
                         </span>
                       </div>
 
-                      <p className="text-xs text-zinc-600 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-zinc-300 mt-1 line-clamp-2 leading-relaxed">
                         {notif.message}
                       </p>
 
@@ -291,7 +291,7 @@ export const NotificationDropdown: React.FC = () => {
                             e.stopPropagation();
                             handleNotificationClick(notif);
                           }}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors"
                         >
                           <span>{notif.actionLabel || 'View Details'}</span>
                           <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
@@ -302,10 +302,10 @@ export const NotificationDropdown: React.FC = () => {
                           <button
                             type="button"
                             onClick={(e) => handleMarkItemRead(e, notif.id)}
-                            className="px-2 py-0.5 rounded-md bg-white hover:bg-zinc-100 text-zinc-500 hover:text-zinc-900 border border-zinc-200 text-[10px] font-semibold flex items-center gap-1 transition-all shadow-2xs"
+                            className="px-2 py-0.5 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 text-[10px] font-semibold flex items-center gap-1 transition-all shadow-2xs"
                             title="Mark as read"
                           >
-                            <Check className="w-3 h-3 text-emerald-600" />
+                            <Check className="w-3 h-3 text-emerald-400" />
                             <span>Mark read</span>
                           </button>
                         )}
@@ -317,16 +317,16 @@ export const NotificationDropdown: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-2.5 border-t border-zinc-200 bg-zinc-50/70 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-3.5">
+            <div className="p-2.5 border-t border-zinc-800 bg-[#090a0c] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-3.5">
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => {
                     notificationService.triggerTestPushAlert();
                   }}
-                  className="text-[11px] font-bold text-zinc-900 bg-white hover:bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 transition-all"
+                  className="text-[11px] font-bold text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-2xs cursor-pointer active:scale-95 transition-all"
                 >
-                  <Bell className="w-3 h-3 text-emerald-600 animate-bounce" />
+                  <Bell className="w-3 h-3 text-emerald-400 animate-bounce" />
                   <span>Send Test Push Alert</span>
                 </button>
 
@@ -336,7 +336,7 @@ export const NotificationDropdown: React.FC = () => {
                     setIsOpen(false);
                     setIsBoardModalOpen(true);
                   }}
-                  className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                  className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
                 >
                   <span>🇵🇰 BISE Desk</span>
                   <ExternalLink className="w-3 h-3" />
@@ -346,7 +346,7 @@ export const NotificationDropdown: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-xs text-zinc-500 hover:text-zinc-900 font-medium self-end sm:self-auto"
+                className="text-xs text-zinc-400 hover:text-white font-medium self-end sm:self-auto cursor-pointer"
               >
                 Close
               </button>

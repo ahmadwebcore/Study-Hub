@@ -88,7 +88,7 @@ export const MediaCenterPage: React.FC = () => {
       fileType: uploadFileType,
       fileUrl: previewFileUrl || (uploadFileType === 'image' ? 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=800&auto=format&fit=crop' : '/mock-materials/syllabus_document.pdf'),
       thumbnailUrl: uploadFileType === 'image' ? (previewFileUrl || 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=300&auto=format&fit=crop') : undefined,
-      uploadedBy: role === 'teacher' ? 'Ahmad WebCore' : (profile?.name || 'Student Scholar'),
+      uploadedBy: role === 'teacher' ? 'Ahmad' : (profile?.name || 'Student Scholar'),
       uploadedByRole: role,
       subjectId: selectedSubject.id,
       subjectName: selectedSubject.name,

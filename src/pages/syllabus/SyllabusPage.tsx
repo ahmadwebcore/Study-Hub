@@ -218,7 +218,7 @@ export const SyllabusPage: React.FC = () => {
       const teacherGmail = emailService.getTeacherConfiguredEmail();
       emailService.sendManualDirectEmail({
         senderEmail: teacherGmail,
-        senderName: user?.name || 'Ahmad WebCore',
+        senderName: user?.name || 'Ahmad',
         recipientEmail: studentGmail,
         recipientName: 'Student Scholar',
         subject: `📋 Syllabus Daily Tasks Assigned: ${data.title}`,
@@ -332,7 +332,7 @@ export const SyllabusPage: React.FC = () => {
       category: isImage ? 'image' : 'syllabus',
       fileType: isImage ? 'image' : isDoc ? 'docx' : 'pdf',
       fileSizeBytes: file.size,
-      uploadedBy: role === 'teacher' ? 'Ahmad WebCore' : 'Student Scholar',
+      uploadedBy: role === 'teacher' ? 'Ahmad' : 'Student Scholar',
       uploadedByRole: role,
       subjectId: selectedSubjectId,
       subjectName: currentSubject.name,
@@ -350,7 +350,7 @@ export const SyllabusPage: React.FC = () => {
     await new Promise((r) => setTimeout(r, 600));
 
     if (paceTargetChoice === 'entire_book') {
-      const res = taskService.generateEntireBookTasksAndDailyTests({
+      taskService.generateEntireBookTasksAndDailyTests({
         subjectId: selectedSubjectId,
         subjectName: currentSubject.name,
         subjectCode: currentSubject.code,
@@ -362,8 +362,8 @@ export const SyllabusPage: React.FC = () => {
       });
 
       setIsGeneratingPlan(false);
-      setSuccessToast(`🎉 Entire Book daily tasks (${res.tasks.length} tasks) & Daily Test Series (${res.testsCount} assessments) scheduled for ${currentSubject.name} through February 28th!`);
-      setTimeout(() => setSuccessToast(null), 6000);
+      setSuccessToast(`🎉 1st Year FA-IT syllabus parsed into daily reading quotas & 30-mark test series through Feb 28! Use the AI Assistant (bottom right) if you want to adjust any dates or series.`);
+      setTimeout(() => setSuccessToast(null), 7000);
       return;
     }
 
@@ -638,10 +638,10 @@ export const SyllabusPage: React.FC = () => {
               size="sm"
               className="w-full text-xs font-bold shadow-xs py-2"
               isLoading={isGeneratingPlan}
-              loadingText="Scheduling Tasks..."
+              loadingText="Breaking PDF into Series..."
               onClick={handleGenerateStudyTasksFromSyllabus}
             >
-              Generate Daily Tasks (Sundays OFF)
+              Break PDF into Series &amp; Auto-Schedule
             </Button>
           </div>
         </div>

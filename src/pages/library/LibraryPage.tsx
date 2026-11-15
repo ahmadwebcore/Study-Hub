@@ -21,6 +21,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CircularProgress } from '../../components/ui/CircularProgress';
+import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
 import { BookItem, Subject } from '../../types';
 import { useRole } from '../../hooks/useRole';
 import { bookService } from '../../services/bookService';
@@ -66,6 +67,7 @@ export const LibraryPage: React.FC = () => {
   const [previewBook, setPreviewBook] = useState<BookItem | null>(null);
   const [deletingBook, setDeletingBook] = useState<BookItem | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
 
   const getProgressPercentage = (b: BookItem, tf: 'weekly' | 'monthly' | 'overall') => {
     if (tf === 'weekly') {
@@ -238,7 +240,7 @@ export const LibraryPage: React.FC = () => {
     const teacherGmail = emailService.getTeacherConfiguredEmail();
     emailService.sendManualDirectEmail({
       senderEmail: teacherGmail,
-      senderName: user?.name || 'Ahmad WebCore',
+      senderName: user?.name || 'Ahmad',
       recipientEmail: studentGmail,
       recipientName: 'Student Scholar',
       subject: `📖 New Weekly Study Roadmap: ${data.title}`,
@@ -268,7 +270,7 @@ export const LibraryPage: React.FC = () => {
     const teacherGmail = emailService.getTeacherConfiguredEmail();
     emailService.sendManualDirectEmail({
       senderEmail: teacherGmail,
-      senderName: 'Ahmad WebCore',
+      senderName: 'Ahmad',
       recipientEmail: studentGmail,
       recipientName: 'Student Scholar',
       subject: `📖 Study Target Assigned: ${b.title}`,
@@ -336,7 +338,14 @@ export const LibraryPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsBoardModalOpen(true)}
+            className="bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 text-xs font-bold"
+          >
+            🇵🇰 BISE DG Khan 1st Year Desk (Pairing &amp; Circulars)
+          </Button>
           {role === 'student' ? (
             <Button
               variant="outline"
@@ -834,6 +843,13 @@ export const LibraryPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {/* BISE DG Khan 1st Year Official Board Desk */}
+      <BISEDGKhanModal
+        isOpen={isBoardModalOpen}
+        onClose={() => setIsBoardModalOpen(false)}
+        initialTab="pairing"
+      />
     </div>
   );
 };

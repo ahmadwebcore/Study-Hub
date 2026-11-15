@@ -27,7 +27,7 @@ export const SettingsPage: React.FC = () => {
     'gmail_dispatch'
   );
   const [teacherEmailInput, setTeacherEmailInput] = useState(emailService.getTeacherConfiguredEmail());
-  const [teacherDisplayName, setTeacherDisplayName] = useState('Ahmad WebCore');
+  const [teacherDisplayName, setTeacherDisplayName] = useState('Ahmad');
   const [studentEmailInput, setStudentEmailInput] = useState(emailService.getStudentConfiguredEmail());
   const [guardianEmailInput, setGuardianEmailInput] = useState('parent.ahmad@gmail.com');
   const [isComposeOpen, setIsComposeOpen] = useState(false);

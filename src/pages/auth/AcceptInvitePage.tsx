@@ -105,7 +105,7 @@ export const AcceptInvitePage: React.FC = () => {
     } else {
       notificationService.addNotification({
         title: `🎉 Welcome to StudyHub!`,
-        message: `Your account is active. Mentorship with Ahmad WebCore is live.`,
+        message: `Your account is active. Mentorship with Ahmad is live.`,
         category: 'system',
       });
       navigate('/dashboard', { replace: true });

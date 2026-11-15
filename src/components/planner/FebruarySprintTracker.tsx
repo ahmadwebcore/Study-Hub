@@ -9,6 +9,7 @@ import {
   Compass,
   ChevronDown,
   ChevronUp,
+  Clock,
 } from 'lucide-react';
 import {
   targetPlannerService,
@@ -24,6 +25,23 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
   const [stats, setStats] = useState<TargetPlannerStats>(targetPlannerService.getPlannerStats());
   const [expandedSubject, setExpandedSubject] = useState<string | null>(null);
   const [quickUpdateSuccess, setQuickUpdateSuccess] = useState<string | null>(null);
+  const [windowRemaining, setWindowRemaining] = useState<string>('');
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      const diffMs = Math.max(0, endOfDay.getTime() - now.getTime());
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+      setWindowRemaining(`${hours}h ${mins.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`);
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const refresh = () => setStats(targetPlannerService.getPlannerStats());
@@ -58,9 +76,15 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
         
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
-              <CalendarCheck className="w-3.5 h-3.5" />
-              <span>3-Month Target Sprint &bull; Deadline: 28 Feb 2027</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
+                <CalendarCheck className="w-3.5 h-3.5" />
+                <span>3-Month Target Sprint &bull; Deadline: 28 Feb 2027</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-mono font-bold shadow-xs">
+                <Clock className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span>Today's 24H Window: {windowRemaining || 'Counting...'}</span>
+              </div>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
               Syllabus Completion & Daily Quota Engine
@@ -103,7 +127,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
           <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
             <span className="text-zinc-300 flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-              Syllabus Completion ("all updates itna slybus hugya"):
+              1st Year FA-IT Syllabus Completion:
             </span>
             <span className="font-mono font-bold text-white">
               {stats.overallCompletionPercentage}% Completed &bull; {stats.totalBookPages - stats.totalCompletedPages} Pages Remaining
@@ -142,12 +166,12 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
           {[
-            { day: 'Monday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FSC-PED' },
-            { day: 'Tuesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FSC-URD' },
-            { day: 'Wednesday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FSC-ENG' },
-            { day: 'Thursday', subject: 'Computer Science', focus: 'Computing & Networks', color: '#0EA5E9', code: 'FSC-CS' },
-            { day: 'Friday', subject: 'Islamiyat & Tarjuma', focus: 'Quranic Translation', color: '#059669', code: 'FSC-ISL' },
-            { day: 'Saturday', subject: 'Economics', focus: 'Microeconomics & Graphs', color: '#F59E0B', code: 'FSC-ECO' },
+            { day: 'Monday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FAIT-PED' },
+            { day: 'Tuesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FAIT-URD' },
+            { day: 'Wednesday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FAIT-ENG' },
+            { day: 'Thursday', subject: 'Computer Science', focus: 'Computing & Networks', color: '#0EA5E9', code: 'FAIT-CS' },
+            { day: 'Friday', subject: 'Islamiyat & Tarjuma', focus: 'Quranic Translation', color: '#059669', code: 'FAIT-ISL' },
+            { day: 'Saturday', subject: 'Economics', focus: 'Microeconomics & Graphs', color: '#F59E0B', code: 'FAIT-ECO' },
             { day: 'Sunday', subject: 'Rest & Revision', focus: 'Mandatory Weekly Rest', color: '#EF4444', isOff: true },
           ].map((item) => {
             const isToday = todayName.toLowerCase() === item.day.toLowerCase();

@@ -137,7 +137,7 @@ export const WeeklyTasksPage: React.FC = () => {
     if (!approvingTask) return;
     setIsApproving(true);
     await new Promise((r) => setTimeout(r, 400));
-    taskService.approveTask(approvingTask.id, user?.name || 'Ahmad WebCore', teacherFeedback);
+    taskService.approveTask(approvingTask.id, user?.name || 'Ahmad', teacherFeedback);
     setIsApproving(false);
     setApprovingTask(null);
     loadData();
@@ -184,7 +184,7 @@ export const WeeklyTasksPage: React.FC = () => {
         category: isImg ? 'image' : 'syllabus',
         fileType: isImg ? 'image' : isDoc ? 'docx' : 'pdf',
         fileSizeBytes: uploadedPdfFile.size,
-        uploadedBy: user?.name || (role === 'teacher' ? 'Ahmad WebCore' : 'Student Scholar'),
+        uploadedBy: user?.name || (role === 'teacher' ? 'Ahmad' : 'Student Scholar'),
         uploadedByRole: role,
         subjectId: genSubjectId,
         subjectName: selectedSubj?.name || 'Academic Subject',
