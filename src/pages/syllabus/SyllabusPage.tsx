@@ -9,7 +9,7 @@ import {
   Clock,
   Download,
   BookOpen,
-  Sparkles,
+  CalendarCheck,
   PlusCircle,
   Edit3,
   Trash2,
@@ -548,7 +548,7 @@ export const SyllabusPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
           <div>
             <h3 className="text-sm sm:text-base font-bold text-zinc-900 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <CalendarCheck className="w-4 h-4 text-emerald-600" />
               Upload Syllabus & Auto-Schedule Daily Study Tasks
             </h3>
             <p className="text-xs text-zinc-500 mt-0.5">
@@ -735,92 +735,101 @@ export const SyllabusPage: React.FC = () => {
                     <div
                       key={topic.id}
                       onClick={() => handleToggleTopic(unit.id, topic)}
-                      className={`p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 cursor-pointer select-none ${
+                      className={`p-3.5 sm:p-4 rounded-2xl border transition-all space-y-2.5 cursor-pointer select-none ${
                         status === 'completed'
                           ? 'bg-[#e8f8f0]/40 border-[#14B866]/30 text-[#142D27]'
                           : status === 'in_progress'
                           ? 'bg-amber-50/40 border-amber-300 text-[#142D27]'
-                          : 'bg-[#F7F9F8] border-[#e1ede7] text-[#557067] hover:bg-white'
+                          : 'bg-[#F7F9F8] border-[#e1ede7] text-[#557067] hover:bg-white hover:shadow-xs'
                       }`}
                     >
-                      <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                      {/* Top: Checkmark & Full-Width Topic Title */}
+                      <div className="flex items-start gap-3">
                         {status === 'completed' ? (
-                          <CheckCircle2 className="w-4 h-4 text-[#14B866] shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-4.5 h-4.5 text-[#14B866] shrink-0 mt-0.5" />
                         ) : status === 'in_progress' ? (
                           <div className="w-4 h-4 rounded-full border-2 border-amber-500 border-t-transparent animate-spin shrink-0 mt-0.5" />
                         ) : (
-                          <Circle className="w-4 h-4 text-[#7d9990] shrink-0 mt-0.5" />
+                          <Circle className="w-4.5 h-4.5 text-[#7d9990] shrink-0 mt-0.5" />
                         )}
                         <div className="flex-1 min-w-0">
                           <p
-                            className={`text-xs sm:text-sm font-semibold leading-snug break-words ${
+                            className={`text-xs sm:text-sm font-semibold leading-relaxed break-words ${
                               status === 'completed' ? 'line-through text-[#7d9990]' : 'text-[#142D27]'
                             }`}
                           >
                             {topic.title}
                           </p>
-                          <span className="text-[10px] text-[#7d9990] flex items-center gap-1 mt-1">
-                            <Clock className="w-3 h-3 shrink-0" />
-                            Est. {topic.estimatedHours} Hours
-                            {topic.attachmentName && (
-                              <span className="text-[#14B866] font-medium ml-2 flex items-center gap-0.5 truncate">
-                                <Paperclip className="w-3 h-3 shrink-0" />
-                                {topic.attachmentName}
-                              </span>
-                            )}
-                          </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 sm:border-none pl-6 sm:pl-0">
-                        {/* Status Badge */}
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize shrink-0 ${
-                            status === 'completed'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : status === 'in_progress'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-zinc-100 text-zinc-600'
-                          }`}
-                        >
-                          {status.replace('_', ' ')}
-                        </span>
+                      {/* Bottom Row: Metadata Info + Badges + Actions */}
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-200/50 text-[11px] pl-7">
+                        <div className="flex items-center gap-2.5 text-zinc-500 text-[11px]">
+                          <span className="flex items-center gap-1 font-medium">
+                            <Clock className="w-3 h-3 text-zinc-400 shrink-0" />
+                            Est. {topic.estimatedHours} Hours
+                          </span>
+                          {topic.attachmentName && (
+                            <span className="text-[#14B866] font-medium flex items-center gap-0.5 truncate max-w-[140px]">
+                              <Paperclip className="w-3 h-3 shrink-0" />
+                              {topic.attachmentName}
+                            </span>
+                          )}
+                        </div>
 
-                        {topic.notesAvailable && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveNotesTopic({ topic, unitTitle: unit.title });
-                            }}
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#14B866] hover:text-[#109653] bg-white px-2 py-0.5 rounded-lg border border-[#e1ede7] shadow-xs shrink-0"
+                        <div className="flex items-center gap-2 shrink-0">
+                          {/* Status Badge */}
+                          <span
+                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize shrink-0 ${
+                              status === 'completed'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : status === 'in_progress'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-zinc-100 text-zinc-600'
+                            }`}
                           >
-                            <FileText className="w-3 h-3" />
-                            Notes
-                          </button>
-                        )}
+                            {status.replace('_', ' ')}
+                          </span>
 
-                        {role === 'teacher' && (
-                          <div className="flex items-center gap-1 ml-1" onClick={(e) => e.stopPropagation()}>
+                          {topic.notesAvailable && (
                             <button
-                              onClick={() => {
-                                setEditingTopic({ unitId: unit.id, topic });
-                                setTopicValue('title', topic.title);
-                                setTopicValue('description', topic.description || '');
-                                setTopicValue('estimatedHours', topic.estimatedHours);
-                                setTopicValue('notesContent', topic.notesContent || '');
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveNotesTopic({ topic, unitTitle: unit.title });
                               }}
-                              className="p-1 rounded text-zinc-400 hover:text-[#142D27]"
+                              className="flex items-center gap-1 text-[11px] font-semibold text-[#14B866] hover:text-[#109653] bg-white px-2.5 py-0.5 rounded-lg border border-[#e1ede7] shadow-2xs shrink-0"
                             >
-                              <Edit3 className="w-3.5 h-3.5" />
+                              <FileText className="w-3 h-3" />
+                              Notes
                             </button>
-                            <button
-                              onClick={() => setDeletingTopic({ unitId: unit.id, topic })}
-                              className="p-1 rounded text-zinc-400 hover:text-rose-600"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        )}
+                          )}
+
+                          {role === 'teacher' && (
+                            <div className="flex items-center gap-1 ml-1" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                onClick={() => {
+                                  setEditingTopic({ unitId: unit.id, topic });
+                                  setTopicValue('title', topic.title);
+                                  setTopicValue('description', topic.description || '');
+                                  setTopicValue('estimatedHours', topic.estimatedHours);
+                                  setTopicValue('notesContent', topic.notesContent || '');
+                                }}
+                                className="p-1 rounded text-zinc-400 hover:text-[#142D27]"
+                                title="Edit Topic"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setDeletingTopic({ unitId: unit.id, topic })}
+                                className="p-1 rounded text-zinc-400 hover:text-rose-600"
+                                title="Delete Topic"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -960,7 +969,7 @@ export const SyllabusPage: React.FC = () => {
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] space-y-2 text-xs text-[#263B35]">
               <div className="flex items-center gap-2 text-xs font-bold text-[#14B866]">
-                <Sparkles className="w-4 h-4" />
+                <BookOpen className="w-4 h-4" />
                 <span>Core Theoretical Concept:</span>
               </div>
               <p className="leading-relaxed">

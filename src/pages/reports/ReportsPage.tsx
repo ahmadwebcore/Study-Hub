@@ -4,7 +4,7 @@ import {
   FileSpreadsheet,
   CheckCircle,
   AlertTriangle,
-  Sparkles,
+  Award,
   Eye,
   FileText,
 } from 'lucide-react';
@@ -229,7 +229,7 @@ export const ReportsPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-5 border-l-4 border-l-[#14B866]">
           <div className="flex items-center gap-2 text-xs font-bold text-[#14B866] uppercase tracking-wider">
-            <Sparkles className="w-4 h-4" />
+            <Award className="w-4 h-4" />
             Highest Proficiency Areas
           </div>
           <p className="text-xs text-[#557067] mt-1">

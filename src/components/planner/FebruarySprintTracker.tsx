@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Calendar,
   CheckCircle2,
-  Sparkles,
+  CalendarCheck,
   BookOpen,
   TrendingUp,
   Plus,
@@ -59,7 +59,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#14B866]/20 border border-[#14B866]/30 text-[#14B866] text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+              <CalendarCheck className="w-3.5 h-3.5" />
               <span>3-Month Target Sprint &bull; Deadline: 28 Feb 2027</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">

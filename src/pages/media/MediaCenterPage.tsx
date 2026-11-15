@@ -7,7 +7,7 @@ import {
   Search,
   Trash2,
   Eye,
-  Sparkles,
+  CalendarCheck,
   CheckCircle2,
   HardDrive,
   Layers,
@@ -414,7 +414,7 @@ export const MediaCenterPage: React.FC = () => {
                       className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl shadow-xs transition-colors"
                       title="Automatically schedules 24 daily tasks over 4 weeks with Sundays OFF"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      <CalendarCheck className="w-3.5 h-3.5 text-emerald-300" />
                       Auto-Schedule (Sundays OFF)
                     </button>
                   )}
@@ -604,7 +604,7 @@ export const MediaCenterPage: React.FC = () => {
                   <Button
                     variant="primary"
                     size="sm"
-                    icon={<Sparkles className="w-4 h-4" />}
+                    icon={<CalendarCheck className="w-4 h-4" />}
                     onClick={() => {
                       handleGenerateMonthlyTasks(previewItem);
                       setPreviewItem(null);

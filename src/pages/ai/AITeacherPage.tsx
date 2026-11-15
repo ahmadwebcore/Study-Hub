@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Bot,
-  Sparkles,
   Send,
   Copy,
   CheckCheck,
@@ -528,7 +526,7 @@ export const AITeacherPage: React.FC = () => {
                         className="w-full text-left p-2 rounded-xl bg-white hover:bg-zinc-50 border border-zinc-200/80 hover:border-zinc-300 text-xs text-zinc-800 transition-all flex items-start justify-between gap-2 shadow-2xs cursor-pointer group active:scale-[0.99]"
                       >
                         <div className="flex items-start gap-1.5 min-w-0">
-                          <Sparkles
+                          <BookOpen
                             className="w-3.5 h-3.5 shrink-0 mt-0.5 transition-transform group-hover:scale-110"
                             style={{ color: chap.accentColor }}
                           />
@@ -552,7 +550,7 @@ export const AITeacherPage: React.FC = () => {
           <div className="bg-white rounded-2xl border border-zinc-200 p-3 sm:px-4 flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white flex items-center justify-center font-bold shadow-xs">
-                <Bot className="w-4 h-4 text-emerald-300" />
+                <GraduationCap className="w-4 h-4 text-emerald-300" />
               </div>
               <div>
                 <h3 className="text-xs sm:text-sm font-bold text-zinc-900 leading-tight flex items-center gap-1.5">
@@ -760,7 +758,7 @@ export const AITeacherPage: React.FC = () => {
                 onClick={() => handleAsk(chip.q)}
                 className="shrink-0 text-[11px] font-semibold px-3 py-1 rounded-full bg-white hover:bg-emerald-50 text-zinc-700 hover:text-emerald-800 border border-zinc-200 hover:border-emerald-300 transition-colors flex items-center gap-1 shadow-2xs cursor-pointer active:scale-95"
               >
-                <Sparkles className="w-3 h-3 text-emerald-600" />
+                <BookOpen className="w-3 h-3 text-emerald-600" />
                 <span>{chip.label}</span>
               </button>
             ))}
@@ -886,7 +884,7 @@ export const AITeacherPage: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-3 h-3 text-emerald-600" />
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         <span>Test Connection Now</span>
                       </>
                     )}

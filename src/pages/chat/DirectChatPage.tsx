@@ -5,7 +5,7 @@ import {
   CheckCheck,
   User,
   Shield,
-  Bot,
+  GraduationCap,
   FileText,
   X,
   Search,
@@ -179,7 +179,7 @@ export const DirectChatPage: React.FC = () => {
             className="p-3 rounded-xl hover:bg-zinc-100 border border-transparent transition-all flex items-start gap-2.5 block"
           >
             <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs shrink-0 border border-purple-200">
-              <Bot className="w-4 h-4 text-purple-700" />
+              <GraduationCap className="w-4 h-4 text-purple-700" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-1">
@@ -255,7 +255,7 @@ export const DirectChatPage: React.FC = () => {
               to="/ai-teacher"
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 font-medium text-xs transition-colors"
             >
-              <Bot className="w-3.5 h-3.5 text-emerald-600" />
+              <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
               <span className="hidden sm:inline">AI Assistant</span>
             </Link>
           </div>

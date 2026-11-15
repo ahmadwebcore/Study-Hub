@@ -4,7 +4,8 @@ import {
   CheckCircle2,
   Check,
   MessageSquare,
-  Sparkles,
+  GraduationCap,
+  Compass,
   Layers,
   ArrowRight,
   Clock,
@@ -103,7 +104,7 @@ export const StudentDashboard: React.FC = () => {
             to="/ai-teacher"
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50/80 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-all shadow-2xs"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <Compass className="w-3.5 h-3.5 text-emerald-600" />
             <span>AI Assistant</span>
           </Link>
         </div>
@@ -205,7 +206,7 @@ export const StudentDashboard: React.FC = () => {
         <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm flex flex-col justify-between space-y-3">
           <div className="space-y-1.5">
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <Sparkles className="w-4 h-4" />
+              <GraduationCap className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-bold text-zinc-900 font-serif">
               AI Academic Assistant (24/7 Copilot)

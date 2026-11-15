@@ -313,7 +313,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         </div>
 
         {/* Subject Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
           <button
             onClick={() => setSelectedSubjectId('all')}
             className={`px-3 py-1 rounded-xl font-medium whitespace-nowrap transition-colors ${
@@ -350,7 +350,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-5 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory gap-2.5 sm:gap-3 pb-2 sm:pb-0 no-scrollbar">
           {filteredTests.map((test) => {
             const meta = getTestStatus(test);
 
@@ -358,7 +358,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <div
                 key={test.id}
                 onClick={() => setActivePopupTest(test)}
-                className={`group relative p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none ${
+                className={`group relative p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none min-w-[170px] sm:min-w-0 snap-start shrink-0 sm:shrink ${
                   meta.isToday
                     ? 'bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20 hover:border-emerald-600'
                     : meta.isLocked

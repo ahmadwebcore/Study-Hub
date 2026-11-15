@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Search,
-  Sparkles,
+  BookOpen,
   Copy,
   Check,
   GraduationCap,
@@ -242,7 +242,7 @@ export const GrammarHubPage: React.FC = () => {
             {item.rules && item.rules.length > 0 && (
               <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
                 <span className="text-xs font-bold text-amber-900 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <BookOpen className="w-3.5 h-3.5 text-amber-600" />
                   Board Examiner Guidelines & Official Marking Criteria:
                 </span>
                 <div className="space-y-1 text-xs text-amber-950">

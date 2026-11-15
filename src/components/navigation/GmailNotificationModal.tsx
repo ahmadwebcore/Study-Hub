@@ -7,7 +7,7 @@ import {
   Calendar,
   Award,
   ChevronRight,
-  Sparkles,
+  Zap,
   Inbox,
   ArrowLeft,
 } from 'lucide-react';
@@ -225,7 +225,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
                 : 'text-[#557067] hover:bg-[#F7F9F8]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
             <span>Test Dispatches & Triggers</span>
           </button>
         </div>

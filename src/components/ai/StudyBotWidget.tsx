@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Sparkles,
+  BookOpen,
   X,
   Send,
-  Bot,
+  GraduationCap,
   Settings,
   Key,
   Cpu,
@@ -117,7 +117,7 @@ export const StudyBotWidget: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-40">
+    <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-30">
       {/* Floating Launcher Button */}
       {!isOpen && (
         <>
@@ -125,10 +125,10 @@ export const StudyBotWidget: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="sm:hidden flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl active:scale-90 transition-all border border-emerald-400/40 relative"
-            aria-label="Open AI Study Assistant"
+            className="sm:hidden flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl active:scale-90 transition-all border border-emerald-400/40 relative"
+            aria-label="Open Academic Study Assistant"
           >
-            <Bot className="w-5 h-5 text-emerald-200" />
+            <GraduationCap className="w-5 h-5 text-emerald-100" />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27] animate-ping" />
             <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27]" />
           </button>
@@ -137,16 +137,16 @@ export const StudyBotWidget: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="hidden sm:flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-400/30"
-            aria-label="Open AI Study Assistant"
+            className="hidden sm:flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#142D27] to-[#14B866] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-400/30"
+            aria-label="Open Academic Study Assistant"
           >
             <div className="relative">
-              <Bot className="w-5 h-5 text-emerald-300" />
+              <GraduationCap className="w-5 h-5 text-emerald-200" />
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             </div>
             <div className="text-left">
-              <span className="block text-xs font-bold tracking-tight">AI Study Assistant</span>
-              <span className="block text-[10px] text-emerald-200">24/7 Academic Copilot</span>
+              <span className="block text-xs font-bold tracking-tight">Academic Assistant</span>
+              <span className="block text-[10px] text-emerald-200 font-medium">Study Guide &amp; Copilot</span>
             </div>
           </button>
         </>
@@ -159,7 +159,7 @@ export const StudyBotWidget: React.FC = () => {
           <div className="p-3.5 bg-gradient-to-r from-[#142D27] to-[#1A3831] text-white flex items-center justify-between border-b border-emerald-900/30">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center">
-                <Bot className="w-4 h-4 text-emerald-400" />
+                <GraduationCap className="w-4 h-4 text-emerald-300" />
               </div>
               <div>
                 <h4 className="text-xs font-bold flex items-center gap-1.5">
@@ -331,7 +331,7 @@ export const StudyBotWidget: React.FC = () => {
                   {msg.boardExamTips && msg.boardExamTips.length > 0 && (
                     <div className="mt-2.5 pt-2 border-t border-zinc-100 space-y-1 text-[11px]">
                       <span className="font-bold text-emerald-700 flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" />
+                        <BookOpen className="w-3 h-3" />
                         Board Exam Key Points:
                       </span>
                       {msg.boardExamTips.map((tip, i) => (

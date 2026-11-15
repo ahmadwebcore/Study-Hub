@@ -12,7 +12,7 @@ import {
   Upload,
   Edit3,
   Trash2,
-  Sparkles,
+  CalendarCheck,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -380,7 +380,7 @@ export const WeeklyTasksPage: React.FC = () => {
             onClick={() => setIsGenerateModalOpen(true)}
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xs"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 mr-1" />
+            <CalendarCheck className="w-3.5 h-3.5 text-emerald-200 mr-1" />
             Upload PDF & Auto-Schedule
           </Button>
         </div>
@@ -951,7 +951,7 @@ export const WeeklyTasksPage: React.FC = () => {
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-xs flex items-center gap-1.5 text-zinc-900">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
                     Entire Book + Daily Test Series
                   </span>
                   <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-600 text-white uppercase">

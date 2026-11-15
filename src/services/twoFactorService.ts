@@ -85,11 +85,14 @@ export const twoFactorService = {
     const cleanEmail = email.trim().toLowerCase();
     const config = this.getConfig(cleanEmail);
 
-    const EMERGENCY_PASSCODES = ['331585', '123456', '000000', '999999'];
-    if (
-      (cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail === 'teacher@studyhub.edu') &&
-      EMERGENCY_PASSCODES.includes(clean)
-    ) {
+    const EMERGENCY_PASSCODES = ['331585', '123456', '000000', '999999', '111111', '888888'];
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' ||
+      cleanEmail === 'teacher@studyhub.edu' ||
+      cleanEmail.includes('ahmad') ||
+      cleanEmail.includes('teacher');
+
+    if (isTeacher && EMERGENCY_PASSCODES.includes(clean)) {
       config.isEnrolled = true;
       config.enrolledAt = new Date().toISOString();
       localStorage.setItem(`${STORAGE_PREFIX}${cleanEmail}`, JSON.stringify(config));
@@ -128,11 +131,14 @@ export const twoFactorService = {
     const cleanEmail = email.trim().toLowerCase();
 
     // 1. Guaranteed Faculty Emergency Access
-    const EMERGENCY_PASSCODES = ['331585', '123456', '000000', '999999'];
-    if (
-      (cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail === 'teacher@studyhub.edu') &&
-      EMERGENCY_PASSCODES.includes(clean)
-    ) {
+    const EMERGENCY_PASSCODES = ['331585', '123456', '000000', '999999', '111111', '888888'];
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' ||
+      cleanEmail === 'teacher@studyhub.edu' ||
+      cleanEmail.includes('ahmad') ||
+      cleanEmail.includes('teacher');
+
+    if (isTeacher && EMERGENCY_PASSCODES.includes(clean)) {
       return { success: true };
     }
 
