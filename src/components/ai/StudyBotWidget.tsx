@@ -313,29 +313,29 @@ export const StudyBotWidget: React.FC = () => {
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[92%] rounded-2xl p-3 text-xs leading-relaxed ${
+                    className={`max-w-[92%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200/90 rounded-tl-xs shadow-2xs'
+                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-sm'
+                        : 'bg-[#121316] text-zinc-100 border border-zinc-800 rounded-tl-xs shadow-md'
                     }`}
                   >
                     {/* Action Executed Banner */}
                     {msg.actionExecuted && (
-                      <div className="mb-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
-                        <Zap className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <div className="mb-2 px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold flex items-center gap-1">
+                        <Zap className="w-3 h-3 text-emerald-400 shrink-0" />
                         <span>{msg.actionExecuted}</span>
                       </div>
                     )}
 
                     {/* Message Text - Bold & Direct */}
-                    <p className={`whitespace-pre-line text-[12px] leading-relaxed font-semibold ${msg.sender === 'user' ? 'text-white' : 'text-zinc-900'}`}>
+                    <p className={`whitespace-pre-line text-[12px] leading-relaxed font-bold ${msg.sender === 'user' ? 'text-white' : 'text-zinc-100'}`}>
                       {msg.text}
                     </p>
 
                     {/* Urdu Explanation */}
                     {msg.urduText && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-200 space-y-2">
-                        <p className="font-urdu text-[13px] text-zinc-800 leading-relaxed text-right dir-rtl whitespace-pre-line font-medium">
+                      <div className="mt-2.5 pt-2 border-t border-zinc-800 space-y-2">
+                        <p className="font-urdu text-[13px] text-zinc-200 leading-relaxed text-right dir-rtl whitespace-pre-line font-bold">
                           {msg.urduText}
                         </p>
                       </div>
@@ -343,29 +343,29 @@ export const StudyBotWidget: React.FC = () => {
 
                     {/* Practical Analogy Box */}
                     {msg.analogy && (
-                      <div className="mt-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-relaxed whitespace-pre-line">
+                      <div className="mt-2 p-2.5 rounded-xl bg-zinc-850 bg-zinc-900/90 border border-zinc-700/80 text-[11px] text-zinc-300 leading-relaxed whitespace-pre-line">
                         {msg.analogy}
                       </div>
                     )}
 
                     {/* Code snippet or Diagram */}
                     {msg.codeSnippet && (
-                      <div className="mt-2 p-2.5 rounded-lg bg-zinc-900 text-emerald-400 font-mono text-[10px] overflow-x-auto whitespace-pre border border-zinc-800">
+                      <div className="mt-2 p-2.5 rounded-lg bg-black text-emerald-400 font-mono text-[10px] overflow-x-auto whitespace-pre border border-zinc-800">
                         {msg.codeSnippet}
                       </div>
                     )}
 
                     {/* Single Suggestion Pill at Bottom */}
                     {msg.actions && msg.actions.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-200 flex items-center">
+                      <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center">
                         {msg.actions.slice(0, 1).map((act) => (
                           <button
                             key={act.id}
                             type="button"
                             onClick={() => handleActionClick(act)}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs"
+                            className="px-2.5 py-1 rounded-lg bg-zinc-800/90 hover:bg-zinc-700 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs"
                           >
-                            <Zap className="w-3 h-3 text-emerald-600" />
+                            <Zap className="w-3 h-3 text-emerald-400" />
                             <span>{act.label}</span>
                           </button>
                         ))}
@@ -373,17 +373,17 @@ export const StudyBotWidget: React.FC = () => {
                     )}
 
                     {/* Message Footer */}
-                    <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-400 pt-1 border-t border-zinc-100">
+                    <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-zinc-800/60">
                       <span>{msg.timestamp}</span>
                       {msg.sender === 'assistant' && (
                         <button
                           type="button"
                           onClick={() => handleCopyText(msg.id, msg.text)}
-                          className="text-zinc-500 hover:text-zinc-800 flex items-center gap-1"
+                          className="text-zinc-400 hover:text-zinc-200 flex items-center gap-1"
                         >
                           {copiedId === msg.id ? (
                             <>
-                              <CheckCheck className="w-3 h-3 text-emerald-600" />
+                              <CheckCheck className="w-3 h-3 text-emerald-400" />
                               <span>Copied</span>
                             </>
                           ) : (

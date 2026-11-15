@@ -95,29 +95,29 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
           </div>
 
           {/* Key Metric Badges (Test Series Mini Card Style) */}
-          <div className="grid grid-cols-3 gap-2.5 sm:gap-3 shrink-0">
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
-              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Days to Feb 28</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 font-mono">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full lg:w-auto shrink-0">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">Days to Feb 28</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-emerald-700 font-mono">
                 {stats.daysToTarget}d
               </span>
-              <span className="block text-[9px] text-zinc-500">({stats.activeStudyDaysToTarget} study days)</span>
+              <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">({stats.activeStudyDaysToTarget} study days)</span>
             </div>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
-              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">May Exams</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-amber-700 font-mono">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">May Exams</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-amber-700 font-mono">
                 {stats.daysToExams}d
               </span>
-              <span className="block text-[9px] text-zinc-500">Board Exam</span>
+              <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">Board Exam</span>
             </div>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3 text-center min-w-[95px] shadow-2xs">
-              <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Total Progress</span>
-              <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 font-mono">
+            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">Total Progress</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-emerald-700 font-mono">
                 {stats.overallCompletionPercentage}%
               </span>
-              <span className="block text-[9px] text-zinc-500">{stats.totalCompletedPages}/{stats.totalBookPages} pgs</span>
+              <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">{stats.totalCompletedPages}/{stats.totalBookPages} pgs</span>
             </div>
           </div>
         </div>
@@ -178,7 +178,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
             return (
               <div
                 key={item.day}
-                className={`p-2.5 rounded-xl border transition-all ${
+                className={`p-2.5 rounded-xl border transition-all ${item.day === 'Monday' ? 'col-span-2 sm:col-span-1' : '' } ${
                   isToday
                     ? 'bg-emerald-50/80 border-[#14B866] shadow-sm ring-1 ring-[#14B866]/30'
                     : item.isOff

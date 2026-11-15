@@ -43,10 +43,10 @@ export interface DailyTask {
   studentName: string;
 }
 
-const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v8';
+const STORAGE_KEY = 'studyhub_weekly_daily_tasks_v9';
 
 try {
-  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7'].forEach(v => localStorage.removeItem('studyhub_weekly_daily_tasks_' + v));
+  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8'].forEach(v => localStorage.removeItem('studyhub_weekly_daily_tasks_' + v));
 } catch {}
 
 // Helpers to format dates and get day of week

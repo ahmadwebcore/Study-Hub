@@ -132,12 +132,12 @@ export const StudentDashboard: React.FC = () => {
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
           {/* Daily Welcome Briefing Trigger */}
           <button
             type="button"
             onClick={() => setIsDailyWelcomeOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-all shadow-2xs cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-all shadow-2xs cursor-pointer text-center"
             title="Open Today's Academic Briefing"
           >
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
@@ -148,7 +148,7 @@ export const StudentDashboard: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsChangePasswordOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs cursor-pointer text-center"
             title="Set Password and Google Authenticator 2FA"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -157,14 +157,14 @@ export const StudentDashboard: React.FC = () => {
 
           <Link
             to="/chat"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs text-center"
           >
             <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
             <span>Message Ahmad</span>
           </Link>
           <Link
             to="/ai-teacher"
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-all shadow-2xs"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-all shadow-2xs text-center"
           >
             <Compass className="w-3.5 h-3.5 text-emerald-600" />
             <span>AI Assistant</span>

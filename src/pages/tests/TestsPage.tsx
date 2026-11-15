@@ -517,29 +517,29 @@ export const TestsPage: React.FC = () => {
       </div>
 
       {/* View Mode Toggle: Compact Day Boxes vs Detailed Cards */}
-      <div className="flex items-center justify-between gap-3 p-1.5 bg-[#F7F9F8] border border-[#e1ede7] rounded-2xl">
-        <div className="flex items-center gap-1.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 bg-[#F7F9F8] border border-[#e1ede7] rounded-2xl">
+        <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
           <button
             onClick={() => setViewLayout('boxes')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
               viewLayout === 'boxes'
                 ? 'bg-[#142D27] text-white shadow-xs'
                 : 'text-[#557067] hover:text-[#142D27]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Compact Day Boxes (Daily Series)</span>
+            <span>Compact Boxes</span>
           </button>
           <button
             onClick={() => setViewLayout('cards')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
               viewLayout === 'cards'
                 ? 'bg-[#142D27] text-white shadow-xs'
                 : 'text-[#557067] hover:text-[#142D27]'
             }`}
           >
             <List className="w-3.5 h-3.5" />
-            <span>Detailed Examination Cards</span>
+            <span>Detailed Cards</span>
           </button>
         </div>
 

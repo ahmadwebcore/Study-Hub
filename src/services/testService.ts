@@ -191,7 +191,7 @@ export function generateStandardFAITQuestions(subjectCode: string, testTitle: st
   const code = (subjectCode || '').toUpperCase();
   const title = testTitle || '';
 
-  if (code.includes('ECO') || title.toLowerCase().includes('economic') || title.toLowerCase().includes('utility') || title.toLowerCase().includes('demand')) {
+  if (code.includes('ECO') || code.includes('ECD') || title.toLowerCase().includes('economic') || title.toLowerCase().includes('utility') || title.toLowerCase().includes('demand')) {
     return [
       {
         id: `${testId}_q1`,

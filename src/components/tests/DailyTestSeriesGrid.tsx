@@ -376,15 +376,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-5 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory gap-2.5 sm:gap-3 pb-2 sm:pb-0 no-scrollbar">
-          {filteredTests.map((test) => {
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+          {filteredTests.map((test, index) => {
             const meta = getTestStatus(test);
+            const isLastOdd = index === filteredTests.length - 1 && filteredTests.length % 2 !== 0;
 
             return (
               <div
                 key={test.id}
                 onClick={() => setActivePopupTest(test)}
-                className={`group relative p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none min-w-[170px] sm:min-w-0 snap-start shrink-0 sm:shrink ${
+                className={`group relative p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-full ${
+                  isLastOdd ? 'col-span-2 sm:col-span-1' : ''
+                } ${
                   meta.isToday
                     ? 'bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20 hover:border-emerald-600'
                     : meta.isLocked
@@ -600,12 +603,12 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="p-3.5 border-t border-zinc-200 bg-zinc-50 flex flex-wrap items-center justify-between gap-2">
+              <div className="p-3.5 border-t border-zinc-200 bg-zinc-50 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setActivePopupTest(null)}
-                    className="px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-xs font-semibold text-zinc-700"
+                    className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-100 text-xs font-semibold text-zinc-700 transition-colors"
                   >
                     Close
                   </button>
@@ -613,7 +616,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <button
                     type="button"
                     onClick={() => handleShareWhatsAppFromModal(activePopupTest, score)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-colors"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-colors"
                   >
                     <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                     <span>WhatsApp</span>
@@ -629,14 +632,14 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                           setActivePopupTest(null);
                           if (onGradeTest) onGradeTest(activePopupTest);
                         }}
-                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
                       >
                         <FileCheck2 className="w-3.5 h-3.5" />
                         <span>Check & Grade Submission</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
+                      <span className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold text-center">
                         <Clock className="w-3.5 h-3.5 text-blue-600" />
                         <span>Awaiting Teacher Evaluation by Ahmad</span>
                       </span>
@@ -645,7 +648,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     <button
                       type="button"
                       onClick={() => handleAttemptFromModal(activePopupTest)}
-                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer active:scale-98"
                     >
                       <FileCheck2 className="w-3.5 h-3.5" />
                       <span>{meta.status === 'failed_retest' ? 'Retake Test' : meta.status === 'passed' ? 'Review Submission' : 'Attempt Test'}</span>
