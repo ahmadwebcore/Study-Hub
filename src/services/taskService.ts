@@ -84,7 +84,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Excellent work! Topology diagrams are crisp and explanation is strictly as per DG Khan marking rubric. Marks: 28/30',
     },
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_02',
@@ -112,7 +112,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Neat presentation and accurate Urdu spelling. Summary length is strictly adhering to board guidelines. Marks: 29/30',
     },
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_03',
@@ -140,7 +140,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Accurate indirect conversions. Quotation marks and tense changes are properly handled. Marks: 27/30',
     },
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_04',
@@ -168,7 +168,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Flawless translation and beautiful handwriting. Full marks awarded. Marks: 30/30',
     },
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_05',
@@ -196,7 +196,7 @@ const SEED_TASKS: DailyTask[] = [
       feedback: 'Heart anatomy diagram is clear and exam outline is complete. Marks: 28/30',
     },
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_05',
@@ -215,7 +215,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 60,
     status: 'pending',
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_06',
@@ -234,7 +234,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 75,
     status: 'pending',
     studentId: 'usr_s_01',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_07',
@@ -252,7 +252,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_pk_01',
@@ -273,7 +273,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
   {
     id: 'tsk_pk_02',
@@ -294,7 +294,7 @@ const SEED_TASKS: DailyTask[] = [
     estimatedMinutes: 0,
     status: 'approved',
     studentId: 'usr_student_demo',
-    studentName: 'Student Scholar',
+    studentName: 'Henza Noor',
   },
 ];
 
@@ -407,7 +407,7 @@ class TaskService {
       estimatedMinutes: params.estimatedMinutes || 45,
       status: 'pending',
       studentId: params.studentId || 'usr_student_demo',
-      studentName: params.studentName || 'Student Scholar',
+      studentName: params.studentName || 'Henza Noor',
     };
 
     this.tasks.unshift(newTask);
@@ -430,7 +430,7 @@ class TaskService {
     this.loadTasks();
     const created: DailyTask[] = [];
     const studentId = params.studentId || 'usr_student_demo';
-    const studentName = params.studentName || 'Student Scholar';
+    const studentName = params.studentName || 'Henza Noor';
 
     const startPage = params.startPage || 1;
     const pagesPerDay = Math.max(15, Math.ceil(params.totalPagesOrTopics / 6));
@@ -553,7 +553,7 @@ class TaskService {
     this.loadTasks();
     const created: DailyTask[] = [];
     const studentId = params.studentId || 'usr_student_demo';
-    const studentName = params.studentName || 'Student Scholar';
+    const studentName = params.studentName || 'Henza Noor';
     const numWeeks = params.totalWeeks || 4;
     const totalDays = numWeeks * 7;
     const dailyMinutes = params.dailyMinutes || 45;
@@ -691,7 +691,7 @@ class TaskService {
     this.loadTasks();
     const createdTasks: DailyTask[] = [];
     const studentId = 'usr_student_demo';
-    const studentName = params.studentName || 'Student Scholar';
+    const studentName = params.studentName || 'Henza Noor';
     const totalPages = params.totalPages || 200;
     const totalChapters = params.totalChapters || 10;
     const pagesPerChapter = Math.max(12, Math.round(totalPages / totalChapters));

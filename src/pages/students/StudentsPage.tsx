@@ -922,7 +922,7 @@ export const StudentsPage: React.FC = () => {
               <input
                 type="email"
                 {...registerInvite('email')}
-                placeholder="jordan.m@student.studyhub.edu"
+                placeholder="student@example.com"
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
               />
               {inviteErrors.email && (
@@ -1002,7 +1002,7 @@ export const StudentsPage: React.FC = () => {
             <div className="flex items-center gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs">
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               <span>
-                Are you sure you want to remove <strong>{studentToDelete.name}</strong> ({studentToDelete.rollNumber}) from StudyHub?
+                Are you sure you want to remove <strong>{studentToDelete.name}</strong> ({studentToDelete.rollNumber}) from Global Science Academy?
               </span>
             </div>
             <p className="text-xs text-[#557067] leading-relaxed">

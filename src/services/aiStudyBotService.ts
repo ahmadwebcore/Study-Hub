@@ -294,7 +294,21 @@ export class AIStudyBotService {
     }
   }
 
+  public getActiveStudentName(): string {
+    try {
+      const stored = localStorage.getItem('studyhub_logged_in_user');
+      if (stored) {
+        const u = JSON.parse(stored);
+        if (u.name && !u.name.toLowerCase().includes('bilal') && !u.name.toLowerCase().includes('scholar')) {
+          return u.name.split(' ')[0] || 'Henza';
+        }
+      }
+    } catch {}
+    return 'Henza';
+  }
+
   public getChatHistory(): AIChatMessage[] {
+    const studentName = this.getActiveStudentName();
     try {
       const stored = localStorage.getItem(STORAGE_KEY_CHAT_HISTORY);
       if (stored) {
@@ -304,16 +318,15 @@ export class AIStudyBotService {
           if (
             parsed[0]?.text?.includes('Explain a topic') ||
             parsed[0]?.text?.includes('Welcome to StudyHub') ||
-            parsed[0]?.text?.includes('Academic Copilot')
+            parsed[0]?.text?.includes('Academic Copilot') ||
+            parsed[0]?.actions?.length ||
+            !parsed[0]?.text?.includes(studentName)
           ) {
             parsed[0] = {
               id: 'msg_welcome',
               sender: 'assistant',
-              text: 'Hi! How can I assist you with your 1st Year FA-IT studies or daily schedule today?',
+              text: `Hi ${studentName}! How can we help you today?`,
               timestamp: 'Just now',
-              actions: [
-                { id: 'act_resched', label: 'Reschedule Today’s 30-Mark Test', actionType: 'reschedule_test' },
-              ],
             };
             this.saveChatHistory(parsed);
           }
@@ -323,16 +336,13 @@ export class AIStudyBotService {
     } catch {
       // fallback
     }
-    // Clean minimal default initial greeting
+    // Clean minimal default initial greeting - no suggestion buttons
     return [
       {
         id: 'msg_welcome',
         sender: 'assistant',
-        text: 'Hi! How can I assist you with your 1st Year FA-IT studies or daily schedule today?',
+        text: `Hi ${studentName}! How can we help you today?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_resched', label: 'Reschedule Today’s 30-Mark Test', actionType: 'reschedule_test' },
-        ],
       },
     ];
   }
@@ -407,7 +417,7 @@ export class AIStudyBotService {
 
     if (actionType === 'share_whatsapp') {
       const text = encodeURIComponent(
-        `🇵🇰 StudyHub Academic Report\nStudent: Student Scholar (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nRecent Exam: Computer Science 28/30 Marks (Passed)\nGoal: Complete 6 Books before February 28, 2027`
+        `🇵🇰 StudyHub Academic Report\nStudent: Henza Noor (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nRecent Exam: Computer Science 28/30 Marks (Passed)\nGoal: Complete 6 Books before February 28, 2027`
       );
       const url = `https://wa.me/?text=${text}`;
       if (typeof window !== 'undefined') {
@@ -435,6 +445,18 @@ export class AIStudyBotService {
    */
   public async askAI(query: string): Promise<AIChatMessage> {
     const qLower = query.toLowerCase().trim();
+
+    // Simple Greeting Intent
+    const isGreeting = /^(hi|hello|hey|salam|assalam|aoa|adaab|greetings)\b/i.test(qLower);
+    if (isGreeting) {
+      const studentName = this.getActiveStudentName();
+      return {
+        id: `msg_greet_${Date.now()}`,
+        sender: 'assistant',
+        text: `Hi ${studentName}! How can we help you today?`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+    }
 
     // 1. Check for Automation Intents
     if (

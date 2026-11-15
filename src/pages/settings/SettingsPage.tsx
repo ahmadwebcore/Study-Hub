@@ -361,7 +361,7 @@ export const SettingsPage: React.FC = () => {
             {/* Automated Dispatch Channels List */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#7d9990]">
-                Automated Notification Events Active in StudyHub
+                Automated Notification Events Active in Global Science Academy
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {[
@@ -461,7 +461,7 @@ export const SettingsPage: React.FC = () => {
             <div>
               <CardTitle>Academic Profile Details</CardTitle>
               <CardDescription>
-                Personal credentials currently active in the StudyHub environment.
+                Personal credentials currently active in the Global Science Academy environment.
               </CardDescription>
             </div>
             <Badge variant="primary" size="sm">
@@ -534,7 +534,7 @@ export const SettingsPage: React.FC = () => {
             <div>
               <CardTitle>Role Perspective Switcher</CardTitle>
               <CardDescription>
-                StudyHub supports both Teacher / Admin and Student workspaces. Toggle perspectives instantly.
+                Global Science Academy supports both Faculty Lead and Student workspaces. Toggle perspectives instantly.
               </CardDescription>
             </div>
           </CardHeader>

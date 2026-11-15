@@ -61,8 +61,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
     setShowProfileMenu(false);
   };
 
-  const userName = role === 'teacher' ? 'Ahmad' : (profile?.name && !profile.name.toLowerCase().includes('bilal') ? profile.name : 'Student Scholar');
-  const userInitials = role === 'teacher' ? 'A' : (userName ? userName[0].toUpperCase() : 'S');
+  const userName = role === 'teacher' ? 'Ahmad' : (profile?.name && !profile.name.toLowerCase().includes('bilal') && !profile.name.toLowerCase().includes('scholar') ? profile.name : 'Henza Noor');
+  const userInitials = role === 'teacher' ? 'A' : (userName ? userName[0].toUpperCase() : 'H');
 
   return (
     <header className="h-16 bg-white/95 backdrop-blur-md border-b border-[#e1ede7] sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
@@ -76,17 +76,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* StudyHub Brand Logo in Header (Mobile Only - Desktop has Sidebar) */}
+        {/* Global Science Academy Brand Logo in Header (Mobile Only - Desktop has Sidebar) */}
         <Link to="/dashboard" className="flex lg:hidden items-center gap-2 shrink-0 group py-1">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white shadow-2xs ring-1 ring-white/20 group-hover:scale-105 transition-transform duration-200">
             <GraduationCap className="h-4.5 w-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-base tracking-tight text-[#142D27] leading-none font-serif">
-              Study<span className="text-[#14B866]">Hub</span>
+            <span className="font-bold text-xs sm:text-sm tracking-tight text-[#142D27] leading-none font-serif">
+              Global Science Academy
             </span>
-            <span className="text-[9px] font-semibold text-zinc-400 tracking-wider uppercase leading-tight">
-              Academic Portal
+            <span className="text-[9px] font-semibold text-[#14B866] tracking-wider uppercase leading-tight mt-0.5">
+              Fatehpur
             </span>
           </div>
         </Link>

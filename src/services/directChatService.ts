@@ -29,7 +29,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
   {
     id: 'msg_02',
     senderId: 'usr_s_01',
-    senderName: 'Student Scholar',
+    senderName: 'Henza Noor',
     senderRole: 'student',
     text: 'Walaikum Assalam Sir Ahmad! I have started the Computer Science and Urdu chapters. The daily reading quotas are very clear.',
     timestamp: 'Yesterday at 05:15 PM',
@@ -49,7 +49,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
   {
     id: 'msg_04',
     senderId: 'usr_s_01',
-    senderName: 'Student Scholar',
+    senderName: 'Henza Noor',
     senderRole: 'student',
     text: 'Understood Sir! I am preparing for tomorrow’s Physical Education test on human anatomy.',
     timestamp: 'Today at 09:10 AM',
@@ -109,7 +109,7 @@ class DirectChatService {
     this.loadMessages();
 
     const isTeacher = params.senderRole === 'teacher';
-    const senderName = isTeacher ? 'Ahmad' : 'Student Scholar';
+    const senderName = isTeacher ? 'Ahmad' : 'Henza Noor';
     const senderId = isTeacher ? 'usr_t_01' : 'usr_s_01';
 
     const now = new Date();
@@ -144,7 +144,7 @@ class DirectChatService {
       });
     } else {
       notificationService.addNotification({
-        title: `💬 Student Message: Student Scholar`,
+        title: `💬 Student Message: Henza Noor`,
         message: params.text.length > 60 ? `${params.text.substring(0, 60)}...` : params.text,
         category: 'system',
       });

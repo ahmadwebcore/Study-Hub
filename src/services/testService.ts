@@ -537,7 +537,7 @@ export const testService = {
         syllabusCoverage: `${params.bookTitle} — Chapter ${w + 1} Board Short Questions & Theory Problems`,
         instructions: 'Attempt all objective and subjective sections within 45 minutes. Total Marks: 30. Passing benchmark: 15/30 (50%).',
         status: w === 0 ? 'ongoing' : 'scheduled',
-        assignedStudentName: 'Student Scholar',
+        assignedStudentName: 'Henza Noor',
       };
       created.push(newTest);
     }

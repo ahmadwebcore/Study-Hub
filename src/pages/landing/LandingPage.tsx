@@ -46,11 +46,11 @@ export const LandingPage: React.FC = () => {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-zinc-950 font-bold shadow-xs">
             <GraduationCap className="h-4 w-4" />
           </div>
-          <span className="font-extrabold text-sm tracking-tight text-white">
-            Study<span className="text-emerald-400">Hub</span>
+          <span className="font-extrabold text-sm tracking-tight text-white font-serif">
+            Global Science Academy
           </span>
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] text-zinc-300 font-medium">Academic Portal 2026</span>
+          <span className="text-[11px] text-zinc-300 font-medium">Fatehpur &bull; BISE DG Khan</span>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ export const LandingPage: React.FC = () => {
       {/* Clean Minimal Footer */}
       <footer className="relative z-10 w-full text-center py-6 text-xs text-zinc-400 border-t border-white/10 backdrop-blur-xs">
         <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>StudyHub &bull; Pakistani Academic LMS</span>
+          <span>Global Science Academy &bull; Fatehpur (BISE DG Khan)</span>
           <span>Google Authenticator 2FA Secured</span>
         </div>
       </footer>

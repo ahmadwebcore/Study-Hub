@@ -598,7 +598,7 @@ export const AITeacherPage: React.FC = () => {
                 {msg.sender === 'assistant' && (
                   <div className="flex items-center gap-1.5 mb-1 text-[11px] font-bold text-zinc-500">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    <span>StudyHub Copilot</span>
+                    <span>GSA Academic Tutor</span>
                     <span className="text-[10px] text-zinc-400 font-normal">&bull; {msg.timestamp}</span>
                   </div>
                 )}
@@ -737,7 +737,7 @@ export const AITeacherPage: React.FC = () => {
               <div className="flex items-center gap-3 text-xs text-zinc-700 bg-white p-4 rounded-2xl border border-zinc-200 shadow-xs w-fit animate-in fade-in duration-150">
                 <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-ping" />
                 <span className="font-semibold">
-                  StudyHub AI is formulating your solution with board scoring tips...
+                  Academic Tutor is formulating your solution with board scoring tips...
                 </span>
               </div>
             )}

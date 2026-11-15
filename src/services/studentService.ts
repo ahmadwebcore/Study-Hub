@@ -7,7 +7,17 @@ const STUDENT_STORAGE_KEY = 'studyhub_registered_students_list';
 function getStoredStudents(): Student[] {
   try {
     const raw = localStorage.getItem(STUDENT_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const cleaned = parsed.filter((s: Student) => {
+          const n = (s.name || '').toLowerCase();
+          const e = (s.email || '').toLowerCase();
+          return !n.includes('bilal') && !n.includes('ayesha') && !n.includes('student scholar') && !e.includes('bilal');
+        });
+        if (cleaned.length > 0) return cleaned;
+      }
+    }
   } catch {}
   return SAMPLE_STUDENTS_LIST;
 }

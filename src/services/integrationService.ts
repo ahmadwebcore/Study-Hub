@@ -3,7 +3,7 @@
 
 export interface WhatsAppConfig {
   phoneNumber: string; // e.g. "923001234567"
-  recipientName: string; // "Student Scholar" or "Parent"
+  recipientName: string; // "Henza Noor" or "Parent"
   includeAhmadRemarks: boolean;
   defaultLanguage: 'urdu' | 'english' | 'both';
 }
@@ -21,7 +21,7 @@ const GSHEETS_CONFIG_KEY = 'studyhub_gsheets_config_v1';
 class IntegrationService {
   private waConfig: WhatsAppConfig = {
     phoneNumber: '923001234567',
-    recipientName: 'Student Scholar / Parent',
+    recipientName: 'Henza Noor / Parent',
     includeAhmadRemarks: true,
     defaultLanguage: 'both',
   };

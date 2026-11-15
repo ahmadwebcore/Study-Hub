@@ -35,7 +35,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
   {
     id: 'em_001',
     recipientEmail: 'student@studyhub.edu',
-    recipientName: 'Student Scholar',
+    recipientName: 'Henza Noor',
     senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
     subject: '🎓 Exam Graded: Computer Science Networks - PASSED (28/30)',
@@ -64,7 +64,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Exam Results Certified: Computer Science Architecture & Networks</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
-            Dear <strong>Student Scholar</strong>,<br/>
+            Dear <strong>Henza Noor</strong>,<br/>
             Your faculty evaluator <strong>Ahmad</strong> has completed reviewing your examination. Your submission has satisfied and exceeded all certified passing benchmarks.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
@@ -109,7 +109,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
   {
     id: 'em_002',
     recipientEmail: 'student@studyhub.edu',
-    recipientName: 'Student Scholar',
+    recipientName: 'Henza Noor',
     senderName: 'StudyHub Academic Scheduler',
     senderEmail: 'scheduler@studyhub.edu',
     subject: '⏰ Urgent Reminder: Quantum Mechanics Assessment Due in 24 Hours',
@@ -134,7 +134,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
           <h2 style="color: #142D27; margin: 0 0 8px 0; font-size: 18px;">Upcoming Submission Deadline</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
-            Hello <strong>Student Scholar</strong>,<br/>
+            Hello <strong>Henza Noor</strong>,<br/>
             This is an automated countdown reminder that your scheduled assessment <strong>Quantum Mechanics Mid-Term Examination</strong> is scheduled for tomorrow.
           </p>
           <div style="background: #F7F9F8; border: 1px solid #e1ede7; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
@@ -158,7 +158,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
   {
     id: 'em_003',
     recipientEmail: 'student@studyhub.edu',
-    recipientName: 'Student Scholar',
+    recipientName: 'Henza Noor',
     senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
     subject: '✉️ Faculty Invitation: Join Advanced STEM Cohort on StudyHub',
@@ -216,7 +216,7 @@ class EmailService {
           const sanitized = { ...e };
           if (sanitized.recipientEmail && sanitized.recipientEmail.includes('bilal')) {
             sanitized.recipientEmail = 'student@studyhub.edu';
-            sanitized.recipientName = 'Student Scholar';
+            sanitized.recipientName = 'Henza Noor';
           }
           if (sanitized.senderName && (sanitized.senderName.includes('Clara') || sanitized.senderName.includes('clara'))) {
             sanitized.senderName = 'Ahmad';

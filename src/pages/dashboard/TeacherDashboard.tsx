@@ -374,7 +374,7 @@ export const TeacherDashboard: React.FC = () => {
       >
         <div className="space-y-3.5">
           <p className="text-xs text-zinc-600">
-            Invite a student to your StudyHub academic portal. They will receive an invitation token to redeem.
+            Invite a student to the Global Science Academy portal. They will receive an invitation token to redeem.
           </p>
 
           <div>
@@ -394,7 +394,7 @@ export const TeacherDashboard: React.FC = () => {
               type="email"
               value={newStudentEmail}
               onChange={(e) => setNewStudentEmail(e.target.value)}
-              placeholder="e.g. student@studyhub.edu"
+              placeholder="e.g. henzanoor@gmail.com"
               className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>

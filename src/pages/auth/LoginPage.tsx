@@ -402,15 +402,20 @@ export const LoginPage: React.FC = () => {
       <div className="w-full max-w-md mx-auto space-y-5 relative z-10">
         {/* Logo Header */}
         <div className="text-center space-y-1">
-          <Link to="/" className="inline-flex items-center gap-2 group">
+          <Link to="/" className="inline-flex items-center gap-2.5 group">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-[#142D27] to-[#14B866] text-white shadow-sm ring-1 ring-white/20">
               <GraduationCap className="h-5 w-5" />
             </div>
-            <span className="font-extrabold text-2xl tracking-tight text-[#142D27]">
-              Study<span className="text-[#14B866]">Hub</span>
-            </span>
+            <div className="text-left">
+              <span className="font-extrabold text-xl tracking-tight text-[#142D27] block font-serif">
+                Global Science Academy
+              </span>
+              <span className="text-[10px] text-zinc-500 font-medium block">
+                Fatehpur &bull; BISE DG Khan Board
+              </span>
+            </div>
           </Link>
-          <h1 className="text-xl font-bold text-[#142D27] tracking-tight">
+          <h1 className="text-xl font-bold text-[#142D27] tracking-tight pt-1">
             {step === 'credentials' ? 'Academic Portal Access' : 'Two-Factor Verification'}
           </h1>
           <p className="text-xs text-[#557067]">

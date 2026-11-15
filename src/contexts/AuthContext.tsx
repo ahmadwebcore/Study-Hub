@@ -30,25 +30,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+
   const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
     if (!p) return fallbackRole === 'teacher' ? { ...SAMPLE_TEACHER } : { ...SAMPLE_STUDENT };
     const clean = { ...p };
     try {
+      const emailKey = clean.email ? `studyhub_avatar_${clean.email.toLowerCase()}` : '';
+      const savedEmailAvatar = emailKey ? localStorage.getItem(emailKey) : null;
       const savedTeacherAvatar = localStorage.getItem('studyhub_custom_avatar_ahmad');
-      const savedStudentAvatar = localStorage.getItem('studyhub_custom_avatar_student');
-      if (fallbackRole === 'teacher' && savedTeacherAvatar) {
+      const savedStudentAvatar = localStorage.getItem('studyhub_custom_avatar_henza') || localStorage.getItem('studyhub_custom_avatar_student');
+
+      if (savedEmailAvatar) {
+        clean.avatar = savedEmailAvatar;
+      } else if (fallbackRole === 'teacher' && savedTeacherAvatar) {
         clean.avatar = savedTeacherAvatar;
       } else if (fallbackRole === 'student' && savedStudentAvatar) {
         clean.avatar = savedStudentAvatar;
       }
     } catch {}
+
     if (clean.email && clean.email.toLowerCase().includes('bilal')) {
-      clean.email = 'student@studyhub.edu';
-      clean.name = 'Student Scholar';
+      clean.email = 'henzanoor@gmail.com';
+      clean.name = 'Henza Noor';
     }
-    if (clean.name && clean.name.toLowerCase().includes('bilal')) {
-      clean.name = 'Student Scholar';
-      clean.email = 'student@studyhub.edu';
+    if (clean.name && (clean.name.toLowerCase().includes('bilal') || clean.name.toLowerCase().includes('scholar'))) {
+      clean.name = 'Henza Noor';
+      clean.email = 'henzanoor@gmail.com';
     }
     if (clean.email && clean.email.toLowerCase().includes('clara')) {
       clean.email = 'ahmadwebcore@gmail.com';
@@ -61,8 +68,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return clean;
   };
 
-  const [profile, setProfile] = useState<UserProfile | null>(() => sanitizeProfile(SAMPLE_TEACHER, 'teacher'));
-  const [demoRole, setDemoRole] = useState<UserRole>('teacher');
+  const [demoRole, setDemoRole] = useState<UserRole>(() => {
+    try {
+      const savedRole = localStorage.getItem('studyhub_active_role');
+      if (savedRole === 'student' || savedRole === 'teacher') return savedRole;
+    } catch {}
+    return 'teacher';
+  });
+
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    try {
+      const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+      const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || 'teacher';
+      if (savedUserStr) {
+        const parsed = JSON.parse(savedUserStr);
+        return sanitizeProfile(parsed, savedRole);
+      }
+      return sanitizeProfile(savedRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, savedRole);
+    } catch {
+      return sanitizeProfile(SAMPLE_TEACHER, 'teacher');
+    }
+  });
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const configured = isSupabaseConfigured();
@@ -75,20 +102,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (activeRole === 'teacher') {
         localStorage.setItem('studyhub_custom_avatar_ahmad', cleanUrl);
       } else {
+        localStorage.setItem('studyhub_custom_avatar_henza', cleanUrl);
         localStorage.setItem('studyhub_custom_avatar_student', cleanUrl);
+      }
+      if (profile?.email) {
+        localStorage.setItem(`studyhub_avatar_${profile.email.toLowerCase()}`, cleanUrl);
+      }
+      if (profile) {
+        const updated = { ...profile, avatar: cleanUrl };
+        localStorage.setItem('studyhub_logged_in_user', JSON.stringify(updated));
       }
     } catch {}
     setProfile((prev) => (prev ? { ...prev, avatar: cleanUrl } : prev));
+    window.dispatchEvent(new CustomEvent('studyhub_avatar_updated', { detail: cleanUrl }));
   };
 
   useEffect(() => {
     let mounted = true;
 
-    // Purge any legacy localStorage keys containing bilal or clara
+    // Purge any legacy localStorage keys containing bilal, clara, or outdated student names
     try {
       const studentEmail = localStorage.getItem('studyhub_student_configured_gmail');
-      if (studentEmail && studentEmail.includes('bilal')) {
-        localStorage.setItem('studyhub_student_configured_gmail', 'student@studyhub.edu');
+      if (!studentEmail || studentEmail.includes('bilal') || studentEmail.includes('studyhub.edu')) {
+        localStorage.setItem('studyhub_student_configured_gmail', 'henzanoor@gmail.com');
       }
       const teacherEmail = localStorage.getItem('studyhub_teacher_configured_gmail');
       if (teacherEmail && teacherEmail.includes('clara')) {
@@ -97,9 +133,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
 
     async function initAuth() {
+      // Check stored session first
+      try {
+        const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+        const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
+        if (savedUserStr) {
+          const parsed = JSON.parse(savedUserStr);
+          const sanitized = sanitizeProfile(parsed, savedRole);
+          if (mounted) {
+            setProfile(sanitized);
+            setUser({ id: sanitized.id, email: sanitized.email } as User);
+            setDemoRole(savedRole);
+          }
+        }
+      } catch {}
+
       if (!configured) {
-        setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
-        setLoading(false);
+        if (mounted) setLoading(false);
         return;
       }
 
@@ -110,14 +160,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(initialSession.user);
           const userProfile = await authService.fetchUserProfile(initialSession.user.id);
           if (mounted) {
-            setProfile(sanitizeProfile(userProfile, demoRole));
+            const sanitized = sanitizeProfile(userProfile, demoRole);
+            setProfile(sanitized);
+            try {
+              localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
+            } catch {}
           }
         }
       } catch {
-        // Fallback to demo profile if network or session fetch failed
-        if (mounted) {
-          setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
-        }
+        // Handled via stored profile
       } finally {
         if (mounted) setLoading(false);
       }
@@ -134,9 +185,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (currentSession?.user) {
             const userProfile = await authService.fetchUserProfile(currentSession.user.id);
-            if (mounted) setProfile(sanitizeProfile(userProfile, demoRole));
-          } else {
-            if (mounted) setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
+            if (mounted) {
+              const sanitized = sanitizeProfile(userProfile, demoRole);
+              setProfile(sanitized);
+              try {
+                localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
+              } catch {}
+            }
           }
           setLoading(false);
         }
@@ -162,18 +217,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     if (authedUser) {
       setUser(authedUser as User);
-      setProfile(authedProfile);
+      const sanitized = sanitizeProfile(authedProfile, roleMode);
+      setProfile(sanitized);
+      try {
+        localStorage.setItem('studyhub_active_role', roleMode);
+        localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
+      } catch {}
     }
     return { error: null };
   };
 
   const completeTwoFactorAuth = (email: string, targetRole: UserRole = 'teacher') => {
     setRole(targetRole);
-    const authedProfile = targetRole === 'teacher'
-      ? { ...SAMPLE_TEACHER, email }
-      : { ...SAMPLE_STUDENT, email };
+    const base = targetRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
+    const authedProfile = sanitizeProfile({ ...base, email }, targetRole);
     setUser({ id: authedProfile.id, email } as User);
     setProfile(authedProfile);
+    try {
+      localStorage.setItem('studyhub_active_role', targetRole);
+      localStorage.setItem('studyhub_logged_in_user', JSON.stringify(authedProfile));
+    } catch {}
     sessionStorage.removeItem('studyhub_pending_2fa');
   };
 
@@ -209,7 +272,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await authService.signOut();
     setUser(null);
     setSession(null);
-    setProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
+    try {
+      localStorage.removeItem('studyhub_logged_in_user');
+    } catch {}
+    setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
   };
 
   const resetPassword = async (email: string) => {
@@ -226,13 +292,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const toggleDemoRole = () => {
     const nextRole = demoRole === 'teacher' ? 'student' : 'teacher';
-    setDemoRole(nextRole);
-    setProfile(sanitizeProfile(nextRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, nextRole));
+    setRole(nextRole);
   };
 
   const setRole = (newRole: UserRole) => {
+    try {
+      localStorage.setItem('studyhub_active_role', newRole);
+    } catch {}
     setDemoRole(newRole);
-    setProfile(sanitizeProfile(newRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, newRole));
+    const base = newRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
+    const sanitized = sanitizeProfile(base, newRole);
+    setProfile(sanitized);
+    try {
+      localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
+    } catch {}
   };
 
   const currentRole: UserRole = profile?.role || demoRole;

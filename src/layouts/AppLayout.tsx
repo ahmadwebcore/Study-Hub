@@ -61,7 +61,7 @@ export const AppLayout: React.FC = () => {
           <footer className="py-4 px-6 border-t border-[#e1ede7] text-center text-xs text-[#7d9990] bg-white/50">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
               <span>
-                StudyHub LMS &copy; {new Date().getFullYear()} &bull; Premium Teacher–Student Academic Platform
+                Global Science Academy, Fatehpur &copy; {new Date().getFullYear()} &bull; Academic Portal
               </span>
               <div className="flex items-center gap-4 text-[11px]">
                 <span className="hover:text-[#14B866] cursor-pointer">Privacy Policy</span>

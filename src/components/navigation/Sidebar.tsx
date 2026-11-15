@@ -89,15 +89,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base tracking-tight text-[#142D27]">
-                Study<span className="text-[#14B866]">Hub</span>
-              </span>
-              <span className="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
-                Portal
+              <span className="font-extrabold text-sm tracking-tight text-[#142D27] leading-tight font-serif">
+                Global Science Academy
               </span>
             </div>
-            <span className="text-[10px] font-medium text-[#7d9990] -mt-0.5">
-              Academic Workspace
+            <span className="text-[10px] font-semibold text-[#14B866] -mt-0.5 tracking-wider uppercase">
+              Fatehpur &bull; BISE DG Khan
             </span>
           </div>
         </NavLink>
@@ -233,7 +230,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           <div className="flex items-center gap-2 min-w-0">
             <ShieldCheck className="w-3.5 h-3.5 text-[#14B866] shrink-0" />
             <span className="truncate text-[11px]">
-              {role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Student Scholar'}
+              {role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Henza Noor (Student)'}
             </span>
           </div>
           <ChevronRight className="w-3 h-3 text-zinc-400 shrink-0" />
