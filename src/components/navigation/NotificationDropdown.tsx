@@ -3,23 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import {
   Bell,
   Check,
+  CheckCheck,
   Clock,
   Award,
-  CheckCheck,
   MessageSquare,
-  ExternalLink,
   ChevronRight,
   X,
   Smartphone,
   BookOpen,
   GraduationCap,
-  Sparkles,
 } from 'lucide-react';
 import { NotificationItem } from '../../types';
 import { notificationService } from '../../services/notificationService';
 import { BISEDGKhanModal } from '../board/BISEDGKhanModal';
 
-type FilterCategory = 'all' | 'board' | 'test' | 'quota' | 'faculty';
+type FilterCategory = 'all' | 'test' | 'quota' | 'board' | 'faculty';
 
 export const NotificationDropdown: React.FC = () => {
   const navigate = useNavigate();
@@ -35,7 +33,6 @@ export const NotificationDropdown: React.FC = () => {
   const [pushToast, setPushToast] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const refresh = () => {
@@ -54,9 +51,22 @@ export const NotificationDropdown: React.FC = () => {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [isOpen]);
+
+  // Lock body scroll on mobile when sheet is open
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 640) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original || 'unset';
+      };
+    }
+  }, [isOpen]);
 
   const markAllAsRead = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -114,63 +124,74 @@ export const NotificationDropdown: React.FC = () => {
     const granted = await notificationService.requestPushPermission();
     setPushStatus(granted ? 'granted' : 'denied');
     if (granted) {
-      setPushToast('📱 Mobile Push Notifications enabled!');
+      setPushToast('Mobile push notifications active!');
       setTimeout(() => setPushToast(null), 3000);
     } else {
-      setPushToast('Permission denied. Please allow notifications in browser settings.');
+      setPushToast('Notifications permission not enabled in browser.');
       setTimeout(() => setPushToast(null), 3500);
     }
-  };
-
-  const handleSendTestAlert = () => {
-    const added = notificationService.triggerTestPushAlert();
-    setPushToast(`🔔 Alert sent: ${added.title.slice(0, 25)}...`);
-    setTimeout(() => setPushToast(null), 3000);
   };
 
   const getCategoryIcon = (category: NotificationItem['category']) => {
     switch (category) {
       case 'board':
-        return <span className="text-sm">🇵🇰</span>;
+        return <span className="text-xs">🇵🇰</span>;
       case 'assignment':
-        return <BookOpen className="w-4 h-4 text-amber-400" />;
+        return <BookOpen className="w-3.5 h-3.5 text-amber-600" />;
       case 'test':
-        return <GraduationCap className="w-4 h-4 text-emerald-400" />;
+        return <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />;
       case 'grade':
-        return <Award className="w-4 h-4 text-sky-400" />;
+        return <Award className="w-3.5 h-3.5 text-sky-600" />;
       case 'chat':
-        return <MessageSquare className="w-4 h-4 text-blue-400" />;
+        return <MessageSquare className="w-3.5 h-3.5 text-indigo-600" />;
       default:
-        return <Clock className="w-4 h-4 text-zinc-400" />;
+        return <Clock className="w-3.5 h-3.5 text-zinc-500" />;
     }
   };
 
   const filteredNotifications = notifications.filter((n) => {
     if (activeCategory === 'all') return true;
-    if (activeCategory === 'board') return n.category === 'board';
     if (activeCategory === 'test') return n.category === 'test';
     if (activeCategory === 'quota') return n.category === 'assignment' || n.category === 'schedule';
+    if (activeCategory === 'board') return n.category === 'board';
     if (activeCategory === 'faculty') return n.category === 'chat' || n.category === 'grade';
     return true;
   });
+
+  const categories: { id: FilterCategory; label: string; count: number }[] = [
+    { id: 'all', label: 'All', count: notifications.length },
+    { id: 'test', label: '30M Tests', count: notifications.filter((n) => n.category === 'test').length },
+    {
+      id: 'quota',
+      label: 'Daily Quota',
+      count: notifications.filter((n) => n.category === 'assignment' || n.category === 'schedule').length,
+    },
+    { id: 'board', label: 'DG Khan Board', count: notifications.filter((n) => n.category === 'board').length },
+    {
+      id: 'faculty',
+      label: 'Faculty Lead',
+      count: notifications.filter((n) => n.category === 'chat' || n.category === 'grade').length,
+    },
+  ];
 
   return (
     <>
       <div className="relative" ref={dropdownRef}>
         {/* Navbar Bell Button */}
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-200 shadow-xs focus:outline-none cursor-pointer ${
+          className={`relative flex h-9 w-9 sm:h-9 sm:w-9 items-center justify-center rounded-xl border transition-all duration-200 focus:outline-none cursor-pointer ${
             isOpen
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-100'
-              : 'border-[#e1ede7] bg-white text-[#557067] hover:text-[#142D27] hover:bg-[#F7F9F8]'
+              ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
+              : 'border-white/10 bg-[#2e3533] text-zinc-200 hover:text-white hover:bg-white/10 shadow-2xs'
           }`}
           aria-label="View notifications"
-          title="Academic Alerts & Board Feed"
+          title="Academic Alerts & Feed"
         >
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white ring-2 ring-white shadow-xs animate-in zoom-in duration-150">
+            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white ring-2 ring-[#262c2a] shadow-xs animate-in zoom-in duration-150">
               {unreadCount}
             </span>
           )}
@@ -178,62 +199,71 @@ export const NotificationDropdown: React.FC = () => {
 
         {isOpen && (
           <>
-            {/* Mobile Backdrop */}
+            {/* Backdrop: Full screen blur on mobile, subtle on desktop */}
             <div
-              className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs z-40 sm:hidden"
+              className="fixed inset-0 bg-zinc-950/65 backdrop-blur-xs z-40 sm:hidden"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Redesigned 2026 Crisp White Glassmorphic Notification Drawer */}
-            <div className="fixed inset-x-2.5 top-16 max-h-[85vh] sm:max-h-[640px] sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:absolute sm:w-[460px] rounded-3xl bg-white/95 backdrop-blur-2xl border border-[#e1ede7] shadow-2xl z-50 flex flex-col overflow-hidden text-[#142D27] animate-in fade-in zoom-in-95 duration-200">
-              {/* Top Subtle Ambient Glow */}
-              <div className="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Container: Bottom Sheet on Mobile (<640px) | Anchored Popover on Desktop (>=640px) */}
+            <div
+              className={`
+                fixed inset-x-0 bottom-0 z-50 max-h-[88vh] rounded-t-[28px] border-t border-zinc-200/90 bg-white shadow-2xl flex flex-col overflow-hidden text-zinc-900 animate-in slide-in-from-bottom duration-200
+                sm:fixed sm:inset-auto sm:right-4 sm:top-16 sm:mt-1 sm:w-[420px] sm:max-h-[580px] sm:rounded-2xl sm:border sm:border-zinc-200/90 sm:animate-in sm:fade-in-50 sm:zoom-in-95
+                lg:absolute lg:right-0 lg:top-full lg:mt-2
+              `}
+            >
+              {/* Mobile Drag Handle Indicator (Only on Mobile) */}
+              <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-zinc-50 shrink-0">
+                <div className="w-10 h-1 rounded-full bg-zinc-300" />
+              </div>
 
               {/* Toast Feedback Overlay */}
               {pushToast && (
-                <div className="absolute top-2 inset-x-4 z-20 p-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold text-center shadow-lg border border-emerald-400/30 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute top-3 inset-x-4 z-30 p-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold text-center shadow-lg border border-emerald-400/30 animate-in fade-in duration-150">
                   {pushToast}
                 </div>
               )}
 
               {/* Header */}
-              <div className="p-4 border-b border-[#e1ede7] bg-[#F7F9F8] relative z-10 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <div className="relative flex items-center justify-center w-7 h-7 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700">
+              <div className="px-4 py-3 sm:py-3.5 border-b border-zinc-100 bg-zinc-50/90 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center justify-center w-7 h-7 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 shrink-0">
                     <Bell className="w-3.5 h-3.5" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute -top-0.5 -right-0.5 ring-2 ring-white animate-pulse" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-[#142D27] font-serif tracking-tight flex items-center gap-2">
-                      <span>Academic Alerts &amp; Board Feed</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-xs sm:text-sm text-zinc-900 tracking-tight font-serif truncate">
+                        Academic Alerts &amp; Feed
+                      </h4>
                       {unreadCount > 0 && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
                           {unreadCount} new
                         </span>
                       )}
-                    </h4>
-                    <p className="text-[10px] text-[#557067] font-sans">
-                      Real-time tests, daily book quotas &amp; BISE DG Khan notices
+                    </div>
+                    <p className="text-[10px] text-zinc-500 truncate">
+                      Daily tests, quotas &amp; DG Khan board feed
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
                   {unreadCount > 0 && (
                     <button
                       type="button"
                       onClick={markAllAsRead}
-                      className="text-[11px] text-emerald-800 hover:text-emerald-900 font-bold flex items-center gap-1 transition-colors px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100/70 border border-emerald-200/80 cursor-pointer active:scale-95"
+                      className="text-[11px] text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 transition-colors px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 cursor-pointer active:scale-95"
+                      title="Mark all notifications as read"
                     >
                       <Check className="w-3 h-3 text-emerald-600" />
-                      <span className="hidden sm:inline">Mark all read</span>
+                      <span>Mark all read</span>
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
-                    className="p-1.5 rounded-xl text-[#7d9990] hover:text-[#142D27] hover:bg-[#E7EFEA] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 transition-colors cursor-pointer"
                     aria-label="Close notification panel"
                   >
                     <X className="w-4 h-4" />
@@ -241,60 +271,37 @@ export const NotificationDropdown: React.FC = () => {
                 </div>
               </div>
 
-              {/* Filter Category Tabs (Crisp Bento Chips) */}
-              <div className="flex items-center gap-1.5 p-2.5 bg-white border-b border-[#e1ede7] overflow-x-auto text-[11px] no-scrollbar shrink-0">
-                {[
-                  { id: 'all', label: 'All', count: notifications.length },
-                  {
-                    id: 'test',
-                    label: '30M Tests',
-                    count: notifications.filter((n) => n.category === 'test').length,
-                  },
-                  {
-                    id: 'quota',
-                    label: 'Daily Quota',
-                    count: notifications.filter(
-                      (n) => n.category === 'assignment' || n.category === 'schedule'
-                    ).length,
-                  },
-                  {
-                    id: 'board',
-                    label: 'DG Khan Board',
-                    count: notifications.filter((n) => n.category === 'board').length,
-                  },
-                  {
-                    id: 'faculty',
-                    label: 'Faculty Lead',
-                    count: notifications.filter(
-                      (n) => n.category === 'chat' || n.category === 'grade'
-                    ).length,
-                  },
-                ].map((tab) => (
+              {/* Filter Chips Bar (Smooth Horizontal Scroll, Zero Cut-offs) */}
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-white border-b border-zinc-100 overflow-x-auto text-xs no-scrollbar shrink-0">
+                {categories.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveCategory(tab.id as FilterCategory)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 flex items-center gap-1 shrink-0 cursor-pointer ${
+                    type="button"
+                    onClick={() => setActiveCategory(tab.id)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all duration-150 flex items-center gap-1 shrink-0 cursor-pointer ${
                       activeCategory === tab.id
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-xs font-bold ring-1 ring-emerald-300'
-                        : 'text-[#557067] hover:text-[#142D27] bg-[#F7F9F8] border border-[#e1ede7] hover:bg-[#E7EFEA]'
+                        ? 'bg-emerald-700 text-white shadow-xs font-bold'
+                        : 'text-zinc-600 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200/70'
                     }`}
                   >
                     <span>{tab.label}</span>
-                    <span className="opacity-70 text-[10px]">({tab.count})</span>
+                    <span className={`text-[10px] ${activeCategory === tab.id ? 'text-emerald-200' : 'text-zinc-400'}`}>
+                      {tab.count}
+                    </span>
                   </button>
                 ))}
               </div>
 
-              {/* Notification Cards List */}
-              <div className="flex-1 overflow-y-auto p-3 space-y-2.5 bg-[#F7F9F8]/50 relative z-10 divide-none">
+              {/* Notifications List (Smooth Native Scroll, Zero Overflow Glitches) */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-zinc-50/50">
                 {filteredNotifications.length === 0 ? (
-                  <div className="py-12 text-center space-y-2.5">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 shadow-xs">
-                      <CheckCheck className="w-6 h-6" />
+                  <div className="py-10 text-center space-y-2">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 shadow-2xs">
+                      <CheckCheck className="w-5 h-5" />
                     </div>
-                    <p className="text-xs font-bold text-[#142D27] font-serif">All caught up!</p>
-                    <p className="text-[11px] text-[#557067] max-w-xs mx-auto">
-                      Zero pending alerts in this category. You are on track with your study quota.
+                    <p className="text-xs font-bold text-zinc-800 font-serif">All caught up!</p>
+                    <p className="text-[11px] text-zinc-500 max-w-xs mx-auto">
+                      Zero pending alerts in this category. You are on track with your syllabus and tests.
                     </p>
                   </div>
                 ) : (
@@ -302,82 +309,78 @@ export const NotificationDropdown: React.FC = () => {
                     <div
                       key={notif.id}
                       onClick={() => handleNotificationClick(notif)}
-                      className={`group relative p-3.5 rounded-2xl transition-all duration-200 border cursor-pointer ${
+                      className={`group relative p-3 rounded-2xl transition-all duration-150 border cursor-pointer ${
                         !notif.read
                           ? notif.urgent
-                            ? 'bg-rose-50/40 border-rose-200 hover:border-rose-400 hover:shadow-sm'
-                            : 'bg-emerald-50/40 border-emerald-200 hover:border-emerald-400 hover:shadow-sm'
-                          : 'bg-white border-[#e1ede7] hover:border-emerald-200 hover:bg-[#F7F9F8] text-[#557067]'
+                            ? 'bg-rose-50/50 border-rose-200/90 hover:border-rose-300 shadow-2xs'
+                            : 'bg-emerald-50/40 border-emerald-200/90 hover:border-emerald-300 shadow-2xs'
+                          : 'bg-white border-zinc-200/80 hover:border-zinc-300 text-zinc-600'
                       }`}
                     >
-                      <div className="flex items-start gap-3">
-                        {/* Category Avatar */}
+                      <div className="flex items-start gap-2.5">
+                        {/* Icon */}
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border mt-0.5 shadow-2xs ${
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border mt-0.5 shadow-2xs ${
                             notif.category === 'test'
                               ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                               : notif.category === 'assignment'
                               ? 'bg-amber-50 border-amber-200 text-amber-700'
                               : notif.category === 'board'
                               ? 'bg-sky-50 border-sky-200 text-sky-700'
-                              : 'bg-zinc-50 border-zinc-200 text-zinc-700'
+                              : 'bg-zinc-100 border-zinc-200 text-zinc-700'
                           }`}
                         >
                           {getCategoryIcon(notif.category)}
                         </div>
 
-                        {/* Card Body */}
-                        <div className="flex-1 min-w-0 pr-1">
-                          <div className="flex items-center justify-between gap-2">
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          {/* Badges + Timestamp */}
+                          <div className="flex items-center justify-between gap-1 mb-1">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               {notif.urgent && (
-                                <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200 text-[9px] font-bold uppercase tracking-wider shrink-0">
+                                <span className="px-1.5 py-0.2 rounded-md bg-rose-100 text-rose-800 text-[9px] font-bold uppercase tracking-wider shrink-0">
                                   Urgent
                                 </span>
                               )}
                               {notif.badge && (
-                                <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200 text-[9px] font-semibold shrink-0">
+                                <span className="px-1.5 py-0.2 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 text-[9px] font-semibold shrink-0">
                                   {notif.badge}
                                 </span>
                               )}
                             </div>
-                            <span className="text-[10px] text-[#7d9990] font-mono shrink-0">
+                            <span className="text-[10px] text-zinc-400 font-mono shrink-0">
                               {notif.timestamp}
                             </span>
                           </div>
 
+                          {/* Title */}
                           <h5
-                            className={`text-xs font-bold mt-1 line-clamp-1 group-hover:text-emerald-700 transition-colors ${
-                              !notif.read ? 'text-[#142D27]' : 'text-[#263B35]'
+                            className={`text-xs font-bold leading-snug line-clamp-2 ${
+                              !notif.read ? 'text-zinc-900 group-hover:text-emerald-800' : 'text-zinc-700'
                             }`}
                           >
                             {notif.title}
                           </h5>
 
-                          <p className="text-xs text-[#557067] mt-1 line-clamp-2 leading-relaxed font-sans">
+                          {/* Message */}
+                          <p className="text-[11px] text-zinc-500 mt-0.5 line-clamp-2 leading-relaxed">
                             {notif.message}
                           </p>
 
-                          {/* Card Footer Actions */}
-                          <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#e1ede7]">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleNotificationClick(notif);
-                              }}
-                              className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200/80 hover:border-emerald-300 transition-all shadow-2xs group-hover:translate-x-0.5 cursor-pointer"
-                            >
+                          {/* Action Footer */}
+                          <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-zinc-100">
+                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 group-hover:text-emerald-800">
                               <span>{notif.actionLabel || 'View Details'}</span>
-                              <ChevronRight className="w-3.5 h-3.5 text-emerald-600" />
-                            </button>
+                              <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                            </span>
 
                             {!notif.read && (
                               <button
                                 type="button"
                                 onClick={(e) => handleMarkItemRead(e, notif.id)}
-                                className="px-2 py-0.5 rounded-lg bg-white hover:bg-zinc-100 text-[#557067] hover:text-[#142D27] border border-[#e1ede7] text-[10px] font-medium flex items-center gap-1 transition-all cursor-pointer"
-                                title="Mark as read"
+                                className="px-2 py-0.5 rounded-md hover:bg-zinc-200 text-zinc-500 hover:text-zinc-800 text-[10px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                                title="Mark read"
                               >
                                 <Check className="w-3 h-3 text-emerald-600" />
                                 <span>Mark read</span>
@@ -387,68 +390,35 @@ export const NotificationDropdown: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Unread Glowing Dot */}
+                      {/* Unread Indicator Dot */}
                       {!notif.read && (
-                        <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white shadow-xs" />
+                        <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white shadow-2xs" />
                       )}
                     </div>
                   ))
                 )}
               </div>
 
-              {/* Redesigned Clean Footer (Mobile Native Push Controls & Shortcuts) */}
-              <div className="p-3 border-t border-[#e1ede7] bg-[#F7F9F8] relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs">
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Native Mobile Push Button */}
-                  <button
-                    type="button"
-                    onClick={handleEnablePush}
-                    className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer active:scale-95 ${
-                      pushStatus === 'granted'
-                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                        : 'bg-white hover:bg-emerald-50 border-[#e1ede7] text-[#142D27]'
-                    }`}
-                    title={
-                      pushStatus === 'granted'
-                        ? 'Native device push notifications active'
-                        : 'Enable real OS push notifications'
-                    }
-                  >
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>
-                      {pushStatus === 'granted' ? '✓ Mobile Push Active' : 'Enable Mobile Push'}
-                    </span>
-                  </button>
-
-                  {/* Send Test Push Alert */}
-                  <button
-                    type="button"
-                    onClick={handleSendTestAlert}
-                    className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-emerald-50 border border-[#e1ede7] text-[11px] font-semibold text-[#142D27] hover:text-emerald-800 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-                    title="Send an instant simulated push alert"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Send Instant Alert</span>
-                  </button>
-
-                  {/* BISE Desk Link */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsOpen(false);
-                      setIsBoardModalOpen(true);
-                    }}
-                    className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-[#e1ede7] text-[11px] font-semibold text-sky-800 hover:text-sky-900 flex items-center gap-1 transition-all cursor-pointer"
-                  >
-                    <span>🇵🇰 BISE Desk</span>
-                    <ExternalLink className="w-3 h-3 text-sky-600" />
-                  </button>
-                </div>
+              {/* Minimalist 2026 Single-Row Footer (Zero Wrapping, Zero Clutter) */}
+              <div className="px-4 py-2.5 border-t border-zinc-100 bg-zinc-50/90 flex items-center justify-between text-xs shrink-0">
+                <button
+                  type="button"
+                  onClick={handleEnablePush}
+                  className={`inline-flex items-center gap-1.5 text-[11px] font-semibold transition-colors cursor-pointer ${
+                    pushStatus === 'granted'
+                      ? 'text-emerald-700 hover:text-emerald-800 font-bold'
+                      : 'text-zinc-600 hover:text-zinc-900'
+                  }`}
+                  title={pushStatus === 'granted' ? 'Native push active' : 'Enable push notifications'}
+                >
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>{pushStatus === 'granted' ? 'Mobile Push Active' : 'Enable Mobile Push'}</span>
+                </button>
 
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="text-xs text-[#557067] hover:text-[#142D27] font-medium self-end sm:self-auto cursor-pointer px-2 py-1"
+                  className="px-3 py-1 rounded-lg bg-zinc-200/80 hover:bg-zinc-300 text-zinc-700 font-semibold text-xs transition-colors cursor-pointer"
                 >
                   Close
                 </button>
