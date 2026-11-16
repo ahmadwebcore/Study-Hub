@@ -17,6 +17,7 @@ import {
   X,
   Sparkles,
   BookOpen,
+  CalendarCheck,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
@@ -141,6 +142,19 @@ export const StudentDashboard: React.FC = () => {
     }
   };
 
+  // Attendance & Performance metrics
+  const now = new Date();
+  const currentMonthStats = attendanceService.getMonthlyStats(now.getFullYear(), now.getMonth());
+
+  // Week 1 tests (or current week tests)
+  const currentWeekTests = tests.filter((t) => t.id.endsWith('_w1'));
+  const completedWeekTests = currentWeekTests.filter((t) => {
+    return t.studentScore !== undefined || t.myAttempt?.status === 'submitted' || t.status === 'graded';
+  });
+  const weekTotalScore = completedWeekTests.reduce((acc, t) => acc + (t.studentScore ?? t.myAttempt?.totalScore ?? 0), 0);
+  const weekMaxScore = completedWeekTests.length * 30;
+  const weekPercentage = weekMaxScore > 0 ? Math.round((weekTotalScore / weekMaxScore) * 100) : 0;
+
   const formattedToday = new Intl.DateTimeFormat('en-PK', {
     weekday: 'long',
     day: 'numeric',
@@ -240,7 +254,149 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Today's Core Work (Harmonious Contrast: 1 Crisp White Card + 1 Rich Dark Prestige Card) */}
+{/* Daily Attendance Check-In Alert / Notification Banner (If 24h passed & not marked) */}
+      {!isTodayPresent ? (
+        <div className="p-4 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-emerald-900 border border-emerald-500/40 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md ring-2 ring-emerald-400/30">
+              <CalendarCheck className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-900/80 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                  Daily Attendance Check-In
+                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              </div>
+              <h3 className="text-sm font-bold text-white mt-1">
+                Mark Daily Presentation for {formattedToday}
+              </h3>
+              <p className="text-xs text-zinc-300">
+                Tap to record your official attendance today. Synced live with Faculty Lead Ahmad and Google Sheets ledger.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleMarkPresentToday}
+            className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs shadow-md transition-all cursor-pointer shrink-0 active:scale-95 flex items-center justify-center gap-1.5"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-950" />
+            <span>Mark Present Today (1-Click)</span>
+          </button>
+        </div>
+      ) : (
+        <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/20 text-emerald-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>
+              <strong>Attendance Recorded:</strong> Present today ({todayAttendanceRecord?.timeMarked || 'Morning'}) &bull; Synchronized with Sir Ahmad
+            </span>
+          </div>
+          <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-900/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30 w-fit">
+            Google Sheets Synchronized
+          </span>
+        </div>
+      )}
+
+      {/* Simple Weekly & Monthly Performance (2 Balanced Cards) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white font-serif">Academic Performance</h2>
+            <p className="text-xs text-zinc-400">Simple weekly progress and monthly attendance overview.</p>
+          </div>
+          <span className="text-[11px] font-semibold text-zinc-400">
+            Session: <strong className="text-zinc-200">1st Year FA-IT</strong>
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Card 1: Weekly Performance (This Week) */}
+          <div className="p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Weekly Performance &bull; Week 1
+                </span>
+                <span className="text-xs font-semibold text-[#557067]">
+                  Nov 17 &ndash; Nov 21
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-[#142D27] font-serif pt-1">
+                Current Week Targets
+              </h3>
+              <p className="text-xs text-[#557067]">
+                Tests start Tuesday (Urdu), Wednesday (English), Thursday (Computer), Friday (Islamiyat), Saturday (Economics &amp; Physical Education).
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#e1ede7] text-center">
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Tests Done</span>
+                <span className="text-base font-extrabold text-[#142D27] mt-0.5 block">
+                  {completedWeekTests.length} / 6
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Pass Rate</span>
+                <span className="text-base font-extrabold text-emerald-700 mt-0.5 block">
+                  {completedWeekTests.length > 0 ? `${weekPercentage}%` : 'Starting Tue'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Sunday Rest</span>
+                <span className="text-base font-extrabold text-sky-700 mt-0.5 block">
+                  Strictly OFF
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Monthly Performance (November 2026) */}
+          <div className="p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm flex flex-col justify-between space-y-4">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Monthly Overview &bull; {currentMonthStats.monthName} {currentMonthStats.year}
+                </span>
+                <span className="text-xs font-semibold text-emerald-700">
+                  Verified Records
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-[#142D27] font-serif pt-1">
+                Cumulative Monthly Ledger
+              </h3>
+              <p className="text-xs text-[#557067]">
+                Live attendance presentation and verified examination evaluation recorded by Sir Ahmad.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#e1ede7] text-center">
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Attendance</span>
+                <span className="text-base font-extrabold text-emerald-700 mt-0.5 block">
+                  {currentMonthStats.attendancePercentage}%
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Board Standing</span>
+                <span className="text-base font-extrabold text-[#142D27] mt-0.5 block">
+                  A* Grade
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase block">Faculty Lead</span>
+                <span className="text-base font-extrabold text-emerald-800 mt-0.5 block">
+                  Ahmad
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+            {/* 2. Today's Core Work (Harmonious Contrast: 1 Crisp White Card + 1 Rich Dark Prestige Card) */}
       <div>
         <div className="flex items-center justify-between pb-3">
           <div>
