@@ -67,3 +67,16 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Authentic High-Legibility Urdu Typography Stack (2026 Executive Standard) */
+.font-urdu, [lang="ur"], [dir="rtl"], :lang(ur) {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaliq', 'Urdu Typesetting', 'Noto Sans Arabic', system-ui, serif;
+  line-height: 2.1;
+  letter-spacing: 0;
+}
+
+/* For compact Urdu badges, pills, and button labels */
+.font-urdu-compact {
+  font-family: 'Noto Sans Arabic', 'Noto Nastaliq Urdu', 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.4;
+}

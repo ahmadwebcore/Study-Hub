@@ -281,6 +281,9 @@ export interface TestAnswer {
   isFlaggedForReview?: boolean;
   marksAwarded?: number;
   feedback?: string;
+  pageCount?: number;
+  pageThumbnails?: string[];
+  isRetest?: boolean;
 }
 
 export interface TestAttempt {
@@ -340,6 +343,9 @@ export interface Submission {
   fileSize?: string;
   fileUrl?: string;
   feedback?: string;
+  pageCount?: number;
+  pageThumbnails?: string[];
+  isRetest?: boolean;
 }
 
 export interface ResultRecord {

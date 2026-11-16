@@ -1623,6 +1623,41 @@ export function saveLocalCertifiedResult(result: ResultRecord) {
   } catch {}
 }
 
+export function extractDayAndCleanTitle(title: string, dateStr?: string): { day: string; cleanTitle: string; isUrdu: boolean } {
+  let cleanTitle = (title || '')
+    .replace(/^Daily Test Series:\s*/i, '')
+    .replace(/^Series\s*\d+:\s*/i, '')
+    .trim();
+
+  let day = '';
+  const dayMatch = cleanTitle.match(/^(پیر|منگل|بدھ|جمعرات|جمعہ|ہفتہ|اتوار)\s*(\([A-Za-z]+\))?:\s*/i)
+    || cleanTitle.match(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday):\s*/i);
+
+  if (dayMatch) {
+    day = dayMatch[0].replace(/:\s*$/, '').trim();
+    cleanTitle = cleanTitle.slice(dayMatch[0].length).trim();
+  } else if (dateStr) {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      const enDay = d.toLocaleDateString('en-US', { weekday: 'long' });
+      const urduMap: Record<string, string> = {
+        Monday: 'پیر (Monday)',
+        Tuesday: 'منگل (Tuesday)',
+        Wednesday: 'بدھ (Wednesday)',
+        Thursday: 'جمعرات (Thursday)',
+        Friday: 'جمعہ (Friday)',
+        Saturday: 'ہفتہ (Saturday)',
+        Sunday: 'اتوار (Sunday)',
+      };
+      day = urduMap[enDay] || `${enDay}`;
+    }
+  }
+
+  cleanTitle = cleanTitle.replace(/^:\s*/, '').trim();
+  const isUrdu = /[\u0600-\u06FF]/.test(cleanTitle);
+  return { day: day || 'منگل (Tuesday)', cleanTitle, isUrdu };
+}
+
 export function generateStandardFAITQuestions(subjectCode: string, testTitle: string, testId: string = 'test_gen'): TestQuestion[] {
   const code = (subjectCode || '').toUpperCase();
   const title = testTitle || '';

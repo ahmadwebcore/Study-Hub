@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
-import { testService } from '../../services/testService';
+import { testService, extractDayAndCleanTitle } from '../../services/testService';
 import { integrationService } from '../../services/integrationService';
 import { PDFViewerModal } from '../books/PDFViewerModal';
 
@@ -252,33 +252,6 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     window.open(url, '_blank');
   };
 
-  const getDayLabel = (dateStr: string, title?: string): { dayEn: string; dayUr: string; combined: string } => {
-    if (title?.includes('بدھ') || title?.toLowerCase().includes('wednesday')) return { dayEn: 'Wednesday', dayUr: 'بدھ', combined: 'بدھ (Wednesday)' };
-    if (title?.includes('منگل') || title?.toLowerCase().includes('tuesday')) return { dayEn: 'Tuesday', dayUr: 'منگل', combined: 'منگل (Tuesday)' };
-    if (title?.includes('جمعرات') || title?.toLowerCase().includes('thursday')) return { dayEn: 'Thursday', dayUr: 'جمعرات', combined: 'جمعرات (Thursday)' };
-    if (title?.includes('جمعہ') || title?.toLowerCase().includes('friday')) return { dayEn: 'Friday', dayUr: 'جمعہ', combined: 'جمعہ (Friday)' };
-    if (title?.includes('ہفتہ') || title?.toLowerCase().includes('saturday')) return { dayEn: 'Saturday', dayUr: 'ہفتہ', combined: 'ہفتہ (Saturday)' };
-    if (title?.includes('پیر') || title?.toLowerCase().includes('monday')) return { dayEn: 'Monday', dayUr: 'پیر', combined: 'پیر (Monday)' };
-    if (title?.includes('اتوار') || title?.toLowerCase().includes('sunday')) return { dayEn: 'Sunday', dayUr: 'اتوار', combined: 'اتوار (Sunday)' };
-
-    try {
-      const d = new Date(dateStr);
-      const dayNum = d.getDay();
-      const days = [
-        { dayEn: 'Sunday', dayUr: 'اتوار', combined: 'اتوار (Sunday)' },
-        { dayEn: 'Monday', dayUr: 'پیر', combined: 'پیر (Monday)' },
-        { dayEn: 'Tuesday', dayUr: 'منگل', combined: 'منگل (Tuesday)' },
-        { dayEn: 'Wednesday', dayUr: 'بدھ', combined: 'بدھ (Wednesday)' },
-        { dayEn: 'Thursday', dayUr: 'جمعرات', combined: 'جمعرات (Thursday)' },
-        { dayEn: 'Friday', dayUr: 'جمعہ', combined: 'جمعہ (Friday)' },
-        { dayEn: 'Saturday', dayUr: 'ہفتہ', combined: 'ہفتہ (Saturday)' },
-      ];
-      return days[dayNum] || { dayEn: 'Day', dayUr: 'دن', combined: 'Day' };
-    } catch {
-      return { dayEn: 'Day', dayUr: 'دن', combined: 'Day' };
-    }
-  };
-
   return (
     <div className="space-y-4 font-sans">
       {/* Top Filter and Controls Bar */}
@@ -409,13 +382,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3 pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
             {filteredTests.map((test) => {
               const meta = getTestStatus(test);
-              const dayMeta = getDayLabel(test.date, test.title);
-              const isUrduTest =
-                test.subjectCode?.includes('URD') ||
-                test.subjectName?.toLowerCase().includes('urdu') ||
-                test.title?.includes('اُردو') ||
-                test.title?.includes('سرمایہ') ||
-                test.title?.match(/[\u0600-\u06FF]/);
+              const { day: cardDay, cleanTitle: cardCleanTitle, isUrdu: cardIsUrdu } = extractDayAndCleanTitle(test.title, test.date);
 
               return (
                 <div
@@ -440,8 +407,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <div>
                     <div className="flex items-center justify-between gap-1 mb-2">
                       {/* Day Pill */}
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 truncate">
-                        {dayMeta.combined}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact truncate">
+                        {cardDay}
                       </span>
 
                       {/* Status Pill */}
@@ -473,11 +440,11 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                       </span>
                     </div>
 
-                    {/* Test Title (In Urdu for Urdu book / subjects, no 'Series' text) */}
-                    <h4 className={`mt-2 line-clamp-2 leading-snug group-hover:text-emerald-400 transition-colors ${
-                      isUrduTest ? 'font-urdu text-[14px] font-bold text-[#142D27] text-right dir-rtl leading-relaxed' : 'text-xs font-bold text-[#142D27]'
+                    {/* Test Title (In Urdu for Urdu book / subjects, no 'Series' text, no BiDi flip) */}
+                    <h4 className={`mt-2 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors ${
+                      cardIsUrdu ? 'font-urdu text-[13px] font-bold text-[#142D27] text-right dir-rtl leading-loose' : 'text-xs font-bold text-[#142D27]'
                     }`}>
-                      {test.title.replace(/^Daily Test Series:\s*/i, '')}
+                      <bdi>{cardCleanTitle}</bdi>
                     </h4>
                   </div>
 
@@ -524,6 +491,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       {activePopupTest && (() => {
         const meta = getTestStatus(activePopupTest);
         const score = activePopupTest.studentScore ?? activePopupTest.myAttempt?.totalScore;
+        const { day: modalDay, cleanTitle: modalCleanTitle, isUrdu: modalIsUrdu } = extractDayAndCleanTitle(activePopupTest.title, activePopupTest.date);
 
         return createPortal(
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
@@ -532,27 +500,31 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <div className="p-4 sm:p-5 border-b border-[#e1ede7] bg-[#F7F9F8] flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 text-[10px] font-bold border border-zinc-700/80">
-                      {getDayLabel(activePopupTest.date, activePopupTest.title).combined}
+                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
+                      {modalDay}
                     </span>
                     <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border ${meta.badgeClass}`}>
                       {meta.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                       <span>{meta.label}</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 text-[10px] font-bold border border-zinc-700">
+                    <span className="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-bold border border-zinc-200">
                       {activePopupTest.subjectCode}
                     </span>
-                    <span className="text-[11px] font-bold text-emerald-400">
+                    <span className="text-[11px] font-bold text-emerald-700">
                       Total: 30 Marks &bull; Passing: 15
                     </span>
                   </div>
 
-                  <h3 className={`text-base font-bold text-[#142D27] mt-1.5 ${
-                    activePopupTest.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
-                  }`}>
-                    {activePopupTest.title.replace(/^Daily Test Series:\s*/i, '')}
+                  <h3
+                    className={`text-base font-bold text-[#142D27] mt-1.5 ${
+                      modalIsUrdu
+                        ? 'font-urdu text-xl font-bold leading-loose text-right dir-rtl'
+                        : ''
+                    }`}
+                  >
+                    <bdi>{modalCleanTitle}</bdi>
                   </h3>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-zinc-500">
                     {activePopupTest.subjectName} &bull; BISE DG Khan FA-IT Pattern
                   </p>
                 </div>
@@ -657,14 +629,22 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   </div>
                   <div className="py-1">
                     <span className="text-[#557067] font-medium block mb-1">Syllabus &amp; Topics:</span>
-                    <p className="text-[11px] text-[#2e473f] bg-white p-2.5 rounded-xl border border-[#e1ede7] leading-relaxed shadow-2xs">
+                    <p className={`p-2.5 rounded-xl bg-white border border-[#e1ede7] shadow-2xs ${
+                      activePopupTest.syllabusCoverage?.match(/[\u0600-\u06FF]/)
+                        ? 'font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]'
+                        : 'text-xs text-[#2e473f] leading-relaxed'
+                    }`}>
                       {activePopupTest.syllabusCoverage}
                     </p>
                   </div>
                   {activePopupTest.instructions && (
                     <div className="py-1">
                       <span className="text-[#557067] font-medium block mb-1">Ahmad&apos;s Instructions:</span>
-                      <p className="text-[11px] text-[#2e473f] bg-white p-2.5 rounded-xl border border-[#e1ede7] leading-relaxed shadow-2xs">
+                      <p className={`p-2.5 rounded-xl bg-white border border-[#e1ede7] shadow-2xs ${
+                        activePopupTest.instructions?.match(/[\u0600-\u06FF]/)
+                          ? 'font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]'
+                          : 'text-xs text-[#2e473f] leading-relaxed'
+                      }`}>
                         {activePopupTest.instructions}
                       </p>
                     </div>

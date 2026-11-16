@@ -1,6 +1,26 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { Submission } from '../types';
+import { Submission, ResultRecord } from '../types';
 import { SAMPLE_SUBMISSIONS } from '../data/sampleData';
+import { saveLocalTestStatus, saveLocalCertifiedResult } from './testService';
+
+const SUBMISSIONS_STORAGE_KEY = 'studyhub_submissions_v5';
+
+export function getLocalSubmissions(): Submission[] {
+  try {
+    const raw = localStorage.getItem(SUBMISSIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+  return SAMPLE_SUBMISSIONS;
+}
+
+export function saveLocalSubmissions(subs: Submission[]) {
+  try {
+    localStorage.setItem(SUBMISSIONS_STORAGE_KEY, JSON.stringify(subs));
+  } catch {}
+}
 
 export const submissionService = {
   /**
@@ -8,7 +28,7 @@ export const submissionService = {
    */
   async fetchSubmissions(): Promise<Submission[]> {
     if (!isSupabaseConfigured()) {
-      return SAMPLE_SUBMISSIONS;
+      return getLocalSubmissions();
     }
 
     try {
@@ -18,7 +38,7 @@ export const submissionService = {
         .order('submitted_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        return SAMPLE_SUBMISSIONS;
+        return getLocalSubmissions();
       }
 
       return data.map((item) => ({
@@ -36,7 +56,7 @@ export const submissionService = {
         }),
         status: item.status,
         score: item.score,
-        maxScore: item.assignments?.total_marks || 50,
+        maxScore: item.assignments?.total_marks || 30,
         comment: item.comment,
         fileName: item.file_name,
         fileSize: item.file_size,
@@ -44,8 +64,85 @@ export const submissionService = {
         feedback: item.feedback,
       }));
     } catch {
-      return SAMPLE_SUBMISSIONS;
+      return getLocalSubmissions();
     }
+  },
+
+  /**
+   * Create or update student submission (supports multi-page camera/browser uploads)
+   */
+  async createSubmission(params: {
+    assignmentId: string;
+    assignmentTitle: string;
+    subjectName?: string;
+    studentId: string;
+    studentName: string;
+    studentAvatar?: string;
+    maxScore: number;
+    comment?: string;
+    fileName: string;
+    fileSize?: string;
+    fileUrl?: string;
+    pageCount?: number;
+    pageThumbnails?: string[];
+    isRetest?: boolean;
+  }): Promise<Submission> {
+    const newSub: Submission = {
+      id: `sub_${Date.now()}`,
+      assignmentId: params.assignmentId,
+      assignmentTitle: params.assignmentTitle,
+      subjectName: params.subjectName,
+      studentId: params.studentId,
+      studentName: params.studentName,
+      studentAvatar: params.studentAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
+      submittedAt: new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      status: 'submitted',
+      maxScore: params.maxScore || 30,
+      comment: params.comment,
+      fileName: params.fileName,
+      fileSize: params.fileSize || '2.4 MB',
+      fileUrl: params.fileUrl,
+      pageCount: params.pageCount || 1,
+      pageThumbnails: params.pageThumbnails,
+      isRetest: params.isRetest || false,
+    };
+
+    // Update local store
+    const current = getLocalSubmissions();
+    const updated = [newSub, ...current.filter((s) => s.id !== newSub.id)];
+    saveLocalSubmissions(updated);
+
+    // Save test status as submitted
+    if (params.assignmentId) {
+      saveLocalTestStatus(params.assignmentId, 'submitted');
+    }
+
+    // Trigger reactive window events
+    window.dispatchEvent(new CustomEvent('studyhub_submissions_updated', { detail: newSub }));
+    window.dispatchEvent(new CustomEvent('studyhub_tests_updated', { detail: { testId: params.assignmentId, status: 'submitted' } }));
+
+    if (isSupabaseConfigured()) {
+      try {
+        await supabase.from('submissions').upsert({
+          id: newSub.id,
+          assignment_id: params.assignmentId,
+          student_id: params.studentId,
+          file_name: params.fileName,
+          file_url: params.fileUrl,
+          file_size: params.fileSize,
+          comment: params.comment,
+          status: 'submitted',
+          submitted_at: new Date().toISOString(),
+        });
+      } catch {}
+    }
+
+    return newSub;
   },
 
   /**
@@ -109,64 +206,18 @@ export const submissionService = {
     fileSize?: string;
     comment?: string;
   }): Promise<{ submission: Submission | null; error: Error | null }> {
-    if (!isSupabaseConfigured()) {
-      const mockSubm: Submission = {
-        id: `subm_${Date.now()}`,
-        assignmentId: params.assignmentId,
-        assignmentTitle: 'Assignment Solution',
-        studentId: params.studentId,
-        studentName: 'Alex Rivera',
-        studentAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
-        submittedAt: 'Just now',
-        status: 'submitted',
-        maxScore: 50,
-        comment: params.comment,
-        fileName: params.fileName,
-        fileSize: params.fileSize || '1.8 MB',
-        fileUrl: params.fileUrl,
-      };
-      return { submission: mockSubm, error: null };
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .upsert({
-          assignment_id: params.assignmentId,
-          student_id: params.studentId,
-          file_name: params.fileName,
-          file_url: params.fileUrl,
-          file_size: params.fileSize,
-          comment: params.comment,
-          status: 'submitted',
-          submitted_at: new Date().toISOString(),
-        })
-        .select('*, assignments(title, total_marks)')
-        .single();
-
-      if (error) throw error;
-
-      return {
-        submission: {
-          id: data.id,
-          assignmentId: data.assignment_id,
-          assignmentTitle: data.assignments?.title || 'Assignment Solution',
-          studentId: data.student_id,
-          studentName: 'Student',
-          studentAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
-          submittedAt: 'Just now',
-          status: data.status,
-          maxScore: data.assignments?.total_marks || 50,
-          comment: data.comment,
-          fileName: data.file_name,
-          fileSize: data.file_size,
-          fileUrl: data.file_url,
-        },
-        error: null,
-      };
-    } catch (err: unknown) {
-      return { submission: null, error: err instanceof Error ? err : new Error('Failed to submit assignment') };
-    }
+    const sub = await this.createSubmission({
+      assignmentId: params.assignmentId,
+      assignmentTitle: 'Assignment Solution',
+      studentId: params.studentId,
+      studentName: 'Henza Noor',
+      fileName: params.fileName,
+      fileUrl: params.fileUrl,
+      fileSize: params.fileSize,
+      comment: params.comment,
+      maxScore: 30,
+    });
+    return { submission: sub, error: null };
   },
 
   /**
@@ -178,6 +229,59 @@ export const submissionService = {
     feedback: string,
     gradedBy?: string
   ): Promise<{ success: boolean; error: Error | null }> {
+    const subs = getLocalSubmissions();
+    const targetIdx = subs.findIndex((s) => s.id === submissionId);
+    let targetSub: Submission | null = null;
+
+    if (targetIdx >= 0) {
+      targetSub = {
+        ...subs[targetIdx],
+        score,
+        feedback,
+        status: 'graded',
+      };
+      subs[targetIdx] = targetSub;
+      saveLocalSubmissions(subs);
+    }
+
+    if (targetSub) {
+      const maxMarks = targetSub.maxScore || 30;
+      const passingMarks = Math.round(maxMarks * 0.5);
+      const isPassed = score >= passingMarks;
+      const percentage = Math.round((score / maxMarks) * 100);
+      const grade =
+        percentage >= 90 ? 'A*' : percentage >= 80 ? 'A' : percentage >= 70 ? 'B' : percentage >= 60 ? 'C' : percentage >= 50 ? 'D' : 'F';
+
+      // Record in test statuses
+      saveLocalTestStatus(targetSub.assignmentId, isPassed ? 'passed' : 'failed_retest', score);
+
+      // Record certified result
+      const certifiedResult: ResultRecord = {
+        id: `cert_${Date.now()}`,
+        testId: targetSub.assignmentId,
+        testTitle: targetSub.assignmentTitle,
+        subjectName: targetSub.subjectName || 'FA-IT Examination',
+        subjectCode: 'FAIT-EXAM-11',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        studentId: targetSub.studentId,
+        studentName: targetSub.studentName,
+        studentAvatar: targetSub.studentAvatar,
+        score,
+        maxScore: maxMarks,
+        percentage,
+        passingMarks,
+        passed: isPassed,
+        grade,
+        rank: isPassed ? 'Top 10%' : 'Needs Retake',
+        feedback: feedback || (isPassed ? 'Verified by Faculty Lead Ahmad.' : 'Retest required. Please revise.'),
+      };
+      saveLocalCertifiedResult(certifiedResult);
+
+      window.dispatchEvent(new CustomEvent('studyhub_submissions_updated', { detail: targetSub }));
+      window.dispatchEvent(new CustomEvent('studyhub_tests_updated', { detail: { testId: targetSub.assignmentId, status: isPassed ? 'passed' : 'failed_retest', score } }));
+      window.dispatchEvent(new CustomEvent('studyhub_certified_results_update', { detail: certifiedResult }));
+    }
+
     if (!isSupabaseConfigured()) {
       return { success: true, error: null };
     }

@@ -1,359 +1,972 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
-  FileText,
+  Camera,
   Upload,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
   Clock,
   Calendar,
-  CheckCircle2,
+  BookOpen,
+  X,
+  Plus,
+  Trash2,
+  RotateCcw,
+  Award,
+  ChevronRight,
   Search,
+  Check,
+  Maximize2,
+  Printer,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
-import { testService } from '../../services/testService';
+import {
+  testService,
+  extractDayAndCleanTitle,
+  getLocalCertifiedResults,
+  getLocalTestStatuses,
+} from '../../services/testService';
 import { submissionService } from '../../services/submissionService';
-import { TestItem, Submission } from '../../types';
-import { SAMPLE_TESTS, SAMPLE_SUBMISSIONS } from '../../data/sampleData';
+import { notificationService } from '../../services/notificationService';
+import { TestItem, ResultRecord } from '../../types';
+import { SAMPLE_TESTS } from '../../data/sampleData';
 import { useRole } from '../../hooks/useRole';
+import { getTextbookDetailsForTest } from '../../data/textbookContent';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
+
+interface UploadedPage {
+  id: string;
+  name: string;
+  size: string;
+  previewUrl: string;
+  file?: File;
+  pageNumber: number;
+}
 
 export const TestSubmissionPage: React.FC = () => {
   const { user } = useRole();
-  const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
-  const [submissions, setSubmissions] = useState<Submission[]>(SAMPLE_SUBMISSIONS);
-  const [activeTab, setActiveTab] = useState<'available' | 'submitted'>('available');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
+  const queryTestId = searchParams.get('testId');
 
-  // Upload handwritten submission state
-  const [uploadingTest, setUploadingTest] = useState<TestItem | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [studentComment, setStudentComment] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
+  const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
+  const [activeTest, setActiveTest] = useState<TestItem | null>(null);
+  const [isRetakeMode, setIsRetakeMode] = useState<boolean>(false);
+
+  // Multi-page camera / file uploads
+  const [uploadedPages, setUploadedPages] = useState<UploadedPage[]>([]);
+  const [studentComment, setStudentComment] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [zoomPage, setZoomPage] = useState<UploadedPage | null>(null);
+  const [pdfViewerTest, setPdfViewerTest] = useState<TestItem | null>(null);
+
+  // Filter and search for all tests timeline
+  const [filterTab, setFilterTab] = useState<'all' | 'today' | 'passed' | 'retest' | 'under_review'>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  // Certified marks and submission status maps
+  const [certifiedResults, setCertifiedResults] = useState<ResultRecord[]>([]);
+  const [testStatuses, setTestStatuses] = useState<Record<string, { status: string; score?: number }>>({});
+
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const topTerminalRef = useRef<HTMLDivElement>(null);
+
+  // Load all tests, statuses, and certified grades
+  const loadData = () => {
+    testService.fetchTests(user?.id).then((data) => {
+      if (data && data.length > 0) {
+        setTests(data);
+
+        // Select active test: from URL query, or default to today's active test (Nov 17, 2026), or first
+        if (queryTestId) {
+          const matched = data.find((t) => t.id === queryTestId);
+          if (matched) setActiveTest(matched);
+          else setActiveTest(data[0]);
+        } else if (!activeTest) {
+          const todayMatch = data.find((t) => t.date.includes('Nov 17') || t.id.includes('ped_1')) || data[0];
+          setActiveTest(todayMatch);
+        }
+      }
+    });
+
+    const localCert = getLocalCertifiedResults();
+    setCertifiedResults(localCert);
+
+    const statuses = getLocalTestStatuses();
+    setTestStatuses(statuses);
+  };
 
   useEffect(() => {
-    testService.fetchTests(user?.id).then((data) => {
-      if (data && data.length > 0) setTests(data);
-    });
-    submissionService.fetchSubmissions().then((data) => {
-      if (data && data.length > 0) setSubmissions(data);
-    });
-  }, [user]);
+    loadData();
 
-  const availableTests = tests
-    .filter((t) => t.status === 'scheduled' || t.status === 'ongoing')
-    .filter((t) =>
-      searchTerm
-        ? t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          t.subjectCode.toLowerCase().includes(searchTerm.toLowerCase())
-        : true
-    );
-  const mySubmissions = submissions
-    .filter((s) =>
-      searchTerm
-        ? s.assignmentTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (s.subjectName && s.subjectName.toLowerCase().includes(searchTerm.toLowerCase()))
-        : true
-    );
+    const handleSync = () => {
+      loadData();
+    };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+    window.addEventListener('studyhub_tests_updated', handleSync);
+    window.addEventListener('studyhub_submissions_updated', handleSync);
+    window.addEventListener('studyhub_certified_results_update', handleSync);
+
+    return () => {
+      window.removeEventListener('studyhub_tests_updated', handleSync);
+      window.removeEventListener('studyhub_submissions_updated', handleSync);
+      window.removeEventListener('studyhub_certified_results_update', handleSync);
+    };
+  }, [user, queryTestId]);
+
+  // When active test changes, clear uploaded pages or set retake mode
+  const handleSelectTest = (test: TestItem, forceRetake: boolean = false) => {
+    setActiveTest(test);
+    setIsRetakeMode(forceRetake);
+    setUploadedPages([]);
+    setStudentComment('');
+    if (topTerminalRef.current) {
+      topTerminalRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
-  const handleConfirmUpload = async () => {
-    if (!uploadingTest || !selectedFile) return;
-    setIsUploading(true);
-    await new Promise((r) => setTimeout(r, 600));
+  // Handle camera capture or file browse
+  const handleFileSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    const newSub: Submission = {
-      id: `sub_${Date.now()}`,
-      assignmentId: uploadingTest.id,
-      assignmentTitle: uploadingTest.title,
-      subjectName: uploadingTest.subjectName,
-      studentId: user?.id || 'usr_student_demo',
-      studentName: user?.name || 'Student Scholar',
-      studentAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop',
-      submittedAt: 'Just now',
-      status: 'submitted',
-      maxScore: uploadingTest.totalMarks,
-      comment: studentComment,
-      fileName: selectedFile.name,
-      fileSize: `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`,
-    };
+    const newPages: UploadedPage[] = Array.from(files).map((file, idx) => ({
+      id: `page_${Date.now()}_${idx}`,
+      name: file.name,
+      size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+      previewUrl: URL.createObjectURL(file),
+      file,
+      pageNumber: uploadedPages.length + idx + 1,
+    }));
 
-    setSubmissions((prev) => [newSub, ...prev]);
-    setIsUploading(false);
-    setUploadingTest(null);
-    setSelectedFile(null);
-    setStudentComment('');
-    setSuccessToast(`Examination answer sheet for "${uploadingTest.title}" submitted successfully! Awaiting teacher grading.`);
-    setTimeout(() => setSuccessToast(null), 5000);
+    setUploadedPages((prev) => [...prev, ...newPages]);
+    e.target.value = '';
   };
 
+  const handleRemovePage = (id: string) => {
+    setUploadedPages((prev) =>
+      prev
+        .filter((p) => p.id !== id)
+        .map((p, idx) => ({ ...p, pageNumber: idx + 1 }))
+    );
+  };
+
+  // Submit test solutions to Ahmad Sir
+  const handleSubmitTestSolution = async () => {
+    if (!activeTest || uploadedPages.length === 0) return;
+    setIsSubmitting(true);
+
+    try {
+      await new Promise((r) => setTimeout(r, 600));
+
+      const fileNameSummary =
+        uploadedPages.length === 1
+          ? uploadedPages[0].name
+          : `${activeTest.subjectCode}_solution_${uploadedPages.length}_pages.pdf`;
+
+      await submissionService.createSubmission({
+        assignmentId: activeTest.id,
+        assignmentTitle: activeTest.title,
+        subjectName: activeTest.subjectName,
+        studentId: user?.id || 'usr_henza_noor',
+        studentName: user?.name || 'Henza Noor',
+        maxScore: activeTest.totalMarks || 30,
+        comment: studentComment || (isRetakeMode ? 'Retake Attempt Solution Paper' : 'Daily Test Solution Paper'),
+        fileName: fileNameSummary,
+        fileSize: `${(uploadedPages.length * 1.4).toFixed(1)} MB`,
+        pageCount: uploadedPages.length,
+        pageThumbnails: uploadedPages.map((p) => p.previewUrl),
+        isRetest: isRetakeMode,
+      });
+
+      notificationService.notifyStudentSubmission(
+        user?.name || 'Henza Noor',
+        activeTest.title
+      );
+
+      setIsSubmitting(false);
+      setUploadedPages([]);
+      setStudentComment('');
+      setIsRetakeMode(false);
+      setSuccessToast(
+        `🎉 30-Marks Answer Sheet for "${activeTest.subjectName}" submitted successfully! Ahmad Sir has been notified to evaluate and award certified marks.`
+      );
+
+      // Refresh local test status
+      loadData();
+    } catch {
+      setIsSubmitting(false);
+      setSuccessToast('Submission completed and saved to examination ledger.');
+    }
+  };
+
+  // Certified result for the active test
+  const activeCertified = activeTest
+    ? certifiedResults.find((r) => r.testId === activeTest.id)
+    : undefined;
+  const activeLocalStatus = activeTest ? testStatuses[activeTest.id] : undefined;
+  const isPreviouslyFailed =
+    (activeCertified && activeCertified.score < 15) || activeLocalStatus?.status === 'failed_retest';
+
+  // Details for current test textbook & questions
+  const bookDetails = activeTest ? getTextbookDetailsForTest(activeTest) : null;
+  const activeDayAndTitle = activeTest
+    ? extractDayAndCleanTitle(activeTest.title, activeTest.date)
+    : { day: 'منگل (Tuesday)', cleanTitle: '', isUrdu: false };
+
+  // Sort tests: Newest / Today's test at the VERY TOP, past 1-month tests descending
+  const sortedTests = [...tests].sort((a, b) => {
+    const timeA = new Date(a.date).getTime() || 0;
+    const timeB = new Date(b.date).getTime() || 0;
+    return timeB - timeA; // Descending: newest on top
+  });
+
+  // Filtered list for the series cards timeline
+  const filteredTests = sortedTests.filter((test) => {
+    const cert = certifiedResults.find((r) => r.testId === test.id);
+    const stat = testStatuses[test.id]?.status;
+
+    if (filterTab === 'today') {
+      return test.date.includes('Nov 17') || test.id === 'test_henza_ped_1';
+    }
+    if (filterTab === 'passed') {
+      return (cert && cert.passed) || stat === 'passed' || (cert && cert.score >= 15);
+    }
+    if (filterTab === 'retest') {
+      return (cert && cert.score < 15) || stat === 'failed_retest';
+    }
+    if (filterTab === 'under_review') {
+      return stat === 'submitted' && !cert;
+    }
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      return (
+        test.title.toLowerCase().includes(q) ||
+        test.subjectName.toLowerCase().includes(q) ||
+        test.subjectCode.toLowerCase().includes(q) ||
+        test.date.toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
   return (
-    <div className="space-y-6">
-      {/* Toast */}
+    <div className="space-y-7 pb-16">
+      {/* Hidden camera & file pickers */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        multiple
+        onChange={handleFileSelection}
+        className="hidden"
+      />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*,application/pdf"
+        multiple
+        onChange={handleFileSelection}
+        className="hidden"
+      />
+
+      {/* Floating Success Toast */}
       {successToast && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-[#142D27] flex items-center justify-between text-xs font-semibold animate-in fade-in">
-          <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            {successToast}
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-[#142D27] flex items-center justify-between text-xs font-semibold shadow-md animate-in fade-in duration-200">
+          <span className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>{successToast}</span>
           </span>
-          <button onClick={() => setSuccessToast(null)} className="text-[#557067] hover:text-[#142D27]">
+          <button
+            onClick={() => setSuccessToast(null)}
+            className="text-[#557067] hover:text-[#142D27] text-base font-bold ml-3"
+          >
             &times;
           </button>
         </div>
       )}
 
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-[#142D27]">Student Test Submission Terminal</h1>
+            <h1 className="text-2xl font-bold text-[#142D27] font-serif">Daily Test Submission Terminal</h1>
             <Badge variant="primary" size="sm" dot>
-              Official Exam Desk
+              30 Marks BISE DG Khan Pattern
             </Badge>
           </div>
           <p className="text-xs sm:text-sm text-[#557067] mt-1">
-            Dedicated workstation to submit handwritten examination solution scripts, PDF papers, and digital answers.
+            Official testing desk: review questions on the left, capture multiple answer pages via camera on the right, and submit for teacher evaluation.
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center p-1 rounded-xl bg-white border border-[#e1ede7] self-start sm:self-auto">
-          <button
-            onClick={() => setActiveTab('available')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-              activeTab === 'available'
-                ? 'bg-[#142D27] text-white'
-                : 'text-[#557067] hover:text-[#142D27]'
-            }`}
-          >
-            Available Tests ({availableTests.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('submitted')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-              activeTab === 'submitted'
-                ? 'bg-[#142D27] text-white'
-                : 'text-[#557067] hover:text-[#142D27]'
-            }`}
-          >
-            My Submission History ({mySubmissions.length})
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Search */}
-      <div className="relative">
-        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d9990]" />
-        <input
-          type="text"
-          placeholder="Search by test title, subject name, or course code..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] placeholder-[#7d9990] focus:border-[#14B866] focus:outline-none"
-        />
-      </div>
-
-      {/* Main Content */}
-      {activeTab === 'available' ? (
-        <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-white border border-[#e1ede7]">
-            <h3 className="text-sm font-bold text-[#142D27]">Scheduled Examination Queue</h3>
-            <p className="text-xs text-[#557067] mt-0.5">
-              Review syllabus coverage and upload your handwritten answer sheets before the official window closes.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {availableTests.map((test) => (
-              <div
-                key={test.id}
-                className="p-5 rounded-2xl bg-white border border-[#e1ede7] hover:border-[#14B866]/50 transition-colors flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#E7EFEA] text-[#142D27]">
-                      {test.subjectCode}
-                    </span>
-                    <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-rose-600" />
-                      {test.durationMinutes} Mins Allowed
-                    </span>
-                  </div>
-
-                  <h3 className={`text-base font-bold text-[#142D27] mt-2.5 ${
-                    test.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
-                  }`}>
-                    {test.title}
-                  </h3>
-                  <p className="text-xs text-[#557067] mt-0.5">{test.subjectName}</p>
-
-                  <div className="mt-3 p-3 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">
-                    <p className="text-[11px] font-bold text-[#142D27]">Syllabus Covered:</p>
-                    <p className="text-xs text-[#557067] mt-0.5 leading-relaxed">{test.syllabusCoverage}</p>
-                  </div>
-
-                  <div className="mt-3 flex items-center justify-between text-xs text-[#557067]">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#14B866]" />
-                      Date: {test.date} at {test.time}
-                    </span>
-                    <span className="font-bold text-[#142D27]">
-                      Total: {test.totalMarks} Marks
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-5 pt-3 border-t border-[#e1ede7] flex items-center justify-between">
-                  <span className="text-xs text-[#7d9990]">
-                    Pass Benchmark: {test.passingMarks || Math.round(test.totalMarks * 0.5)} Marks
-                  </span>
-
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    icon={<Upload className="w-3.5 h-3.5" />}
-                    onClick={() => {
-                      setUploadingTest(test);
-                      setSelectedFile(null);
-                      setStudentComment('');
-                    }}
-                  >
-                    Submit Answer Sheet
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        /* Submitted Tests History */
-        <div className="space-y-3">
-          {mySubmissions.map((sub) => (
-            <div
-              key={sub.id}
-              className="p-4 sm:p-5 rounded-2xl bg-white border border-[#e1ede7] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        <div className="flex items-center gap-2">
+          {activeTest && (
+            <button
+              onClick={() => setPdfViewerTest(activeTest)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#e1ede7] text-xs font-bold text-emerald-800 hover:bg-emerald-50 transition-colors shadow-2xs cursor-pointer"
             >
-              <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5 text-emerald-600" />
+              <BookOpen className="w-4 h-4 text-emerald-600" />
+              <span>View Textbook in PDF</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* HERO SPLIT WORKSPACE: Left Question Paper, Right Camera Submission */}
+      {activeTest && (
+        <div
+          ref={topTerminalRef}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-5 rounded-3xl bg-white border border-[#e1ede7] p-4 sm:p-6 shadow-sm"
+        >
+          {/* LEFT COLUMN: Testing Paper & Examination Questions (7 Columns) */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-4 pr-0 lg:pr-3 border-b lg:border-b-0 lg:border-r border-[#e1ede7] pb-5 lg:pb-0">
+            <div>
+              {/* Top Meta Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#e1ede7]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200 font-urdu-compact">
+                    {activeDayAndTitle.day}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[11px] font-bold border border-zinc-200">
+                    {activeTest.subjectCode}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+                    30 Marks Total
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-[#142D27]">{sub.assignmentTitle}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
-                      {sub.status}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#557067] mt-0.5">
-                    Attached file: <strong>{sub.fileName}</strong> &bull; Submitted {sub.submittedAt}
-                  </p>
-                  {sub.comment && (
-                    <p className="text-xs text-[#557067] italic mt-1 bg-[#F7F9F8] p-2 rounded-lg border border-[#e1ede7]">
-                      "{sub.comment}"
-                    </p>
-                  )}
-                  {sub.feedback && (
-                    <p className="text-xs text-emerald-900 font-semibold mt-1 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
-                      Teacher Feedback: "{sub.feedback}"
-                    </p>
-                  )}
+
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#557067]">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                    {activeTest.durationMinutes || 45} Mins
+                  </span>
+                  <span>&bull;</span>
+                  <span className="text-emerald-700 font-bold">Passing: 15 / 30 (50%)</span>
                 </div>
               </div>
 
-              <div className="shrink-0 flex items-center gap-3">
-                {sub.score !== undefined ? (
-                  <div className="text-right">
-                    <span className="text-xs text-[#7d9990] block">Marks Awarded</span>
-                    <span className="text-base font-extrabold text-[#14B866]">
-                      {sub.score} / {sub.maxScore}
+              {/* Title in Authentic Urdu Font without BiDi flip */}
+              <div className="mt-3.5">
+                <h2 className="font-urdu text-xl font-bold leading-loose text-[#142D27] text-right dir-rtl">
+                  <bdi>{activeDayAndTitle.cleanTitle}</bdi>
+                </h2>
+                <p className="text-xs text-[#557067] font-medium mt-1">
+                  {activeTest.subjectName} &bull; BISE DG Khan FA-IT Examination Standard
+                </p>
+              </div>
+
+              {/* Retake Notice if active */}
+              {(isRetakeMode || isPreviouslyFailed) && (
+                <div className="mt-3 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-start gap-2.5">
+                  <RotateCcw className="w-4 h-4 text-rose-600 mt-0.5 shrink-0" />
+                  <div>
+                    <span className="font-bold block text-rose-800">
+                      🔄 Retest &amp; Re-upload Mode Active
                     </span>
+                    <p className="text-[11px] text-rose-700 mt-0.5">
+                      Your previous score was{' '}
+                      <strong>{activeCertified?.score ?? activeLocalStatus?.score ?? 11}/30</strong>. Submit fresh, corrected answer sheets to clear the 15-mark passing threshold.
+                    </p>
                   </div>
-                ) : (
-                  <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
-                    Under Review
-                  </span>
+                </div>
+              )}
+
+              {/* Certified Grade Banner if already graded */}
+              {activeCertified && !isRetakeMode && (
+                <div className={`mt-3 p-3 rounded-2xl border text-xs flex items-start gap-2.5 ${
+                  activeCertified.passed
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    : 'bg-rose-50 border-rose-200 text-rose-900'
+                }`}>
+                  <Award className={`w-4 h-4 mt-0.5 shrink-0 ${activeCertified.passed ? 'text-emerald-600' : 'text-rose-600'}`} />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold">
+                        {activeCertified.passed ? 'Certified Grade: ' : 'Retest Required: '}
+                        {activeCertified.score} / {activeCertified.maxScore} Marks ({activeCertified.grade})
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        activeCertified.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                      }`}>
+                        {activeCertified.passed ? 'PASSED ✅' : 'RETEST ⚠️'}
+                      </span>
+                    </div>
+                    {activeCertified.feedback && (
+                      <p className="text-[11px] mt-1 italic opacity-90">
+                        &quot;{activeCertified.feedback}&quot; — Ahmad (Faculty Lead)
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Syllabus & Instructions Boxes */}
+              <div className="mt-3.5 space-y-2">
+                <div className="p-3 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">
+                  <span className="font-bold text-[#142D27] block mb-1">📖 Syllabus Covered (Textbook Pages):</span>
+                  <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]">
+                    {activeTest.syllabusCoverage}
+                  </p>
+                </div>
+
+                {activeTest.instructions && (
+                  <div className="p-3 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">
+                    <span className="font-bold text-[#142D27] block mb-1">✍️ Ahmad&apos;s Teacher Instructions:</span>
+                    <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]">
+                      {activeTest.instructions}
+                    </p>
+                  </div>
                 )}
               </div>
+
+              {/* CURATED QUESTION PAPER BREAKDOWN (30 Marks BISE DG Khan) */}
+              <div className="mt-4 pt-3 border-t border-[#e1ede7] space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#557067] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                    Formal Test Paper (30 Marks)
+                  </h3>
+                  <span className="text-[11px] font-semibold text-emerald-700">Section A, B &amp; C</span>
+                </div>
+
+                {/* Section A: MCQs (10 Marks) */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                    <span className="text-xs font-bold text-[#142D27]">حreader حصہ اوّل — کثیر الانتخابی سوالات (Section A: MCQs)</span>
+                    <span className="text-[11px] font-bold text-emerald-700">10 Marks</span>
+                  </div>
+                  {bookDetails?.chapter?.boardQuestions?.filter((q) => q.type === 'mcq').length ? (
+                    <div className="space-y-2">
+                      {bookDetails.chapter.boardQuestions
+                        .filter((q) => q.type === 'mcq')
+                        .map((q, idx) => (
+                          <div key={idx} className="text-xs text-right dir-rtl">
+                            <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
+                              سوال {idx + 1}: {q.question}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]">
+                        1. درسی کتاب کے سبق اور خلاصہ سے 10 اہم معروضی کثیر الانتخابی سوالات حل کریں۔
+                      </p>
+                      <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#557067]">
+                        (الف) درست جواب کا انتخاب کریں اور اپنی جوابی کاپی پر نمبر شمار کے ساتھ واضح تحریر کریں)
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Section B: Short Questions (10 Marks) */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                    <span className="text-xs font-bold text-[#142D27]">حصہ دوم — مختصر سوالات (Section B: Short Questions)</span>
+                    <span className="text-[11px] font-bold text-emerald-700">10 Marks (5 &times; 2M)</span>
+                  </div>
+                  <div className="space-y-2">
+                    {bookDetails?.chapter?.boardQuestions
+                      ?.filter((q) => q.type === 'short')
+                      .slice(0, 3)
+                      .map((q, idx) => (
+                        <div key={idx} className="p-2 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
+                          <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
+                            س {idx + 1}: {q.question}
+                          </p>
+                        </div>
+                      ))}
+                    <div className="p-2 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
+                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
+                        س 4: بورڈ پیٹرن کے مطابق باب کی بنیادی اصطلاحات اور اہم نکات کی مختصر تعریف کریں۔
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section C: Long Question / Diagram / Practical (10 Marks) */}
+                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                    <span className="text-xs font-bold text-[#142D27]">حصہ سوم — تفصیلی سوال و خاکہ (Section C: Long / Essay)</span>
+                    <span className="text-[11px] font-bold text-emerald-700">10 Marks</span>
+                  </div>
+                  {bookDetails?.chapter?.boardQuestions?.find((q) => q.type === 'long') ? (
+                    <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
+                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
+                        {bookDetails.chapter.boardQuestions.find((q) => q.type === 'long')?.question}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
+                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
+                        سوال: عنوان کا مکمل جامع خلاصہ، متعلقہ خاکہ (Diagram) یا تشریح خوشخط تحریر کریں۔
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          ))}
+
+            {/* Bottom Actions for Question Paper */}
+            <div className="pt-4 border-t border-[#e1ede7] flex flex-wrap items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => setPdfViewerTest(activeTest)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Read Topic in PDF Textbook</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-semibold border border-zinc-200 transition-colors"
+              >
+                <Printer className="w-3.5 h-3.5 text-zinc-500" />
+                <span>Print Paper</span>
+              </button>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Multi-Page Camera & File Submission Terminal (5 Columns) */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-4 pl-0 lg:pl-3">
+            <div>
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#e1ede7]">
+                <div>
+                  <h3 className="text-sm font-bold text-[#142D27] flex items-center gap-1.5">
+                    <Camera className="w-4 h-4 text-emerald-600" />
+                    Answer Sheet Submission Desk
+                  </h3>
+                  <p className="text-[11px] text-[#557067]">
+                    Capture handwritten pages using camera or select files.
+                  </p>
+                </div>
+
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  {uploadedPages.length} {uploadedPages.length === 1 ? 'Page' : 'Pages'} Added
+                </span>
+              </div>
+
+              {/* Dual Action Buttons: Camera & File Browser */}
+              <div className="mt-3.5 grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex flex-col items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow active:scale-98 cursor-pointer"
+                >
+                  <Camera className="w-5 h-5 text-white" />
+                  <span>📷 Take Photo (Camera)</span>
+                  <span className="text-[10px] text-emerald-100 font-normal">Snap page by page</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-3 rounded-2xl bg-white hover:bg-zinc-50 text-[#142D27] font-bold text-xs border border-[#e1ede7] flex flex-col items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+                >
+                  <Upload className="w-5 h-5 text-[#142D27]" />
+                  <span>📁 Browse Files / PDF</span>
+                  <span className="text-[10px] text-[#7d9990] font-normal">Select multiple files</span>
+                </button>
+              </div>
+
+              {/* Multi-Page Uploaded Thumbnails Grid */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#142D27]">
+                    Attached Solution Sheets ({uploadedPages.length}):
+                  </span>
+                  {uploadedPages.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setUploadedPages([])}
+                      className="text-[11px] font-semibold text-rose-600 hover:underline flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Clear All
+                    </button>
+                  )}
+                </div>
+
+                {uploadedPages.length === 0 ? (
+                  <div
+                    onClick={() => cameraInputRef.current?.click()}
+                    className="p-6 rounded-2xl border-2 border-dashed border-[#ccdcd4] bg-[#fafcfb] hover:bg-emerald-50/50 hover:border-emerald-300 transition-colors cursor-pointer text-center space-y-2"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-white border border-[#e1ede7] flex items-center justify-center mx-auto text-emerald-600 shadow-2xs">
+                      <Camera className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs font-bold text-[#142D27]">No pages captured yet</p>
+                    <p className="text-[11px] text-[#7d9990] max-w-xs mx-auto leading-relaxed">
+                      Tap <strong>Take Photo</strong> on your phone to capture each handwritten page of your solution. Passing is 15/30 marks.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto p-1">
+                    {uploadedPages.map((page) => (
+                      <div
+                        key={page.id}
+                        className="group relative rounded-xl border border-[#e1ede7] bg-white p-1.5 shadow-2xs flex flex-col justify-between overflow-hidden"
+                      >
+                        <div className="relative aspect-[3/4] bg-zinc-100 rounded-lg overflow-hidden flex items-center justify-center">
+                          {page.previewUrl ? (
+                            <img
+                              src={page.previewUrl}
+                              alt={page.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <FileText className="w-8 h-8 text-zinc-400" />
+                          )}
+
+                          {/* Quick Page Number Pill */}
+                          <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-white text-[10px] font-bold">
+                            Page {page.pageNumber}
+                          </span>
+
+                          {/* Zoom & Delete Actions Overlay */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setZoomPage(page)}
+                              className="p-1.5 rounded-lg bg-white/90 text-zinc-900 hover:bg-white transition-colors"
+                              title="Zoom page"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePage(page.id)}
+                              className="p-1.5 rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition-colors"
+                              title="Delete page"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-1 flex items-center justify-between text-[10px] text-[#557067] px-0.5">
+                          <span className="truncate max-w-[80px]">{page.name}</span>
+                          <span className="font-semibold">{page.size}</span>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Add More Button inside grid */}
+                    <button
+                      type="button"
+                      onClick={() => cameraInputRef.current?.click()}
+                      className="aspect-[3/4] rounded-xl border-2 border-dashed border-[#ccdcd4] bg-[#fafcfb] hover:bg-emerald-50 hover:border-emerald-300 transition-colors flex flex-col items-center justify-center gap-1 text-[#557067] hover:text-emerald-700 cursor-pointer"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="text-[10px] font-bold">+ Page {uploadedPages.length + 1}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Student Remarks / Notes */}
+              <div className="mt-3.5">
+                <label className="text-xs font-bold text-[#142D27] block mb-1">
+                  Optional Note for Ahmad Sir:
+                </label>
+                <textarea
+                  rows={2}
+                  value={studentComment}
+                  onChange={(e) => setStudentComment(e.target.value)}
+                  placeholder="e.g. Completed Section A MCQs, Section B short questions, and Section C diagram. Retest attempt..."
+                  className="w-full p-2.5 text-xs rounded-xl bg-white border border-[#e1ede7] text-[#142D27] placeholder-[#7d9990] focus:border-emerald-500 focus:outline-none resize-none shadow-2xs"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button CTA */}
+            <div className="pt-3 border-t border-[#e1ede7]">
+              <Button
+                variant="primary"
+                size="lg"
+                disabled={uploadedPages.length === 0 || isSubmitting}
+                onClick={handleSubmitTestSolution}
+                className="w-full justify-center text-xs sm:text-sm font-bold py-3 bg-emerald-600 hover:bg-emerald-500"
+                icon={<Check className="w-4 h-4" />}
+              >
+                {isSubmitting
+                  ? 'Submitting Answer Sheets...'
+                  : `Submit 30-Marks Test (${uploadedPages.length} Pages)`}
+              </Button>
+              <p className="text-[10px] text-center text-[#7d9990] mt-1.5">
+                Once submitted, Ahmad Sir verifies handwritten work &amp; issues official certified marks.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Answer Sheet Upload Modal */}
-      <Modal
-        isOpen={!!uploadingTest}
-        onClose={() => setUploadingTest(null)}
-        title="Submit Examination Answer Script"
-        description={uploadingTest ? `Upload handwritten solution PDF or image for "${uploadingTest.title}"` : ''}
-      >
-        {uploadingTest && (
-          <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs space-y-1">
-              <p className="text-[#263B35]"><strong>Subject:</strong> {uploadingTest.subjectName}</p>
-              <p className="text-[#263B35]"><strong>Total Marks:</strong> {uploadingTest.totalMarks} Marks</p>
-              <p className="text-[#263B35]"><strong>Passing Requirement:</strong> {uploadingTest.passingMarks || Math.round(uploadingTest.totalMarks * 0.5)} Marks</p>
-            </div>
+      {/* TIMELINE OF ALL TESTS (PAST 1 MONTH THROUGH FEB 28) - SERIES BENTO CARDS */}
+      <div className="space-y-4 pt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-[#142D27] font-serif flex items-center gap-2">
+              <span>All Examination Series &amp; Test Records</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                {sortedTests.length} Total Tests
+              </span>
+            </h2>
+            <p className="text-xs text-[#557067] mt-0.5">
+              Complete archive from past months through Feb 28, 2027. Newest and active tests at the top. Retake any test to improve your score.
+            </p>
+          </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#142D27] mb-1">
-                Select Handwritten Answer Sheet / PDF File:
-              </label>
-              <div className="border border-dashed border-[#e1ede7] hover:border-[#14B866] rounded-xl p-4 text-center cursor-pointer bg-[#F7F9F8]">
-                <input
-                  type="file"
-                  id="test-file-input"
-                  onChange={handleFileChange}
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="hidden"
-                />
-                <label htmlFor="test-file-input" className="cursor-pointer block space-y-1">
-                  <Upload className="w-6 h-6 text-[#14B866] mx-auto mb-1" />
-                  <p className="text-xs font-semibold text-[#142D27]">
-                    {selectedFile ? selectedFile.name : 'Click to select solution PDF or image'}
-                  </p>
-                  <p className="text-[11px] text-[#7d9990]">
-                    {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB selected` : 'PDF, JPG or PNG up to 50MB'}
-                  </p>
-                </label>
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-[#e1ede7] overflow-x-auto no-scrollbar">
+            <button
+              onClick={() => setFilterTab('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+                filterTab === 'all'
+                  ? 'bg-emerald-700 text-white'
+                  : 'text-[#557067] hover:text-[#142D27]'
+              }`}
+            >
+              All Tests ({sortedTests.length})
+            </button>
+            <button
+              onClick={() => setFilterTab('today')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+                filterTab === 'today'
+                  ? 'bg-emerald-700 text-white'
+                  : 'text-[#557067] hover:text-[#142D27]'
+              }`}
+            >
+              Today&apos;s Active
+            </button>
+            <button
+              onClick={() => setFilterTab('passed')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+                filterTab === 'passed'
+                  ? 'bg-emerald-700 text-white'
+                  : 'text-[#557067] hover:text-[#142D27]'
+              }`}
+            >
+              Passed (15-30M)
+            </button>
+            <button
+              onClick={() => setFilterTab('retest')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+                filterTab === 'retest'
+                  ? 'bg-rose-600 text-white'
+                  : 'text-rose-700 hover:text-rose-900'
+              }`}
+            >
+              Retest (&lt;15M)
+            </button>
+            <button
+              onClick={() => setFilterTab('under_review')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+                filterTab === 'under_review'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-blue-700 hover:text-blue-900'
+              }`}
+            >
+              Awaiting Check
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Search Bar */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7d9990]" />
+          <input
+            type="text"
+            placeholder="Search by test title in Urdu, subject name, or course code..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-[#e1ede7] rounded-2xl text-[#142D27] placeholder-[#7d9990] focus:border-emerald-500 focus:outline-none shadow-2xs"
+          />
+        </div>
+
+        {/* SERIES CARDS BENTO GRID: Responsive 1-col on mobile, 2-col on md, 3-col on lg */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredTests.map((test) => {
+            const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(test.title, test.date);
+            const cert = certifiedResults.find((r) => r.testId === test.id);
+            const statusInfo = testStatuses[test.id];
+            const score = cert?.score ?? statusInfo?.score ?? test.studentScore;
+            const isPassed = (cert && cert.passed) || (score !== undefined && score >= 15);
+            const isRetest = (cert && !cert.passed) || (score !== undefined && score < 15);
+            const isSubmitted = statusInfo?.status === 'submitted' && !cert;
+            const isSelected = activeTest?.id === test.id;
+
+            return (
+              <div
+                key={test.id}
+                className={`p-4 sm:p-5 rounded-3xl bg-white border transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md group ${
+                  isSelected
+                    ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20'
+                    : 'border-[#e1ede7] hover:border-emerald-300'
+                }`}
+              >
+                <div>
+                  {/* Top Day, Code, & Marks Pill Row */}
+                  <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
+                        {day}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-bold border border-zinc-200">
+                        {test.subjectCode}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                      <span>30M</span>
+                      <span className="text-[#ccdcd4]">&bull;</span>
+                      <span className="text-[#557067] font-semibold">{test.durationMinutes || 45}m</span>
+                    </div>
+                  </div>
+
+                  {/* Title in Authentic Urdu Font without BiDi flip */}
+                  <div className="mt-2.5">
+                    <h3
+                      className={`group-hover:text-emerald-700 transition-colors ${
+                        isUrdu
+                          ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
+                          : 'text-sm font-bold text-[#142D27] leading-snug'
+                      }`}
+                    >
+                      <bdi>{cleanTitle}</bdi>
+                    </h3>
+                    <p className="text-[11px] text-[#557067] mt-0.5">{test.subjectName}</p>
+                  </div>
+
+                  {/* Syllabus Snippet */}
+                  <div className="mt-3 p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">
+                    <span className="text-[10px] font-bold text-[#142D27] block mb-0.5">Syllabus Scope:</span>
+                    <p className="font-urdu text-[12px] text-right dir-rtl text-[#557067] leading-relaxed line-clamp-2">
+                      {test.syllabusCoverage}
+                    </p>
+                  </div>
+
+                  {/* Dynamic Status / Certified Result Badge */}
+                  <div className="mt-3">
+                    {isPassed ? (
+                      <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
+                        <span className="font-bold text-emerald-800 flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          Passed: {score}/30 Marks ({cert?.grade || 'A*'})
+                        </span>
+                        <span className="text-[10px] font-semibold text-emerald-700">Certified</span>
+                      </div>
+                    ) : isRetest ? (
+                      <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs flex items-center justify-between">
+                        <span className="font-bold text-rose-800 flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                          Score: {score}/30 &bull; Retest Required
+                        </span>
+                        <span className="text-[10px] font-bold text-rose-700">&lt;15 Passing</span>
+                      </div>
+                    ) : isSubmitted ? (
+                      <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-xs flex items-center justify-between">
+                        <span className="font-bold text-blue-800 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-blue-600" />
+                          Under Review by Ahmad Sir
+                        </span>
+                        <span className="text-[10px] font-semibold text-blue-700">Submitted</span>
+                      </div>
+                    ) : (
+                      <div className="p-2 rounded-xl bg-zinc-50 border border-zinc-200 text-xs flex items-center justify-between text-[#557067]">
+                        <span className="flex items-center gap-1 font-medium">
+                          <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                          {test.date} &bull; {test.time}
+                        </span>
+                        <span className="text-[10px] font-bold text-zinc-600">Pending</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Action Footer */}
+                <div className="mt-4 pt-3 border-t border-[#e1ede7] flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPdfViewerTest(test)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#557067] hover:text-emerald-700 transition-colors cursor-pointer"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>View in PDF</span>
+                  </button>
+
+                  {isRetest ? (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleSelectTest(test, true)}
+                      className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold"
+                      icon={<RotateCcw className="w-3.5 h-3.5" />}
+                    >
+                      🔄 Retake &amp; Re-upload
+                    </Button>
+                  ) : (
+                    <Button
+                      variant={isSelected ? 'secondary' : 'primary'}
+                      size="sm"
+                      onClick={() => handleSelectTest(test, false)}
+                      className="text-xs font-bold"
+                      icon={<ChevronRight className="w-3.5 h-3.5" />}
+                    >
+                      {isSelected ? 'Active in Desk' : 'Submit Paper'}
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
+            );
+          })}
+        </div>
+      </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#142D27] mb-1">
-                Student Notes / Working Remarks (Optional):
-              </label>
-              <textarea
-                rows={2}
-                value={studentComment}
-                onChange={(e) => setStudentComment(e.target.value)}
-                placeholder="E.g., Included all scratch working on page 3..."
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
+      {/* ZOOM MODAL FOR UPLOADED PAGE */}
+      {zoomPage && (
+        <Modal
+          isOpen={!!zoomPage}
+          onClose={() => setZoomPage(null)}
+          title={`Answer Sheet: Page ${zoomPage.pageNumber}`}
+        >
+          <div className="p-3 text-center space-y-3">
+            <div className="max-h-[70vh] overflow-auto rounded-2xl bg-zinc-950 flex items-center justify-center p-2">
+              <img
+                src={zoomPage.previewUrl}
+                alt={`Page ${zoomPage.pageNumber}`}
+                className="max-h-[65vh] w-auto object-contain rounded-lg"
               />
             </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="ghost" size="sm" onClick={() => setUploadingTest(null)}>
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleConfirmUpload}
-                disabled={!selectedFile}
-                isLoading={isUploading}
-                loadingText="Uploading Answer Script..."
-              >
-                Submit for Teacher Marking
-              </Button>
+            <div className="flex items-center justify-between text-xs text-[#557067]">
+              <span>{zoomPage.name}</span>
+              <span>{zoomPage.size}</span>
             </div>
           </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
+
+      {/* PDF VIEWER MODAL FOR TEXTBOOK EXCERPTS & PAGES */}
+      {pdfViewerTest && (
+        <PDFViewerModal
+          isOpen={!!pdfViewerTest}
+          onClose={() => setPdfViewerTest(null)}
+          testId={pdfViewerTest.id}
+          testTitle={pdfViewerTest.title}
+          subjectCode={pdfViewerTest.subjectCode}
+          subjectName={pdfViewerTest.subjectName}
+          syllabusCoverage={pdfViewerTest.syllabusCoverage}
+        />
+      )}
     </div>
   );
 };
