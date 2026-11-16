@@ -313,7 +313,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               onClick={() => setHideCompleted(!hideCompleted)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                 hideCompleted
-                  ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
+                  ? 'bg-[#142D27] text-white border-[#142D27] shadow-2xs'
                   : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
               }`}
             >
@@ -339,7 +339,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               onClick={() => setSelectedMonth(m.id)}
               className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
                 selectedMonth === m.id
-                  ? 'bg-zinc-900 text-white shadow-2xs'
+                  ? 'bg-[#142D27] text-white shadow-2xs'
                   : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
               }`}
             >
@@ -354,7 +354,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
             onClick={() => setSelectedSubjectId('all')}
             className={`px-3 py-1 rounded-xl font-medium whitespace-nowrap transition-colors ${
               selectedSubjectId === 'all'
-                ? 'bg-zinc-900 text-white'
+                ? 'bg-[#142D27] text-white'
                 : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
@@ -366,7 +366,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               onClick={() => setSelectedSubjectId(s.id)}
               className={`px-3 py-1 rounded-xl font-medium whitespace-nowrap transition-colors ${
                 selectedSubjectId === s.id
-                  ? 'bg-zinc-900 text-white'
+                  ? 'bg-[#142D27] text-white'
                   : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
               }`}
             >
@@ -421,18 +421,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <div
                   key={test.id}
                   onClick={() => setActivePopupTest(test)}
-                  className={`group relative p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-[220px] sm:w-[240px] lg:w-auto shrink-0 snap-start shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 ${
+                  className={`group relative p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-[220px] sm:w-[240px] lg:w-auto shrink-0 snap-start shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
                     meta.isToday
-                      ? 'bg-[#18181b] border-emerald-500 shadow-sm ring-2 ring-emerald-500/30 hover:border-emerald-400 text-zinc-100'
+                      ? 'bg-white border-2 border-emerald-500 shadow-md ring-2 ring-emerald-500/20 text-[#142D27]'
                       : meta.isLocked
-                      ? 'bg-[#141417] border-zinc-800 hover:bg-[#1a1a1e] text-zinc-400'
+                      ? 'bg-[#fafcfb] border-[#e1ede7] text-zinc-600 hover:border-zinc-300'
                       : meta.status === 'passed'
-                      ? 'bg-[#121c17] border-emerald-800/80 hover:bg-[#16251e] text-zinc-100'
+                      ? 'bg-[#f0fbf5] border border-emerald-300 text-[#142D27]'
                       : meta.status === 'failed_retest'
-                      ? 'bg-[#241315] border-rose-800/80 hover:bg-[#2b171a] text-zinc-100'
+                      ? 'bg-[#fff5f5] border border-rose-200 text-rose-950'
                       : meta.status === 'pending'
-                      ? 'bg-[#211a12] border-amber-800/80 hover:bg-[#292015] text-zinc-100'
-                      : 'bg-[#18181b] border-zinc-800 hover:border-zinc-700 text-zinc-100'
+                      ? 'bg-[#fffdf5] border border-amber-200 text-amber-950'
+                      : 'bg-white border border-[#e1ede7] hover:border-emerald-300 text-[#142D27]'
                   }`}
                   title="Click to view details popup"
                 >
@@ -440,7 +440,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <div>
                     <div className="flex items-center justify-between gap-1 mb-2">
                       {/* Day Pill */}
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 truncate">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 truncate">
                         {dayMeta.combined}
                       </span>
 
@@ -463,7 +463,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     </div>
 
                     {/* Subject Name & 30M Badge */}
-                    <div className="flex items-center justify-between gap-1 text-[10px] text-zinc-400 font-semibold pb-1.5 border-b border-zinc-800">
+                    <div className="flex items-center justify-between gap-1 text-[10px] text-[#557067] font-semibold pb-1.5 border-b border-[#e1ede7]">
                       <div className="flex items-center gap-1 truncate">
                         <BookOpen className="w-3 h-3 text-zinc-500 shrink-0" />
                         <span className="truncate">{test.subjectName.split('(')[0]}</span>
@@ -475,14 +475,14 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
 
                     {/* Test Title (In Urdu for Urdu book / subjects, no 'Series' text) */}
                     <h4 className={`mt-2 line-clamp-2 leading-snug group-hover:text-emerald-400 transition-colors ${
-                      isUrduTest ? 'font-urdu text-[13px] font-bold text-zinc-100 text-right dir-rtl' : 'text-xs font-bold text-zinc-100'
+                      isUrduTest ? 'font-urdu text-[14px] font-bold text-[#142D27] text-right dir-rtl leading-relaxed' : 'text-xs font-bold text-[#142D27]'
                     }`}>
                       {test.title.replace(/^Daily Test Series:\s*/i, '')}
                     </h4>
                   </div>
 
                   {/* Bottom Timing / Unlocks Indicator & Quick PDF Viewer */}
-                  <div className="mt-3 pt-2 border-t border-zinc-800 flex items-center justify-between text-[10px] gap-1">
+                  <div className="mt-3 pt-2 border-t border-[#e1ede7] flex items-center justify-between text-[10px] gap-1">
                     <span className="text-zinc-400 font-medium truncate flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-zinc-500 shrink-0" />
                       <span>{test.date}</span>
@@ -495,14 +495,14 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                           e.stopPropagation();
                           setPdfViewerTest(test);
                         }}
-                        className="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-400 border border-zinc-700 font-bold text-[9px] transition-colors flex items-center gap-0.5 cursor-pointer shadow-2xs"
+                        className="px-1.5 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[9px] transition-colors flex items-center gap-0.5 cursor-pointer shadow-2xs"
                         title="View attached chapter and pages in textbook PDF"
                       >
                         <BookOpen className="w-2.5 h-2.5" />
                         <span>PDF</span>
                       </button>
 
-                      <span className="text-[10px] font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                      <span className="text-[10px] font-bold text-emerald-700 group-hover:text-emerald-800 transition-colors">
                         View &rarr;
                       </span>
                     </div>
@@ -527,9 +527,9 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
 
         return createPortal(
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-[#18181b] rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden flex flex-col text-zinc-100">
+            <div className="relative w-full max-w-lg bg-white rounded-3xl border border-zinc-200 shadow-2xl overflow-hidden flex flex-col text-zinc-900">
               {/* Modal Header */}
-              <div className="p-4 sm:p-5 border-b border-zinc-800 bg-[#141417] flex items-start justify-between gap-3">
+              <div className="p-4 sm:p-5 border-b border-[#e1ede7] bg-[#F7F9F8] flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 text-[10px] font-bold border border-zinc-700/80">
@@ -547,7 +547,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     </span>
                   </div>
 
-                  <h3 className={`text-base font-bold text-zinc-100 mt-1.5 ${
+                  <h3 className={`text-base font-bold text-[#142D27] mt-1.5 ${
                     activePopupTest.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
                   }`}>
                     {activePopupTest.title.replace(/^Daily Test Series:\s*/i, '')}
@@ -560,7 +560,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <button
                   type="button"
                   onClick={() => setActivePopupTest(null)}
-                  className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -570,11 +570,11 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <div className="p-4 sm:p-5 space-y-4 max-h-[70vh] overflow-y-auto">
                 {/* Lock / Active Status Banner */}
                 {meta.isLocked && (
-                  <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs flex items-start gap-2.5 text-zinc-300">
-                    <Lock className="w-4 h-4 text-zinc-400 mt-0.5 shrink-0" />
+                  <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-xs flex items-start gap-2.5 text-zinc-700">
+                    <Lock className="w-4 h-4 text-zinc-500 mt-0.5 shrink-0" />
                     <div>
-                      <span className="font-bold text-zinc-100 block">Test Locked</span>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">
+                      <span className="font-bold text-zinc-900 block">Test Locked</span>
+                      <p className="text-[11px] text-zinc-500 mt-0.5">
                         This test is scheduled for <strong>{activePopupTest.date}</strong>. It will automatically unlock at <strong>12:00 AM midnight</strong> on that date.
                       </p>
                     </div>
@@ -582,11 +582,11 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 )}
 
                 {meta.isToday && (
-                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/80 text-xs flex items-start gap-2.5 text-emerald-200">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 animate-pulse shrink-0"></span>
+                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs flex items-start gap-2.5 text-emerald-900">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mt-1 animate-pulse shrink-0"></span>
                     <div>
-                      <span className="font-bold text-emerald-300 block">🟢 Unlocked & Ready for Today</span>
-                      <p className="text-[11px] text-emerald-300/80 mt-0.5">
+                      <span className="font-bold text-emerald-800 block">🟢 Unlocked &amp; Ready for Today</span>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">
                         This test is active right now. Please attempt and submit your handwritten sheet or responses before 11:59 PM.
                       </p>
                     </div>
@@ -594,18 +594,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 )}
 
                 {meta.status === 'passed' && (
-                  <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-800/80 text-xs space-y-1 text-emerald-200">
+                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-1 text-emerald-900">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-emerald-300 flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="font-bold text-emerald-800 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                         Result: Passed
                       </span>
-                      <span className="text-xs font-bold text-emerald-400">
+                      <span className="text-xs font-bold text-emerald-700">
                         Score: {score}/30 Marks ({Math.round(((score || 0) / 30) * 100)}%)
                       </span>
                     </div>
                     {activePopupTest.myAttempt?.feedback && (
-                      <p className="text-[11px] text-emerald-300/80 italic pt-1">
+                      <p className="text-[11px] text-emerald-700 italic pt-1">
                         &quot;{activePopupTest.myAttempt.feedback}&quot; — Ahmad (Faculty Lead)
                       </p>
                     )}
@@ -613,28 +613,28 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 )}
 
                 {meta.status === 'failed_retest' && (
-                  <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-800/80 text-xs space-y-1 text-rose-200">
+                  <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-1 text-rose-900">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-rose-300 flex items-center gap-1.5">
-                        <AlertCircle className="w-4 h-4 text-rose-400" />
+                      <span className="font-bold text-rose-800 flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-rose-600" />
                         Result: Retest Required (Below 15)
                       </span>
-                      <span className="text-xs font-bold text-rose-400">
+                      <span className="text-xs font-bold text-rose-700">
                         Score: {score}/30 Marks
                       </span>
                     </div>
-                    <p className="text-[11px] text-rose-300/80 pt-1">
+                    <p className="text-[11px] text-rose-700 pt-1">
                       Passing marks are 15/30 (50%). Please revise the chapter notes and submit a retest attempt.
                     </p>
                   </div>
                 )}
 
                 {meta.status === 'pending' && (
-                  <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/80 text-xs flex items-start gap-2.5 text-amber-200">
-                    <Clock className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs flex items-start gap-2.5 text-amber-900">
+                    <Clock className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
                     <div>
-                      <span className="font-bold text-amber-300 block">Pending Assessment</span>
-                      <p className="text-[11px] text-amber-300/80 mt-0.5">
+                      <span className="font-bold text-amber-800 block">Pending Assessment</span>
+                      <p className="text-[11px] text-amber-700 mt-0.5">
                         This test was scheduled on {activePopupTest.date} and has not yet been submitted. You can still complete and submit it to clear your backlog.
                       </p>
                     </div>
@@ -642,29 +642,29 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 )}
 
                 {/* Details Breakdown */}
-                <div className="bg-zinc-50 p-3.5 rounded-xl border border-zinc-200 space-y-2 text-xs">
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-200">
-                    <span className="text-zinc-400 font-medium">Scheduled Date:</span>
-                    <span className="font-bold text-zinc-100">{activePopupTest.date} &bull; {activePopupTest.time}</span>
+                <div className="bg-[#F7F9F8] p-3.5 rounded-2xl border border-[#e1ede7] space-y-2 text-xs">
+                  <div className="flex items-center justify-between py-1 border-b border-[#e1ede7]">
+                    <span className="text-[#557067] font-medium">Scheduled Date:</span>
+                    <span className="font-bold text-[#142D27]">{activePopupTest.date} &bull; {activePopupTest.time}</span>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-800">
-                    <span className="text-zinc-400 font-medium">Duration:</span>
-                    <span className="font-bold text-zinc-100">{activePopupTest.durationMinutes || 60} Minutes</span>
+                  <div className="flex items-center justify-between py-1 border-b border-[#e1ede7]">
+                    <span className="text-[#557067] font-medium">Duration:</span>
+                    <span className="font-bold text-[#142D27]">{activePopupTest.durationMinutes || 60} Minutes</span>
                   </div>
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-800">
-                    <span className="text-zinc-400 font-medium">Passing Benchmark:</span>
-                    <span className="font-bold text-emerald-400">15 / 30 Marks (50%)</span>
+                  <div className="flex items-center justify-between py-1 border-b border-[#e1ede7]">
+                    <span className="text-[#557067] font-medium">Passing Benchmark:</span>
+                    <span className="font-bold text-emerald-700">15 / 30 Marks (50%)</span>
                   </div>
                   <div className="py-1">
-                    <span className="text-zinc-400 font-medium block mb-1">Syllabus & Topics:</span>
-                    <p className="text-[11px] text-zinc-300 bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 leading-relaxed">
+                    <span className="text-[#557067] font-medium block mb-1">Syllabus &amp; Topics:</span>
+                    <p className="text-[11px] text-[#2e473f] bg-white p-2.5 rounded-xl border border-[#e1ede7] leading-relaxed shadow-2xs">
                       {activePopupTest.syllabusCoverage}
                     </p>
                   </div>
                   {activePopupTest.instructions && (
                     <div className="py-1">
-                      <span className="text-zinc-400 font-medium block mb-1">Ahmad&apos;s Instructions:</span>
-                      <p className="text-[11px] text-zinc-300 bg-zinc-900 p-2.5 rounded-lg border border-zinc-800 leading-relaxed">
+                      <span className="text-[#557067] font-medium block mb-1">Ahmad&apos;s Instructions:</span>
+                      <p className="text-[11px] text-[#2e473f] bg-white p-2.5 rounded-xl border border-[#e1ede7] leading-relaxed shadow-2xs">
                         {activePopupTest.instructions}
                       </p>
                     </div>
@@ -673,12 +673,12 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="p-3.5 border-t border-zinc-800 bg-[#141417] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+              <div className="p-3.5 border-t border-[#e1ede7] bg-[#F7F9F8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setActivePopupTest(null)}
-                    className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-zinc-200 transition-colors"
+                    className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-colors"
                   >
                     Close
                   </button>

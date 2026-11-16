@@ -761,7 +761,7 @@ export const TestsPage: React.FC = () => {
       {activeExamTest &&
         createPortal(
           <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 pt-10 sm:pt-6 pb-6 animate-in fade-in duration-200">
-            <div className="bg-[#18181b] rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl border border-zinc-800 overflow-hidden text-zinc-100">
+            <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200 overflow-hidden text-zinc-900">
               {/* Exam Header */}
               <div className="px-5 py-3.5 bg-[#142D27] text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -870,8 +870,8 @@ export const TestsPage: React.FC = () => {
                 return (
                   <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
                     {/* Question Navigator Drawer */}
-                    <div className="w-full md:w-56 p-4 border-b md:border-b-0 md:border-r border-zinc-800 bg-[#141417] overflow-y-auto shrink-0 text-zinc-100">
-                      <span className="text-xs font-bold text-zinc-200 block mb-3">
+                    <div className="w-full md:w-56 p-4 border-b md:border-b-0 md:border-r border-[#e1ede7] bg-[#F7F9F8] overflow-y-auto shrink-0 text-zinc-800">
+                      <span className="text-xs font-bold text-[#142D27] block mb-3">
                         Question Palette ({effectiveQuestions.length})
                       </span>
 
@@ -893,34 +893,34 @@ export const TestsPage: React.FC = () => {
                               onClick={() => setCurrentQuestionIndex(idx)}
                               className={`h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center relative ${
                                 isCurrent
-                                  ? 'bg-emerald-600 text-white ring-2 ring-emerald-400'
+                                  ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-sm'
                                   : isFlagged
-                                  ? 'bg-amber-950/70 text-amber-300 border border-amber-800/80'
+                                  ? 'bg-amber-50 text-amber-800 border border-amber-300'
                                   : isAnswered
-                                  ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-800/80'
-                                  : 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700'
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
+                                  : 'bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-100'
                               }`}
                             >
                               {idx + 1}
                               {isFlagged && (
-                                <span className="w-2 h-2 rounded-full bg-amber-400 absolute -top-0.5 -right-0.5" />
+                                <span className="w-2 h-2 rounded-full bg-amber-500 absolute -top-0.5 -right-0.5" />
                               )}
                             </button>
                           );
                         })}
                       </div>
 
-                      <div className="mt-6 pt-4 border-t border-zinc-800 space-y-2 text-[10px] text-zinc-400">
+                      <div className="mt-6 pt-4 border-t border-[#e1ede7] space-y-2 text-[10px] text-[#557067]">
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded bg-emerald-950/70 border border-emerald-800" />
+                          <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-300" />
                           <span>Answered / Attached</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded bg-amber-950/70 border border-amber-800" />
+                          <span className="w-3 h-3 rounded bg-amber-100 border border-amber-300" />
                           <span>Flagged for Review</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 rounded bg-zinc-800 border border-zinc-700" />
+                          <span className="w-3 h-3 rounded bg-white border border-zinc-200" />
                           <span>Not Attempted</span>
                         </div>
                       </div>

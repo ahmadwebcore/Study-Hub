@@ -391,49 +391,49 @@ export const WeeklyTasksPage: React.FC = () => {
 
       {/* Status Summary Bento Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Awaiting Approval
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-amber-400">{awaitingApprovalCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/80">
+            <span className="text-xl font-extrabold text-amber-700">{awaitingApprovalCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
               Teacher Gate
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Verified Complete
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-emerald-400">{approvedCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80">
+            <span className="text-xl font-extrabold text-emerald-700">{approvedCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               Approved
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Pending Student
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-zinc-200">{pendingCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
+            <span className="text-xl font-extrabold text-[#142D27]">{pendingCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
               In Progress
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             🇵🇰 Off Days Policy
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-bold text-zinc-200">Sunday & Holidays</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80">
+            <span className="text-sm font-bold text-[#142D27]">Sunday & Holidays</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               Mandatory Off
             </span>
           </div>
@@ -628,14 +628,14 @@ export const WeeklyTasksPage: React.FC = () => {
               /* Regular Weekday Task Card */
               <div
                 key={task.id}
-                className={`p-4 sm:p-5 rounded-2xl bg-[#18181b] border transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-zinc-100 ${
+                className={`p-4 sm:p-5 rounded-2xl bg-white border transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4 text-[#142D27] shadow-sm hover:shadow-md ${
                   task.status === 'approved'
-                    ? 'border-emerald-800/80 shadow-sm'
+                    ? 'border-emerald-300'
                     : task.status === 'submitted_for_approval'
-                    ? 'border-amber-800/80 shadow-sm'
+                    ? 'border-amber-300'
                     : task.status === 'overdue'
-                    ? 'border-rose-800/80 shadow-sm'
-                    : 'border-zinc-800 hover:border-zinc-700'
+                    ? 'border-rose-300'
+                    : 'border-[#e1ede7] hover:border-emerald-300'
                 }`}
               >
                 {/* Left: Info */}
@@ -643,12 +643,12 @@ export const WeeklyTasksPage: React.FC = () => {
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       task.status === 'approved'
-                        ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/80'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : task.status === 'submitted_for_approval'
-                        ? 'bg-amber-950/70 text-amber-400 border border-amber-800/80'
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
                         : task.status === 'overdue'
-                        ? 'bg-rose-950/70 text-rose-400 border border-rose-800/80'
-                        : 'bg-zinc-800 text-emerald-400 border border-zinc-700'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}
                   >
                     {task.status === 'approved' ? (
@@ -667,7 +667,7 @@ export const WeeklyTasksPage: React.FC = () => {
                       <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                         {task.subjectCode}
                       </span>
-                      <span className="text-[11px] font-bold text-zinc-400">
+                      <span className="text-[11px] font-bold text-[#557067]">
                         {task.dayOfWeek} • {task.assignedDate}
                       </span>
                       {task.pagesRange && (
@@ -680,10 +680,10 @@ export const WeeklyTasksPage: React.FC = () => {
                       </span>
                     </div>
 
-                    <h4 className="text-sm font-bold text-zinc-100 mt-1 truncate">
+                    <h4 className="text-sm font-bold text-[#142D27] mt-1 truncate">
                       {task.title}
                     </h4>
-                    <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#557067] mt-0.5 line-clamp-2 leading-relaxed">
                       {task.description}
                     </p>
 
@@ -694,12 +694,12 @@ export const WeeklyTasksPage: React.FC = () => {
 
                     {/* Student notes or teacher feedback excerpt if available */}
                     {task.studentSubmission?.notes && (
-                      <div className="mt-2 text-xs bg-zinc-900 p-2 rounded-lg border border-zinc-800 text-zinc-300">
+                      <div className="mt-2 text-xs bg-zinc-50 p-2 rounded-lg border border-zinc-200 text-zinc-700">
                         <strong className="text-zinc-200">Student Work Log:</strong> &quot;{task.studentSubmission.notes}&quot;
                       </div>
                     )}
                     {task.approval?.feedback && (
-                      <div className="mt-1.5 text-xs bg-emerald-950/40 p-2 rounded-lg border border-emerald-800/80 text-emerald-300">
+                      <div className="mt-1.5 text-xs bg-emerald-50 p-2 rounded-lg border border-emerald-200 text-emerald-800">
                         <strong className="text-emerald-200">Teacher Verification:</strong> &quot;{task.approval.feedback}&quot; ({task.approval.approvedBy})
                       </div>
                     )}
@@ -737,7 +737,7 @@ export const WeeklyTasksPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setPdfTaskTarget(task)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all cursor-pointer"
                       title="View attached textbook chapter & pages in PDF reader"
                     >
                       <BookOpen className="w-3.5 h-3.5 text-emerald-400" />

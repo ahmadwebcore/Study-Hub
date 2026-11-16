@@ -494,17 +494,17 @@ export const TeacherDashboard: React.FC = () => {
           </div>
 
           {/* Solution Sheet Preview */}
-          <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-[#142D27] space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+              <span className="font-semibold text-emerald-800 flex items-center gap-1.5">
                 📄 Student Solution Sheet
               </span>
-              <span className="text-[10px] text-zinc-400">PDF / Image Preview</span>
+              <span className="text-[10px] text-[#7d9990]">PDF / Image Preview</span>
             </div>
-            <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700/80 font-mono text-[11px] text-zinc-300 space-y-1">
-              <p className="text-emerald-300 font-bold">&bull; Worked Solution Problem Set (FA-IT 1st Year):</p>
-              <p className="text-zinc-400 italic">"Student handwritten coursework submitted for BISE DG Khan examination standards. Key definitions, diagrams, and exercises completed."</p>
-              <div className="pt-1 text-[10px] text-zinc-500">File: {approvingTask?.studentSubmission?.attachmentName || 'student_solution_notes.pdf'}</div>
+            <div className="p-3 rounded-lg bg-white border border-[#e1ede7] font-mono text-[11px] text-[#2e473f] space-y-1 shadow-2xs">
+              <p className="text-emerald-700 font-bold">&bull; Worked Solution Problem Set (FA-IT 1st Year):</p>
+              <p className="text-[#557067] italic">&quot;Student handwritten coursework submitted for BISE DG Khan examination standards. Key definitions, diagrams, and exercises completed.&quot;</p>
+              <div className="pt-1 text-[10px] text-[#7d9990]">File: {approvingTask?.studentSubmission?.attachmentName || 'student_solution_notes.pdf'}</div>
             </div>
           </div>
 

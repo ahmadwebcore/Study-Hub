@@ -65,45 +65,45 @@ export const CompletedWorkPage: React.FC = () => {
         </Button>
       </div>
 
-      {/* Summary KPI Bento Grid - Light Black Aesthetic */}
+      {/* Summary KPI Bento Grid - Crisp White Modern Aesthetic */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-4 sm:p-5 rounded-3xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider">
               Approved Work Units
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-800/80 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-zinc-100 font-serif mt-2">{completedTasks.length}</p>
-          <p className="text-[11px] text-zinc-400 mt-0.5">100% verified by faculty assessment</p>
+          <p className="text-2xl font-extrabold text-[#142D27] font-serif mt-2">{completedTasks.length}</p>
+          <p className="text-[11px] text-[#7d9990] mt-0.5">100% verified by faculty assessment</p>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-3xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider">
               Verified Study Time
             </span>
-            <div className="w-8 h-8 rounded-xl bg-sky-950/60 text-sky-400 border border-sky-800/80 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center">
               <Calendar className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-extrabold text-zinc-100 font-serif mt-2">{totalHours} Hours</p>
-          <p className="text-[11px] text-zinc-400 mt-0.5">Dedicated to 1st Year FA-IT syllabus</p>
+          <p className="text-2xl font-extrabold text-[#142D27] font-serif mt-2">{totalHours} Hours</p>
+          <p className="text-[11px] text-[#7d9990] mt-0.5">Dedicated to 1st Year FA-IT syllabus</p>
         </div>
 
-        <div className="p-4 sm:p-5 rounded-3xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider">
               Approval Authority
             </span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 border border-emerald-800/80 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-lg font-bold text-zinc-100 font-serif mt-2 truncate">Ahmad</p>
-          <p className="text-[11px] text-emerald-400 mt-0.5 font-semibold">Faculty Lead Evaluator</p>
+          <p className="text-lg font-bold text-[#142D27] font-serif mt-2 truncate">Ahmad</p>
+          <p className="text-[11px] text-emerald-700 mt-0.5 font-semibold">Faculty Lead Evaluator</p>
         </div>
       </div>
 
@@ -154,55 +154,55 @@ export const CompletedWorkPage: React.FC = () => {
               return (
                 <div
                   key={task.id}
-                  className="p-4 rounded-3xl bg-[#18181b] border border-zinc-800 text-zinc-100 hover:border-emerald-500/80 hover:shadow-lg transition-all flex flex-col justify-between shadow-sm group"
+                  className="p-4 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
                 >
                   {/* Top Meta: Code & Date */}
                   <div>
-                    <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-800">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80 truncate">
+                    <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 truncate">
                         {task.subjectCode}
                       </span>
-                      <span className="text-[10px] text-zinc-400 font-medium shrink-0">
+                      <span className="text-[10px] text-[#7d9990] font-medium shrink-0">
                         {task.assignedDate}
                       </span>
                     </div>
 
                     {/* Subject Name & Topic Title */}
                     <div className="mt-2.5">
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                      <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
                         {task.subjectName}
                       </span>
-                      <h4 className="text-xs font-bold text-zinc-100 font-serif mt-1 leading-snug line-clamp-2 group-hover:text-emerald-400 transition-colors">
+                      <h4 className="text-xs font-bold text-[#142D27] font-serif mt-1 leading-snug line-clamp-2 group-hover:text-emerald-700 transition-colors">
                         {task.title}
                       </h4>
                     </div>
 
                     {/* Marks & Time Stats */}
                     <div className="mt-3 flex items-center justify-between gap-1.5">
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300">
-                        <Award className="w-3 h-3 text-emerald-400 shrink-0" />
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
+                        <Award className="w-3 h-3 text-emerald-600 shrink-0" />
                         {marksText}
                       </span>
-                      <span className="text-[10px] font-semibold text-zinc-400">
+                      <span className="text-[10px] font-semibold text-[#557067]">
                         {task.estimatedMinutes || 60} Mins
                       </span>
                     </div>
 
                     {/* Teacher Remarks Snippet */}
                     {task.approval?.feedback && (
-                      <p className="text-[11px] text-zinc-300 mt-2 line-clamp-2 italic leading-relaxed pl-2 border-l-2 border-emerald-400 bg-zinc-900 p-1.5 rounded-r-lg">
+                      <p className="text-[11px] text-[#2e473f] mt-2 line-clamp-2 italic leading-relaxed pl-2 border-l-2 border-emerald-500 bg-emerald-50/50 p-1.5 rounded-r-lg">
                         &quot;{task.approval.feedback.replace(/Marks:\s*\d+\/\d+/i, '').trim()}&quot;
                       </p>
                     )}
                   </div>
 
                   {/* Bottom Verification Footer */}
-                  <div className="pt-2.5 mt-3 border-t border-zinc-800 flex items-center justify-between gap-1">
-                    <span className="text-[10px] font-semibold text-emerald-400 truncate">
+                  <div className="pt-2.5 mt-3 border-t border-[#e1ede7] flex items-center justify-between gap-1">
+                    <span className="text-[10px] font-semibold text-emerald-700 truncate">
                       Signed: {task.approval?.approvedBy || 'Ahmad'}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80 shrink-0">
-                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                    <span className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
                       Verified
                     </span>
                   </div>
