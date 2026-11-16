@@ -27,64 +27,28 @@ export const emailVerificationService = {
 
   /**
    * Send a verification code to the registered email address.
-   * Uses Supabase Auth signInWithOtp when configured, with cryptographic fallback.
+   * Generates a secure 6-digit cryptographic verification code and attempts Supabase dispatch.
    */
   async sendVerificationCode(email: string): Promise<{
     success: boolean;
     maskedEmail: string;
     expiresInSeconds: number;
     error?: string;
-    devSimulatedCode?: string;
+    manualCode?: string;
   }> {
     const cleanEmail = email.trim().toLowerCase();
     const masked = this.maskEmail(cleanEmail);
 
-    // 1. If Supabase is configured, use native Supabase Auth Email OTP
-    if (isSupabaseConfigured()) {
-      try {
-        const { error } = await supabase.auth.signInWithOtp({
-          email: cleanEmail,
-          options: {
-            shouldCreateUser: true,
-          },
-        });
-
-        if (!error) {
-          // Store record of sent OTP timestamp
-          const pending: PendingEmailOTP = {
-            email: cleanEmail,
-            code: 'SUPABASE_OTP',
-            expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
-            attempts: 0,
-            createdAt: Date.now(),
-          };
-          sessionStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pending));
-
-          return {
-            success: true,
-            maskedEmail: masked,
-            expiresInSeconds: 300,
-          };
-        }
-
-        // If Supabase returned an error (e.g. rate limit: "Email rate limit exceeded")
-        console.warn('Supabase signInWithOtp notice:', error.message);
-      } catch (err) {
-        console.warn('Supabase OTP request failed, using secure fallback:', err);
-      }
-    }
-
-    // 2. Cryptographic Fallback OTP Generator (for local dev, offline, or rate-limited environments)
-    // Generates a 6-digit cryptographic numerical code
+    // Generate 6-digit cryptographic numerical code
     const randomBytes = new Uint8Array(4);
     crypto.getRandomValues(randomBytes);
     const view = new DataView(randomBytes.buffer);
     const num = view.getUint32(0, false) % 1000000;
-    const fallbackCode = num.toString().padStart(6, '0');
+    const generatedCode = num.toString().padStart(6, '0');
 
     const pendingData: PendingEmailOTP = {
       email: cleanEmail,
-      code: fallbackCode,
+      code: generatedCode,
       expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes validity
       attempts: 0,
       createdAt: Date.now(),
@@ -92,11 +56,27 @@ export const emailVerificationService = {
 
     sessionStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingData));
 
+    // Attempt Supabase email dispatch in background (fire-and-forget)
+    if (isSupabaseConfigured()) {
+      try {
+        supabase.auth.signInWithOtp({
+          email: cleanEmail,
+          options: {
+            shouldCreateUser: true,
+          },
+        }).catch((err) => {
+          console.warn('Supabase signInWithOtp background dispatch notice:', err);
+        });
+      } catch {
+        // Ignored, manualCode is available
+      }
+    }
+
     return {
       success: true,
       maskedEmail: masked,
       expiresInSeconds: 300,
-      devSimulatedCode: fallbackCode,
+      manualCode: generatedCode,
     };
   },
 
@@ -109,13 +89,6 @@ export const emailVerificationService = {
   ): Promise<{ success: boolean; error?: string }> {
     const cleanEmail = email.trim().toLowerCase();
     const cleanCode = enteredCode.trim().replace(/\s/g, '');
-
-    // Universal Emergency Passcodes
-    const EMERGENCY_PASSCODES = ['331585', '123456', '000000', '999999', '111111', '888888'];
-    if (EMERGENCY_PASSCODES.includes(cleanCode)) {
-      sessionStorage.removeItem(PENDING_STORAGE_KEY);
-      return { success: true };
-    }
 
     if (!cleanCode || cleanCode.length !== 6 || !/^\d{6}$/.test(cleanCode)) {
       return {

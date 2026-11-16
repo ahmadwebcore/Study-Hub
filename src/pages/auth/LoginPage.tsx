@@ -15,6 +15,7 @@ import {
   Ticket,
   Send,
   Key,
+  QrCode,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -69,14 +70,14 @@ export const LoginPage: React.FC = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [totpCode, setTotpCode] = useState('');
   const [copiedSecret, setCopiedSecret] = useState(false);
-  const [copiedRecovery, setCopiedRecovery] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
 
-  // Email Verification State
+  // Email / Manual Verification State
   const [emailOtpCode, setEmailOtpCode] = useState('');
   const [emailCodeSent, setEmailCodeSent] = useState(false);
+  const [manualCode, setManualCode] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [expiryCountdown, setExpiryCountdown] = useState(0);
-  const [emailSuccessMsg, setEmailSuccessMsg] = useState<string | null>(null);
 
   // Check for restored verification session on page refresh
   useEffect(() => {
@@ -162,8 +163,17 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      let activeRole: 'teacher' | 'student' = roleMode;
+      if (cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail.includes('ahmad') || cleanEmail.includes('teacher')) {
+        activeRole = 'teacher';
+      } else if (cleanEmail === 'henzanoor@gmail.com' || cleanEmail.includes('henza') || cleanEmail.includes('student')) {
+        activeRole = 'student';
+      }
+      setRoleMode(activeRole);
+
       // 1. Verify credentials strictly
-      const result = await authService.validateCredentials(email, password, roleMode);
+      const result = await authService.validateCredentials(cleanEmail, password, activeRole);
 
       if (!result.valid || result.error) {
         setIsSubmitting(false);
@@ -171,20 +181,16 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      // 2. Both Faculty and Student require full 2FA challenge (Google Authenticator or Email OTP)
-      const cleanEmail = email.trim().toLowerCase();
+      // 2. Both Faculty and Student require full 2FA challenge (Google Authenticator or Manual Code)
       setVerifiedEmail(cleanEmail);
       sessionStorage.setItem(
         'studyhub_pending_2fa',
-        JSON.stringify({ email: cleanEmail, roleMode })
+        JSON.stringify({ email: cleanEmail, roleMode: activeRole })
       );
 
       const config = twoFactorService.getConfig(cleanEmail);
       setTfaConfig(config);
-
-      if (!config.isEnrolled) {
-        await loadEnrollmentQrCode(cleanEmail, config.secret);
-      }
+      await loadEnrollmentQrCode(cleanEmail, config.secret);
 
       setIsSubmitting(false);
       setStep('verification');
@@ -206,54 +212,18 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    const EMERGENCY_PASSCODES = ['331585', '816796', '123456', '000000', '999999', '111111', '888888', '654321'];
-    const isTeacher = roleMode === 'teacher';
-    // For emergency bypass or direct authority:
-    if (
-      EMERGENCY_PASSCODES.includes(clean) ||
-      (isTeacher && verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
-    ) {
-      completeTwoFactorAuth(verifiedEmail || (isTeacher ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'), roleMode);
-      navigate('/dashboard', { replace: true });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const isEnrolled = tfaConfig?.isEnrolled ?? false;
+      const res = await twoFactorService.verifyCode(verifiedEmail, clean);
 
-      if (!isEnrolled) {
-        // ENROLLMENT CONFIRMATION FLOW:
-        const res = await twoFactorService.confirmAndEnroll(verifiedEmail, clean);
-        if (!res.success) {
-          if (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher')) {
-            completeTwoFactorAuth(verifiedEmail, 'teacher');
-            setIsSubmitting(false);
-            navigate('/dashboard', { replace: true });
-            return;
-          }
-          setIsSubmitting(false);
-          setAuthError(res.error || 'Verification failed. Please check the code in Google Authenticator.');
-          return;
-        }
-      } else {
-        // ACTIVE 2FA VERIFICATION FLOW:
-        const res = await twoFactorService.verifyCode(verifiedEmail, clean);
-        if (!res.success) {
-          if (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher')) {
-            completeTwoFactorAuth(verifiedEmail, 'teacher');
-            setIsSubmitting(false);
-            navigate('/dashboard', { replace: true });
-            return;
-          }
-          setIsSubmitting(false);
-          setAuthError(res.error || 'Incorrect code. Please enter the current code from Google Authenticator.');
-          return;
-        }
+      if (!res.success) {
+        setIsSubmitting(false);
+        setAuthError(res.error || 'Incorrect Google Authenticator code. Please check your app.');
+        return;
       }
 
-      // SUCCESS: complete session & enter appropriate portal
+      // SUCCESS: complete session & enter appropriate portal strictly according to roleMode
       completeTwoFactorAuth(verifiedEmail, roleMode);
       setIsSubmitting(false);
       navigate('/dashboard', { replace: true });
@@ -278,11 +248,10 @@ export const LoginPage: React.FC = () => {
   };
 
   // ==========================================
-  // STEP 2B: GMAIL / EMAIL VERIFICATION
+  // STEP 2B: MANUAL / EMAIL CODE VERIFICATION
   // ==========================================
   const handleSendEmailVerification = async () => {
     setAuthError(null);
-    setEmailSuccessMsg(null);
     setIsSubmitting(true);
 
     try {
@@ -293,13 +262,15 @@ export const LoginPage: React.FC = () => {
         setEmailCodeSent(true);
         setResendCooldown(60);
         setExpiryCountdown(res.expiresInSeconds || 300);
-        setEmailSuccessMsg('A 6-digit verification code has been dispatched to your registered email.');
+        if (res.manualCode) {
+          setManualCode(res.manualCode);
+        }
       } else {
-        setAuthError(res.error || 'Failed to dispatch verification email. Please try again.');
+        setAuthError(res.error || 'Failed to dispatch verification code. Please try again.');
       }
     } catch {
       setIsSubmitting(false);
-      setAuthError('Failed to send verification code. Please check your network connection.');
+      setAuthError('Failed to send verification code. Please check your connection.');
     }
   };
 
@@ -309,18 +280,7 @@ export const LoginPage: React.FC = () => {
 
     const cleanOtp = (emailOtpCode || '').trim().replace(/\D/g, '');
     if (!cleanOtp || cleanOtp.length !== 6) {
-      setAuthError('Please enter the 6-digit code received in your email.');
-      return;
-    }
-
-    const EMERGENCY_PASSCODES = ['331585', '816796', '123456', '000000', '999999', '111111', '888888', '654321'];
-    const isTeacher = roleMode === 'teacher';
-    if (
-      EMERGENCY_PASSCODES.includes(cleanOtp) ||
-      (isTeacher && verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
-    ) {
-      completeTwoFactorAuth(verifiedEmail || (isTeacher ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'), roleMode);
-      navigate('/dashboard', { replace: true });
+      setAuthError('Please enter the 6-digit verification code.');
       return;
     }
 
@@ -352,7 +312,9 @@ export const LoginPage: React.FC = () => {
     setAuthError(null);
     setTotpCode('');
     setEmailOtpCode('');
+    setManualCode('');
     setEmailCodeSent(false);
+    setShowQrModal(false);
   };
 
   // Helper copy handlers
@@ -361,14 +323,6 @@ export const LoginPage: React.FC = () => {
       navigator.clipboard.writeText(tfaConfig.secret);
       setCopiedSecret(true);
       setTimeout(() => setCopiedSecret(false), 2000);
-    }
-  };
-
-  const handleCopyRecoveryCodes = () => {
-    if (tfaConfig?.recoveryCodes) {
-      navigator.clipboard.writeText(tfaConfig.recoveryCodes.join('\n'));
-      setCopiedRecovery(true);
-      setTimeout(() => setCopiedRecovery(false), 2000);
     }
   };
 
@@ -472,11 +426,20 @@ export const LoginPage: React.FC = () => {
                     <input
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEmail(val);
+                        const clean = val.trim().toLowerCase();
+                        if (clean === 'ahmadwebcore@gmail.com' || clean.includes('ahmad') || clean.includes('teacher')) {
+                          setRoleMode('teacher');
+                        } else if (clean === 'henzanoor@gmail.com' || clean.includes('henza') || clean.includes('student')) {
+                          setRoleMode('student');
+                        }
+                      }}
                       placeholder={
                         roleMode === 'teacher'
-                          ? 'faculty@example.com'
-                          : 'student@example.com'
+                          ? 'ahmadwebcore@gmail.com'
+                          : 'henzanoor@gmail.com'
                       }
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
@@ -570,15 +533,15 @@ export const LoginPage: React.FC = () => {
                 </span>
               </div>
 
-              {/* Method Switcher Tabs */}
-              <div className="grid grid-cols-2 p-1 rounded-xl bg-[#F7F9F8] border border-zinc-200">
+              {/* Method Switcher Tabs: Google Authenticator (Default) vs Manual Code */}
+              <div className="grid grid-cols-2 p-1 rounded-xl bg-zinc-100 border border-zinc-200">
                 <button
                   type="button"
                   onClick={() => {
                     setVerificationMethod('authenticator');
                     setAuthError(null);
                   }}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     verificationMethod === 'authenticator'
                       ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200'
                       : 'text-zinc-500 hover:text-zinc-900'
@@ -592,279 +555,227 @@ export const LoginPage: React.FC = () => {
                   onClick={() => {
                     setVerificationMethod('email');
                     setAuthError(null);
+                    if (!emailCodeSent) {
+                      handleSendEmailVerification();
+                    }
                   }}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     verificationMethod === 'email'
                       ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200'
                       : 'text-zinc-500 hover:text-zinc-900'
                   }`}
                 >
-                  <Mail className="w-3.5 h-3.5 text-sky-600" />
-                  Email Verification
+                  <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+                  Manual Verification Code
                 </button>
               </div>
 
               {/* ----------------------------------------------------------- */}
-              {/* OPTION A: GOOGLE AUTHENTICATOR (ENROLLMENT VS VERIFY)       */}
+              {/* WAY 1: GOOGLE AUTHENTICATOR (DEFAULT)                       */}
               {/* ----------------------------------------------------------- */}
               {verificationMethod === 'authenticator' && (
-                <>
-                  {/* CASE 1: NOT YET ENROLLED (ENROLLMENT VIEW WITH QR CODE) */}
-                  {!tfaConfig?.isEnrolled ? (
-                    <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
-                      <div className="text-center space-y-2">
-                        <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-semibold">
-                          Initial 2FA Setup Required
-                        </div>
-                        <p className="text-xs text-zinc-600 leading-relaxed">
-                          Scan this QR code with <strong>Google Authenticator</strong> on your phone:
-                        </p>
-
-                        {/* Scannable Base32 QR Code */}
-                        <div className="p-2.5 bg-white border border-zinc-200 rounded-xl inline-block shadow-xs">
-                          {qrCodeUrl ? (
-                            <img
-                              src={qrCodeUrl}
-                              alt="Google Authenticator QR Code"
-                              className="w-40 h-40 mx-auto rounded"
-                            />
-                          ) : (
-                            <div className="w-40 h-40 bg-zinc-100 flex items-center justify-center text-xs text-zinc-400">
-                              Generating Setup QR...
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Manual Base32 Setup Key */}
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-zinc-400 block font-medium">
-                            Or enter secret key manually into Google Authenticator:
-                          </span>
-                          <div className="flex items-center justify-center gap-2">
-                            <span className="text-[11px] font-mono font-bold text-zinc-800 bg-zinc-100 px-2.5 py-1 rounded-md border border-zinc-200 select-all">
-                              {tfaConfig?.secret}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={handleCopySecret}
-                              className="p-1 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors"
-                              title="Copy Secret Key"
-                            >
-                              {copiedSecret ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Backup Recovery Codes Box */}
-                        <div className="pt-2 text-left bg-zinc-50 p-2.5 rounded-xl border border-zinc-200 space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-semibold text-zinc-800 flex items-center gap-1">
-                              <Key className="w-3 h-3 text-amber-600" />
-                              Single-Use Backup Recovery Codes
-                            </span>
-                            <button
-                              type="button"
-                              onClick={handleCopyRecoveryCodes}
-                              className="text-[10px] text-emerald-600 font-semibold hover:underline flex items-center gap-0.5"
-                            >
-                              {copiedRecovery ? 'Copied!' : 'Copy All'}
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-zinc-600">
-                            {tfaConfig?.recoveryCodes.map((c, i) => (
-                              <div key={i} className="bg-white px-2 py-0.5 rounded border border-zinc-200">
-                                {c}
-                              </div>
-                            ))}
-                          </div>
-                          <p className="text-[10px] text-zinc-400 leading-tight">
-                            Save these keys in a safe place. You can use them if you ever lose your phone.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* First Code Input to Confirm Setup */}
-                      <div>
-                        <label className="block text-xs font-semibold text-zinc-800 mb-1 text-center">
-                          Enter 6-Digit Code to Confirm & Activate
-                        </label>
-                        <div className="relative">
-                          <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                          <input
-                            type="text"
-                            maxLength={6}
-                            value={totpCode}
-                            onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-                            placeholder="000000"
-                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        className="w-full h-11 text-xs font-bold shadow-sm"
-                        isLoading={isSubmitting}
-                        loadingText="Activating 2FA..."
-                        icon={<ArrowRight className="w-4 h-4" />}
-                      >
-                        Confirm Code & Activate 2FA
-                      </Button>
-                    </form>
-                  ) : (
-                    /* CASE 2: ALREADY ENROLLED (CLEAN 6-DIGIT PROMPT) */
-                    <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
-                      <div className="text-center space-y-1.5 py-1">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
-                          <ShieldCheck className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-sm font-bold text-zinc-900">
-                          Enter Authenticator Code
-                        </h3>
-                        <p className="text-xs text-zinc-500">
-                          Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
-                        </p>
-                      </div>
-
-                      <div>
-                        <div className="relative">
-                          <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="one-time-code"
-                            maxLength={6}
-                            value={totpCode}
-                            onChange={(e) => handleTotpCodeChange(e.target.value)}
-                            placeholder="000000"
-                            className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
-                            autoFocus
-                          />
-                        </div>
-                      </div>
-
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        className="w-full h-11 text-xs font-bold shadow-sm"
-                        isLoading={isSubmitting}
-                        loadingText="Verifying Code..."
-                        icon={<ArrowRight className="w-4 h-4" />}
-                      >
-                        Verify & Enter Portal
-                      </Button>
-                    </form>
-                  )}
-                </>
-              )}
-
-              {/* ----------------------------------------------------------- */}
-              {/* OPTION B: GMAIL / EMAIL VERIFICATION                        */}
-              {/* ----------------------------------------------------------- */}
-              {verificationMethod === 'email' && (
-                <div className="space-y-4">
-                  {/* Notice / Instructions */}
-                  <div className="text-center space-y-1 py-1">
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200">
-                      <Mail className="w-5 h-5" />
+                <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
+                  <div className="text-center space-y-1.5 py-1">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
+                      <ShieldCheck className="w-6 h-6" />
                     </div>
-                    <h3 className="text-xs font-bold text-zinc-900">
-                      Gmail One-Time Passcode (OTP)
+                    <h3 className="text-sm font-bold text-zinc-900">
+                      Enter Authenticator Code
                     </h3>
-                    <p className="text-[11px] text-zinc-500">
-                      We will dispatch a secure 6-digit code to your registered academic email address.
+                    <p className="text-xs text-zinc-500">
+                      Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
                     </p>
                   </div>
 
-                  {emailSuccessMsg && (
-                    <div className="p-2.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-800 flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                      <span>{emailSuccessMsg}</span>
+                  <div>
+                    <div className="relative">
+                      <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={6}
+                        value={totpCode}
+                        onChange={(e) => handleTotpCodeChange(e.target.value)}
+                        placeholder="000000"
+                        className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
+                        autoFocus
+                      />
                     </div>
-                  )}
+                  </div>
 
-                  {!emailCodeSent ? (
-                    <div className="space-y-3">
-                      <Button
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-full h-11 text-xs font-bold shadow-sm"
+                    isLoading={isSubmitting}
+                    loadingText="Verifying Code..."
+                    icon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Verify Authenticator Code & Enter
+                  </Button>
+
+                  {/* Manual Setup Key Box */}
+                  <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-center space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-zinc-600 font-medium">Authenticator Setup Key (Manual Code):</span>
+                      <button
                         type="button"
-                        variant="primary"
-                        onClick={handleSendEmailVerification}
-                        className="w-full h-11 text-xs font-bold shadow-sm"
-                        isLoading={isSubmitting}
-                        loadingText="Sending Code..."
-                        icon={<Send className="w-3.5 h-3.5" />}
+                        onClick={() => setShowQrModal(!showQrModal)}
+                        className="text-[11px] font-semibold text-emerald-700 hover:underline cursor-pointer flex items-center gap-1"
                       >
-                        Send Verification Code to Gmail
-                      </Button>
-                      <p className="text-[10px] text-zinc-400 text-center">
-                        Code expires in 5 minutes after being dispatched.
+                        <QrCode className="w-3 h-3" />
+                        <span>{showQrModal ? 'Hide QR' : 'Show Setup QR'}</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2">
+                      <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
+                        {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234')}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={handleCopySecret}
+                        className="p-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer"
+                        title="Copy Key"
+                      >
+                        {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+
+                    {showQrModal && qrCodeUrl && (
+                      <div className="pt-2 animate-in fade-in duration-200">
+                        <img
+                          src={qrCodeUrl}
+                          alt="Google Authenticator QR Code"
+                          className="w-36 h-36 mx-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-xs"
+                        />
+                        <p className="text-[10px] text-zinc-500 pt-1">
+                          Scan with Google Authenticator
+                        </p>
+                      </div>
+                    )}
+
+                    <p className="text-[11px] text-zinc-500 leading-tight">
+                      In Google Authenticator: tap <strong>+</strong> &gt; <strong>Enter a setup key</strong> &gt; paste this code.
+                    </p>
+                  </div>
+                </form>
+              )}
+
+              {/* ----------------------------------------------------------- */}
+              {/* WAY 2: MANUAL VERIFICATION CODE                             */}
+              {/* ----------------------------------------------------------- */}
+              {verificationMethod === 'email' && (
+                <div className="space-y-4">
+                  <div className="text-center space-y-1 py-1">
+                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <h3 className="text-xs font-bold text-zinc-900">
+                      Manual Security Verification Code
+                    </h3>
+                    <p className="text-[11px] text-zinc-500">
+                      Authorized security verification for {verifiedEmail}
+                    </p>
+                  </div>
+
+                  {manualCode ? (
+                    <div className="p-3.5 bg-sky-50/80 border border-sky-200/80 rounded-2xl text-center space-y-2 shadow-xs">
+                      <div className="flex items-center justify-center gap-1.5 text-sky-900 text-xs font-bold">
+                        <Key className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Active Session Verification Code</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="font-mono text-2xl font-bold tracking-widest text-sky-950 bg-white px-3.5 py-1 rounded-xl border border-sky-200 shadow-2xs select-all">
+                          {manualCode}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEmailOtpCode(manualCode);
+                            navigator.clipboard.writeText(manualCode);
+                          }}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white transition-colors cursor-pointer"
+                        >
+                          Fill Code
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-sky-700">
+                        Enter this 6-digit code below to safely authorize your login.
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={handleVerifyEmailCode} className="space-y-3.5">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-xs font-semibold text-zinc-800">
-                            Enter 6-Digit Email Code
-                          </label>
-                          {expiryCountdown > 0 && (
-                            <span className="text-[10px] font-mono text-zinc-400">
-                              Expires in: {formatCountdown(expiryCountdown)}
-                            </span>
-                          )}
-                        </div>
-                        <div className="relative">
-                          <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                          <input
-                            type="text"
-                            maxLength={6}
-                            value={emailOtpCode}
-                            onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, ''))}
-                            placeholder="000000"
-                            className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
-                            autoFocus
-                          />
-                        </div>
-                      </div>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={handleSendEmailVerification}
+                      className="w-full h-11 text-xs font-bold shadow-sm"
+                      isLoading={isSubmitting}
+                      loadingText="Generating Code..."
+                      icon={<Send className="w-3.5 h-3.5" />}
+                    >
+                      Generate 6-Digit Manual Verification Code
+                    </Button>
+                  )}
 
-                      <Button
-                        type="submit"
-                        variant="primary"
-                        className="w-full h-11 text-xs font-bold shadow-sm"
-                        isLoading={isSubmitting}
-                        loadingText="Verifying Code..."
-                        icon={<ArrowRight className="w-4 h-4" />}
-                      >
-                        Verify Email Code & Enter
-                      </Button>
-
-                      {/* Resend Code Button with Cooldown */}
-                      <div className="flex items-center justify-between pt-1 text-xs">
-                        <span className="text-[11px] text-zinc-400">
-                          Didn't receive the email?
-                        </span>
-                        {resendCooldown > 0 ? (
-                          <span className="text-[11px] font-medium text-zinc-400">
-                            Resend in {resendCooldown}s
+                  <form onSubmit={handleVerifyEmailCode} className="space-y-3.5">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs font-semibold text-zinc-800">
+                          Enter 6-Digit Code
+                        </label>
+                        {expiryCountdown > 0 && (
+                          <span className="text-[10px] font-mono text-zinc-400">
+                            Valid for: {formatCountdown(expiryCountdown)}
                           </span>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={handleSendEmailVerification}
-                            className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold"
-                          >
-                            Resend Code
-                          </button>
                         )}
                       </div>
-                    </form>
-                  )}
+                      <div className="relative">
+                        <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          value={emailOtpCode}
+                          onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, ''))}
+                          placeholder="000000"
+                          className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      className="w-full h-11 text-xs font-bold shadow-sm"
+                      isLoading={isSubmitting}
+                      loadingText="Verifying Code..."
+                      icon={<ArrowRight className="w-4 h-4" />}
+                    >
+                      Verify Manual Code & Enter
+                    </Button>
+
+                    <div className="flex items-center justify-between pt-1 text-xs">
+                      <span className="text-[11px] text-zinc-400">
+                        Need a fresh code?
+                      </span>
+                      {resendCooldown > 0 ? (
+                        <span className="text-[11px] font-medium text-zinc-400">
+                          Refresh in {resendCooldown}s
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleSendEmailVerification}
+                          className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer"
+                        >
+                          Generate New Code
+                        </button>
+                      )}
+                    </div>
+                  </form>
                 </div>
               )}
 

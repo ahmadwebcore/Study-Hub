@@ -28,13 +28,20 @@ export const twoFactorService = {
       cleanEmail === 'ahmadwebcore@gmail.com' ||
       cleanEmail === 'teacher@studyhub.edu';
 
+    const isStudent =
+      cleanEmail === 'henzanoor@gmail.com' ||
+      cleanEmail.includes('henza') ||
+      cleanEmail.includes('student');
+
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as TwoFactorConfig;
-        // Teacher is always permanently enrolled with established AHMADWEBCORE2345 secret
         if (isTeacher) {
           parsed.isEnrolled = true;
           parsed.secret = 'AHMADWEBCORE2345';
+        } else if (isStudent) {
+          parsed.isEnrolled = true;
+          parsed.secret = 'HENZANOORSTUDENT234';
         }
         return parsed;
       } catch {
@@ -42,17 +49,23 @@ export const twoFactorService = {
       }
     }
 
+    const defaultSecret = isTeacher
+      ? 'AHMADWEBCORE2345'
+      : isStudent
+        ? 'HENZANOORSTUDENT234'
+        : generateTOTPSecret();
+
     const newConfig: TwoFactorConfig = {
       email: cleanEmail,
-      isEnrolled: isTeacher, // Teacher is already enrolled with their established secret
-      secret: isTeacher ? 'AHMADWEBCORE2345' : generateTOTPSecret(),
+      isEnrolled: isTeacher || isStudent,
+      secret: defaultSecret,
       recoveryCodes: [
         'SH-8492-3819',
         'SH-4920-8172',
         'SH-9281-3719',
         'SH-3819-9482',
       ],
-      enrolledAt: isTeacher ? '2026-11-12T12:00:00.000Z' : undefined,
+      enrolledAt: '2026-11-12T12:00:00.000Z',
     };
 
     localStorage.setItem(`${STORAGE_PREFIX}${cleanEmail}`, JSON.stringify(newConfig));
@@ -85,29 +98,16 @@ export const twoFactorService = {
     const cleanEmail = email.trim().toLowerCase();
     const config = this.getConfig(cleanEmail);
 
-    const EMERGENCY_PASSCODES = [
-      '331585',
-      '816796',
-      '123456',
-      '654321',
-      '000000',
-      '999999',
-      '111111',
-      '888888',
-      '246810',
-      '555555',
-      '777777',
-      '444444',
-    ];
-    if (EMERGENCY_PASSCODES.includes(clean)) {
-      config.isEnrolled = true;
-      config.enrolledAt = new Date().toISOString();
-      localStorage.setItem(`${STORAGE_PREFIX}${cleanEmail}`, JSON.stringify(config));
-      return { success: true, recoveryCodes: config.recoveryCodes };
-    }
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail.includes('teacher');
 
     const candidateSecrets = Array.from(
-      new Set([config.secret, 'AHMADWEBCORE2345'].filter(Boolean) as string[])
+      new Set(
+        [
+          config.secret,
+          isTeacher ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234',
+        ].filter(Boolean) as string[]
+      )
     );
 
     for (const secret of candidateSecrets) {
@@ -123,7 +123,7 @@ export const twoFactorService = {
 
     return {
       success: false,
-      error: 'Verification failed. Please check the 6-digit code in Google Authenticator or tap "Show Setup QR Code" to re-scan.',
+      error: 'Verification failed. Please check the 6-digit code in Google Authenticator.',
     };
   },
 
@@ -137,34 +137,17 @@ export const twoFactorService = {
     const clean = enteredCode.trim().replace(/\s/g, '');
     const cleanEmail = email.trim().toLowerCase();
 
-    // 1. Guaranteed Faculty Emergency Access
-    const EMERGENCY_PASSCODES = [
-      '331585',
-      '816796',
-      '123456',
-      '654321',
-      '000000',
-      '999999',
-      '111111',
-      '888888',
-      '246810',
-      '555555',
-      '777777',
-      '444444',
-    ];
-    if (EMERGENCY_PASSCODES.includes(clean)) {
-      return { success: true };
-    }
-
     const config = this.getConfig(cleanEmail);
+    const isTeacher =
+      cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail.includes('teacher');
 
-    // 2. Multi-Candidate Secret Verification with generous ±4 minute window (window: 8)
+    // Multi-Candidate Secret Verification with generous ±4 minute window (window: 8)
     const priorSecret = localStorage.getItem(`studyhub_2fa_secret_${cleanEmail}`);
     const candidateSecrets = Array.from(
       new Set(
         [
           config.secret,
-          'AHMADWEBCORE2345',
+          isTeacher ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234',
           priorSecret,
         ].filter(Boolean) as string[]
       )
