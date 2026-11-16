@@ -115,7 +115,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
+      className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-zinc-950/70 backdrop-blur-md animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
       onClick={onClose}
     >
       <div

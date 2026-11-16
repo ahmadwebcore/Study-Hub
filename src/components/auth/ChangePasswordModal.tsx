@@ -200,7 +200,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-5 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-5 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
       onClick={onClose}
     >
       <div

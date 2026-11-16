@@ -84,7 +84,7 @@ export const ResultsPage: React.FC = () => {
           size="sm"
           icon={<Download className="w-4 h-4 text-emerald-400" />}
           onClick={handleExportTranscript}
-          className="bg-[#1c211f] border-white/10 text-zinc-200 hover:bg-white/10 hover:text-white"
+          className="bg-[#2e3533] border-white/10 text-zinc-200 hover:bg-white/10 hover:text-white"
         >
           Export Official Transcript
         </Button>

@@ -339,7 +339,7 @@ export const TestSubmissionPage: React.FC = () => {
           {activeTest && (
             <button
               onClick={() => setPdfViewerTest(activeTest)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1c211f] border border-white/10 text-xs font-bold text-zinc-200 hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#2e3533] border border-white/10 text-xs font-bold text-zinc-200 hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-emerald-400" />
               <span>View Textbook in PDF</span>
@@ -658,12 +658,12 @@ export const TestSubmissionPage: React.FC = () => {
                           )}
 
                           {/* Quick Page Number Pill */}
-                          <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-white text-[10px] font-bold">
+                          <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-zinc-900/75 backdrop-blur-xs text-white text-[10px] font-bold">
                             Page {page.pageNumber}
                           </span>
 
                           {/* Zoom & Delete Actions Overlay */}
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <div className="absolute inset-0 bg-zinc-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <button
                               type="button"
                               onClick={() => setZoomPage(page)}

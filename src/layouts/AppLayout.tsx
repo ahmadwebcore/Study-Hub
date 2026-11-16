@@ -26,7 +26,7 @@ export const AppLayout: React.FC = () => {
   const isAITeacherPage = location.pathname.startsWith('/ai-teacher');
 
   return (
-    <div className="min-h-screen bg-[#151918] flex flex-col font-sans text-zinc-100">
+    <div className="min-h-screen bg-[#1f2422] flex flex-col font-sans text-zinc-100">
       {/* Real Mobile App Native Push Banner */}
       <MobileNativePushBanner />
 
@@ -47,19 +47,19 @@ export const AppLayout: React.FC = () => {
           <div className="fixed inset-0 z-50 lg:hidden flex">
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+              className="fixed inset-0 bg-zinc-950/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
               onClick={() => setMobileMenuOpen(false)}
             />
 
             {/* Slide-over drawer */}
-            <div className="relative flex flex-col w-[82vw] max-w-[300px] h-full bg-[#121514] shadow-2xl z-10 animate-in slide-in-from-left duration-200 border-r border-white/10 overflow-hidden">
+            <div className="relative flex flex-col w-[82vw] max-w-[300px] h-full bg-[#262c2a] shadow-2xl z-10 animate-in slide-in-from-left duration-200 border-r border-white/10 overflow-hidden">
               <Sidebar onCloseMobile={() => setMobileMenuOpen(false)} />
             </div>
           </div>
         )}
 
         {/* Main Workspace Area (Fluid width, eliminates wonkey white gap, adjusts to sidebar) */}
-        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 bg-[#151918]">
+        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 bg-[#1f2422]">
           {/* Active Student Preview Banner (Visible only when Teacher has switched to Student perspective) */}
           {canSwitchRole && role === 'student' && (
             <div className="bg-[#142D27] text-white px-3 sm:px-6 py-2 flex items-center justify-between text-xs sticky top-0 z-30 border-b border-emerald-500/30 shadow-xs">
@@ -88,7 +88,7 @@ export const AppLayout: React.FC = () => {
             onToggleSidebar={toggleSidebarCollapsed}
           />
 
-          <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1720px] transition-all bg-[#151918]">
+          <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1720px] transition-all bg-[#1f2422]">
             <Outlet />
           </main>
 
@@ -96,7 +96,7 @@ export const AppLayout: React.FC = () => {
           {!isAITeacherPage && <StudyBotWidget />}
 
           {/* Minimalist 2026 Footer */}
-          <footer className="py-4 px-3 sm:px-6 lg:px-8 border-t border-white/10 text-xs text-zinc-400 bg-[#121514]">
+          <footer className="py-4 px-3 sm:px-6 lg:px-8 border-t border-white/10 text-xs text-zinc-400 bg-[#262c2a]">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-[1720px]">
               <span>
                 Global Science Academy, Fatehpur &copy; {new Date().getFullYear()} &bull; Academic Portal

@@ -245,14 +245,14 @@ export const TeacherDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setIsScheduleTestOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#1c211f] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#2e3533] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-zinc-400" />
             Schedule 30M Test
           </button>
           <button
             onClick={() => setIsComposeEmailOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#1c211f] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#2e3533] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
           >
             <Mail className="w-3.5 h-3.5 text-zinc-400" />
             Email Student

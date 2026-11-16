@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
   const userInitials = role === 'teacher' ? 'A' : (userName ? userName[0].toUpperCase() : 'H');
 
   return (
-    <header className="h-16 bg-[#131615]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3 text-white">
+    <header className="h-16 bg-[#262c2a]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3 text-white">
       {/* Left: Mobile hamburger & Logo & Global Search */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-1 max-w-lg min-w-0">
         <button
@@ -101,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#1c211f] text-zinc-300 hover:bg-white/10 hover:text-white transition-all focus:outline-none cursor-pointer shadow-2xs"
+            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#2e3533] text-zinc-300 hover:bg-white/10 hover:text-white transition-all focus:outline-none cursor-pointer shadow-2xs"
             title={isSidebarCollapsed ? "Expand sidebar to full width" : "Collapse sidebar to compact mode"}
             aria-label="Toggle sidebar collapse"
           >
@@ -120,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
             type="text"
             aria-label="Global search across subjects and assignments"
             placeholder="Search syllabus, tests, or topics..."
-            className="w-full h-9 pl-8 pr-3 rounded-xl border border-white/10 bg-[#1c211f] text-xs text-white placeholder-zinc-400 focus:bg-[#222826] focus:border-emerald-500 transition-all"
+            className="w-full h-9 pl-8 pr-3 rounded-xl border border-white/10 bg-[#2e3533] text-xs text-white placeholder-zinc-400 focus:bg-[#38413e] focus:border-emerald-500 transition-all"
           />
         </div>
       </div>
@@ -249,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
       {/* Profile Photo Update Modal */}
       {isAvatarModalOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-xs animate-in fade-in duration-150">
             <div className="w-full max-w-md bg-white rounded-2xl border border-zinc-200 shadow-2xl p-5 space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
                 <div className="flex items-center gap-2">

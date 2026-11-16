@@ -531,7 +531,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
 
         return createPortal(
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
             onClick={() => setActivePopupTest(null)}
           >
             <div

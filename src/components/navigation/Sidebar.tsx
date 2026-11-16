@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        'h-full w-full flex flex-col bg-[#121514] border-r border-white/10 select-none transition-all duration-300 text-zinc-300',
+        'h-full w-full flex flex-col bg-[#262c2a] border-r border-white/10 select-none transition-all duration-300 text-zinc-300',
         isCollapsed ? 'w-20' : 'w-full lg:w-64 xl:w-72'
       )}
       aria-label="Main Navigation Sidebar"
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={cn(
             'p-3 mx-3 my-2.5 rounded-2xl border transition-all shadow-2xs',
             role === 'teacher'
-              ? 'bg-[#1a1e1d] border-white/10'
+              ? 'bg-[#2e3533] border-white/10'
               : 'bg-emerald-950/80 border-emerald-500/40 ring-1 ring-emerald-500/30'
           )}
         >
@@ -280,7 +280,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         )}
 
                         {item.badge && isCollapsed && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#121514]" />
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#262c2a]" />
                         )}
                       </>
                     )}
@@ -322,7 +322,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* User Account Session Info */}
         <div
           className={cn(
-            'flex items-center rounded-xl border border-white/10 bg-[#161a19] transition-all',
+            'flex items-center rounded-xl border border-white/10 bg-[#2e3533] transition-all',
             isCollapsed ? 'justify-center p-2' : 'justify-between px-2.5 py-2'
           )}
         >

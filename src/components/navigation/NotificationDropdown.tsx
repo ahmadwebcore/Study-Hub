@@ -180,7 +180,7 @@ export const NotificationDropdown: React.FC = () => {
           <>
             {/* Mobile Backdrop */}
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 sm:hidden"
+              className="fixed inset-0 bg-zinc-950/60 backdrop-blur-xs z-40 sm:hidden"
               onClick={() => setIsOpen(false)}
             />
 

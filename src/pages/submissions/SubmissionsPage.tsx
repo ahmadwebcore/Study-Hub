@@ -308,10 +308,10 @@ export const SubmissionsPage: React.FC = () => {
                             title={`Click to zoom Page ${idx + 1}`}
                           >
                             <img src={thumb} alt={`Page ${idx + 1}`} className="w-full h-full object-cover" />
-                            <span className="absolute bottom-0 inset-x-0 bg-black/70 text-white text-[8px] font-bold text-center py-0.5">
+                            <span className="absolute bottom-0 inset-x-0 bg-zinc-900/75 text-white text-[8px] font-bold text-center py-0.5">
                               P.{idx + 1}
                             </span>
-                            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="absolute inset-0 bg-zinc-900/35 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
                               <Eye className="w-3.5 h-3.5 text-white" />
                             </div>
                           </div>
@@ -446,7 +446,7 @@ export const SubmissionsPage: React.FC = () => {
                     className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[#e1ede7] bg-white cursor-pointer hover:border-emerald-400"
                   >
                     <img src={thumb} alt={`Page ${idx + 1}`} className="w-full h-full object-cover" />
-                    <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/70 text-white text-[9px] font-bold">
+                    <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-zinc-900/75 text-white text-[9px] font-bold">
                       Page {idx + 1}
                     </span>
                   </div>
@@ -540,10 +540,10 @@ export const SubmissionsPage: React.FC = () => {
                     className="relative aspect-[3/4] rounded-xl overflow-hidden border border-[#e1ede7] bg-white cursor-pointer hover:border-emerald-400 group/item"
                   >
                     <img src={thumb} alt={`Page ${idx + 1}`} className="w-full h-full object-cover" />
-                    <span className="absolute bottom-1 left-1 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] font-bold">
+                    <span className="absolute bottom-1 left-1 px-2 py-0.5 rounded bg-zinc-900/75 text-white text-[10px] font-bold">
                       Page {idx + 1}
                     </span>
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-zinc-900/35 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center">
                       <Maximize2 className="w-4 h-4 text-white" />
                     </div>
                   </div>
