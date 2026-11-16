@@ -389,49 +389,49 @@ export const WeeklyTasksPage: React.FC = () => {
 
       {/* Status Summary Bento Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-bold text-[#7d9990] uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
             Awaiting Approval
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-amber-700">{awaitingApprovalCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="text-xl font-extrabold text-amber-400">{awaitingApprovalCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/80">
               Teacher Gate
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-bold text-[#7d9990] uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
             Verified Complete
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-emerald-700">{approvedCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="text-xl font-extrabold text-emerald-400">{approvedCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80">
               Approved
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-bold text-[#7d9990] uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
             Pending Student
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-[#263B35]">{pendingCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
+            <span className="text-xl font-extrabold text-zinc-200">{pendingCount}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
               In Progress
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7]">
-          <span className="text-[11px] font-bold text-[#7d9990] uppercase tracking-wider block">
+        <div className="p-3.5 rounded-2xl bg-[#18181b] border border-zinc-800 text-zinc-100 shadow-md">
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
             🇵🇰 Off Days Policy
           </span>
           <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-bold text-[#142D27]">Sunday & Holidays</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="text-sm font-bold text-zinc-200">Sunday & Holidays</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/80">
               Mandatory Off
             </span>
           </div>
@@ -626,14 +626,14 @@ export const WeeklyTasksPage: React.FC = () => {
               /* Regular Weekday Task Card */
               <div
                 key={task.id}
-                className={`p-4 sm:p-5 rounded-2xl bg-white border transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                className={`p-4 sm:p-5 rounded-2xl bg-[#18181b] border transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4 text-zinc-100 ${
                   task.status === 'approved'
-                    ? 'border-emerald-200/80'
+                    ? 'border-emerald-800/80 shadow-sm'
                     : task.status === 'submitted_for_approval'
-                    ? 'border-amber-300 bg-amber-50/20'
+                    ? 'border-amber-800/80 shadow-sm'
                     : task.status === 'overdue'
-                    ? 'border-rose-300 bg-rose-50/20'
-                    : 'border-[#e1ede7] hover:border-[#14B866]/40'
+                    ? 'border-rose-800/80 shadow-sm'
+                    : 'border-zinc-800 hover:border-zinc-700'
                 }`}
               >
                 {/* Left: Info */}
@@ -641,64 +641,64 @@ export const WeeklyTasksPage: React.FC = () => {
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       task.status === 'approved'
-                        ? 'bg-emerald-100 text-emerald-700'
+                        ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800/80'
                         : task.status === 'submitted_for_approval'
-                        ? 'bg-amber-100 text-amber-700'
+                        ? 'bg-amber-950/70 text-amber-400 border border-amber-800/80'
                         : task.status === 'overdue'
-                        ? 'bg-rose-100 text-rose-700'
-                        : 'bg-[#E7EFEA] text-[#142D27]'
+                        ? 'bg-rose-950/70 text-rose-400 border border-rose-800/80'
+                        : 'bg-zinc-800 text-emerald-400 border border-zinc-700'
                     }`}
                   >
                     {task.status === 'approved' ? (
-                      <Check className="w-5 h-5 text-emerald-600" />
+                      <Check className="w-5 h-5 text-emerald-400" />
                     ) : task.status === 'submitted_for_approval' ? (
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-400" />
                     ) : task.status === 'overdue' ? (
-                      <AlertTriangle className="w-5 h-5 text-rose-600" />
+                      <AlertTriangle className="w-5 h-5 text-rose-400" />
                     ) : (
-                      <BookOpen className="w-5 h-5 text-[#14B866]" />
+                      <BookOpen className="w-5 h-5 text-emerald-400" />
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#E7EFEA] text-[#142D27]">
+                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                         {task.subjectCode}
                       </span>
-                      <span className="text-[11px] font-bold text-[#557067]">
+                      <span className="text-[11px] font-bold text-zinc-400">
                         {task.dayOfWeek} • {task.assignedDate}
                       </span>
                       {task.pagesRange && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-100 text-zinc-700">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
                           {task.pagesRange}
                         </span>
                       )}
-                      <span className="text-[10px] text-[#7d9990]">
+                      <span className="text-[10px] text-zinc-500">
                         ({task.estimatedMinutes} mins)
                       </span>
                     </div>
 
-                    <h4 className="text-sm font-bold text-[#142D27] mt-1 truncate">
+                    <h4 className="text-sm font-bold text-zinc-100 mt-1 truncate">
                       {task.title}
                     </h4>
-                    <p className="text-xs text-[#557067] mt-0.5 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2 leading-relaxed">
                       {task.description}
                     </p>
 
                     {/* Source label */}
-                    <p className="text-[11px] text-[#7d9990] mt-1">
-                      Source: <strong>{task.sourceTitle}</strong>
+                    <p className="text-[11px] text-zinc-500 mt-1">
+                      Source: <strong className="text-zinc-400">{task.sourceTitle}</strong>
                     </p>
 
                     {/* Student notes or teacher feedback excerpt if available */}
                     {task.studentSubmission?.notes && (
-                      <div className="mt-2 text-xs bg-[#F7F9F8] p-2 rounded-lg border border-[#e1ede7] text-[#263B35]">
-                        <strong>Student Work Log:</strong> "{task.studentSubmission.notes}"
+                      <div className="mt-2 text-xs bg-zinc-900 p-2 rounded-lg border border-zinc-800 text-zinc-300">
+                        <strong className="text-zinc-200">Student Work Log:</strong> &quot;{task.studentSubmission.notes}&quot;
                       </div>
                     )}
                     {task.approval?.feedback && (
-                      <div className="mt-1.5 text-xs bg-emerald-50/70 p-2 rounded-lg border border-emerald-200/60 text-emerald-900">
-                        <strong>Teacher Verification:</strong> "{task.approval.feedback}" ({task.approval.approvedBy})
+                      <div className="mt-1.5 text-xs bg-emerald-950/40 p-2 rounded-lg border border-emerald-800/80 text-emerald-300">
+                        <strong className="text-emerald-200">Teacher Verification:</strong> &quot;{task.approval.feedback}&quot; ({task.approval.approvedBy})
                       </div>
                     )}
                   </div>

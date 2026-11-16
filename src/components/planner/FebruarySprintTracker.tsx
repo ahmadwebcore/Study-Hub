@@ -71,50 +71,50 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
   const todayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date());
 
   return (
-    <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden mb-6">
+    <div className="bg-[#18181b] rounded-3xl border border-zinc-800 shadow-md overflow-hidden mb-6 text-zinc-100">
       {/* Target Header Banner - Clean Test Series Mini-Card Aesthetic */}
-      <div className="bg-white text-zinc-900 p-5 sm:p-6 border-b border-zinc-200 relative">
+      <div className="bg-[#141417] text-zinc-100 p-5 sm:p-6 border-b border-zinc-800 relative">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-                <CalendarCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs font-semibold">
+                <CalendarCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>3-Month Target Sprint &bull; Deadline: 28 Feb 2027</span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-bold shadow-2xs">
-                <Clock className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs font-mono font-bold shadow-2xs">
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Today's 24H Window: {windowRemaining || 'Counting...'}</span>
               </div>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 font-serif flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-100 font-serif flex items-center gap-2">
               Syllabus Completion &amp; Daily Quota Engine
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-600 max-w-2xl leading-relaxed">
-              Annual Board Examinations commence in <strong className="text-zinc-900">May 2027</strong>. Complete 100% of the syllabus across all 6 subjects by <strong className="text-emerald-700 font-bold">February 28th</strong> with daily page targets.
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+              Annual Board Examinations commence in <strong className="text-zinc-100">May 2027</strong>. Complete 100% of the syllabus across all 6 subjects by <strong className="text-emerald-400 font-bold">February 28th</strong> with daily page targets.
             </p>
           </div>
 
-          {/* Key Metric Badges (Test Series Mini Card Style) */}
+          {/* Key Metric Badges (Light Black Mini Card Style) */}
           <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full lg:w-auto shrink-0">
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
-              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">Days to Feb 28</span>
-              <span className="text-lg sm:text-2xl font-extrabold text-emerald-700 font-mono">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-400 tracking-wider truncate">Days to Feb 28</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-emerald-400 font-mono">
                 {stats.daysToTarget}d
               </span>
               <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">({stats.activeStudyDaysToTarget} study days)</span>
             </div>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
-              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">May Exams</span>
-              <span className="text-lg sm:text-2xl font-extrabold text-amber-700 font-mono">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-400 tracking-wider truncate">May Exams</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-amber-400 font-mono">
                 {stats.daysToExams}d
               </span>
               <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">Board Exam</span>
             </div>
 
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
-              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-500 tracking-wider truncate">Total Progress</span>
-              <span className="text-lg sm:text-2xl font-extrabold text-emerald-700 font-mono">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-2 sm:p-3 text-center min-w-0 shadow-2xs">
+              <span className="block text-[9px] sm:text-[10px] uppercase font-bold text-zinc-400 tracking-wider truncate">Total Progress</span>
+              <span className="text-lg sm:text-2xl font-extrabold text-emerald-400 font-mono">
                 {stats.overallCompletionPercentage}%
               </span>
               <span className="block text-[8px] sm:text-[9px] text-zinc-500 truncate">{stats.totalCompletedPages}/{stats.totalBookPages} pgs</span>
@@ -123,19 +123,19 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
         </div>
 
         {/* Live Overall Progress Bar */}
-        <div className="mt-5 pt-4 border-t border-zinc-100">
+        <div className="mt-5 pt-4 border-t border-zinc-800">
           <div className="flex items-center justify-between text-xs mb-1.5 font-medium">
-            <span className="text-zinc-700 flex items-center gap-1.5 font-semibold">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-zinc-300 flex items-center gap-1.5 font-semibold">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
               1st Year FA-IT Syllabus Completion:
             </span>
-            <span className="font-mono font-bold text-emerald-800">
+            <span className="font-mono font-bold text-emerald-400">
               {stats.overallCompletionPercentage}% Completed &bull; {stats.totalBookPages - stats.totalCompletedPages} Pages Remaining
             </span>
           </div>
-          <div className="w-full h-3 rounded-full bg-zinc-100 p-0.5 border border-zinc-200 overflow-hidden">
+          <div className="w-full h-3 rounded-full bg-zinc-900 p-0.5 border border-zinc-800 overflow-hidden">
             <div
-              className="h-full bg-emerald-600 rounded-full transition-all duration-500 shadow-2xs"
+              className="h-full bg-emerald-500 rounded-full transition-all duration-500 shadow-2xs"
               style={{ width: `${stats.overallCompletionPercentage}%` }}
             />
           </div>
@@ -251,7 +251,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
               return (
                 <div
                   key={quota.subjectId}
-                  className="rounded-xl border border-[#e1ede7] bg-white p-4 hover:shadow-md transition-all flex flex-col justify-between"
+                  className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 hover:border-zinc-700 transition-all flex flex-col justify-between text-zinc-100"
                 >
                   <div className="space-y-3">
                     {/* Header */}
@@ -262,25 +262,25 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                             className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: quota.accentColor }}
                           />
-                          <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">
+                          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide">
                             {quota.assignedDay}
                           </span>
                         </div>
-                        <h4 className="font-bold text-zinc-900 text-sm mt-0.5">{quota.subjectName}</h4>
-                        <p className="text-xs text-zinc-500 font-mono">{quota.code} &bull; 11th Class</p>
+                        <h4 className="font-bold text-zinc-100 text-sm mt-0.5">{quota.subjectName}</h4>
+                        <p className="text-xs text-zinc-400 font-mono">{quota.code} &bull; 11th Class</p>
                       </div>
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700">
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700">
                         {progressPct}%
                       </span>
                     </div>
 
                     {/* Progress Bar */}
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[11px] text-zinc-500">
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
                         <span>{quota.completedPages} / {quota.totalPages} pgs ({remainingPages} left)</span>
                         <span>{quota.completedChapters}/{quota.totalChapters} chs</span>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-zinc-100 overflow-hidden">
+                      <div className="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-300"
                           style={{
@@ -292,12 +292,12 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                     </div>
 
                     {/* Daily Quota Target Pill */}
-                    <div className="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-100 text-xs space-y-1">
-                      <div className="flex items-center justify-between font-semibold text-emerald-900">
+                    <div className="p-2.5 rounded-lg bg-emerald-950/40 border border-emerald-800/80 text-xs space-y-1 text-emerald-200">
+                      <div className="flex items-center justify-between font-semibold text-emerald-300">
                         <span>Daily Target:</span>
-                        <span className="font-mono text-emerald-700 font-bold">{quota.dailyPageTarget} Pages / Day</span>
+                        <span className="font-mono text-emerald-400 font-bold">{quota.dailyPageTarget} Pages / Day</span>
                       </div>
-                      <p className="text-[11px] text-emerald-800 font-medium">
+                      <p className="text-[11px] text-emerald-300/80 font-medium">
                         &bull; {quota.dailyTopicsTarget}
                       </p>
                     </div>
@@ -307,19 +307,19 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                       <button
                         type="button"
                         onClick={() => setExpandedSubject(isExpanded ? null : quota.subjectId)}
-                        className="w-full flex items-center justify-between text-xs text-zinc-600 hover:text-zinc-900 py-1 font-semibold"
+                        className="w-full flex items-center justify-between text-xs text-zinc-400 hover:text-zinc-200 py-1 font-semibold"
                       >
                         <span className="flex items-center gap-1">
-                          <Compass className="w-3.5 h-3.5 text-zinc-500" />
+                          <Compass className="w-3.5 h-3.5 text-zinc-400" />
                           Guide as a Teacher
                         </span>
                         {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                       </button>
 
                       {isExpanded && (
-                        <div className="mt-2 p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 text-xs space-y-2 animate-in fade-in duration-150">
-                          <p className="text-zinc-700 leading-relaxed font-medium">
-                            <strong className="text-zinc-900">Teacher Note:</strong> {quota.teacherGuideNote}
+                        <div className="mt-2 p-2.5 rounded-lg bg-zinc-950 border border-zinc-800 text-xs space-y-2 animate-in fade-in duration-150">
+                          <p className="text-zinc-300 leading-relaxed font-medium">
+                            <strong className="text-zinc-100">Teacher Note:</strong> {quota.teacherGuideNote}
                           </p>
                           <div className="space-y-1 pt-1 border-t border-zinc-200">
                             <span className="text-[10px] font-bold text-zinc-500 uppercase">Board Exam Tips:</span>

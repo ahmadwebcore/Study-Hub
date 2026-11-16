@@ -185,43 +185,43 @@ export const StudentDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Card 1: Daily Reading Quota (Crisp White Card) */}
-          <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm hover:border-zinc-300 transition-all flex flex-col justify-between space-y-4">
+          {/* Card 1: Daily Reading Quota (Light Black Card) */}
+          <div className="p-5 rounded-3xl bg-[#18181b] border border-zinc-800 shadow-md hover:border-zinc-700 transition-all flex flex-col justify-between space-y-4 text-zinc-100">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/80">
                   Step 1 &bull; Daily Quota
                 </span>
-                <span className="text-xs font-semibold text-zinc-500 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
+                <span className="text-xs font-semibold text-zinc-400 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-zinc-400" />
                   {activeTodayTask ? `~${activeTodayTask.estimatedMinutes || 45} Mins` : '~45 Mins (2.5 Pgs)'}
                 </span>
               </div>
-              <h3 className="text-base font-bold text-zinc-900 font-serif">
+              <h3 className="text-base font-bold text-zinc-100 font-serif">
                 {activeTodayTask
                   ? `${activeTodayTask.subjectName}: ${activeTodayTask.title}`
                   : 'No Daily Reading Task Scheduled'}
               </h3>
-              <p className="text-xs text-zinc-600 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 {activeTodayTask
                   ? activeTodayTask.description
                   : 'Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate daily study targets and page quotas (Sundays OFF).'}
               </p>
             </div>
 
-            <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
+            <div className="pt-2 border-t border-zinc-800 flex items-center gap-2">
               {activeTodayTask ? (
                 <>
                   <Link
                     to="/weekly-tasks"
-                    className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-700 bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl transition-colors"
+                    className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl transition-colors"
                   >
                     View Weekly Schedule
                   </Link>
                   <button
                     type="button"
                     onClick={() => handleQuickCompleteQuota(activeTodayTask)}
-                    className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
+                    className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>Mark Done</span>
@@ -230,42 +230,42 @@ export const StudentDashboard: React.FC = () => {
               ) : (
                 <Link
                   to="/library"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-all shadow-xs"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs"
                 >
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-white" />
                   <span>Upload Book PDF in Library</span>
                 </Link>
               )}
             </div>
           </div>
 
-          {/* Card 2: Today's 30-Mark Test (Mini Card Style Matching Test Series) */}
-          <div className="p-5 rounded-3xl bg-white border-2 border-emerald-500/80 shadow-xs hover:border-emerald-600 hover:shadow-sm transition-all flex flex-col justify-between space-y-4">
+          {/* Card 2: Today's 30-Mark Test (Light Black Card with Emerald Highlight) */}
+          <div className="p-5 rounded-3xl bg-[#18181b] border-2 border-emerald-500/80 shadow-md hover:border-emerald-400 hover:shadow-lg transition-all flex flex-col justify-between space-y-4 text-zinc-100">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/80">
                   Step 2 &bull; 30-Mark Test
                 </span>
-                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
                   <Award className="w-3.5 h-3.5" />
                   {activeTodayTest ? `Pass: ${activeTodayTest.passingMarks}/${activeTodayTest.totalMarks} Marks` : 'Pass: 15/30 Marks'}
                 </span>
               </div>
-              <h3 className="text-base font-bold text-zinc-900 font-serif">
+              <h3 className="text-base font-bold text-zinc-100 font-serif">
                 {activeTodayTest ? activeTodayTest.title : 'No 30-Mark Test Scheduled'}
               </h3>
-              <p className="text-xs text-zinc-600 leading-relaxed">
+              <p className="text-xs text-zinc-400 leading-relaxed">
                 {activeTodayTest
                   ? activeTodayTest.syllabusCoverage || activeTodayTest.instructions
                   : 'Upload your textbook PDF to break chapters into weekly 30-mark assessments mapped to BISE DG Khan pattern.'}
               </p>
             </div>
 
-            <div className="pt-2 border-t border-zinc-100 flex items-center gap-2">
+            <div className="pt-2 border-t border-zinc-800 flex items-center gap-2">
               {activeTodayTest ? (
                 <Link
                   to={`/test-submit?testId=${activeTodayTest.id}`}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
                 >
                   <FileCheck2 className="w-3.5 h-3.5 text-white" />
                   <span>Start 30-Mark Test</span>
@@ -274,7 +274,7 @@ export const StudentDashboard: React.FC = () => {
               ) : (
                 <Link
                   to="/library"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-300 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-800/80 rounded-xl transition-all"
                 >
                   <span>⚡ Schedule Tests from Book PDF</span>
                 </Link>
@@ -289,24 +289,24 @@ export const StudentDashboard: React.FC = () => {
         <DailyTestSeriesGrid tests={tests} />
       </div>
 
-      {/* 4. Support & Board Hub (2 Equal Matched Cards) */}
+      {/* 4. Support & Board Hub (2 Light Black Equal Matched Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* AI Tutor Card */}
-        <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm flex flex-col justify-between space-y-3">
+        <div className="p-5 rounded-3xl bg-[#18181b] border border-zinc-800 shadow-md flex flex-col justify-between space-y-3 text-zinc-100">
           <div className="space-y-1.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 flex items-center justify-center border border-emerald-800/60">
               <GraduationCap className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+            <h3 className="text-sm font-bold text-zinc-100 font-serif">
               Academic Tutor (Global Science Academy)
             </h3>
-            <p className="text-xs text-zinc-600 leading-relaxed">
+            <p className="text-xs text-zinc-400 leading-relaxed">
               Have doubts on Bus Topology, CPU registers, or Urdu grammar? Ask in English, Urdu, or Roman Urdu for clear analogies.
             </p>
           </div>
           <Link
             to="/ai-teacher"
-            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors"
+            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-semibold text-zinc-200 transition-colors"
           >
             <span>Ask: "Explain Bus Topology with real analogy"</span>
             <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -314,56 +314,56 @@ export const StudentDashboard: React.FC = () => {
         </div>
 
         {/* BISE DG Khan Pairing Scheme Card */}
-        <div className="p-5 rounded-3xl bg-white border border-zinc-200 shadow-sm flex flex-col justify-between space-y-3">
+        <div className="p-5 rounded-3xl bg-[#18181b] border border-zinc-800 shadow-md flex flex-col justify-between space-y-3 text-zinc-100">
           <div className="space-y-1.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-xl bg-emerald-950/60 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-800/60">
               🇵🇰
             </div>
-            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+            <h3 className="text-sm font-bold text-zinc-100 font-serif">
               BISE DG Khan Board Updates &amp; Pairing
             </h3>
-            <p className="text-xs text-zinc-600 leading-relaxed">
+            <p className="text-xs text-zinc-400 leading-relaxed">
               Review question distributions for 1st Year FA-IT: MCQs, Short Questions, Long Questions, and 2026–2027 annual timetable.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setIsBoardModalOpen(true)}
-            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-800 transition-colors cursor-pointer"
+            className="inline-flex items-center justify-between p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs font-semibold text-zinc-200 transition-colors cursor-pointer"
           >
             <span>View 1st Year FA-IT Pairing Scheme</span>
-            <Layers className="w-4 h-4 text-emerald-600" />
+            <Layers className="w-4 h-4 text-emerald-400" />
           </button>
         </div>
       </div>
 
       {/* 5. Recent Verified Marks & Certified History */}
-      <div className="bg-white rounded-3xl border border-zinc-200 p-5 shadow-sm space-y-3">
-        <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
+      <div className="bg-[#18181b] rounded-3xl border border-zinc-800 p-5 shadow-md space-y-3 text-zinc-100">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
           <div>
-            <h3 className="text-sm font-bold text-zinc-900 font-serif">
+            <h3 className="text-sm font-bold text-zinc-100 font-serif">
               Recent Certified Marks &amp; Records
             </h3>
-            <p className="text-[11px] text-zinc-500">
+            <p className="text-[11px] text-zinc-400">
               Evaluated and certified by faculty director Ahmad. Records are permanently preserved.
             </p>
           </div>
           <Link
             to="/results"
-            className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline"
+            className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 hover:underline"
           >
             View All Results &rarr;
           </Link>
         </div>
 
-        <div className="divide-y divide-zinc-100 text-xs">
+        <div className="divide-y divide-zinc-800 text-xs">
           <div className="py-2.5 flex items-center justify-between gap-3">
             <div>
-              <span className="font-bold text-zinc-900 block">Chapter 1: Basics of IT &amp; Hardware</span>
-              <span className="text-[11px] text-zinc-500">Computer Science &bull; Evaluated by Ahmad</span>
+              <span className="font-bold text-zinc-200 block">Chapter 1: Basics of IT &amp; Hardware</span>
+              <span className="text-[11px] text-zinc-400">Computer Science &bull; Evaluated by Ahmad</span>
             </div>
             <div className="text-right">
-              <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+              <span className="font-extrabold text-emerald-300 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
                 27 / 30 (Grade A)
               </span>
               <span className="block text-[10px] text-zinc-400 mt-0.5">Certified Passed</span>
@@ -372,11 +372,11 @@ export const StudentDashboard: React.FC = () => {
 
           <div className="py-2.5 flex items-center justify-between gap-3">
             <div>
-              <span className="font-bold text-zinc-900 block">Urdu Prose: Uswa-e-Hasna Short Questions</span>
-              <span className="text-[11px] text-zinc-500">Urdu &amp; Grammar &bull; Evaluated by Ahmad</span>
+              <span className="font-bold text-zinc-200 block">Urdu Prose: Uswa-e-Hasna Short Questions</span>
+              <span className="text-[11px] text-zinc-400">Urdu &amp; Grammar &bull; Evaluated by Ahmad</span>
             </div>
             <div className="text-right">
-              <span className="font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+              <span className="font-extrabold text-emerald-300 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
                 28 / 30 (Grade A*)
               </span>
               <span className="block text-[10px] text-zinc-400 mt-0.5">Certified Passed</span>
