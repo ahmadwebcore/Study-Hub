@@ -104,9 +104,9 @@ export const StudentsPage: React.FC = () => {
     defaultValues: {
       name: '',
       email: '',
-      academicClass: 'Grade 11',
-      course: 'Advanced STEM',
-      board: 'Cambridge International (CIE)',
+      academicClass: '1st Year Intermediate',
+      course: '1st Year FA-IT (Intermediate Part 1)',
+      board: 'BISE D.G. Khan (Dera Ghazi Khan Board)',
       academicSession: '2026-2027',
     },
   });
@@ -179,9 +179,9 @@ export const StudentsPage: React.FC = () => {
     setEditingStudent(student);
     setEditValue('name', student.name);
     setEditValue('rollNumber', student.rollNumber || 'SH-2026-001');
-    setEditValue('academicClass', student.academicClass || student.grade || 'Grade 11');
-    setEditValue('course', student.course || 'Advanced STEM');
-    setEditValue('board', student.board || 'Cambridge International (CIE)');
+    setEditValue('academicClass', student.academicClass || student.grade || '1st Year Intermediate');
+    setEditValue('course', student.course || '1st Year FA-IT (Intermediate Part 1)');
+    setEditValue('board', student.board || 'BISE D.G. Khan (Dera Ghazi Khan Board)');
     setEditValue('academicSession', student.academicSession || '2026-2027');
     setEditValue('status', student.status || 'active');
   };
@@ -404,8 +404,8 @@ export const StudentsPage: React.FC = () => {
             className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
           >
             <option value="all">All Classes / Grades</option>
-            <option value="Grade 11">Grade 11</option>
-            <option value="Grade 12">Grade 12</option>
+            <option value="1st Year Intermediate">1st Year Intermediate</option>
+            <option value="2nd Year Intermediate">2nd Year Intermediate</option>
           </select>
 
           <select
@@ -415,9 +415,10 @@ export const StudentsPage: React.FC = () => {
             className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
           >
             <option value="all">All Course Streams</option>
-            <option value="Advanced STEM">Advanced STEM</option>
-            <option value="Pre-Medical">Pre-Medical</option>
-            <option value="Engineering Track">Engineering Track</option>
+            <option value="1st Year FA-IT (Intermediate Part 1)">1st Year FA-IT</option>
+            <option value="F.Sc Pre-Medical">F.Sc Pre-Medical</option>
+            <option value="F.Sc Pre-Engineering">F.Sc Pre-Engineering</option>
+            <option value="ICS (Computer Science)">ICS (Computer Science)</option>
           </select>
 
           <select
@@ -427,9 +428,10 @@ export const StudentsPage: React.FC = () => {
             className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
           >
             <option value="all">All Examination Boards</option>
-            <option value="Cambridge International (CIE)">Cambridge International (CIE)</option>
-            <option value="CBSE">CBSE</option>
-            <option value="International Baccalaureate (IB)">International Baccalaureate (IB)</option>
+            <option value="BISE D.G. Khan (Dera Ghazi Khan Board)">BISE DG Khan</option>
+            <option value="BISE Multan">BISE Multan</option>
+            <option value="BISE Lahore">BISE Lahore</option>
+            <option value="Punjab Board">Punjab Board</option>
           </select>
         </div>
       </div>
@@ -459,7 +461,7 @@ export const StudentsPage: React.FC = () => {
                         {student.email}
                       </p>
                       <span className="text-[11px] font-semibold text-[#14B866] mt-0.5 inline-block">
-                        {student.academicClass || student.grade} &bull; {student.course || 'Advanced STEM'}
+                        {student.academicClass || student.grade} &bull; {student.course || '1st Year FA-IT'}
                       </span>
                     </div>
                   </div>
@@ -648,8 +650,8 @@ export const StudentsPage: React.FC = () => {
                 {...registerEdit('academicClass')}
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] bg-white"
               >
-                <option value="Grade 11">Grade 11</option>
-                <option value="Grade 12">Grade 12</option>
+                <option value="1st Year Intermediate">1st Year Intermediate</option>
+                <option value="2nd Year Intermediate">2nd Year Intermediate</option>
               </select>
             </div>
 
@@ -659,9 +661,10 @@ export const StudentsPage: React.FC = () => {
                 {...registerEdit('course')}
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] bg-white"
               >
-                <option value="Advanced STEM">Advanced STEM</option>
-                <option value="Pre-Medical">Pre-Medical</option>
-                <option value="Engineering Track">Engineering Track</option>
+                <option value="1st Year FA-IT (Intermediate Part 1)">1st Year FA-IT (Intermediate Part 1)</option>
+                <option value="F.Sc Pre-Medical">F.Sc Pre-Medical</option>
+                <option value="F.Sc Pre-Engineering">F.Sc Pre-Engineering</option>
+                <option value="ICS (Computer Science)">ICS (Computer Science)</option>
               </select>
             </div>
           </div>
@@ -673,9 +676,10 @@ export const StudentsPage: React.FC = () => {
                 {...registerEdit('board')}
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] bg-white"
               >
-                <option value="Cambridge International (CIE)">Cambridge International (CIE)</option>
-                <option value="CBSE">CBSE</option>
-                <option value="International Baccalaureate (IB)">International Baccalaureate (IB)</option>
+                <option value="BISE D.G. Khan (Dera Ghazi Khan Board)">BISE D.G. Khan (Dera Ghazi Khan Board)</option>
+                <option value="BISE Multan">BISE Multan</option>
+                <option value="BISE Lahore">BISE Lahore</option>
+                <option value="Punjab Board">Punjab Board</option>
               </select>
             </div>
 
@@ -824,11 +828,11 @@ export const StudentsPage: React.FC = () => {
               </div>
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#7d9990]">Course Stream</span>
-                <p className="font-semibold text-[#142D27] mt-0.5">{selectedStudentPreview.course || 'Advanced STEM'}</p>
+                <p className="font-semibold text-[#142D27] mt-0.5">{selectedStudentPreview.course || '1st Year FA-IT (Intermediate Part 1)'}</p>
               </div>
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#7d9990]">Examination Board</span>
-                <p className="font-semibold text-[#142D27] mt-0.5">{selectedStudentPreview.board || 'Cambridge International (CIE)'}</p>
+                <p className="font-semibold text-[#142D27] mt-0.5">{selectedStudentPreview.board || 'BISE D.G. Khan (Dera Ghazi Khan Board)'}</p>
               </div>
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#7d9990]">Academic Session</span>
@@ -909,7 +913,7 @@ export const StudentsPage: React.FC = () => {
               <input
                 type="text"
                 {...registerInvite('name')}
-                placeholder="e.g. Jordan Miller"
+                placeholder="e.g. Henza Noor"
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
               />
               {inviteErrors.name && (
@@ -922,7 +926,7 @@ export const StudentsPage: React.FC = () => {
               <input
                 type="email"
                 {...registerInvite('email')}
-                placeholder="student@example.com"
+                placeholder="e.g. dbaddiesvlog@gmail.com"
                 className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
               />
               {inviteErrors.email && (
@@ -937,8 +941,8 @@ export const StudentsPage: React.FC = () => {
                   {...registerInvite('academicClass')}
                   className="w-full px-3 py-2 text-sm rounded-xl border border-[#e1ede7] bg-white"
                 >
-                  <option value="Grade 11">Grade 11</option>
-                  <option value="Grade 12">Grade 12</option>
+                  <option value="1st Year Intermediate">1st Year Intermediate</option>
+                  <option value="2nd Year Intermediate">2nd Year Intermediate</option>
                 </select>
               </div>
 

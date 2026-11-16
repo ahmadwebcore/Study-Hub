@@ -104,9 +104,9 @@ export const TeacherDashboard: React.FC = () => {
     await studentService.createInvitation(
       newStudentEmail,
       user.id || 'usr_t_01',
-      'Grade 11',
       '1st Year Intermediate',
-      'Punjab & Federal Board',
+      '1st Year FA-IT (Intermediate Part 1)',
+      'BISE D.G. Khan (Dera Ghazi Khan Board)',
       '2026-2027'
     );
 

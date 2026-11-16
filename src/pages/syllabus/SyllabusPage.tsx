@@ -478,7 +478,7 @@ export const SyllabusPage: React.FC = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-[#14B866] uppercase tracking-wider">
-                {currentSubject.course || 'Advanced STEM'} Track
+                {currentSubject.course || '1st Year FA-IT (BISE DG Khan)'} Track
               </span>
               <span className="text-xs text-[#7d9990]">&bull;</span>
               <span className="text-xs text-[#557067]">Session: {currentSubject.academicSession || '2026-2027'}</span>

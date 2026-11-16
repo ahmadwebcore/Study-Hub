@@ -1,4 +1,5 @@
 import { notificationService } from './notificationService';
+import { integrationService } from './integrationService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_RESULTS } from '../data/sampleData';
@@ -2585,6 +2586,18 @@ export const testService = {
 
     const percentage = Math.round((autoScore / test.totalMarks) * 100);
     const passed = autoScore >= (test.passingMarks || test.totalMarks * 0.4);
+    const grade = percentage >= 90 ? 'A*' : percentage >= 80 ? 'A' : percentage >= 70 ? 'B' : percentage >= 50 ? 'C' : 'F';
+
+    // Real-time synchronization of test submission to Google Sheets
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: 'Henza Noor',
+      activityType: '30-Mark Test Evaluation',
+      subject: test.subjectName,
+      score: `${autoScore}/${test.totalMarks} (${percentage}%)`,
+      resultStatus: passed ? 'PASSED' : 'RETEST',
+      remarks: `Submitted by student. Auto-graded: ${autoScore}/${test.totalMarks} (${grade}).`,
+    });
 
     if (!isSupabaseConfigured()) {
       const mockResult: TestAttempt = {
@@ -2596,7 +2609,7 @@ export const testService = {
         status: 'submitted',
         totalScore: autoScore,
         percentage,
-        grade: percentage >= 90 ? 'A*' : percentage >= 80 ? 'A' : percentage >= 70 ? 'B' : percentage >= 50 ? 'C' : 'F',
+        grade,
         passed,
         answers,
       };
@@ -2731,6 +2744,17 @@ export const testService = {
         window.dispatchEvent(new Event('studyhub_submissions_updated'));
         window.dispatchEvent(new Event('studyhub_notification_update'));
       }
+
+      // Real-time synchronization of teacher certified evaluation to Google Sheets
+      integrationService.recordActivityInGoogleSheet({
+        date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        studentName: params.studentName || 'Henza Noor',
+        activityType: '30-Mark Test Evaluation',
+        subject: params.test.subjectName,
+        score: `${totalScore}/${params.test.totalMarks} (${percentage}%)`,
+        resultStatus: passed ? 'PASSED' : 'RETEST',
+        remarks: params.overallFeedback || `Official grade certified by Sir Ahmad • ${grade} (${passed ? 'PASSED' : 'RETEST'})`,
+      });
 
       return { success: true, error: null };
     }

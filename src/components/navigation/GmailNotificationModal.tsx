@@ -130,8 +130,8 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
       studentName: 'Student Scholar',
       teacherName: 'Ahmad',
       inviteToken: `sh_inv_${Math.floor(100000 + Math.random() * 900000)}`,
-      course: 'Advanced STEM Honors (2026-2027)',
-      board: 'Cambridge International Examination (CIE)',
+      course: '1st Year FA-IT (2026-2027)',
+      board: 'BISE D.G. Khan (Dera Ghazi Khan Board)',
     });
     setDispatchFeedback(`Dispatched Faculty Invitation Token to ${testEmailAddress}!`);
     refreshEmails();

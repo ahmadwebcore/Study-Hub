@@ -5,6 +5,7 @@
 import { emailService } from './emailService';
 import { testService } from './testService';
 import { notificationService } from './notificationService';
+import { integrationService } from './integrationService';
 import { getPakistanHoliday } from '../data/pakistanHolidays';
 
 export interface DailyTask {
@@ -2683,6 +2684,18 @@ class TaskService {
     };
 
     this.saveTasks();
+
+    // Real-time synchronization of submitted daily task to Google Sheets
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: this.tasks[taskIndex].studentName || 'Henza Noor',
+      activityType: 'Daily Reading Quota',
+      subject: this.tasks[taskIndex].subjectName,
+      score: 'Submitted for Review',
+      resultStatus: 'COMPLETED',
+      remarks: `${this.tasks[taskIndex].title} — Notes: "${notes || 'Daily textbook pages completed'}"`,
+    });
+
     return this.tasks[taskIndex];
   }
 
@@ -2709,6 +2722,18 @@ class TaskService {
     };
 
     this.saveTasks();
+
+    // Real-time synchronization of approved daily quota to Google Sheets
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: this.tasks[taskIndex].studentName || 'Henza Noor',
+      activityType: 'Daily Reading Quota',
+      subject: this.tasks[taskIndex].subjectName,
+      score: 'Verified & Approved',
+      resultStatus: 'COMPLETED',
+      remarks: feedback || `Verified by ${teacherName || 'Sir Ahmad'}. Marked complete.`,
+    });
+
     return this.tasks[taskIndex];
   }
 
@@ -2733,6 +2758,18 @@ class TaskService {
     };
 
     this.saveTasks();
+
+    // Real-time synchronization of revision request to Google Sheets
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: this.tasks[taskIndex].studentName || 'Henza Noor',
+      activityType: 'Daily Reading Quota',
+      subject: this.tasks[taskIndex].subjectName,
+      score: 'Revision Requested',
+      resultStatus: 'RETEST',
+      remarks: feedback || `Revision requested by ${teacherName || 'Sir Ahmad'}.`,
+    });
+
     return this.tasks[taskIndex];
   }
 

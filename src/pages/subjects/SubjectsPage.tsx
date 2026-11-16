@@ -81,8 +81,8 @@ export const SubjectsPage: React.FC = () => {
       code: '',
       description: '',
       totalModules: 12,
-      category: 'STEM',
-      course: 'Advanced STEM',
+      category: '1st Year FA-IT',
+      course: '1st Year FA-IT (Intermediate Part 1)',
       academicSession: '2026-2027',
       accentColor: '#14B866',
     },
@@ -134,7 +134,7 @@ export const SubjectsPage: React.FC = () => {
     setEditValue('description', subject.description || '');
     setEditValue('totalModules', subject.totalModules);
     setEditValue('category', subject.category);
-    setEditValue('course', subject.course || 'Advanced STEM');
+    setEditValue('course', subject.course || '1st Year FA-IT (Intermediate Part 1)');
     setEditValue('academicSession', subject.academicSession || '2026-2027');
     setEditValue('accentColor', subject.accentColor || '#14B866');
   };
@@ -289,9 +289,10 @@ export const SubjectsPage: React.FC = () => {
           className="h-10 px-3 rounded-xl border border-[#e1ede7] bg-white text-xs text-[#263B35] focus:outline-none focus:border-[#14B866]"
         >
           <option value="all">All Course Streams</option>
-          <option value="Advanced STEM">Advanced STEM</option>
-          <option value="Pre-Medical">Pre-Medical</option>
-          <option value="Engineering Track">Engineering Track</option>
+          <option value="1st Year FA-IT (Intermediate Part 1)">1st Year FA-IT</option>
+          <option value="F.Sc Pre-Medical">F.Sc Pre-Medical</option>
+          <option value="F.Sc Pre-Engineering">F.Sc Pre-Engineering</option>
+          <option value="ICS (Computer Science)">ICS (Computer Science)</option>
         </select>
 
         <select
@@ -501,7 +502,7 @@ export const SubjectsPage: React.FC = () => {
             <input
               type="text"
               {...registerCreate('course')}
-              placeholder="e.g. Advanced STEM (2026-2027)"
+              placeholder="e.g. 1st Year FA-IT (2026-2027)"
               className="w-full px-3 py-2 text-xs rounded-xl border border-[#e1ede7] focus:outline-none focus:border-[#14B866]"
             />
           </div>

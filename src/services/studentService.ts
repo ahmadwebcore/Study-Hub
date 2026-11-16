@@ -61,7 +61,7 @@ export const studentService = {
           avatar:
             item.avatar_url ||
             'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
-          grade: item.academic_class || 'Grade 11',
+          grade: item.academic_class || '1st Year FA-IT',
           enrolledSubjects: assignedSubjects.length > 0 ? assignedSubjects : ['Computer Science (FA-IT)', 'Urdu Lazmi', 'English Compulsory'],
           assignedSubjectIds: assignedSubjectIds.length > 0 ? assignedSubjectIds : ['sub_01', 'sub_02'],
           overallPerformance: 91.4,
@@ -72,9 +72,9 @@ export const studentService = {
           status: (item.status as 'active' | 'inactive') || 'active',
           rollNumber: item.roll_number || 'SH-2026-001',
           enrolledAt: item.enrolled_at ? new Date(item.enrolled_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Aug 15, 2026',
-          academicClass: item.academic_class || 'Grade 11',
-          course: item.course || 'Advanced STEM',
-          board: item.board || 'Cambridge International (CIE)',
+          academicClass: item.academic_class || '1st Year Intermediate',
+          course: item.course || '1st Year FA-IT (Intermediate Part 1)',
+          board: item.board || 'BISE D.G. Khan (Dera Ghazi Khan Board)',
           academicSession: item.academic_session || '2026-2027',
         };
       });
@@ -158,9 +158,9 @@ export const studentService = {
   async createInvitation(
     email: string,
     invitedBy: string,
-    academicClass: string = 'Grade 11',
-    course: string = 'Advanced STEM',
-    board: string = 'CBSE / IB / Cambridge',
+    academicClass: string = '1st Year Intermediate',
+    course: string = '1st Year FA-IT (Intermediate Part 1)',
+    board: string = 'BISE D.G. Khan (Dera Ghazi Khan Board)',
     academicSession: string = '2026-2027'
   ): Promise<{ invitation: StudentInvitation | null; error: Error | null }> {
     if (!isSupabaseConfigured()) {
@@ -226,9 +226,9 @@ export const studentService = {
         role: 'student',
         token,
         invitedBy: 'usr_t_01',
-        academicClass: 'Grade 11',
-        course: 'Advanced STEM',
-        board: 'CBSE / IB / Cambridge',
+        academicClass: '1st Year Intermediate',
+        course: '1st Year FA-IT (Intermediate Part 1)',
+        board: 'BISE D.G. Khan (Dera Ghazi Khan Board)',
         academicSession: '2026-2027',
         expiresAt: new Date(Date.now() + 7 * 86400000).toISOString(),
         createdAt: new Date().toISOString(),
@@ -252,9 +252,9 @@ export const studentService = {
           role: 'student',
           token,
           invitedBy: 'Ahmad',
-          academicClass: 'Grade 11',
-          course: 'Advanced Mathematics & STEM',
-          board: 'Cambridge International (CIE)',
+          academicClass: '1st Year Intermediate',
+          course: '1st Year FA-IT (Intermediate Part 1)',
+          board: 'BISE D.G. Khan (Dera Ghazi Khan Board)',
           academicSession: '2026-2027',
           expiresAt: new Date(Date.now() + 7 * 86400000).toISOString(),
           createdAt: new Date().toISOString(),

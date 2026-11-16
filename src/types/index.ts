@@ -13,10 +13,10 @@ export interface UserProfile {
   phone?: string;
   grade?: string;
 
-  // Student Academic Details (Requirement 4)
-  academicClass?: string;     // e.g. "Grade 11"
-  course?: string;            // e.g. "Advanced STEM"
-  board?: string;             // e.g. "CBSE / IB / Cambridge"
+  // Student Academic Details
+  academicClass?: string;     // e.g. "1st Year Intermediate"
+  course?: string;            // e.g. "1st Year FA-IT"
+  board?: string;             // e.g. "BISE D.G. Khan"
   academicSession?: string;   // e.g. "2026-2027"
   createdAt?: string;
   updatedAt?: string;

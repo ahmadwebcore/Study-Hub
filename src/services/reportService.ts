@@ -81,7 +81,7 @@ export const reportService = {
     const headers = 'Roll Number,Full Name,Class,Course,Board,Performance,Attendance,Status,Session';
     const rows = students.map(
       (s) =>
-        `"${s.rollNumber || 'SH-1001'}","${s.name}","${s.academicClass || 'Grade 11'}","${s.course || 'Advanced STEM'}","${s.board || 'Cambridge'}","${s.overallPerformance}%","${s.attendanceRate}%","${s.status}","${s.academicSession || '2026-2027'}"`
+        `"${s.rollNumber || 'GSA-2026-042'}","${s.name}","${s.academicClass || '1st Year Intermediate'}","${s.course || '1st Year FA-IT'}","${s.board || 'BISE DG Khan'}","${s.overallPerformance}%","${s.attendanceRate}%","${s.status}","${s.academicSession || '2026-2027'}"`
     );
     const csv = [headers, ...rows].join('\n');
     downloadBlob(csv, 'StudyHub_Cohort_Report_2026.csv', 'text/csv;charset=utf-8;');

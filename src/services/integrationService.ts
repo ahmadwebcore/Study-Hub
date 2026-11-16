@@ -24,8 +24,15 @@ export interface GoogleSheetRow {
   syncStatus: 'synced' | 'pending';
 }
 
-const GSHEETS_CONFIG_KEY = 'studyhub_gsheets_config_v3';
-const GSHEETS_STREAM_KEY = 'studyhub_gsheet_stream_v3';
+const GSHEETS_CONFIG_KEY = 'studyhub_gsheets_config_v4';
+const GSHEETS_STREAM_KEY = 'studyhub_gsheet_stream_v4';
+
+try {
+  ['v1', 'v2', 'v3'].forEach((v) => {
+    localStorage.removeItem('studyhub_gsheets_config_' + v);
+    localStorage.removeItem('studyhub_gsheet_stream_' + v);
+  });
+} catch {}
 
 class IntegrationService {
   private gsheetsConfig: GoogleSheetsConfig = {
@@ -46,7 +53,7 @@ class IntegrationService {
   public isValidSheetUrl(url?: string): boolean {
     if (!url) return false;
     const clean = url.trim();
-    return clean.includes('google.com/spreadsheets') && !clean.includes('1studyhub-fait');
+    return clean.includes('docs.google.com/spreadsheets') && !clean.includes('1studyhub-fait') && !clean.includes('dummy');
   }
 
   public getCreateSheetUrl(): string {
@@ -58,8 +65,7 @@ class IntegrationService {
       const storedGs = localStorage.getItem(GSHEETS_CONFIG_KEY);
       if (storedGs) {
         const parsed = JSON.parse(storedGs);
-        // Sanitize out any old demo or dummy url
-        if (parsed.sheetUrl && parsed.sheetUrl.includes('1studyhub-fait')) {
+        if (parsed.sheetUrl && !this.isValidSheetUrl(parsed.sheetUrl)) {
           parsed.sheetUrl = '';
           parsed.isConnected = false;
         }
@@ -68,18 +74,6 @@ class IntegrationService {
           ...parsed,
           isConnected: this.isValidSheetUrl(parsed.sheetUrl) || Boolean(parsed.webhookUrl),
         };
-      } else {
-        // Clear out any obsolete v2 key if it had the dummy url
-        const oldV2 = localStorage.getItem('studyhub_gsheets_config_v2');
-        if (oldV2) {
-          try {
-            const parsedOld = JSON.parse(oldV2);
-            if (this.isValidSheetUrl(parsedOld.sheetUrl)) {
-              this.gsheetsConfig.sheetUrl = parsedOld.sheetUrl;
-              this.gsheetsConfig.isConnected = true;
-            }
-          } catch {}
-        }
       }
 
       const storedStream = localStorage.getItem(GSHEETS_STREAM_KEY);
@@ -95,58 +89,62 @@ class IntegrationService {
 
   private initDefaultStream(): void {
     const today = new Date();
-    const mockRows: GoogleSheetRow[] = [
+    const todayStr = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const yesterday = new Date(today.getTime() - 86400000);
+    const yestStr = yesterday.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+    const initialRows: GoogleSheetRow[] = [
       {
-        id: 'gs_row_01',
-        date: today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        id: 'gs_row_today_att',
+        date: todayStr,
         studentName: 'Henza Noor',
         activityType: 'Daily Attendance (Present)',
-        subject: 'Physical Education 11',
+        subject: 'اُردو 11 لازمی و قواعد (Urdu & Grammar)',
         score: 'Present (On-Time)',
         resultStatus: 'PRESENT',
-        remarks: 'Daily attendance presentation confirmed at 09:15 AM',
-        syncedAt: 'Today at 09:15 AM',
+        remarks: 'Daily attendance presentation confirmed on schedule (09:10 AM)',
+        syncedAt: 'Today at 09:10 AM',
         syncStatus: 'synced',
       },
       {
-        id: 'gs_row_02',
-        date: today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        id: 'gs_row_today_test',
+        date: todayStr,
         studentName: 'Henza Noor',
         activityType: '30-Mark Test Evaluation',
-        subject: 'Physical Education 11',
-        score: '28/30 (93%)',
-        resultStatus: 'PASSED',
-        remarks: 'Certified by Faculty Director Ahmad • Grade A*',
-        syncedAt: 'Today at 10:45 AM',
+        subject: 'اُردو 11 و شرح سرمایہ (Urdu 11)',
+        score: 'Active Today (30 Marks)',
+        resultStatus: 'PRESENT',
+        remarks: 'سبق اسوہ حسنہ خلاصہ و تشریح، خط نویسی اور علم بیان (تشبیہ) — Live active test',
+        syncedAt: 'Today at 10:00 AM',
         syncStatus: 'synced',
       },
       {
-        id: 'gs_row_03',
-        date: new Date(today.getTime() - 86400000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        id: 'gs_row_yest_quota',
+        date: yestStr,
+        studentName: 'Henza Noor',
+        activityType: 'Daily Reading Quota',
+        subject: 'صحت و جسمانی تعلیم (Physical Education)',
+        score: 'Completed (2.5 Pages)',
+        resultStatus: 'COMPLETED',
+        remarks: 'Daily reading quota completed & verified by Sir Ahmad',
+        syncedAt: 'Yesterday at 04:30 PM',
+        syncStatus: 'synced',
+      },
+      {
+        id: 'gs_row_yest_att',
+        date: yestStr,
         studentName: 'Henza Noor',
         activityType: 'Daily Attendance (Present)',
-        subject: 'Urdu & Grammar 11',
+        subject: 'صحت و جسمانی تعلیم (Physical Education)',
         score: 'Present (On-Time)',
         resultStatus: 'PRESENT',
-        remarks: 'Daily attendance presentation confirmed at 09:05 AM',
+        remarks: 'Daily attendance presentation recorded at 09:05 AM',
         syncedAt: 'Yesterday at 09:05 AM',
-        syncStatus: 'synced',
-      },
-      {
-        id: 'gs_row_04',
-        date: new Date(today.getTime() - 86400000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
-        studentName: 'Henza Noor',
-        activityType: '30-Mark Test Evaluation',
-        subject: 'Urdu & Grammar 11',
-        score: '26/30 (87%)',
-        resultStatus: 'PASSED',
-        remarks: 'Short Questions & Ashar Tashreeh verified by Ahmad',
-        syncedAt: 'Yesterday at 11:20 AM',
         syncStatus: 'synced',
       },
     ];
 
-    this.streamRows = mockRows;
+    this.streamRows = initialRows;
     this.saveStream();
   }
 

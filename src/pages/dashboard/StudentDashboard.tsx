@@ -18,6 +18,7 @@ import {
   Sparkles,
   BookOpen,
   CalendarCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
@@ -304,9 +305,15 @@ export const StudentDashboard: React.FC = () => {
               <strong>Attendance Recorded:</strong> Present today ({todayAttendanceRecord?.timeMarked || 'Morning'}) &bull; Synchronized with Sir Ahmad
             </span>
           </div>
-          <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-900/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30 w-fit">
-            Google Sheets Synchronized
-          </span>
+          <Link
+            to="/integrations"
+            className="text-[10px] font-semibold text-emerald-300 hover:text-white bg-emerald-900/60 hover:bg-emerald-800/80 px-2.5 py-1 rounded-full border border-emerald-500/30 transition-all flex items-center gap-1.5 w-fit shrink-0 cursor-pointer"
+            title="View live Google Sheets sync stream and download ledger"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Google Sheets Synchronized</span>
+            <ExternalLink className="w-2.5 h-2.5 text-emerald-400" />
+          </Link>
         </div>
       )}
 

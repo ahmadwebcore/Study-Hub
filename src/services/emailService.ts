@@ -161,7 +161,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
     recipientName: 'Henza Noor',
     senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
-    subject: '✉️ Faculty Invitation: Join Advanced STEM Cohort on StudyHub',
+    subject: '✉️ Faculty Invitation: Join 1st Year FA-IT Cohort on StudyHub',
     previewText: 'Ahmad has invited you to join StudyHub LMS as a verified student.',
     category: 'invitation',
     sentAt: 'Nov 10, 2026',
@@ -178,7 +178,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
         <div style="padding: 28px;">
           <h2 style="color: #142D27; margin: 0 0 12px 0;">Official Faculty Student Invitation</h2>
           <p style="color: #557067; font-size: 14px; line-height: 1.6;">
-            <strong>Ahmad</strong> has enrolled you into the <strong>Advanced STEM (2026-2027)</strong> cohort under Cambridge International board.
+            <strong>Ahmad</strong> has enrolled you into the <strong>1st Year FA-IT (2026-2027)</strong> cohort under BISE D.G. Khan board.
           </p>
           <div style="background: #e8f8f0; border: 1px solid rgba(20,184,102,0.3); border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0;">
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #142D27; font-weight: 600;">YOUR SECURE INVITATION TOKEN</p>

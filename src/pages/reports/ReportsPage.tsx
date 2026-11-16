@@ -352,7 +352,7 @@ export const ReportsPage: React.FC = () => {
                   <h4 className="text-sm font-bold text-[#142D27]">{activeStudent.name}</h4>
                   <span className="text-xs text-[#557067]">{activeStudent.email}</span>
                   <span className="text-[10px] text-[#7d9990] block mt-0.5">
-                    {activeStudent.academicClass || 'Grade 11'} &bull; {activeStudent.course || 'Advanced STEM'}
+                    {activeStudent.academicClass || '1st Year Intermediate'} &bull; {activeStudent.course || '1st Year FA-IT'}
                   </span>
                 </div>
               </div>
@@ -427,7 +427,7 @@ export const ReportsPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="py-3 px-4 font-medium text-[#557067]">
-                    {student.academicClass || 'Grade 11'} ({student.board || 'CIE'})
+                    {student.academicClass || '1st Year Intermediate'} ({student.board || 'BISE DG Khan'})
                   </td>
                   <td className="py-3 px-4 font-bold text-[#14B866]">
                     {student.overallPerformance}%
@@ -462,7 +462,7 @@ export const ReportsPage: React.FC = () => {
         isOpen={!!studentReportModal}
         onClose={() => setStudentReportModal(null)}
         title={studentReportModal ? `Student Dossier: ${studentReportModal.name}` : 'Student Dossier'}
-        description={`Roll Number: ${studentReportModal?.rollNumber || 'SH-1001'} &bull; ${studentReportModal?.course || 'Advanced STEM'}`}
+        description={`Roll Number: ${studentReportModal?.rollNumber || 'GSA-2026-042'} &bull; ${studentReportModal?.course || '1st Year FA-IT (BISE DG Khan)'}`}
       >
         <div className="space-y-4">
           <div className="p-5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-4">

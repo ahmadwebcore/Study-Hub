@@ -111,7 +111,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
       if (savedUserStr) {
         const parsed = JSON.parse(savedUserStr);
-        if (parsed.email?.toLowerCase().includes('henza') || parsed.name?.toLowerCase().includes('henza')) {
+        if (
+          parsed.email?.toLowerCase().includes('henza') ||
+          parsed.email?.toLowerCase().includes('dbaddies') ||
+          parsed.name?.toLowerCase().includes('henza')
+        ) {
           return 'student';
         }
       }
