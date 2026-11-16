@@ -639,14 +639,14 @@ export const WeeklyTasksPage: React.FC = () => {
                 return (
                   <div
                     key={task.id}
-                    className={`p-5 rounded-3xl bg-white border transition-all duration-150 flex flex-col justify-between shadow-sm hover:shadow-md group ${
+                    className={`p-4 rounded-2xl bg-white border transition-none flex flex-col justify-between shadow-xs select-none min-h-[215px] ${
                       task.status === 'approved'
                         ? 'border-emerald-300'
                         : task.status === 'submitted_for_approval'
                         ? 'border-amber-300'
                         : task.status === 'overdue'
                         ? 'border-rose-300'
-                        : 'border-[#e1ede7] hover:border-emerald-300'
+                        : 'border-zinc-200'
                     }`}
                   >
                     <div>

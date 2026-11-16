@@ -1,6 +1,5 @@
 import { useRole } from '../../hooks/useRole';
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
   Lock,
@@ -13,15 +12,14 @@ import {
   Eye,
   EyeOff,
   ChevronRight,
+  ChevronDown,
   MessageCircle,
   FileCheck2,
   X,
-  Plus,
-  Upload,
 } from 'lucide-react';
 import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
-import { testService, extractDayAndCleanTitle } from '../../services/testService';
+import { extractDayAndCleanTitle } from '../../services/testService';
 import { integrationService } from '../../services/integrationService';
 import { PDFViewerModal } from '../books/PDFViewerModal';
 
@@ -34,16 +32,35 @@ interface DailyTestSeriesGridProps {
 
 export type TestDisplayStatus = 'locked' | 'today' | 'passed' | 'failed_retest' | 'submitted' | 'pending';
 
+export const ACADEMIC_WEEKS = [
+  { id: 'all', label: 'All Weeks (1 to 15)' },
+  { id: 'w1', label: 'Week 1 (Nov 16 - Nov 21) • Current' },
+  { id: 'w2', label: 'Week 2 (Nov 23 - Nov 28)' },
+  { id: 'w3', label: 'Week 3 (Nov 30 - Dec 05)' },
+  { id: 'w4', label: 'Week 4 (Dec 07 - Dec 12)' },
+  { id: 'w5', label: 'Week 5 (Dec 14 - Dec 19)' },
+  { id: 'w6', label: 'Week 6 (Dec 21 - Dec 26)' },
+  { id: 'w7', label: 'Week 7 (Dec 28 - Jan 02)' },
+  { id: 'w8', label: 'Week 8 (Jan 04 - Jan 09)' },
+  { id: 'w9', label: 'Week 9 (Jan 11 - Jan 16)' },
+  { id: 'w10', label: 'Week 10 (Jan 18 - Jan 23)' },
+  { id: 'w11', label: 'Week 11 (Jan 25 - Jan 30)' },
+  { id: 'w12', label: 'Week 12 (Feb 01 - Feb 06)' },
+  { id: 'w13', label: 'Week 13 (Feb 08 - Feb 13)' },
+  { id: 'w14', label: 'Week 14 (Feb 15 - Feb 20)' },
+  { id: 'w15', label: 'Week 15 (Feb 22 - Feb 28 - Final Mocks)' },
+];
+
 export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   tests,
   onTakeTest,
   onGradeTest,
-  onRefreshTests,
+  onRefreshTests: _onRefreshTests,
 }) => {
   const { role } = useRole();
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedWeek, setSelectedWeek] = useState<string>('all');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
-  const [selectedStatusFilter] = useState<string>('all');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('all');
   const [hideCompleted, setHideCompleted] = useState<boolean>(false);
   const [activePopupTest, setActivePopupTest] = useState<TestItem | null>(null);
   const [pdfViewerTest, setPdfViewerTest] = useState<TestItem | null>(null);
@@ -198,19 +215,25 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     };
   };
 
-  // Month filtering (zero deletion - archive browsing)
+  // Week & Subject & Status Filtering
   const filteredTests = tests.filter((t) => {
+    // Week filter (Week 1, Week 2, ..., Week 15)
+    if (selectedWeek !== 'all') {
+      const matchId = t.id.includes(`_${selectedWeek}`) || t.id.endsWith(`_${selectedWeek}`);
+      if (!matchId) {
+        const base = new Date(2026, 10, 16);
+        const testDate = new Date(t.date);
+        if (!isNaN(testDate.getTime())) {
+          const diffWeeks = Math.floor((testDate.getTime() - base.getTime()) / (7 * 24 * 3600 * 1000)) + 1;
+          if (`w${diffWeeks}` !== selectedWeek) return false;
+        } else {
+          return false;
+        }
+      }
+    }
+
     // Subject filter
     if (selectedSubjectId !== 'all' && t.subjectId !== selectedSubjectId) return false;
-
-    // Month filter
-    if (selectedMonth === 'current') {
-      if (!t.date.toLowerCase().includes('nov')) return false;
-    } else if (selectedMonth === 'previous') {
-      if (!t.date.toLowerCase().includes('oct')) return false;
-    } else if (selectedMonth === 'older') {
-      if (t.date.toLowerCase().includes('nov') || t.date.toLowerCase().includes('oct')) return false;
-    }
 
     // Status filter
     const statusMeta = getTestStatus(t);
@@ -218,7 +241,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       if (selectedStatusFilter === 'today' && !statusMeta.isToday) return false;
       if (selectedStatusFilter === 'locked' && !statusMeta.isLocked) return false;
       if (selectedStatusFilter === 'passed' && statusMeta.status !== 'passed') return false;
-      if (selectedStatusFilter === 'pending' && statusMeta.status !== 'pending') return false;
+      if (selectedStatusFilter === 'pending' && statusMeta.status !== 'pending' && statusMeta.status !== 'submitted') return false;
       if (selectedStatusFilter === 'retest' && statusMeta.status !== 'failed_retest') return false;
     }
 
@@ -240,18 +263,6 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     const dateB = new Date(b.date).getTime() || 0;
     return dateA - dateB;
   });
-
-  const handleGenerateEntireBook = (subjectId: string) => {
-    const subj = SAMPLE_SUBJECTS.find((s) => s.id === subjectId) || SAMPLE_SUBJECTS[0];
-    testService.scheduleDailyTestsForBook({
-      subjectId: subj.id,
-      subjectName: subj.name,
-      subjectCode: subj.code,
-      bookTitle: subj.name,
-      totalWeeks: 12,
-    });
-    if (onRefreshTests) onRefreshTests();
-  };
 
   const handleAttemptFromModal = (test: TestItem) => {
     setActivePopupTest(null);
@@ -281,40 +292,32 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
 
   return (
     <div className="space-y-4 font-sans">
-      {/* Top Filter and Controls Bar */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-4 shadow-xs space-y-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      {/* Top Filter Bar with Sleek Dropdowns (Clutter-Free) */}
+      <div className="bg-white rounded-2xl border border-zinc-200 p-3.5 sm:p-4 shadow-xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold text-zinc-900 tracking-tight font-serif">
-                Daily Test Series (5 Daily Tests Row)
+                Daily Test Series
               </h2>
               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 30 Marks Each &bull; Pass: 15 (50%)
               </span>
             </div>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Scheduled daily tests unlock at 12:00 AM midnight. Click any box (locked or open) to view details in popup.
+              Official 15-week timetable (Sundays OFF). Click any card to view questions and instructions in popup.
             </p>
           </div>
 
-          {/* Action Row */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Quick Visibility Filter */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => handleGenerateEntireBook(selectedSubjectId === 'all' ? 'sub_04' : selectedSubjectId)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-b from-[#143229] via-[#0f2720] to-[#0a1b16] text-white ring-1 ring-white/15 shadow-sm hover:shadow-md hover:from-[#193e33] hover:via-[#133027] hover:to-[#0c201a] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200"
-              title="Schedule all book chapters through Feb 28"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Schedule 12-Week Book Tests</span>
-            </button>
-
-            <button
+              type="button"
               onClick={() => setHideCompleted(!hideCompleted)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
                 hideCompleted
                   ? 'bg-[#142D27] text-white border-[#142D27] shadow-2xs'
-                  : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
+                  : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100'
               }`}
             >
               {hideCompleted ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -323,90 +326,97 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </div>
         </div>
 
-        {/* Month Archive Selector (Zero Deletion Guarantee) */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-zinc-100 text-xs">
-          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mr-1">
-            Month Archive:
-          </span>
-          {[
-            { id: 'all', label: `All History (${tests.length})` },
-            { id: 'current', label: 'November 2026 (Current)' },
-            { id: 'previous', label: 'October 2026 (1 Month Back)' },
-            { id: 'older', label: 'Earlier Sessions' },
-          ].map((m) => (
-            <button
-              key={m.id}
-              onClick={() => setSelectedMonth(m.id)}
-              className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
-                selectedMonth === m.id
-                  ? 'bg-[#142D27] text-white shadow-2xs'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-              }`}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
+        {/* 3 Unified Filter Dropdowns (Week, Subject, Status) */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-zinc-100">
+          {/* 1. Academic Week Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Academic Week
+            </label>
+            <div className="relative">
+              <select
+                value={selectedWeek}
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                {ACADEMIC_WEEKS.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
 
-        {/* Subject Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-          <button
-            onClick={() => setSelectedSubjectId('all')}
-            className={`px-3 py-1 rounded-xl font-medium whitespace-nowrap transition-colors ${
-              selectedSubjectId === 'all'
-                ? 'bg-[#142D27] text-white'
-                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-            }`}
-          >
-            All {SAMPLE_SUBJECTS.length} Subjects
-          </button>
-          {SAMPLE_SUBJECTS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setSelectedSubjectId(s.id)}
-              className={`px-3 py-1 rounded-xl font-medium whitespace-nowrap transition-colors ${
-                selectedSubjectId === s.id
-                  ? 'bg-[#142D27] text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-              }`}
-            >
-              {s.name.split('(')[0]}
-            </button>
-          ))}
+          {/* 2. Subject Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Subject ({SAMPLE_SUBJECTS.length})
+            </label>
+            <div className="relative">
+              <select
+                value={selectedSubjectId}
+                onChange={(e) => setSelectedSubjectId(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All {SAMPLE_SUBJECTS.length} Subjects</option>
+                {SAMPLE_SUBJECTS.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.code})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 3. Status Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Test Status
+            </label>
+            <div className="relative">
+              <select
+                value={selectedStatusFilter}
+                onChange={(e) => setSelectedStatusFilter(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All Statuses ({tests.length} Tests)</option>
+                <option value="today">Today's Active Test</option>
+                <option value="locked">Locked (Scheduled)</option>
+                <option value="passed">Passed (15-30 Marks)</option>
+                <option value="retest">Retest Needed (&lt;15 Marks)</option>
+                <option value="pending">Submitted / Under Review</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Row of 5 Small Boxes (grid-cols-2 sm:grid-cols-3 lg:grid-cols-5) */}
+      {/* 3-Cards Per Row Universal Grid (grid-cols-1 md:grid-cols-2 lg:grid-cols-3) */}
       {tests.length === 0 ? (
         <div className="p-8 sm:p-10 rounded-3xl bg-white border border-dashed border-zinc-300 text-center space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
             <BookOpen className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-zinc-900 font-serif">No 30-Mark Tests Scheduled Yet</h3>
+          <h3 className="text-base font-bold text-zinc-900 font-serif">Official 15-Week Test Series</h3>
           <p className="text-xs text-zinc-600 max-w-md mx-auto leading-relaxed">
-            Your 30-mark diagnostic test series will appear here once you upload your textbook PDF. StudyHub will break your book into weekly chapter assessments (Sundays OFF).
+            All 90 daily assessments are pre-configured according to BISE DG Khan board scheme.
           </p>
-          <div className="pt-2">
-            <Link
-              to="/library"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-xs"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              <span>⚡ Upload Book PDF &amp; Generate Series</span>
-            </Link>
-          </div>
         </div>
       ) : displayTests.length === 0 ? (
         <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-2">
           <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
           <h3 className="text-sm font-bold text-zinc-900">No Tests Found in this Filter</h3>
           <p className="text-xs text-zinc-500 max-w-md mx-auto">
-            All tests are safely archived. Switch to &quot;All History&quot; or toggle showing completed tests to review past scores.
+            Switch week or subject filter dropdown above to review tests.
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-1">
             {displayTests.map((test) => {
               const meta = getTestStatus(test);
               const { day: cardDay, cleanTitle: cardCleanTitle, isUrdu: cardIsUrdu } = extractDayAndCleanTitle(test.title, test.date);
@@ -415,89 +425,91 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <div
                   key={test.id}
                   onClick={() => setActivePopupTest(test)}
-                  className={`group relative p-4 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-full shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
+                  className={`relative p-4 rounded-2xl border cursor-pointer flex flex-col justify-between select-none w-full h-[185px] shadow-xs ${
                     meta.isToday
-                      ? 'bg-white border-2 border-emerald-500 shadow-md ring-2 ring-emerald-500/20 text-[#142D27]'
+                      ? 'bg-white border-2 border-emerald-500 ring-2 ring-emerald-500/20 text-[#142D27]'
                       : meta.isLocked
-                      ? 'bg-[#fafcfb] border-[#e1ede7] text-zinc-600 hover:border-zinc-300'
+                      ? 'bg-white border-zinc-200 text-zinc-700'
                       : meta.status === 'passed'
-                      ? 'bg-[#f0fbf5] border border-emerald-300 text-[#142D27]'
+                      ? 'bg-white border-emerald-300 text-[#142D27]'
                       : meta.status === 'failed_retest'
-                      ? 'bg-[#fff5f5] border border-rose-200 text-rose-950'
+                      ? 'bg-white border-rose-300 text-rose-950'
                       : meta.status === 'pending'
-                      ? 'bg-[#fffdf5] border border-amber-200 text-amber-950'
-                      : 'bg-white border border-[#e1ede7] hover:border-emerald-300 text-[#142D27]'
+                      ? 'bg-white border-amber-300 text-amber-950'
+                      : 'bg-white border-zinc-200 text-[#142D27]'
                   }`}
                   title="Click to view details popup"
                 >
                   {/* Top Badge & Day Row */}
-                  <div>
-                    <div className="flex items-center justify-between gap-1 mb-2">
-                      {/* Day Pill */}
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact truncate">
+                  <div className="flex items-center justify-between gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact shrink-0">
                         {cardDay}
                       </span>
-
-                      {/* Status Pill */}
-                      <span
-                        className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border shrink-0 ${meta.badgeClass}`}
-                      >
-                        {meta.isToday && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        )}
-                        {meta.isLocked && <Lock className="w-2.5 h-2.5 text-zinc-400" />}
-                        {!meta.isLocked && meta.status === 'passed' && (
-                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
-                        )}
-                        {!meta.isLocked && meta.status === 'failed_retest' && (
-                          <AlertCircle className="w-2.5 h-2.5 text-rose-400" />
-                        )}
-                        <span>{meta.label}</span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 shrink-0">
+                        {test.subjectCode}
                       </span>
                     </div>
 
-                    {/* Subject Name & 30M Badge */}
-                    <div className="flex items-center justify-between gap-1 text-[10px] text-[#557067] font-semibold pb-1.5 border-b border-[#e1ede7]">
-                      <div className="flex items-center gap-1 truncate">
-                        <BookOpen className="w-3 h-3 text-zinc-500 shrink-0" />
-                        <span className="truncate">{test.subjectName.split('(')[0]}</span>
-                      </div>
-                      <span className="text-[9px] font-bold text-zinc-500 shrink-0">
-                        30M
-                      </span>
-                    </div>
+                    <span
+                      className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border shrink-0 ${meta.badgeClass}`}
+                    >
+                      {meta.isToday && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      )}
+                      {meta.isLocked && <Lock className="w-2.5 h-2.5 text-zinc-400" />}
+                      {!meta.isLocked && meta.status === 'passed' && (
+                        <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                      )}
+                      {!meta.isLocked && meta.status === 'failed_retest' && (
+                        <AlertCircle className="w-2.5 h-2.5 text-rose-400" />
+                      )}
+                      <span>{meta.label}</span>
+                    </span>
+                  </div>
 
-                    {/* Test Title (In Urdu for Urdu book / subjects, no 'Series' text, no BiDi flip) */}
-                    <h4 className={`mt-2 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors ${
-                      cardIsUrdu ? 'font-urdu text-[13px] font-bold text-[#142D27] text-right dir-rtl leading-loose' : 'text-xs font-bold text-[#142D27]'
-                    }`}>
+                  {/* Subject Name & Title in Middle */}
+                  <div className="my-1.5 min-w-0 flex-1 flex flex-col justify-center">
+                    <span className="text-[11px] font-bold text-zinc-500 block truncate leading-tight mb-1">
+                      {test.subjectName.split('(')[0]}
+                    </span>
+                    <h4
+                      className={`line-clamp-2 leading-relaxed ${
+                        cardIsUrdu
+                          ? 'font-urdu text-[14px] font-bold text-zinc-900 text-right dir-rtl leading-relaxed'
+                          : 'text-xs font-bold text-zinc-800'
+                      }`}
+                    >
                       <bdi>{cardCleanTitle}</bdi>
                     </h4>
                   </div>
 
-                  {/* Bottom Timing / Unlocks Indicator & Quick PDF Viewer */}
-                  <div className="mt-3 pt-2 border-t border-[#e1ede7] flex items-center justify-between text-[10px] gap-1">
-                    <span className="text-zinc-400 font-medium truncate flex items-center gap-1">
-                      <Calendar className="w-3 h-3 text-zinc-500 shrink-0" />
+                  {/* Bottom Row */}
+                  <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-xs shrink-0">
+                    <span className="text-[11px] font-semibold text-zinc-500 flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
                       <span>{test.date}</span>
+                      <span className="text-zinc-300">&bull;</span>
+                      <span className="font-bold text-emerald-700">30M</span>
                     </span>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           setPdfViewerTest(test);
                         }}
-                        className="px-1.5 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[9px] transition-colors flex items-center gap-0.5 cursor-pointer shadow-2xs"
-                        title="View attached chapter and pages in textbook PDF"
+                        className="px-2 py-0.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[10px] transition-colors flex items-center gap-1 cursor-pointer"
+                        title="View attached chapter in PDF"
                       >
-                        <BookOpen className="w-2.5 h-2.5" />
+                        <BookOpen className="w-3 h-3" />
                         <span>PDF</span>
                       </button>
 
-                      <span className="text-[10px] font-bold text-emerald-700 group-hover:text-emerald-800 transition-colors">
-                        View &rarr;
+                      <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-0.5">
+                        <span>View</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </span>
                     </div>
                   </div>

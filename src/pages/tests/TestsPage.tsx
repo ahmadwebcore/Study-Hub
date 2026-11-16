@@ -28,7 +28,7 @@ import {
   FileCheck2,
   ShieldCheck,
   Check,
-  Upload,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -613,15 +613,15 @@ export const TestsPage: React.FC = () => {
           </div>
           <h3 className="text-lg font-bold text-zinc-900 font-serif">No 30-Mark Tests in Series Yet</h3>
           <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
-            All demo assessments have been cleared. Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate the 12-week 30-mark chapter assessment test series!
+            All 15-week daily assessments across all 7 FA-IT subjects are active and ready.
           </p>
           <div className="pt-2">
             <Link
               to="/library"
               className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
-              <Upload className="w-4 h-4 text-emerald-100" />
-              <span>⚡ Upload Book PDF &amp; Generate Series</span>
+              <BookOpen className="w-4 h-4 text-emerald-100" />
+              <span>📚 Open Textbook Library &amp; Past Papers</span>
             </Link>
           </div>
         </div>
@@ -636,7 +636,7 @@ export const TestsPage: React.FC = () => {
               return (
                 <div
                   key={test.id}
-                  className="p-5 rounded-3xl bg-white border border-[#e1ede7] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
+                  className="p-5 rounded-3xl bg-white border border-[#e1ede7] transition-none flex flex-col justify-between shadow-xs select-none"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#e1ede7]">

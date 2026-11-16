@@ -15,6 +15,7 @@ import {
   RotateCcw,
   Award,
   ChevronRight,
+  ChevronDown,
   Search,
   Check,
   Maximize2,
@@ -32,7 +33,8 @@ import {
 import { submissionService } from '../../services/submissionService';
 import { notificationService } from '../../services/notificationService';
 import { TestItem, ResultRecord } from '../../types';
-import { SAMPLE_TESTS } from '../../data/sampleData';
+import { SAMPLE_TESTS, SAMPLE_SUBJECTS } from '../../data/sampleData';
+import { ACADEMIC_WEEKS } from '../../components/tests/DailyTestSeriesGrid';
 import { useRole } from '../../hooks/useRole';
 import { getTextbookDetailsForTest } from '../../data/textbookContent';
 import { PDFViewerModal } from '../../components/books/PDFViewerModal';
@@ -64,6 +66,8 @@ export const TestSubmissionPage: React.FC = () => {
   const [pdfViewerTest, setPdfViewerTest] = useState<TestItem | null>(null);
 
   // Filter and search for all tests timeline
+  const [selectedWeek, setSelectedWeek] = useState<string>('all');
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
   const [filterTab, setFilterTab] = useState<'all' | 'today' | 'passed' | 'retest' | 'under_review'>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -233,6 +237,24 @@ export const TestSubmissionPage: React.FC = () => {
 
   // Filtered list for the series cards timeline
   const filteredTests = sortedTests.filter((test) => {
+    // Week filter (w1 ... w15)
+    if (selectedWeek !== 'all') {
+      const matchId = test.id.includes(`_${selectedWeek}`) || test.id.endsWith(`_${selectedWeek}`);
+      if (!matchId) {
+        const base = new Date(2026, 10, 16);
+        const testDate = new Date(test.date);
+        if (!isNaN(testDate.getTime())) {
+          const diffWeeks = Math.floor((testDate.getTime() - base.getTime()) / (7 * 24 * 3600 * 1000)) + 1;
+          if (`w${diffWeeks}` !== selectedWeek) return false;
+        } else {
+          return false;
+        }
+      }
+    }
+
+    // Subject filter
+    if (selectedSubjectId !== 'all' && test.subjectId !== selectedSubjectId) return false;
+
     const cert = certifiedResults.find((r) => r.testId === test.id);
     const stat = testStatuses[test.id]?.status;
 
@@ -733,58 +755,71 @@ export const TestSubmissionPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-[#e1ede7] overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => setFilterTab('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-                filterTab === 'all'
-                  ? 'bg-emerald-700 text-white'
-                  : 'text-[#557067] hover:text-[#142D27]'
-              }`}
-            >
-              All Tests ({sortedTests.length})
-            </button>
-            <button
-              onClick={() => setFilterTab('today')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-                filterTab === 'today'
-                  ? 'bg-emerald-700 text-white'
-                  : 'text-[#557067] hover:text-[#142D27]'
-              }`}
-            >
-              Today&apos;s Active
-            </button>
-            <button
-              onClick={() => setFilterTab('passed')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-                filterTab === 'passed'
-                  ? 'bg-emerald-700 text-white'
-                  : 'text-[#557067] hover:text-[#142D27]'
-              }`}
-            >
-              Passed (15-30M)
-            </button>
-            <button
-              onClick={() => setFilterTab('retest')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-                filterTab === 'retest'
-                  ? 'bg-rose-600 text-white'
-                  : 'text-rose-700 hover:text-rose-900'
-              }`}
-            >
-              Retest (&lt;15M)
-            </button>
-            <button
-              onClick={() => setFilterTab('under_review')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
-                filterTab === 'under_review'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-blue-700 hover:text-blue-900'
-              }`}
-            >
-              Awaiting Check
-            </button>
+          {/* 3 Unified Filter Dropdowns (Week, Subject, Status) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-3 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] w-full">
+            {/* 1. Academic Week Dropdown */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                Academic Week
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedWeek}
+                  onChange={(e) => setSelectedWeek(e.target.value)}
+                  className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+                >
+                  {ACADEMIC_WEEKS.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* 2. Subject Dropdown */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                Subject ({SAMPLE_SUBJECTS.length})
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedSubjectId}
+                  onChange={(e) => setSelectedSubjectId(e.target.value)}
+                  className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="all">All {SAMPLE_SUBJECTS.length} Subjects</option>
+                  {SAMPLE_SUBJECTS.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} ({s.code})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* 3. Status Dropdown */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                Test Status
+              </label>
+              <div className="relative">
+                <select
+                  value={filterTab}
+                  onChange={(e) => setFilterTab(e.target.value as any)}
+                  className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="all">All Tests ({tests.length})</option>
+                  <option value="today">Today's Active</option>
+                  <option value="passed">Passed (15-30 Marks)</option>
+                  <option value="retest">Retest Needed (&lt;15 Marks)</option>
+                  <option value="under_review">Awaiting Check</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -801,142 +836,146 @@ export const TestSubmissionPage: React.FC = () => {
         </div>
 
         {/* SERIES CARDS BENTO GRID: Responsive 1-col on mobile, 2-col on md, 3-col on lg */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTests.map((test) => {
-            const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(test.title, test.date);
-            const cert = certifiedResults.find((r) => r.testId === test.id);
-            const statusInfo = testStatuses[test.id];
-            const score = cert?.score ?? statusInfo?.score ?? test.studentScore;
-            const isPassed = (cert && cert.passed) || (score !== undefined && score >= 15);
-            const isRetest = (cert && !cert.passed) || (score !== undefined && score < 15);
-            const isSubmitted = statusInfo?.status === 'submitted' && !cert;
-            const isSelected = activeTest?.id === test.id;
+        {filteredTests.length === 0 ? (
+          <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-2">
+            <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+            <h3 className="text-sm font-bold text-zinc-900">No Tests Found in this Filter</h3>
+            <p className="text-xs text-zinc-500 max-w-md mx-auto">
+              Switch the week, subject, or status dropdown above to view tests.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredTests.map((test) => {
+              const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(test.title, test.date);
+              const cert = certifiedResults.find((r) => r.testId === test.id);
+              const statusInfo = testStatuses[test.id];
+              const score = cert?.score ?? statusInfo?.score ?? test.studentScore;
+              const isPassed = (cert && cert.passed) || (score !== undefined && score >= 15);
+              const isRetest = (cert && !cert.passed) || (score !== undefined && score < 15);
+              const isSubmitted = statusInfo?.status === 'submitted' && !cert;
+              const isSelected = activeTest?.id === test.id;
 
-            return (
-              <div
-                key={test.id}
-                className={`p-4 sm:p-5 rounded-3xl bg-white border transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md group ${
-                  isSelected
-                    ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20'
-                    : 'border-[#e1ede7] hover:border-emerald-300'
-                }`}
-              >
-                <div>
-                  {/* Top Day, Code, & Marks Pill Row */}
-                  <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
-                    <div className="flex items-center gap-1.5">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
-                        {day}
-                      </span>
-                      <span className="px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-bold border border-zinc-200">
-                        {test.subjectCode}
-                      </span>
+              return (
+                <div
+                  key={test.id}
+                  className={`p-4 rounded-2xl bg-white border transition-none flex flex-col justify-between h-[215px] min-h-[215px] shadow-xs select-none ${
+                    isSelected
+                      ? 'border-2 border-emerald-500 ring-2 ring-emerald-500/20'
+                      : 'border-zinc-200'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    {/* Top Day, Code, & Marks Pill Row */}
+                    <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-100">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
+                          {day}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 text-[10px] font-bold border border-zinc-200">
+                          {test.subjectCode}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                        <span>30M</span>
+                        <span className="text-zinc-300">&bull;</span>
+                        <span className="text-zinc-500 font-semibold">{test.durationMinutes || 45}m</span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                      <span>30M</span>
-                      <span className="text-[#ccdcd4]">&bull;</span>
-                      <span className="text-[#557067] font-semibold">{test.durationMinutes || 45}m</span>
+                    {/* Title & Subject */}
+                    <div>
+                      <span className="text-[11px] font-bold text-zinc-500 block truncate leading-tight">
+                        {test.subjectName.split('(')[0]}
+                      </span>
+                      <h3
+                        className={`line-clamp-2 leading-relaxed ${
+                          isUrdu
+                            ? 'font-urdu text-[14px] font-bold text-zinc-900 text-right dir-rtl leading-relaxed'
+                            : 'text-xs font-bold text-zinc-800 leading-snug'
+                        }`}
+                      >
+                        <bdi>{cleanTitle}</bdi>
+                      </h3>
+                    </div>
+
+                    {/* Dynamic Status / Certified Result Badge */}
+                    <div>
+                      {isPassed ? (
+                        <div className="p-1.5 px-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
+                          <span className="font-bold text-emerald-800 flex items-center gap-1 text-[11px]">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            Passed: {score}/30 ({cert?.grade || 'A*'})
+                          </span>
+                          <span className="text-[10px] font-semibold text-emerald-700">Certified</span>
+                        </div>
+                      ) : isRetest ? (
+                        <div className="p-1.5 px-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs flex items-center justify-between">
+                          <span className="font-bold text-rose-800 flex items-center gap-1 text-[11px]">
+                            <AlertCircle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+                            Score: {score}/30 &bull; Retest
+                          </span>
+                          <span className="text-[10px] font-bold text-rose-700">&lt;15 Pass</span>
+                        </div>
+                      ) : isSubmitted ? (
+                        <div className="p-1.5 px-2.5 rounded-xl bg-blue-50 border border-blue-200 text-xs flex items-center justify-between">
+                          <span className="font-bold text-blue-800 flex items-center gap-1 text-[11px]">
+                            <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            Under Review
+                          </span>
+                          <span className="text-[10px] font-semibold text-blue-700">Submitted</span>
+                        </div>
+                      ) : (
+                        <div className="p-1.5 px-2.5 rounded-xl bg-zinc-50 border border-zinc-200 text-xs flex items-center justify-between text-zinc-600">
+                          <span className="flex items-center gap-1 font-medium text-[11px]">
+                            <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            {test.date}
+                          </span>
+                          <span className="text-[10px] font-bold text-zinc-500">Pending</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Title in Authentic Urdu Font without BiDi flip */}
-                  <div className="mt-2.5">
-                    <h3
-                      className={`group-hover:text-emerald-700 transition-colors ${
-                        isUrdu
-                          ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
-                          : 'text-sm font-bold text-[#142D27] leading-snug'
-                      }`}
+                  {/* Bottom Action Footer */}
+                  <div className="pt-2 border-t border-zinc-100 flex items-center justify-between gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setPdfViewerTest(test)}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-emerald-700 transition-colors cursor-pointer"
                     >
-                      <bdi>{cleanTitle}</bdi>
-                    </h3>
-                    <p className="text-[11px] text-[#557067] mt-0.5">{test.subjectName}</p>
-                  </div>
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>View PDF</span>
+                    </button>
 
-                  {/* Syllabus Snippet */}
-                  <div className="mt-3 p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">
-                    <span className="text-[10px] font-bold text-[#142D27] block mb-0.5">Syllabus Scope:</span>
-                    <p className="font-urdu text-[12px] text-right dir-rtl text-[#557067] leading-relaxed line-clamp-2">
-                      {test.syllabusCoverage}
-                    </p>
-                  </div>
-
-                  {/* Dynamic Status / Certified Result Badge */}
-                  <div className="mt-3">
-                    {isPassed ? (
-                      <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
-                        <span className="font-bold text-emerald-800 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          Passed: {score}/30 Marks ({cert?.grade || 'A*'})
-                        </span>
-                        <span className="text-[10px] font-semibold text-emerald-700">Certified</span>
-                      </div>
-                    ) : isRetest ? (
-                      <div className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-xs flex items-center justify-between">
-                        <span className="font-bold text-rose-800 flex items-center gap-1">
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
-                          Score: {score}/30 &bull; Retest Required
-                        </span>
-                        <span className="text-[10px] font-bold text-rose-700">&lt;15 Passing</span>
-                      </div>
-                    ) : isSubmitted ? (
-                      <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-xs flex items-center justify-between">
-                        <span className="font-bold text-blue-800 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-blue-600" />
-                          Under Review by Ahmad Sir
-                        </span>
-                        <span className="text-[10px] font-semibold text-blue-700">Submitted</span>
-                      </div>
+                    {isRetest ? (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleSelectTest(test, true)}
+                        className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold py-1 px-3"
+                        icon={<RotateCcw className="w-3 h-3" />}
+                      >
+                        Retake
+                      </Button>
                     ) : (
-                      <div className="p-2 rounded-xl bg-zinc-50 border border-zinc-200 text-xs flex items-center justify-between text-[#557067]">
-                        <span className="flex items-center gap-1 font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                          {test.date} &bull; {test.time}
-                        </span>
-                        <span className="text-[10px] font-bold text-zinc-600">Pending</span>
-                      </div>
+                      <Button
+                        variant={isSelected ? 'secondary' : 'primary'}
+                        size="sm"
+                        onClick={() => handleSelectTest(test, false)}
+                        className="text-xs font-bold py-1 px-3"
+                        icon={<ChevronRight className="w-3 h-3" />}
+                      >
+                        {isSelected ? 'Active' : 'Submit'}
+                      </Button>
                     )}
                   </div>
                 </div>
-
-                {/* Bottom Action Footer */}
-                <div className="mt-4 pt-3 border-t border-[#e1ede7] flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPdfViewerTest(test)}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#557067] hover:text-emerald-700 transition-colors cursor-pointer"
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>View in PDF</span>
-                  </button>
-
-                  {isRetest ? (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => handleSelectTest(test, true)}
-                      className="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold"
-                      icon={<RotateCcw className="w-3.5 h-3.5" />}
-                    >
-                      🔄 Retake &amp; Re-upload
-                    </Button>
-                  ) : (
-                    <Button
-                      variant={isSelected ? 'secondary' : 'primary'}
-                      size="sm"
-                      onClick={() => handleSelectTest(test, false)}
-                      className="text-xs font-bold"
-                      icon={<ChevronRight className="w-3.5 h-3.5" />}
-                    >
-                      {isSelected ? 'Active in Desk' : 'Submit Paper'}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* ZOOM MODAL FOR UPLOADED PAGE */}

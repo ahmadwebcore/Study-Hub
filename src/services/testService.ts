@@ -2281,88 +2281,11 @@ export const testService = {
     totalWeeks?: number;
     startDate?: string;
   }): TestItem[] {
-    const existing = getCustomTests();
-    const created: TestItem[] = [];
-    const weeks = params.totalWeeks || 14;
-
-    const subjectDayMap: Record<string, 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday'> = {
-      'sub_01': 'Tuesday',
-      'sub_02': 'Wednesday',
-      'sub_03': 'Thursday',
-      'sub_05': 'Friday',
-      'sub_06': 'Saturday',
-      'sub_04': 'Tuesday',
-    };
-    const targetDay = params.assignedDay || subjectDayMap[params.subjectId] || 'Thursday';
-
-    const dayOffsets: Record<string, number> = {
-      'Monday': 1,
-      'Tuesday': 2,
-      'Wednesday': 3,
-      'Thursday': 4,
-      'Friday': 5,
-      'Saturday': 6,
-    };
-    const targetDayNum = dayOffsets[targetDay] || 4;
-
-    const baseDate = params.startDate ? new Date(params.startDate) : new Date();
-    const currentDay = baseDate.getDay();
-    let daysUntilTarget = (targetDayNum - currentDay + 7) % 7;
-    if (daysUntilTarget === 0) daysUntilTarget = 7;
-
-    for (let w = 0; w < Math.min(weeks, 12); w++) {
-      const testDate = new Date(baseDate);
-      testDate.setDate(baseDate.getDate() + daysUntilTarget + (w * 7));
-      const dateStr = testDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-      const newTest: TestItem = {
-        id: `test_daily_${params.subjectId}_${w + 1}_${Date.now()}`,
-        title: (() => {
-          const isUrduLang = params.subjectCode?.includes('URD') || params.subjectName?.toLowerCase().includes('urdu') || params.bookTitle?.includes('اُردو') || params.bookTitle?.includes('سرمایہ');
-          const isIslamic = params.subjectCode?.includes('TQM') || params.subjectCode?.includes('ISL') || params.subjectName?.includes('Quran') || params.subjectName?.includes('Islam');
-          const isPed = params.subjectCode?.includes('PED') || params.subjectName?.toLowerCase().includes('physical');
-          const dayNamesUrdu: Record<string, string> = {
-            Monday: 'پیر',
-            Tuesday: 'منگل',
-            Wednesday: 'بدھ',
-            Thursday: 'جمعرات',
-            Friday: 'جمعہ',
-            Saturday: 'ہفتہ',
-          };
-          const urduDayName = dayNamesUrdu[targetDay] || targetDay;
-
-          if (isUrduLang) {
-            return `${urduDayName} (${targetDay}): اُردو 11 و شرح سرمایہ — سبق ${w + 1} خلاصہ و امتحانی مشق`;
-          } else if (isIslamic) {
-            if (params.subjectCode?.includes('TQM')) {
-              return `${urduDayName} (${targetDay}): ترجمۃ القرآن المجید — رکوع ${w + 1} با محاورہ ترجمہ`;
-            }
-            return `${urduDayName} (${targetDay}): اسلامیات لازمی — سبق ${w + 1} خلاصہ و اہم سوالات`;
-          } else if (isPed) {
-            return `${urduDayName} (${targetDay}): صحت و جسمانی تعلیم — باب ${w + 1} جسمانی ساخت و قواعد`;
-          }
-          return `${targetDay} (${urduDayName}): ${params.subjectName} — Chapter ${w + 1} Assessment`;
-        })(),
-        subjectId: params.subjectId,
-        subjectName: params.subjectName,
-        subjectCode: params.subjectCode,
-        date: dateStr,
-        time: '02:00 PM',
-        durationMinutes: 45,
-        totalMarks: 30,
-        passingMarks: 15,
-        type: 'Unit Assessment',
-        syllabusCoverage: `${params.bookTitle} — Chapter ${w + 1} Board Short Questions & Theory Problems`,
-        instructions: 'Attempt all objective and subjective sections within 45 minutes. Total Marks: 30. Passing benchmark: 15/30 (50%).',
-        status: w === 0 ? 'ongoing' : 'scheduled',
-        assignedStudentName: 'Henza Noor',
-      };
-      created.push(newTest);
-    }
-
-    const merged = [...created, ...existing];
-    saveCustomTests(merged);
-    return created;
+    // Official 15-Week Academic Schedule (90 tests across all 7 subjects according to BISE DG Khan)
+    // is permanently verified and immutable. Returning official tests without modifying or corrupting timetable.
+    return SAMPLE_TESTS.filter(
+      (t) => t.subjectId === params.subjectId || t.subjectCode === params.subjectCode
+    );
   },
 
   /**

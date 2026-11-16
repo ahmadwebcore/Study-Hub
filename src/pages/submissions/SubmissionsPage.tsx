@@ -213,21 +213,21 @@ export const SubmissionsPage: React.FC = () => {
           />
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white border border-[#e1ede7] overflow-x-auto no-scrollbar shadow-2xs">
-          {(['all', 'submitted', 'under-review', 'graded'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all whitespace-nowrap ${
-                filter === tab
-                  ? 'bg-emerald-700 text-white shadow-2xs'
-                  : 'text-[#557067] hover:text-[#142D27] hover:bg-[#F7F9F8]'
-              }`}
-            >
-              {tab.replace('-', ' ')}
-            </button>
-          ))}
+        {/* Filter Dropdown */}
+        <div className="relative min-w-[170px]">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as any)}
+            className="w-full h-11 px-3.5 pr-8 rounded-2xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 focus:outline-none focus:border-emerald-600 shadow-2xs appearance-none cursor-pointer"
+          >
+            <option value="all">All Submissions</option>
+            <option value="submitted">Submitted</option>
+            <option value="under-review">Under Review</option>
+            <option value="graded">Graded &amp; Certified</option>
+          </select>
+          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs">
+            ▼
+          </div>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export const SubmissionsPage: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="p-5 rounded-3xl bg-white border border-[#e1ede7] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
+                className="p-4 rounded-2xl bg-white border border-zinc-200 transition-none flex flex-col justify-between shadow-xs select-none min-h-[220px]"
               >
                 <div>
                   {/* Top Metadata Row: Subject Code, Day & Page Count */}

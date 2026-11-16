@@ -259,34 +259,34 @@ export const CompletedWorkPage: React.FC = () => {
                 return (
                   <div
                     key={record.id}
-                    className="p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
+                    className="p-4 rounded-2xl bg-white border border-zinc-200 text-[#142D27] transition-none flex flex-col justify-between shadow-xs select-none min-h-[215px]"
                   >
                     <div>
                       {/* Top Header: Day, Code & Date */}
-                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-100">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact">
                             {day}
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
                             {record.subjectCode}
                           </span>
                         </div>
-                        <span className="text-[10px] text-[#7d9990] font-medium">
+                        <span className="text-[10px] text-zinc-400 font-medium">
                           {record.date}
                         </span>
                       </div>
 
                       {/* Subject Name & Clean Urdu Title */}
                       <div className="mt-2.5">
-                        <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
                           {record.subjectName}
                         </span>
                         <h4
-                          className={`mt-1.5 group-hover:text-emerald-700 transition-colors ${
+                          className={`mt-1 line-clamp-2 leading-relaxed ${
                             isUrdu
-                              ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
-                              : 'text-sm font-bold text-[#142D27]'
+                              ? 'font-urdu text-[14px] font-bold text-zinc-900 text-right dir-rtl leading-relaxed'
+                              : 'text-xs font-bold text-zinc-800'
                           }`}
                         >
                           <bdi>{cleanTitle}</bdi>
@@ -380,7 +380,7 @@ export const CompletedWorkPage: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredTasks.map((task) => {
                 const marksMatch = task.approval?.feedback?.match(/Marks:\s*(\d+\/\d+)/i);
                 const marksText = marksMatch ? marksMatch[1] : '28/30';
@@ -388,23 +388,23 @@ export const CompletedWorkPage: React.FC = () => {
                 return (
                   <div
                     key={task.id}
-                    className="p-4 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
+                    className="p-4 rounded-2xl bg-white border border-zinc-200 text-[#142D27] transition-none flex flex-col justify-between shadow-xs select-none min-h-[215px]"
                   >
                     <div>
-                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 truncate">
+                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-zinc-100">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 truncate">
                           {task.subjectCode}
                         </span>
-                        <span className="text-[10px] text-[#7d9990] font-medium shrink-0">
+                        <span className="text-[10px] text-zinc-400 font-medium shrink-0">
                           {task.assignedDate}
                         </span>
                       </div>
 
                       <div className="mt-2.5">
-                        <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">
                           {task.subjectName}
                         </span>
-                        <h4 className="text-xs font-bold text-[#142D27] font-serif mt-1 leading-snug line-clamp-2 group-hover:text-emerald-700 transition-colors">
+                        <h4 className="text-xs font-bold text-zinc-800 mt-1 leading-snug line-clamp-2">
                           {task.title}
                         </h4>
                       </div>
@@ -414,13 +414,13 @@ export const CompletedWorkPage: React.FC = () => {
                           <Award className="w-3 h-3 text-emerald-600 shrink-0" />
                           {marksText}
                         </span>
-                        <span className="text-[10px] font-semibold text-[#557067]">
+                        <span className="text-[10px] font-semibold text-zinc-500">
                           {task.estimatedMinutes || 60} Mins
                         </span>
                       </div>
 
                       {task.approval?.feedback && (
-                        <p className="text-[11px] text-[#2e473f] mt-2 line-clamp-2 italic leading-relaxed pl-2 border-l-2 border-emerald-500 bg-emerald-50/50 p-1.5 rounded-r-lg">
+                        <p className="text-[11px] text-zinc-700 mt-2 line-clamp-2 italic leading-relaxed pl-2 border-l-2 border-emerald-500 bg-emerald-50/50 p-1.5 rounded-r-lg">
                           &quot;{task.approval.feedback.replace(/Marks:\s*\d+\/\d+/i, '').trim()}&quot;
                         </p>
                       )}
