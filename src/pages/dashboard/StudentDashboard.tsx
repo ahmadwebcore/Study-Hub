@@ -327,7 +327,7 @@ export const StudentDashboard: React.FC = () => {
                 Current Week Targets
               </h3>
               <p className="text-xs text-[#557067]">
-                Tests start Tuesday (Urdu), Wednesday (English), Thursday (Computer), Friday (Islamiyat), Saturday (Economics &amp; Physical Education).
+                Tests start Tuesday (Urdu), Wednesday (English), Thursday (Computer), Friday (2 Books: اسلامیات لازمی + ترجمۃ القرآن), Saturday (Economics &amp; Physical Education).
               </p>
             </div>
 

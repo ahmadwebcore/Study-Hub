@@ -157,7 +157,7 @@ export const SAMPLE_SUBJECTS: Subject[] = [
   },
   {
     id: 'sub_05',
-    name: 'Tarjuma-tul-Quran & Islamiyat',
+    name: 'اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)',
     code: 'FAIT-ISL/TQM-11',
     teacherName: 'Ahmad',
     accentColor: '#0EA5E9',

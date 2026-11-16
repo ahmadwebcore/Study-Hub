@@ -3,10 +3,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
 
-const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v10';
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v11';
 
 try {
-  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
+  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
 } catch {}
 
 const INITIAL_HENZA_TESTS: TestItem[] = [
@@ -80,9 +80,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w1",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — عقیدہ توحید، رسالت و سورۃ البقرہ (رکوع 1 تا 2) ترجمہ و مفہوم",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — عقیدہ توحید، رسالت و سورۃ البقرہ (رکوع 1 تا 2) ترجمہ و مفہوم",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Nov 20, 2026",
     "time": "10:00 AM",
@@ -90,8 +90,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 (پنجاب ٹیکسٹ بک بورڈ) و ترجمۃ القرآن (ہمدرد نوٹس) — عقیدہ توحید و رسالت، سورۃ البقرہ آیات 1 تا 16 لفظی و با محاورہ ترجمہ (صفحات 1-18)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — عقیدہ توحید و رسالت، سورۃ البقرہ آیات 1 تا 16 لفظی و با محاورہ ترجمہ (صفحات 1-18)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -182,9 +182,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w2",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — عقیدہ ملائکہ و کتب سماویہ اور سورۃ البقرہ (رکوع 3 تا 4) فہم قرآن",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — عقیدہ ملائکہ و کتب سماویہ اور سورۃ البقرہ (رکوع 3 تا 4) فہم قرآن",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Nov 27, 2026",
     "time": "10:00 AM",
@@ -192,8 +192,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — عقیدہ ملائکہ، اسمائے کتب سماویہ اور سورۃ البقرہ رکوع 3 تا 4 (صفحات 19-35)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — عقیدہ ملائکہ، اسمائے کتب سماویہ اور سورۃ البقرہ رکوع 3 تا 4 (صفحات 19-35)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -284,9 +284,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w3",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — عقیدہ آخرت و انسانی کردار اور سورۃ البقرہ (رکوع 5 تا 6) ترجمہ",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — عقیدہ آخرت و انسانی کردار اور سورۃ البقرہ (رکوع 5 تا 6) ترجمہ",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Dec 04, 2026",
     "time": "10:00 AM",
@@ -294,8 +294,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — عقیدہ آخرت کا انسانی زندگی پر اثر، سورۃ البقرہ رکوع 5 تا 6 (صفحات 36-50)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — عقیدہ آخرت کا انسانی زندگی پر اثر، سورۃ البقرہ رکوع 5 تا 6 (صفحات 36-50)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -386,9 +386,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w4",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — نماز کی اہمیت، فضائل، معراج النبی ﷺ اور سورۃ البقرہ (رکوع 7 تا 8)",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — نماز کی اہمیت، فضائل، معراج النبی ﷺ اور سورۃ البقرہ (رکوع 7 تا 8)",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Dec 11, 2026",
     "time": "10:00 AM",
@@ -396,8 +396,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 و ترجمۃ القرآن — نماز کے روحانی اور معاشرتی فوائد، سورۃ البقرہ رکوع 7 تا 8 (صفحات 51-65)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — نماز کے روحانی اور معاشرتی فوائد، سورۃ البقرہ رکوع 7 تا 8 (صفحات 51-65)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -488,9 +488,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w5",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — روزہ، فلسفہ صیام اور سورۃ البقرہ (رکوع 9 تا 10) با محاورہ ترجمہ",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — روزہ، فلسفہ صیام اور سورۃ البقرہ (رکوع 9 تا 10) با محاورہ ترجمہ",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Dec 18, 2026",
     "time": "10:00 AM",
@@ -498,8 +498,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — روزے کی فضیلت و تربیت نفس، سورۃ البقرہ رکوع 9 تا 10 (صفحات 66-80)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — روزے کی فضیلت و تربیت نفس، سورۃ البقرہ رکوع 9 تا 10 (صفحات 66-80)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -590,9 +590,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w6",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — زکوٰۃ کا معاشی نظام و معاشرتی فوائد اور سورۃ آل عمران تعارف",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — زکوٰۃ کا معاشی نظام و معاشرتی فوائد اور سورۃ آل عمران تعارف",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Dec 25, 2026",
     "time": "10:00 AM",
@@ -600,8 +600,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 و ترجمۃ القرآن — مصارفِ زکوٰۃ، زکوٰۃ کے معاشی فوائد، سورۃ آل عمران تعارف و فضائل (صفحات 81-95)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — مصارفِ زکوٰۃ، زکوٰۃ کے معاشی فوائد، سورۃ آل عمران تعارف و فضائل (صفحات 81-95)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -692,9 +692,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w7",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — حج بیت اللہ، عالمگیر اخوت و سورۃ آل عمران (رکوع 1 تا 3) ترجمہ",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — حج بیت اللہ، عالمگیر اخوت و سورۃ آل عمران (رکوع 1 تا 3) ترجمہ",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Jan 01, 2027",
     "time": "10:00 AM",
@@ -702,8 +702,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 و ترجمۃ القرآن — ارکانِ حج، معاشرتی اخوت، سورۃ آل عمران رکوع 1 تا 3 (صفحات 96-110)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — ارکانِ حج، معاشرتی اخوت، سورۃ آل عمران رکوع 1 تا 3 (صفحات 96-110)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -794,9 +794,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w8",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — جہاد فی سبیل اللہ، اقسام و شرائط و سورۃ آل عمران (رکوع 4 تا 6)",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — جہاد فی سبیل اللہ، اقسام و شرائط و سورۃ آل عمران (رکوع 4 تا 6)",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Jan 08, 2027",
     "time": "10:00 AM",
@@ -804,8 +804,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — جہاد بالنفس و بالمال، سورۃ آل عمران رکوع 4 تا 6 (صفحات 111-125)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — جہاد بالنفس و بالمال، سورۃ آل عمران رکوع 4 تا 6 (صفحات 111-125)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -896,9 +896,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w9",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — سیرت النبی ﷺ: اسوہ حسنہ، امانت و دیانت و سورۃ النساء تعارف",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — سیرت النبی ﷺ: اسوہ حسنہ، امانت و دیانت و سورۃ النساء تعارف",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Jan 15, 2027",
     "time": "10:00 AM",
@@ -906,8 +906,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 و ترجمۃ القرآن — سیرت طیبہ، معاملات میں امانت، سورۃ النساء تعارف و آیات (صفحات 126-140)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — سیرت طیبہ، معاملات میں امانت، سورۃ النساء تعارف و آیات (صفحات 126-140)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -998,9 +998,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w10",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — حقوق العباد: والدین اور اساتذہ کے حقوق و سورۃ النساء (رکوع 1 تا 3)",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — حقوق العباد: والدین اور اساتذہ کے حقوق و سورۃ النساء (رکوع 1 تا 3)",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Jan 22, 2027",
     "time": "10:00 AM",
@@ -1008,8 +1008,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — والدین کی اطاعت، اساتذہ کے حقوق، سورۃ النساء رکوع 1 تا 3 (صفحات 141-155)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — والدین کی اطاعت، اساتذہ کے حقوق، سورۃ النساء رکوع 1 تا 3 (صفحات 141-155)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -1100,9 +1100,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w11",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — حقوق العباد: ہمسایوں اور غیر مسلموں کے حقوق و سورۃ المائدہ تعارف",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — حقوق العباد: ہمسایوں اور غیر مسلموں کے حقوق و سورۃ المائدہ تعارف",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Jan 29, 2027",
     "time": "10:00 AM",
@@ -1110,8 +1110,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی 11 و ترجمۃ القرآن — پڑوسیوں کے حقوق، غیر مسلم شہریوں کے حقوق، سورۃ المائدہ (صفحات 156-170)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — پڑوسیوں کے حقوق، غیر مسلم شہریوں کے حقوق، سورۃ المائدہ (صفحات 156-170)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -1202,9 +1202,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w12",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — اسلامی تہذیب کے بنیادی اوصاف و قرآنی دعائیں اور حفظ آیات",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — اسلامی تہذیب کے بنیادی اوصاف و قرآنی دعائیں اور حفظ آیات",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Feb 05, 2027",
     "time": "10:00 AM",
@@ -1212,8 +1212,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات 11 و ترجمۃ القرآن — اسلامی تہذیب و تمدن، اہم قرآنی دعاؤں کا ترجمہ اور فہم (صفحات 171-185)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — اسلامی تہذیب و تمدن، اہم قرآنی دعاؤں کا ترجمہ اور فہم (صفحات 171-185)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -1304,9 +1304,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w13",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — اہم قرآنی تراجم، کثیر الانتخابی سوالات اور معروضی ریویژن",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — اہم قرآنی تراجم، کثیر الانتخابی سوالات اور معروضی ریویژن",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Feb 12, 2027",
     "time": "10:00 AM",
@@ -1314,8 +1314,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات و ترجمۃ القرآن — تمام منتخب سورتوں کے اہم تراجم اور معروضی بورڈ سوالات کا مکمل جائزہ",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — تمام منتخب سورتوں کے اہم تراجم اور معروضی بورڈ سوالات کا مکمل جائزہ",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -1406,9 +1406,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w14",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — BISE DG Khan بورڈ پاسٹ پیپرز ماڈل ٹیسٹ (100% نصاب)",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — BISE DG Khan بورڈ پاسٹ پیپرز ماڈل ٹیسٹ (100% نصاب)",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Feb 19, 2027",
     "time": "10:00 AM",
@@ -1416,8 +1416,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی و ترجمۃ القرآن 11 — ڈی جی خان بورڈ کے مطابق ماڈل ٹیسٹ پیپر حل کریں",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — ڈی جی خان بورڈ کے مطابق ماڈل ٹیسٹ پیپر حل کریں",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },
@@ -1508,9 +1508,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     "id": "test_henza_fait_isl_tqm_11_w15",
-    "title": "Friday: اسلامیات و ترجمۃ القرآن — فائنل بورڈ ماڈل امتحان (اسلامیات لازمی و ترجمۃ القرآن 100% نصاب)",
+    "title": "Friday: اسلامیات لازمی و ترجمۃ القرآن المجید (2 Books Combined) — فائنل بورڈ ماڈل امتحان (اسلامیات لازمی و ترجمۃ القرآن 100% نصاب)",
     "subjectId": "sub_05",
-    "subjectName": "اسلامیات و ترجمۃ القرآن (Islamiyat & Quran)",
+    "subjectName": "اسلامیات لازمی اور ترجمۃ القرآن المجید (2 Books Combined)",
     "subjectCode": "FAIT-ISL/TQM-11",
     "date": "Feb 26, 2027",
     "time": "10:00 AM",
@@ -1518,8 +1518,8 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "totalMarks": 30,
     "passingMarks": 15,
     "type": "Unit Assessment",
-    "syllabusCoverage": "اسلامیات لازمی و ترجمۃ القرآن 11 — فائنل بورڈ ماڈل امتحان (مکمل نصاب جائزہ)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "syllabusCoverage": "کتاب اول: اسلامیات لازمی 11 (پنجاب ٹیکسٹ بک بورڈ) + کتاب دوم: ترجمۃ القرآن المجید 11 (ہمدرد گائیڈ سیریز) — فائنل بورڈ ماڈل امتحان (مکمل نصاب جائزہ)",
+    "instructions": "یہ جمعۃ المبارک کا خصوصی ٹیسٹ 2 کتب پر مشتمل ہے: (1) اسلامیات لازمی (پنجاب ٹیکسٹ بک بورڈ) اور (2) ترجمۃ القرآن المجید (ہمدرد نوٹس)۔ کل نمبر: 30 (15+15)۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
   },

@@ -460,9 +460,16 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
 
                   {/* Subject Name & Title in Middle */}
                   <div className="my-1.5 min-w-0 flex-1 flex flex-col justify-center">
-                    <span className="text-[11px] font-bold text-zinc-500 block truncate leading-tight mb-1">
-                      {test.subjectName.split('(')[0]}
-                    </span>
+                    <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                      <span className="text-[11px] font-bold text-zinc-500 block truncate leading-tight">
+                        {test.subjectName.split('(')[0]}
+                      </span>
+                      {(test.subjectCode?.includes('ISL') || test.title?.includes('2 Books')) && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-300 uppercase tracking-wider shrink-0">
+                          📚 2 Books Combined
+                        </span>
+                      )}
+                    </div>
                     <h4
                       className={`line-clamp-2 leading-relaxed ${
                         cardIsUrdu
@@ -649,7 +656,41 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   </div>
                 )}
 
-                {/* Details Breakdown */}
+{/* Friday 2 Books Combined Highlight Box */}
+                {(activePopupTest.subjectCode?.includes('ISL') || activePopupTest.title?.includes('2 Books')) && (
+                  <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50/80 border border-emerald-300 text-xs space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-emerald-900 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                        📚 2 Books Combined Assessment (جمعۃ المبارک)
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-700 text-white shadow-2xs">
+                        2 کتب &bull; 30 Marks Total
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                      <div className="p-2.5 rounded-xl bg-white/95 border border-emerald-200">
+                        <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wide block">
+                          📖 کتاب اول: اسلامیات 11 لازمی
+                        </span>
+                        <span className="text-xs font-semibold text-zinc-900 block mt-0.5">
+                          پنجاب ٹیکسٹ بک بورڈ (PCTB)
+                        </span>
+                        <span className="text-[10px] text-zinc-500">15 نمبر سوالات (معروضی و انشائیہ)</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white/95 border border-teal-200">
+                        <span className="text-[10px] font-bold text-teal-800 uppercase tracking-wide block">
+                          📖 کتاب دوم: ترجمۃ القرآن المجید
+                        </span>
+                        <span className="text-xs font-semibold text-zinc-900 block mt-0.5">
+                          ہمدرد گائیڈ سیریز و فہم القرآن
+                        </span>
+                        <span className="text-[10px] text-zinc-500">15 نمبر سوالات (با محاورہ ترجمہ و آیات)</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                                {/* Details Breakdown */}
                 <div className="bg-[#F7F9F8] p-3.5 rounded-2xl border border-[#e1ede7] space-y-2 text-xs">
                   <div className="flex items-center justify-between py-1 border-b border-[#e1ede7]">
                     <span className="text-[#557067] font-medium">Scheduled Date:</span>
