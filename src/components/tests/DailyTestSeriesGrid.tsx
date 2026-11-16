@@ -378,8 +378,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="space-y-1">
-          <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3 pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 pt-1">
             {filteredTests.map((test) => {
               const meta = getTestStatus(test);
               const { day: cardDay, cleanTitle: cardCleanTitle, isUrdu: cardIsUrdu } = extractDayAndCleanTitle(test.title, test.date);
@@ -388,7 +388,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <div
                   key={test.id}
                   onClick={() => setActivePopupTest(test)}
-                  className={`group relative p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-[220px] sm:w-[240px] lg:w-auto shrink-0 snap-start shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
+                  className={`group relative p-4 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-full shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
                     meta.isToday
                       ? 'bg-white border-2 border-emerald-500 shadow-md ring-2 ring-emerald-500/20 text-[#142D27]'
                       : meta.isLocked
@@ -479,10 +479,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
             })}
           </div>
 
-          {/* Mobile Swipe Hint Bar */}
-          <div className="lg:hidden flex items-center justify-between px-1 pt-0.5 text-[11px] text-zinc-400 font-medium">
-            <span>&larr; Swipe to view all 5 daily tests &rarr;</span>
-            <span className="text-emerald-700 font-semibold">{filteredTests.length} tests active</span>
+          {/* Mobile / Tablet Summary Footer */}
+          <div className="flex items-center justify-between px-1 pt-1 text-[11px] text-[#7d9990] font-medium">
+            <span>{filteredTests.length} diagnostic assessments</span>
+            <span className="text-emerald-700 font-semibold sm:hidden">1 Box per Row &bull; Vertical</span>
           </div>
         </div>
       )}

@@ -164,7 +164,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
           </span>
         </div>
 
-        <div className="flex overflow-x-auto lg:grid lg:grid-cols-7 gap-2 pb-2 text-xs no-scrollbar snap-x snap-mandatory">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 pb-1 text-xs">
           {[
             { day: 'Tuesday', urduDay: 'منگل', subject: 'صحت و جسمانی تعلیم', focus: 'ہڈیاں و 400m ٹریک', color: '#10B981', code: 'FAIT-PED' },
             { day: 'Wednesday', urduDay: 'بدھ', subject: 'اُردو 11 و شرح سرمایہ', focus: 'اسوہ حسنہ خلاصہ و قواعد', color: '#8B5CF6', code: 'FAIT-URD' },
@@ -178,7 +178,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
             return (
               <div
                 key={item.day}
-                className={`p-2.5 rounded-xl border transition-all w-[140px] sm:w-[155px] lg:w-auto shrink-0 snap-start ${
+                className={`p-2.5 rounded-xl border transition-all w-full ${
                   isToday
                     ? 'bg-emerald-50/80 border-[#14B866] shadow-sm ring-1 ring-[#14B866]/30'
                     : item.isOff
