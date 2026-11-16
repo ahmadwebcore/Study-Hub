@@ -32,21 +32,21 @@ export type TestDisplayStatus = 'locked' | 'today' | 'passed' | 'failed_retest' 
 
 export const ACADEMIC_WEEKS = [
   { id: 'all', label: 'All Weeks (1 to 15)' },
-  { id: 'w1', label: 'Week 1 (Nov 16 - Nov 21) • Current' },
-  { id: 'w2', label: 'Week 2 (Nov 23 - Nov 28)' },
-  { id: 'w3', label: 'Week 3 (Nov 30 - Dec 05)' },
-  { id: 'w4', label: 'Week 4 (Dec 07 - Dec 12)' },
-  { id: 'w5', label: 'Week 5 (Dec 14 - Dec 19)' },
-  { id: 'w6', label: 'Week 6 (Dec 21 - Dec 26)' },
-  { id: 'w7', label: 'Week 7 (Dec 28 - Jan 02)' },
-  { id: 'w8', label: 'Week 8 (Jan 04 - Jan 09)' },
-  { id: 'w9', label: 'Week 9 (Jan 11 - Jan 16)' },
-  { id: 'w10', label: 'Week 10 (Jan 18 - Jan 23)' },
-  { id: 'w11', label: 'Week 11 (Jan 25 - Jan 30)' },
-  { id: 'w12', label: 'Week 12 (Feb 01 - Feb 06)' },
-  { id: 'w13', label: 'Week 13 (Feb 08 - Feb 13)' },
-  { id: 'w14', label: 'Week 14 (Feb 15 - Feb 20)' },
-  { id: 'w15', label: 'Week 15 (Feb 22 - Feb 28 - Final Mocks)' },
+  { id: 'w1', label: 'Week 1 (Nov 17 - Nov 21) • Current' },
+  { id: 'w2', label: 'Week 2 (Nov 24 - Nov 28)' },
+  { id: 'w3', label: 'Week 3 (Dec 01 - Dec 05)' },
+  { id: 'w4', label: 'Week 4 (Dec 08 - Dec 12)' },
+  { id: 'w5', label: 'Week 5 (Dec 15 - Dec 19)' },
+  { id: 'w6', label: 'Week 6 (Dec 22 - Dec 26)' },
+  { id: 'w7', label: 'Week 7 (Dec 29 - Jan 02)' },
+  { id: 'w8', label: 'Week 8 (Jan 05 - Jan 09)' },
+  { id: 'w9', label: 'Week 9 (Jan 12 - Jan 16)' },
+  { id: 'w10', label: 'Week 10 (Jan 19 - Jan 23)' },
+  { id: 'w11', label: 'Week 11 (Jan 26 - Jan 30)' },
+  { id: 'w12', label: 'Week 12 (Feb 02 - Feb 06)' },
+  { id: 'w13', label: 'Week 13 (Feb 09 - Feb 13)' },
+  { id: 'w14', label: 'Week 14 (Feb 16 - Feb 20)' },
+  { id: 'w15', label: 'Week 15 (Feb 23 - Feb 28 - Final Mocks)' },
 ];
 
 export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
@@ -66,7 +66,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   // Completed / Graded local map for reactive live status
   const [completedMap, setCompletedMap] = useState<Record<string, { status: TestDisplayStatus; score?: number }>>(() => {
     try {
-      const stored = localStorage.getItem('studyhub_test_statuses_v2');
+      const stored = localStorage.getItem('studyhub_test_statuses_v3');
       return stored ? JSON.parse(stored) : {};
     } catch {
       return {};
@@ -220,7 +220,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       // Strictly match exact week suffix like _w1, _w2 (prevents _w1 matching _w10, _w11, etc.)
       const isExactIdMatch = new RegExp(`_${selectedWeek}$`).test(t.id);
       if (!isExactIdMatch) {
-        const base = new Date(2026, 10, 16);
+        const base = new Date(2026, 10, 17);
         base.setHours(0, 0, 0, 0);
         const testDate = new Date(t.date);
         testDate.setHours(0, 0, 0, 0);
@@ -263,7 +263,12 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     if (!metaA.isToday && metaB.isToday) return 1;
     const dateA = new Date(a.date).getTime() || 0;
     const dateB = new Date(b.date).getTime() || 0;
-    return dateA - dateB;
+    if (dateA !== dateB) return dateA - dateB;
+    const isPmA = (a.time || '').toLowerCase().includes('pm');
+    const isPmB = (b.time || '').toLowerCase().includes('pm');
+    if (!isPmA && isPmB) return -1;
+    if (isPmA && !isPmB) return 1;
+    return 0;
   });
 
   const handleAttemptFromModal = (test: TestItem) => {

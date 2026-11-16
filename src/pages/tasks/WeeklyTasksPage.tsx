@@ -106,7 +106,7 @@ export const WeeklyTasksPage: React.FC = () => {
   const filteredTasks = tasks.filter((t) => {
     // Academic Week Filter
     if (selectedWeek !== 'all') {
-      const base = new Date(2026, 10, 16);
+      const base = new Date(2026, 10, 17);
       base.setHours(0, 0, 0, 0);
       const taskDate = new Date(t.dueDate);
       taskDate.setHours(0, 0, 0, 0);
