@@ -36,7 +36,7 @@ export interface MonthlyAttendanceStats {
   daysLateOrAfter: number;
 }
 
-const ATTENDANCE_STORAGE_KEY = 'studyhub_attendance_records_v2';
+const ATTENDANCE_STORAGE_KEY = 'studyhub_attendance_records_v3';
 
 const DAY_SUBJECT_MAP: Record<number, string> = {
   0: 'Sunday (OFF)',
@@ -182,10 +182,10 @@ class AttendanceService {
       status: isSunday ? 'sunday_off' : 'present',
       timeMarked,
       subjectOfDay: subject,
-      testStatus: isSunday ? undefined : 'submitted',
-      testScore: 28,
+      testStatus: isSunday ? undefined : 'pending',
+      testScore: undefined,
       testMaxScore: 30,
-      testResult: 'passed',
+      testResult: undefined,
       syncedToGoogleSheet: true,
       syncedAt: `${todayStr} ${timeMarked}`,
       isAfterDeadline: false,

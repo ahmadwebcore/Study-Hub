@@ -24,16 +24,16 @@ export interface GoogleSheetRow {
   syncStatus: 'synced' | 'pending';
 }
 
-const GSHEETS_CONFIG_KEY = 'studyhub_gsheets_config_v2';
-const GSHEETS_STREAM_KEY = 'studyhub_gsheet_stream_v2';
+const GSHEETS_CONFIG_KEY = 'studyhub_gsheets_config_v3';
+const GSHEETS_STREAM_KEY = 'studyhub_gsheet_stream_v3';
 
 class IntegrationService {
   private gsheetsConfig: GoogleSheetsConfig = {
-    sheetUrl: 'https://docs.google.com/spreadsheets/d/1studyhub-fait-2027-records',
+    sheetUrl: '',
     webhookUrl: '',
     autoSyncEnabled: true,
-    isConnected: true,
-    lastSyncedAt: 'Just now',
+    isConnected: false,
+    lastSyncedAt: undefined,
     syncFrequency: 'instant',
   };
 
@@ -43,11 +43,43 @@ class IntegrationService {
     this.load();
   }
 
+  public isValidSheetUrl(url?: string): boolean {
+    if (!url) return false;
+    const clean = url.trim();
+    return clean.includes('google.com/spreadsheets') && !clean.includes('1studyhub-fait');
+  }
+
+  public getCreateSheetUrl(): string {
+    return 'https://sheets.new';
+  }
+
   private load(): void {
     try {
       const storedGs = localStorage.getItem(GSHEETS_CONFIG_KEY);
       if (storedGs) {
-        this.gsheetsConfig = { ...this.gsheetsConfig, ...JSON.parse(storedGs) };
+        const parsed = JSON.parse(storedGs);
+        // Sanitize out any old demo or dummy url
+        if (parsed.sheetUrl && parsed.sheetUrl.includes('1studyhub-fait')) {
+          parsed.sheetUrl = '';
+          parsed.isConnected = false;
+        }
+        this.gsheetsConfig = {
+          ...this.gsheetsConfig,
+          ...parsed,
+          isConnected: this.isValidSheetUrl(parsed.sheetUrl) || Boolean(parsed.webhookUrl),
+        };
+      } else {
+        // Clear out any obsolete v2 key if it had the dummy url
+        const oldV2 = localStorage.getItem('studyhub_gsheets_config_v2');
+        if (oldV2) {
+          try {
+            const parsedOld = JSON.parse(oldV2);
+            if (this.isValidSheetUrl(parsedOld.sheetUrl)) {
+              this.gsheetsConfig.sheetUrl = parsedOld.sheetUrl;
+              this.gsheetsConfig.isConnected = true;
+            }
+          } catch {}
+        }
       }
 
       const storedStream = localStorage.getItem(GSHEETS_STREAM_KEY);
@@ -130,7 +162,9 @@ class IntegrationService {
   }
 
   public saveGoogleSheetsConfig(config: Partial<GoogleSheetsConfig>): void {
-    this.gsheetsConfig = { ...this.gsheetsConfig, ...config };
+    const nextConfig = { ...this.gsheetsConfig, ...config };
+    nextConfig.isConnected = this.isValidSheetUrl(nextConfig.sheetUrl) || Boolean(nextConfig.webhookUrl);
+    this.gsheetsConfig = nextConfig;
     try {
       localStorage.setItem(GSHEETS_CONFIG_KEY, JSON.stringify(this.gsheetsConfig));
       window.dispatchEvent(new CustomEvent('studyhub_gsheet_config_updated'));

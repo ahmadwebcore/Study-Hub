@@ -2,6 +2,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Submission, ResultRecord } from '../types';
 import { SAMPLE_SUBMISSIONS } from '../data/sampleData';
 import { saveLocalTestStatus, saveLocalCertifiedResult } from './testService';
+import { integrationService } from './integrationService';
 
 const SUBMISSIONS_STORAGE_KEY = 'studyhub_submissions_v5';
 
@@ -121,6 +122,17 @@ export const submissionService = {
     if (params.assignmentId) {
       saveLocalTestStatus(params.assignmentId, 'submitted');
     }
+
+    // Automatically sync submission activity to Google Sheets
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: params.studentName || 'Henza Noor',
+      activityType: '30-Mark Test Evaluation',
+      subject: params.subjectName || params.assignmentTitle,
+      score: 'Submitted for Evaluation',
+      resultStatus: 'PRESENT',
+      remarks: `Handwritten answer sheet (${params.fileName || 'Solution Paper'}) submitted to Ahmad Sir`,
+    });
 
     // Trigger reactive window events
     window.dispatchEvent(new CustomEvent('studyhub_submissions_updated', { detail: newSub }));
@@ -276,6 +288,17 @@ export const submissionService = {
         feedback: feedback || (isPassed ? 'Verified by Faculty Lead Ahmad.' : 'Retest required. Please revise.'),
       };
       saveLocalCertifiedResult(certifiedResult);
+
+      // Automatically sync evaluated test result to Google Sheets
+      integrationService.recordActivityInGoogleSheet({
+        date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        studentName: targetSub.studentName || 'Henza Noor',
+        activityType: '30-Mark Test Evaluation',
+        subject: targetSub.subjectName || targetSub.assignmentTitle,
+        score: `${score}/${maxMarks} (${percentage}%)`,
+        resultStatus: isPassed ? 'PASSED' : 'RETEST',
+        remarks: feedback || `Evaluated by Ahmad Sir • Grade ${grade} • ${isPassed ? 'Passed' : 'Retest Required'}`,
+      });
 
       window.dispatchEvent(new CustomEvent('studyhub_submissions_updated', { detail: targetSub }));
       window.dispatchEvent(new CustomEvent('studyhub_tests_updated', { detail: { testId: targetSub.assignmentId, status: isPassed ? 'passed' : 'failed_retest', score } }));

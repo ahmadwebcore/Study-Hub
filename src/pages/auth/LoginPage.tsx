@@ -529,7 +529,7 @@ export const LoginPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="font-bold block text-zinc-900 leading-tight">
-                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Enrolled Scholar'}
+                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Henza Noor (Student)'}
                     </span>
                     <span className="text-[10px] text-zinc-500 font-medium">
                       {verifiedEmail} &bull; BISE DG Khan
