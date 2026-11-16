@@ -166,13 +166,13 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 pb-1 text-xs">
           {[
-            { day: 'Tuesday', urduDay: 'منگل', subject: 'صحت و جسمانی تعلیم', focus: 'ہڈیاں و 400m ٹریک', color: '#10B981', code: 'FAIT-PED' },
-            { day: 'Wednesday', urduDay: 'بدھ', subject: 'اُردو 11 و شرح سرمایہ', focus: 'اسوہ حسنہ خلاصہ و قواعد', color: '#8B5CF6', code: 'FAIT-URD' },
-            { day: 'Thursday', urduDay: 'جمعرات', subject: 'English 11 & Sunshine', focus: 'Button Button & Tenses', color: '#3B82F6', code: 'FAIT-ENG' },
-            { day: 'Friday', urduDay: 'جمعہ', subject: 'ترجمۃ القرآن المجید', focus: 'سورۃ البقرہ ترجمہ', color: '#0EA5E9', code: 'FAIT-TQM' },
-            { day: 'Saturday', urduDay: 'ہفتہ', subject: 'اسلامیات لازمی', focus: 'عقائد و نظام زکوٰۃ', color: '#14B866', code: 'FAIT-ISL' },
+            { day: 'Monday', urduDay: 'پیر', subject: 'صحت و جسمانی تعلیم', focus: 'ہڈیاں و 400m ٹریک', color: '#10B981', code: 'FAIT-PED' },
+            { day: 'Tuesday', urduDay: 'منگل', subject: 'اُردو 11 لازمی و شرح', focus: 'اسوہ حسنہ خلاصہ و قواعد', color: '#8B5CF6', code: 'FAIT-URD' },
+            { day: 'Wednesday', urduDay: 'بدھ', subject: 'English 11 & Sunshine', focus: 'Button Button & Tenses', color: '#3B82F6', code: 'FAIT-ENG' },
+            { day: 'Thursday', urduDay: 'جمعرات', subject: 'Computer Science (IT)', focus: 'IT Basics & Python', color: '#059669', code: 'FAIT-CSC' },
+            { day: 'Friday', urduDay: 'جمعہ', subject: 'اسلامیات و ترجمۃ القرآن', focus: 'عقائد و سورۃ البقرہ', color: '#0EA5E9', code: 'FAIT-ISL/TQM' },
+            { day: 'Saturday', urduDay: 'ہفتہ', subject: 'اصولِ معاشیات', focus: 'معاشیات نوعیت و تعریفات', color: '#D97706', code: 'FAIT-ECO' },
             { day: 'Sunday', urduDay: 'اتوار', subject: 'Rest Day (چھٹی)', focus: 'ہفتہ وار مکمل ریسٹ', color: '#EF4444', isOff: true },
-            { day: 'Monday', urduDay: 'پیر', subject: 'ہفتہ وار ریویژن', focus: '5 سالہ ماضی پیپرز', color: '#6366F1', code: 'FAIT-REV' },
           ].map((item) => {
             const isToday = todayName.toLowerCase() === item.day.toLowerCase();
             return (

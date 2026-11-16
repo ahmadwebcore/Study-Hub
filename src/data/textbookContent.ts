@@ -448,6 +448,105 @@ export const TEXTBOOK_KNOWLEDGE_BASE: Record<string, BookContentData> = {
       },
     ],
   },
+  'FAIT-ECO-11': {
+    bookId: 'book_henza_09',
+    bookTitle: 'Principles of Economics (Part-1)',
+    urduBookTitle: 'اصولِ معاشیات 11 (علمی کتاب خانہ — پروفیسر حبیب اللہ قریشی)',
+    author: 'پروفیسر حبیب اللہ قریشی (سابق صدر شعبہ معاشیات، گورنمنٹ ایم اے او کالج لاہور)',
+    totalPages: 240,
+    coverUrl: '/covers/cover_economics.jpg',
+    pdfFileName: 'principles_of_economics_11_qureshi.pdf',
+    subjectCode: 'FAIT-ECO-11',
+    chapters: [
+      {
+        chapterNum: 1,
+        title: 'Nature and Scope of Economics',
+        urduTitle: 'باب اول: معاشیات کی نوعیت، وسعت اور تعریفات',
+        pagesRange: 'Pages 1-35',
+        pageStart: 1,
+        pageEnd: 35,
+        summary: 'معاشیات انسان کی معاشی سرگرمیوں، پیدائش دولت اور لامحدود خواہشات کے محدود ذرائع سے تسکین کا نام ہے۔ ایڈم سمتھ نے معاشیات کو علم دولت، الفریڈ مارشل نے مادی فلاح و بہبود، اور لیونل رابنز نے نایاب ذرائع اور متبادل استعمال کا علم قرار دیا۔',
+        keyPoints: [
+          'ایڈم سمتھ (1776): معاشیات دولت کی پیدائش، تقسیم، تبادلہ اور صرف کا علم ہے۔',
+          'الفریڈ مارشل (1890): معاشیات روزمرہ زندگی کے ان معاملات کا جائزہ ہے جو انسان کی مادی خوشحالی سے متعلق ہیں۔',
+          'لیونل رابنز (1932): انسانی مقاصد اور لامحدود خواہشات بمقابلہ محدود و متبادل ذرائع کا معاشی تجزیہ۔',
+          'مائیکرو اکنامکس انفرادی اکائیوں جبکہ میکرو اکنامکس قومی معیشت کا مطالعہ کرتی ہے۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'الفریڈ مارشل اور رابنز کی تعریفات کا تقابلی جائزہ پیش کریں۔',
+            answer: 'مارشل کی تعریف مادی فلاح پر مبنی ہے جبکہ رابنز کی تعریف سائنسی، غیر جانبدار اور محدود وسائل کے انتخاب پر مشتمل ہے۔',
+            marks: 4,
+            type: 'short',
+          },
+          {
+            question: 'جزوی معاشیات (Microeconomics) اور کلی معاشیات (Macroeconomics) میں فرق بیان کریں۔',
+            answer: 'جزوی معاشیات انفرادی صارف یا فرم کا جائزہ لیتی ہے جبکہ کلی معاشیات قومی آمدنی، کل روزگار اور مجموعی قیمتوں کی سطح کا احاطہ کرتی ہے۔',
+            marks: 2,
+            type: 'short',
+          },
+        ],
+      },
+      {
+        chapterNum: 2,
+        title: 'Consumer Behavior & Theory of Utility',
+        urduTitle: 'باب دوم: صارف کا معاشی رویہ اور نظریہ افادہ',
+        pagesRange: 'Pages 36-75',
+        pageStart: 36,
+        pageEnd: 75,
+        summary: 'افادہ کسی شے کی وہ خاصیت ہے جو انسانی ضرورت کو تسکین دیتی ہے۔ قانونِ تقلیلِ افادہِ مختتم کے مطابق کسی شے کی لگاتار اکائیاں استعمال کرنے سے ہر اضافی اکائی سے حاصل ہونے والا مختتم افادہ گھٹتا چلا جاتا ہے تاوقتیکہ وہ صفر (نقطہ سیری) ہو جائے۔',
+        keyPoints: [
+          'ابتدائی افادہ، کل افادہ (Total Utility) اور مختتم افادہ (Marginal Utility) کا تعلق۔',
+          'جب مختتم افادہ صفر ہوتا ہے تو کل افادہ زیادہ سے زیادہ (Maximum) ہوتا ہے۔',
+          'قانون تقلیل افادہ مختتم کے مفروضات: شے کی نوعیت یکساں ہو، مقدار مناسب ہو، اور استعمال مسلسل ہو۔',
+          'قانون مساوی افادہ مختتم صارف کے توازن اور تسکین کو زیادہ سے زیادہ بنانے کا سنہری اصول ہے۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'قانون تقلیل افادہ مختتم کا گوشوارہ اور ڈایاگرام کے ذریعے وضاحت کریں۔',
+            answer: 'گوشوارے میں اکائیوں کے اضافے کے ساتھ مختتم افادہ 10 سے گھٹ کر 0 اور منفی کی طرف جائے گا، جس کا خط نیچے کی طرف جھکتا ہے۔',
+            marks: 8,
+            type: 'long',
+          },
+          {
+            question: 'نقطہ سیری (Point of Satiety) سے کیا مراد ہے؟',
+            answer: 'وہ مقام جہاں کل افادہ بلند ترین سطح پر پہنچ جاتا ہے اور مختتم افادہ صفر ہو جاتا ہے، نقطہ سیری کہلاتا ہے۔',
+            marks: 2,
+            type: 'short',
+          },
+        ],
+      },
+      {
+        chapterNum: 3,
+        title: 'Laws of Demand and Supply',
+        urduTitle: 'باب سوم: قوانین طلب، رسد اور مارکیٹ توازن',
+        pagesRange: 'Pages 76-125',
+        pageStart: 76,
+        pageEnd: 125,
+        summary: 'قانون طلب کے مطابق اگر دیگر حالات بدستور رہیں تو شے کی قیمت بڑھنے سے طلب گھٹ جاتی ہے اور قیمت کم ہونے سے طلب بڑھ جاتی ہے۔ طلب اور رسد کے باہمی تعامل سے جس قیمت پر طلب اور رسد برابر ہو جائیں، وہ توازن قیمت (Equilibrium Price) کہلاتی ہے۔',
+        keyPoints: [
+          'قانون طلب کا خط بائیں سے دائیں نیچے کی جانب جھکتا ہے۔',
+          'طلب کی لچک (Elasticity of Demand): اکائی کے برابر، اکائی سے زیادہ اور اکائی سے کم۔',
+          'رسد کا مفہوم: شے کی وہ مقدار جو بیچنے والے دی گئی قیمت پر فروخت کے لیے پیش کرتے ہیں۔',
+          'توازن قیمت: مارکیٹ کا وہ نقطہ جہاں طلب اور رسد کی لکیریں ایک دوسرے کو قطع کرتی ہیں۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'قانون طلب کے منفی جھکاؤ کی چار بنیادی وجوہات بیان کریں۔',
+            answer: '1. قانون تقلیل افادہ مختتم 2. آمدنی کا اثر 3. متبادل اشیاء کا اثر 4. نئے صارفین کا داخلہ۔',
+            marks: 4,
+            type: 'short',
+          },
+          {
+            question: 'توازن قیمت کا تعین ڈایاگرام کے ذریعے واضح کریں۔',
+            answer: 'جہاں خط طلب (DD) اور خط رسد (SS) ایک دوسرے کو نقطہ E پر قطع کرتے ہیں، وہاں توازن قیمت P اور توازن مقدار Q قائم ہوتی ہے۔',
+            marks: 8,
+            type: 'long',
+          },
+        ],
+      },
+    ],
+  },
 };
 
 // Helper function to resolve textbook info from a test or task item
@@ -464,6 +563,8 @@ export function getTextbookDetailsForTest(params: {
   let matchedKey = 'FAIT-URD-11';
   if (code.includes('PED') || sName.includes('physical')) {
     matchedKey = 'FAIT-PED-11';
+  } else if (code.includes('ECO') || sName.includes('economic') || title.includes('Economics') || title.includes('معاشیات')) {
+    matchedKey = 'FAIT-ECO-11';
   } else if (code.includes('CSC') || sName.includes('computer') || title.includes('Computer') || title.includes('کمپیوٹر') || title.includes('Python')) {
     matchedKey = 'FAIT-CSC-11';
   } else if (code.includes('URD') || sName.includes('urdu') || title.includes('اُردو') || title.includes('سرمایہ')) {

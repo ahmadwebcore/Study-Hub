@@ -39,7 +39,13 @@ export const LoginPage: React.FC = () => {
 
   // Step state
   const [step, setStep] = useState<AuthStep>('credentials');
-  const [roleMode, setRoleMode] = useState<'teacher' | 'student'>('teacher');
+  const [roleMode, setRoleMode] = useState<'teacher' | 'student'>(() => {
+    try {
+      const saved = localStorage.getItem('studyhub_last_active_role');
+      if (saved === 'teacher' || saved === 'student') return saved;
+    } catch {}
+    return 'student'; // Defaults to student portal as Henza is the primary scholar
+  });
 
   // Step 1: Credentials Form
   const [email, setEmail] = useState('');
@@ -467,6 +473,7 @@ export const LoginPage: React.FC = () => {
                   onClick={() => {
                     setRoleMode('teacher');
                     setAuthError(null);
+                    try { localStorage.setItem('studyhub_last_active_role', 'teacher'); } catch {}
                   }}
                   className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
                     roleMode === 'teacher'
@@ -482,6 +489,7 @@ export const LoginPage: React.FC = () => {
                   onClick={() => {
                     setRoleMode('student');
                     setAuthError(null);
+                    try { localStorage.setItem('studyhub_last_active_role', 'student'); } catch {}
                   }}
                   className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
                     roleMode === 'student'
@@ -553,6 +561,25 @@ export const LoginPage: React.FC = () => {
                 >
                   Sign In as {roleMode === 'teacher' ? 'Faculty' : 'Student'}
                 </Button>
+
+                <div className="pt-1 flex items-center justify-between text-xs">
+                  <span className="text-[11px] text-zinc-500">Quick Portal Demo:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (roleMode === 'student') {
+                        setEmail('henzanoor@gmail.com');
+                        setPassword('StudyHub2026!');
+                      } else {
+                        setEmail('ahmadwebcore@gmail.com');
+                        setPassword('StudyHub2026!');
+                      }
+                    }}
+                    className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
+                  >
+                    Auto-Fill {roleMode === 'student' ? 'Henza Noor (Student)' : 'Ahmad (Faculty Lead)'}
+                  </button>
+                </div>
               </form>
 
               {/* Student Invite Link */}

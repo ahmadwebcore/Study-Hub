@@ -230,6 +230,17 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     return true;
   });
 
+  // Priority sorting: Today's active test first, followed by nearest scheduled/pending tests, then past archived
+  const displayTests = [...filteredTests].sort((a, b) => {
+    const metaA = getTestStatus(a);
+    const metaB = getTestStatus(b);
+    if (metaA.isToday && !metaB.isToday) return -1;
+    if (!metaA.isToday && metaB.isToday) return 1;
+    const dateA = new Date(a.date).getTime() || 0;
+    const dateB = new Date(b.date).getTime() || 0;
+    return dateA - dateB;
+  });
+
   const handleGenerateEntireBook = (subjectId: string) => {
     const subj = SAMPLE_SUBJECTS.find((s) => s.id === subjectId) || SAMPLE_SUBJECTS[0];
     testService.scheduleDailyTestsForBook({
@@ -347,7 +358,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
             }`}
           >
-            All 6 Subjects
+            All {SAMPLE_SUBJECTS.length} Subjects
           </button>
           {SAMPLE_SUBJECTS.map((s) => (
             <button
@@ -385,7 +396,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
             </Link>
           </div>
         </div>
-      ) : filteredTests.length === 0 ? (
+      ) : displayTests.length === 0 ? (
         <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-2">
           <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
           <h3 className="text-sm font-bold text-zinc-900">No Tests Found in this Filter</h3>
@@ -396,7 +407,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       ) : (
         <div className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5 pt-1">
-            {filteredTests.map((test) => {
+            {displayTests.map((test) => {
               const meta = getTestStatus(test);
               const { day: cardDay, cleanTitle: cardCleanTitle, isUrdu: cardIsUrdu } = extractDayAndCleanTitle(test.title, test.date);
 
