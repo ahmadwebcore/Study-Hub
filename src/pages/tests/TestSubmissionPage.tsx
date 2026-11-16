@@ -29,6 +29,7 @@ import {
   extractDayAndCleanTitle,
   getLocalCertifiedResults,
   getLocalTestStatuses,
+  isDateToday,
 } from '../../services/testService';
 import { submissionService } from '../../services/submissionService';
 import { notificationService } from '../../services/notificationService';
@@ -91,8 +92,7 @@ export const TestSubmissionPage: React.FC = () => {
           if (matched) setActiveTest(matched);
           else setActiveTest(data[0]);
         } else if (!activeTest) {
-          const todayFormatted = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-          const todayMatch = data.find((t) => t.date === todayFormatted || t.date.includes('Nov 16') || t.id.includes('ped_w1')) || data[0];
+          const todayMatch = data.find((t) => isDateToday(t.date, t.title, t.id)) || data.find((t) => t.status === 'ongoing') || data[0];
           setActiveTest(todayMatch);
         }
       }
@@ -225,9 +225,8 @@ export const TestSubmissionPage: React.FC = () => {
 
   // Sort tests: Newest / Today's test at the VERY TOP, followed by scheduled tests
   const sortedTests = [...tests].sort((a, b) => {
-    const todayFormatted = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-    const isTodayA = a.date === todayFormatted || a.date.includes('Nov 16');
-    const isTodayB = b.date === todayFormatted || b.date.includes('Nov 16');
+    const isTodayA = isDateToday(a.date, a.title, a.id);
+    const isTodayB = isDateToday(b.date, b.title, b.id);
     if (isTodayA && !isTodayB) return -1;
     if (!isTodayA && isTodayB) return 1;
     const timeA = new Date(a.date).getTime() || 0;
@@ -259,8 +258,7 @@ export const TestSubmissionPage: React.FC = () => {
     const stat = testStatuses[test.id]?.status;
 
     if (filterTab === 'today') {
-      const todayFormatted = new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-      return test.date === todayFormatted || test.date.includes('Nov 16') || test.id.includes('ped_w1');
+      return isDateToday(test.date, test.title, test.id);
     }
     if (filterTab === 'passed') {
       return (cert && cert.passed) || stat === 'passed' || (cert && cert.score >= 15);

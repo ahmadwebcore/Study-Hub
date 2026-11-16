@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
-import { extractDayAndCleanTitle } from '../../services/testService';
+import { extractDayAndCleanTitle, parseDateRobust, isDateToday } from '../../services/testService';
 import { PDFViewerModal } from '../books/PDFViewerModal';
 
 interface DailyTestSeriesGridProps {
@@ -73,10 +73,19 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     }
   });
 
+  // 15-second live ticker to dynamically re-evaluate unlock state across midnight
+  const [nowTick, setNowTick] = useState<number>(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNowTick(Date.now());
+    }, 15000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     const handleSync = () => {
       try {
-        const stored = localStorage.getItem('studyhub_test_statuses_v2');
+        const stored = localStorage.getItem('studyhub_test_statuses_v3');
         if (stored) setCompletedMap(JSON.parse(stored));
       } catch {}
     };
@@ -114,16 +123,16 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     unlockTimeText: string;
     scoreText?: string;
   } => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date(nowTick);
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const testDate = new Date(test.date);
-    testDate.setHours(0, 0, 0, 0);
+    const testDate = parseDateRobust(test.date);
+    const testMidnight = new Date(testDate.getFullYear(), testDate.getMonth(), testDate.getDate());
 
-    const diffDays = Math.round((testDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-    const isToday = diffDays === 0 || test.id === 'tst_today';
-    const isFuture = diffDays > 0 && test.id !== 'tst_today';
-    const isPast = diffDays < 0;
+    const diffDays = Math.round((testMidnight.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    const isToday = isDateToday(test.date, test.title, test.id) || test.id === 'tst_today' || diffDays === 0;
+    const isFuture = !isToday && diffDays > 0 && test.id !== 'tst_today';
+    const isPast = !isToday && diffDays < 0;
 
     // Check if test was graded or submitted
     const localOverride = completedMap[test.id];
@@ -167,6 +176,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       };
     }
 
+    // Today's test is ALWAYS unlocked dynamically at 12:00 AM!
+    if (isToday) {
+      return {
+        status: 'today',
+        label: "Today's Test",
+        badgeClass: 'bg-emerald-600 text-white font-bold shadow-2xs',
+        isLocked: false,
+        isToday: true,
+        unlockTimeText: 'Active Today (Closes 11:59 PM)',
+      };
+    }
+
     // Future tests are locked until 12:00 AM on that day
     if (isFuture) {
       return {
@@ -176,18 +197,6 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         isLocked: true,
         isToday: false,
         unlockTimeText: `Unlocks 12:00 AM (${test.date})`,
-      };
-    }
-
-    // Today's test is unlocked at 12:00 AM!
-    if (isToday) {
-      return {
-        status: 'today',
-        label: "Today's Test",
-        badgeClass: 'bg-emerald-600 text-white font-bold shadow-2xs',
-        isLocked: false,
-        isToday: true,
-        unlockTimeText: 'Active Today (Closes 11:59 PM)',
       };
     }
 
@@ -241,7 +250,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     const statusMeta = getTestStatus(t);
     if (selectedStatusFilter !== 'all') {
       if (selectedStatusFilter === 'today' && !statusMeta.isToday) return false;
-      if (selectedStatusFilter === 'locked' && !(statusMeta.isLocked || statusMeta.status === 'locked' || statusMeta.isToday)) return false;
+      if (selectedStatusFilter === 'locked' && !statusMeta.isLocked) return false;
       if (selectedStatusFilter === 'passed' && statusMeta.status !== 'passed') return false;
       if (selectedStatusFilter === 'pending' && statusMeta.status !== 'pending' && statusMeta.status !== 'submitted') return false;
       if (selectedStatusFilter === 'retest' && statusMeta.status !== 'failed_retest') return false;
@@ -374,7 +383,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               >
                 <option value="all">All Statuses ({tests.length} Tests)</option>
                 <option value="today">Today's Active Test</option>
-                <option value="locked">Locked (Scheduled)</option>
+                <option value="locked">Locked (Future Scheduled)</option>
                 <option value="passed">Passed (15-30 Marks)</option>
                 <option value="retest">Retest Needed (&lt;15 Marks)</option>
                 <option value="pending">Submitted / Under Review</option>

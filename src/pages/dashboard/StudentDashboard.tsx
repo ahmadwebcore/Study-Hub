@@ -22,7 +22,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
 import { taskService, DailyTask } from '../../services/taskService';
-import { testService, extractDayAndCleanTitle } from '../../services/testService';
+import { testService, extractDayAndCleanTitle, isDateToday } from '../../services/testService';
 import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
@@ -108,11 +108,22 @@ export const StudentDashboard: React.FC = () => {
     }
   };
 
+  // 15-second live ticker to keep today's active test and timers updated across midnight
+  const [, setTick] = useState<number>(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setTick(Date.now()), 15000);
+    return () => clearInterval(timer);
+  }, []);
+
   const todayTasks = tasks.filter(
     (t) => t.dueDate === todayStr || (!t.isSundayOff && !t.isPakistanHoliday && t.status === 'pending')
   );
   const activeTodayTask = todayTasks[0];
-  const activeTodayTest = tests.find((t) => t.status === 'ongoing' || t.status === 'scheduled');
+  const activeTodayTest =
+    tests.find((t) => isDateToday(t.date, t.title, t.id) && t.status !== 'graded') ||
+    tests.find((t) => t.status === 'ongoing') ||
+    tests.find((t) => t.id.includes('urd_11_w1')) ||
+    tests[0];
 
   useEffect(() => {
     if (isDailyWelcomeOpen) {

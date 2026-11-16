@@ -1,32 +1,56 @@
 import { notificationService } from './notificationService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
-import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
+import { SAMPLE_RESULTS } from '../data/sampleData';
 
-const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v11';
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v14';
 
 try {
-  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
+  ['v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v12', 'v13'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
 } catch {}
 
+export function parseDateRobust(dateStr?: string): Date {
+  if (!dateStr) return new Date();
+  const parsed = new Date(dateStr);
+  if (!isNaN(parsed.getTime())) return parsed;
+  const parts = dateStr.match(/([a-zA-Z]+)\s+(\d+),\s*(\d+)/);
+  if (parts) {
+    const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const monthIdx = monthNames.indexOf(parts[1].slice(0, 3).toLowerCase());
+    if (monthIdx >= 0) {
+      return new Date(parseInt(parts[3], 10), monthIdx, parseInt(parts[2], 10));
+    }
+  }
+  return new Date();
+}
+
+export function isDateToday(dateStr?: string, testTitle?: string, testId?: string): boolean {
+  const now = new Date();
+  if (testId === 'test_henza_fait_urd_11_w1' && now.getDay() === 2) {
+    return true;
+  }
+  if (!dateStr) return false;
+  const testDate = parseDateRobust(dateStr);
+  const isExactDay =
+    testDate.getFullYear() === now.getFullYear() &&
+    testDate.getMonth() === now.getMonth() &&
+    testDate.getDate() === now.getDate();
+
+  if (isExactDay) return true;
+
+  if (testTitle) {
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const todayDayName = dayNames[now.getDay()];
+    if (testTitle.toLowerCase().includes(todayDayName)) {
+      const diffTime = Math.abs(testDate.getTime() - now.getTime());
+      if (diffTime < 4 * 24 * 3600 * 1000) return true;
+    }
+  }
+
+  return false;
+}
+
 const INITIAL_HENZA_TESTS: TestItem[] = [
-  {
-    "id": "test_henza_fait_ped_11_w1",
-    "title": "Saturday (Afternoon 2 PM): صحت و جسمانی تعلیم (Physical Education — Adjusted from Monday Nov 16) — انسانی جسمانی ساخت، ہڈیوں کے جوڑ اور 400 میٹر ٹریک رولز",
-    "subjectId": "sub_01",
-    "subjectName": "صحت و جسمانی تعلیم (Physical Education)",
-    "subjectCode": "FAIT-PED-11",
-    "date": "Nov 21, 2026",
-    "time": "02:00 PM",
-    "durationMinutes": 45,
-    "totalMarks": 30,
-    "passingMarks": 15,
-    "type": "Unit Assessment",
-    "syllabusCoverage": "ہیلتھ اینڈ فزیکل ایجوکیشن 11 (گیلانی) — انسانی جسمانی ساخت، ہڈیوں کے جوڑ اور 400 میٹر ٹریک رولز (صفحات 1-12)",
-    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
-    "status": "scheduled",
-    "assignedStudentName": "Henza Noor"
-  },
   {
     "id": "test_henza_fait_urd_11_w1",
     "title": "Tuesday: اُردو 11 و شرح سرمایہ — سبق اسوہ حسنہ خلاصہ و تشریح، خط نویسی اور علم بیان (تشبیہ)",
@@ -40,6 +64,23 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     "passingMarks": 15,
     "type": "Unit Assessment",
     "syllabusCoverage": "اُردو 11 درسی کتاب و شرح سرمایہ اردو (پروفیسر راؤ خالد محمود) — سبق اسوہ حسنہ خلاصہ و تشریح، خط نویسی اور علم بیان (تشبیہ) (صفحات 1-15)",
+    "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
+    "status": "ongoing",
+    "assignedStudentName": "Henza Noor"
+  },
+  {
+    "id": "test_henza_fait_ped_11_w1",
+    "title": "Saturday (Afternoon 2 PM): صحت و جسمانی تعلیم (Physical Education — Adjusted from Monday Nov 16) — انسانی جسمانی ساخت، ہڈیوں کے جوڑ اور 400 میٹر ٹریک رولز",
+    "subjectId": "sub_01",
+    "subjectName": "صحت و جسمانی تعلیم (Physical Education)",
+    "subjectCode": "FAIT-PED-11",
+    "date": "Nov 21, 2026",
+    "time": "02:00 PM",
+    "durationMinutes": 45,
+    "totalMarks": 30,
+    "passingMarks": 15,
+    "type": "Unit Assessment",
+    "syllabusCoverage": "ہیلتھ اینڈ فزیکل ایجوکیشن 11 (گیلانی) — انسانی جسمانی ساخت، ہڈیوں کے جوڑ اور 400 میٹر ٹریک رولز (صفحات 1-12)",
     "instructions": "10 کثیر الانتخابی سوالات اور 5 مختصر سوالات حل کریں۔ جوابی کاپی کیمرہ یا براؤزر سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ: 15/30۔",
     "status": "scheduled",
     "assignedStudentName": "Henza Noor"
@@ -1543,39 +1584,29 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
 ];
 
 function getCustomTests(): TestItem[] {
+  let list: TestItem[] = [];
   try {
     const raw = localStorage.getItem(CUSTOM_TESTS_KEY);
     if (raw) {
       let parsed = JSON.parse(raw) as TestItem[];
       if (Array.isArray(parsed) && parsed.length > 0) {
-        let modified = false;
-        parsed = parsed.map((t) => {
-          if (t.title?.includes('Daily Test Series') || t.title?.includes('Urdu Lazmi & Sharh')) {
-            modified = true;
-            if (t.subjectCode?.includes('URD') || t.subjectName?.toLowerCase().includes('urdu')) {
-              t.title = 'بدھ (Wednesday): اُردو 11 و شرح سرمایہ — سبق اسوہ حسنہ خلاصہ و علم بیان';
-            } else if (t.subjectCode?.includes('PED')) {
-              t.title = 'منگل (Tuesday): ہیلتھ اینڈ فزیکل ایجوکیشن — انسانی ڈھانچہ و 400 میٹر ٹریک رولز';
-            } else if (t.subjectCode?.includes('ENG')) {
-              t.title = 'جمعرات (Thursday): English 11 & Sunshine — Story 1 "Button, Button" & Master Tenses';
-            } else if (t.subjectCode?.includes('TQM')) {
-              t.title = 'جمعہ (Friday): ترجمۃ القرآن المجید — سورۃ البقرہ رکوع 1 تا 2 با محاورہ ترجمہ';
-            } else if (t.subjectCode?.includes('ISL')) {
-              t.title = 'ہفتہ (Saturday): اسلامیات لازمی — عقیدہ توحید، رسالت اور نظام زکوٰۃ';
-            } else if (t.subjectCode?.includes('REV')) {
-              t.title = 'پیر (Monday): ہفتہ وار بورڈ جائزہ — BISE DG Khan 5 سالہ ماضی پیپرز مشق';
-            }
-          }
-          return t;
-        });
-        if (modified) {
-          saveCustomTests(parsed);
-        }
-        return parsed;
+        list = parsed;
       }
     }
   } catch {}
-  return [...INITIAL_HENZA_TESTS];
+
+  if (list.length === 0) {
+    list = [...INITIAL_HENZA_TESTS];
+    saveCustomTests(list);
+  }
+
+  // Ensure dynamic ongoing status and zero locked state for today's test
+  return list.map((t) => {
+    if (isDateToday(t.date, t.title, t.id) && t.status !== 'graded') {
+      return { ...t, status: 'ongoing' };
+    }
+    return t;
+  });
 }
 
 function saveCustomTests(tests: TestItem[]) {
@@ -2046,7 +2077,7 @@ export const testService = {
   async fetchTests(studentId?: string): Promise<TestItem[]> {
     if (!isSupabaseConfigured()) {
       const custom = getCustomTests();
-      return [...custom, ...SAMPLE_TESTS].map(ensureQuestionsForTest);
+      return custom.map(ensureQuestionsForTest);
     }
 
     try {
@@ -2068,7 +2099,8 @@ export const testService = {
 
       const { data, error } = await query;
       if (error || !data || data.length === 0) {
-        return SAMPLE_TESTS.map(ensureQuestionsForTest);
+        const custom = getCustomTests();
+        return custom.map(ensureQuestionsForTest);
       }
 
       return data.map((item) => {
@@ -2117,7 +2149,8 @@ export const testService = {
         };
       }).map(ensureQuestionsForTest);
     } catch {
-      return SAMPLE_TESTS.map(ensureQuestionsForTest);
+      const custom = getCustomTests();
+      return custom.map(ensureQuestionsForTest);
     }
   },
 
@@ -2127,8 +2160,8 @@ export const testService = {
   async fetchTestById(testId: string, studentId?: string): Promise<TestItem | null> {
     if (!isSupabaseConfigured()) {
       const custom = getCustomTests();
-      const match = [...custom, ...SAMPLE_TESTS].find((t) => t.id === testId) || SAMPLE_TESTS[0];
-      return ensureQuestionsForTest(match);
+      const match = custom.find((t) => t.id === testId) || custom[0];
+      return match ? ensureQuestionsForTest(match) : null;
     }
 
     try {
@@ -2167,7 +2200,8 @@ export const testService = {
         .single();
 
       if (error || !data) {
-        const fallback = SAMPLE_TESTS.find((t) => t.id === testId) || null;
+        const custom = getCustomTests();
+        const fallback = custom.find((t) => t.id === testId) || custom[0];
         return fallback ? ensureQuestionsForTest(fallback) : null;
       }
 
@@ -2264,8 +2298,9 @@ export const testService = {
       };
       return ensureQuestionsForTest(constructed);
     } catch {
-      const match = SAMPLE_TESTS.find((t) => t.id === testId) || SAMPLE_TESTS[0];
-      return ensureQuestionsForTest(match);
+      const custom = getCustomTests();
+      const match = custom.find((t) => t.id === testId) || custom[0];
+      return match ? ensureQuestionsForTest(match) : null;
     }
   },
 
@@ -2283,7 +2318,8 @@ export const testService = {
   }): TestItem[] {
     // Official 15-Week Academic Schedule (90 tests across all 7 subjects according to BISE DG Khan)
     // is permanently verified and immutable. Returning official tests without modifying or corrupting timetable.
-    return SAMPLE_TESTS.filter(
+    const custom = getCustomTests();
+    return custom.filter(
       (t) => t.subjectId === params.subjectId || t.subjectCode === params.subjectCode
     );
   },
@@ -2773,7 +2809,8 @@ export const testService = {
       const { data, error } = await query;
 
       if (error || !data || data.length === 0) {
-        return SAMPLE_RESULTS;
+        const local = getLocalCertifiedResults();
+        return local.length > 0 ? local : SAMPLE_RESULTS;
       }
 
       return data.map((item) => {
@@ -2812,7 +2849,8 @@ export const testService = {
         };
       });
     } catch {
-      return SAMPLE_RESULTS;
+      const local = getLocalCertifiedResults();
+      return local.length > 0 ? local : SAMPLE_RESULTS;
     }
   },
 
