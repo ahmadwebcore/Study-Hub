@@ -2816,4 +2816,7 @@ export const testService = {
       return SAMPLE_RESULTS;
     }
   },
+
+  saveLocalCertifiedResult,
+  getLocalCertifiedResults,
 };

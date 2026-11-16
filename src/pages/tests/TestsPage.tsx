@@ -48,6 +48,7 @@ import {
 import { useRole } from '../../hooks/useRole';
 import { testService, ensureQuestionsForTest, generateStandardFAITQuestions } from '../../services/testService';
 import { subjectService } from '../../services/subjectService';
+import { notificationService } from '../../services/notificationService';
 import { syllabusService } from '../../services/syllabusService';
 import { studentService } from '../../services/studentService';
 import { submissionService } from '../../services/submissionService';
@@ -423,6 +424,13 @@ export const TestsPage: React.FC = () => {
     );
 
     const testTitle = activeExamTest.title;
+
+    // Trigger instant notification for Ahmad (Faculty Lead)
+    notificationService.notifyStudentSubmission(
+      user?.name || 'Henza Noor',
+      testTitle
+    );
+
     setActiveExamTest(null);
     setIsSubmitConfirmOpen(false);
     setSuccessToast(

@@ -178,12 +178,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (configured) {
       const { data: authListener } = supabase.auth.onAuthStateChange(
-        async (_event, currentSession) => {
+        async (event, currentSession) => {
           if (!mounted) return;
-          setSession(currentSession);
-          setUser(currentSession?.user ?? null);
 
           if (currentSession?.user) {
+            setSession(currentSession);
+            setUser(currentSession.user);
             const userProfile = await authService.fetchUserProfile(currentSession.user.id);
             if (mounted) {
               const sanitized = sanitizeProfile(userProfile, demoRole);
@@ -192,6 +192,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
               } catch {}
             }
+          } else if (event === 'SIGNED_OUT') {
+            // Only clear user if the user deliberately signed out
+            const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+            if (!savedUserStr) {
+              setSession(null);
+              setUser(null);
+            }
+          } else {
+            // Keep local persistent session alive indefinitely (never kick user out automatically)
+            try {
+              const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+              const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
+              if (savedUserStr) {
+                const parsed = JSON.parse(savedUserStr);
+                const sanitized = sanitizeProfile(parsed, savedRole);
+                setUser({ id: sanitized.id, email: sanitized.email } as User);
+                setProfile(sanitized);
+                setDemoRole(savedRole);
+              }
+            } catch {}
           }
           setLoading(false);
         }

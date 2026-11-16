@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
 import { taskService, DailyTask } from '../../services/taskService';
 import { testService } from '../../services/testService';
-import { TestItem } from '../../types';
+import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
 import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
@@ -35,6 +35,7 @@ export const StudentDashboard: React.FC = () => {
 
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
+  const [results, setResults] = useState<ResultRecord[]>([]);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -47,6 +48,9 @@ export const StudentDashboard: React.FC = () => {
     setTasks(taskService.getTasks());
     testService.fetchTests(user?.id).then((t) => {
       setTests(t || []);
+    });
+    testService.fetchResults(user?.id).then((r) => {
+      setResults(r || []);
     });
   };
 
@@ -363,10 +367,15 @@ export const StudentDashboard: React.FC = () => {
       <div className="bg-white rounded-3xl border border-[#e1ede7] p-5 shadow-sm space-y-3 text-[#142D27]">
         <div className="flex items-center justify-between border-b border-[#e1ede7] pb-3">
           <div>
-            <h3 className="text-sm font-bold text-[#142D27] font-serif">
-              Recent Certified Marks &amp; Records
-            </h3>
-            <p className="text-[11px] text-[#557067]">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[#142D27] font-serif">
+                Recent Certified Marks &amp; Records
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                {results.length} Verified
+              </span>
+            </div>
+            <p className="text-[11px] text-[#557067] mt-0.5">
               Evaluated and certified by faculty director Ahmad. Records are permanently preserved.
             </p>
           </div>
@@ -378,33 +387,38 @@ export const StudentDashboard: React.FC = () => {
           </Link>
         </div>
 
-        <div className="divide-y divide-[#e1ede7] text-xs">
-          <div className="py-2.5 flex items-center justify-between gap-3">
-            <div>
-              <span className="font-bold text-[#142D27] block">Chapter 1: Basics of IT &amp; Hardware</span>
-              <span className="text-[11px] text-[#7d9990]">Computer Science &bull; Evaluated by Ahmad</span>
+        {results.length === 0 ? (
+          <div className="py-6 px-4 text-center rounded-2xl bg-[#F7F9F8] border border-dashed border-[#e1ede7] space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200">
+              <Award className="w-5 h-5" />
             </div>
-            <div className="text-right">
-              <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full">
-                27 / 30 (Grade A)
-              </span>
-              <span className="block text-[10px] text-[#557067] mt-0.5">Certified Passed</span>
-            </div>
+            <h4 className="text-xs font-bold text-[#142D27]">No Certified Records Yet</h4>
+            <p className="text-[11px] text-[#557067] max-w-sm mx-auto leading-relaxed">
+              Assessment checking starts tomorrow. Once faculty director Ahmad grades Henza Noor's daily tests, certified marks and feedback will appear here dynamically.
+            </p>
           </div>
-
-          <div className="py-2.5 flex items-center justify-between gap-3">
-            <div>
-              <span className="font-bold text-[#142D27] block">Urdu Prose: Uswa-e-Hasna Short Questions</span>
-              <span className="text-[11px] text-[#7d9990]">Urdu &amp; Grammar &bull; Evaluated by Ahmad</span>
-            </div>
-            <div className="text-right">
-              <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full">
-                28 / 30 (Grade A*)
-              </span>
-              <span className="block text-[10px] text-[#557067] mt-0.5">Certified Passed</span>
-            </div>
+        ) : (
+          <div className="divide-y divide-[#e1ede7] text-xs">
+            {results.slice(0, 5).map((r) => (
+              <div key={r.id} className="py-2.5 flex items-center justify-between gap-3">
+                <div>
+                  <span className="font-bold text-[#142D27] block">{r.testTitle || 'Diagnostic Assessment'}</span>
+                  <span className="text-[11px] text-[#7d9990]">{r.subjectName || 'FA-IT'} &bull; Evaluated by Ahmad</span>
+                </div>
+                <div className="text-right">
+                  <span className={`font-extrabold px-2 py-0.5 rounded-full ${
+                    r.passed ? 'text-emerald-800 bg-emerald-50 border border-emerald-200/80' : 'text-rose-800 bg-rose-50 border border-rose-200/80'
+                  }`}>
+                    {r.score} / {r.maxScore || 30} ({r.grade || (r.passed ? 'Grade A' : 'Retest')})
+                  </span>
+                  <span className={`block text-[10px] mt-0.5 ${r.passed ? 'text-[#557067]' : 'text-rose-600'}`}>
+                    {r.passed ? 'Certified Passed' : 'Retest Required'}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
 
       {/* DYNAMIC DAILY WELCOME POPUP MODAL (Portaled to body) */}

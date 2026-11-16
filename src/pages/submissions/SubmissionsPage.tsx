@@ -17,6 +17,7 @@ import { Submission } from '../../types';
 import { useRole } from '../../hooks/useRole';
 import { submissionService } from '../../services/submissionService';
 import { emailService } from '../../services/emailService';
+import { notificationService } from '../../services/notificationService';
 
 export const SubmissionsPage: React.FC = () => {
   const { role, user } = useRole();
@@ -116,6 +117,15 @@ export const SubmissionsPage: React.FC = () => {
       passingMarks: passingThreshold,
       feedback: feedbackInput,
     });
+
+    // In-app & Mobile Push Notification Dispatch
+    notificationService.notifyCertifiedGrade(
+      gradingSubmission.assignmentTitle,
+      scoreVal,
+      gradingSubmission.maxScore,
+      scoreVal >= 27 ? 'Grade A*' : scoreVal >= 24 ? 'Grade A' : isPassed ? 'Grade B' : 'Grade C',
+      feedbackInput || 'Evaluated by faculty director Ahmad.'
+    );
 
     setIsGradingSaving(false);
     setGradingSubmission(null);

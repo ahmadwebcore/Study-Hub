@@ -134,12 +134,46 @@ export const TeacherDashboard: React.FC = () => {
     if (!approvingTask) return;
 
     const taskPercentage = taskMaxMarks > 0 ? Math.round((taskMarks / taskMaxMarks) * 100) : 100;
-    const finalNote = `${approvalFeedback} [Marks Awarded: ${taskMarks}/${taskMaxMarks} (${taskPercentage}%)]`;
+    const gradeLetter = taskPercentage >= 90 ? 'Grade A*' : taskPercentage >= 80 ? 'Grade A' : taskPercentage >= 50 ? 'Grade B' : 'Grade C';
+    const finalNote = `${approvalFeedback || 'Certified by Sir Ahmad'} [Marks Awarded: ${taskMarks}/${taskMaxMarks} (${taskPercentage}%)]`;
     taskService.approveTask(approvingTask.id, 'Ahmad', finalNote);
+
+    // Save dynamic result record
+    testService.saveLocalCertifiedResult({
+      id: `res_${approvingTask.id}_${Date.now()}`,
+      testId: approvingTask.id,
+      testTitle: approvingTask.title,
+      studentId: approvingTask.studentId || 'student_henza',
+      studentName: approvingTask.studentName || 'Henza Noor',
+      studentAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
+      subjectName: approvingTask.subjectName,
+      subjectCode: approvingTask.subjectCode,
+      score: taskMarks,
+      maxScore: taskMaxMarks,
+      percentage: taskPercentage,
+      grade: gradeLetter,
+      rank: '1st in Cohort',
+      passed: taskMarks >= Math.ceil(taskMaxMarks * 0.5),
+      date: new Date().toISOString().slice(0, 10),
+      feedback: finalNote,
+    });
+
+    // Dispatch real-time student notification
+    notificationService.notifyCertifiedGrade(
+      approvingTask.title,
+      taskMarks,
+      taskMaxMarks,
+      gradeLetter,
+      approvalFeedback || 'Excellent coursework completion.'
+    );
+
+    window.dispatchEvent(new Event('studyhub_results_updated'));
+    window.dispatchEvent(new Event('studyhub_tests_updated'));
+
     loadTasks();
     setApprovingTask(null);
-    setSuccessToast(`Task "${approvingTask.title}" approved with ${taskMarks}/${taskMaxMarks} Marks (${taskPercentage}%).`);
-    setTimeout(() => setSuccessToast(null), 3000);
+    setSuccessToast(`Task "${approvingTask.title}" approved with ${taskMarks}/${taskMaxMarks} Marks (${taskPercentage}%). Student notified instantly.`);
+    setTimeout(() => setSuccessToast(null), 3500);
   };
 
   const todayStr = new Date().toISOString().slice(0, 10);

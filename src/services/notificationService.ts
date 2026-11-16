@@ -150,20 +150,6 @@ function getDayScheduleAlerts(): NotificationItem[] {
     urgent: false,
   });
 
-  // Teacher Evaluation notification
-  items.push({
-    id: 'dyn_grade_01',
-    title: 'Grade Certified: 28/30 (A*) Awarded by Sir Ahmad',
-    message: 'Faculty Lead Ahmad reviewed your handwritten test sheet: "Excellent definitions and clear diagrams. Keep handwriting clean."',
-    timestamp: '2 hours ago',
-    read: false,
-    category: 'grade',
-    actionUrl: '/results',
-    actionLabel: 'View Result',
-    badge: 'Certified A*',
-    urgent: false,
-  });
-
   return items;
 }
 
@@ -335,6 +321,51 @@ class NotificationService {
 
     const pick = samples[Math.floor(Math.random() * samples.length)];
     return this.addNotification(pick);
+  }
+
+  public notifyStudentSubmission(studentName: string, testTitle: string): NotificationItem {
+    return this.addNotification({
+      title: `📄 New Test Submission: ${studentName}`,
+      message: `${studentName} has submitted "${testTitle}" for verification. Ready for grading and marks entry.`,
+      category: 'assignment',
+      actionUrl: '/submissions',
+      actionLabel: 'Review Submission',
+      badge: 'Submission',
+      urgent: true,
+    });
+  }
+
+  public notifyCertifiedGrade(
+    testTitle: string,
+    score: number,
+    totalMarks: number,
+    grade: string,
+    feedback?: string
+  ): NotificationItem {
+    const isPassed = score >= Math.ceil(totalMarks * 0.5);
+    return this.addNotification({
+      title: `🎓 Certified Grade: ${score}/${totalMarks} (${grade}) by Sir Ahmad`,
+      message: feedback
+        ? `Faculty Lead Ahmad certified your submission: "${feedback}"`
+        : `Assessment "${testTitle}" graded: ${score}/${totalMarks} (${isPassed ? 'Passed' : 'Retest Required'}).`,
+      category: 'grade',
+      actionUrl: '/results',
+      actionLabel: 'View Certified Result',
+      badge: `${score}/${totalMarks} (${grade})`,
+      urgent: !isPassed,
+    });
+  }
+
+  public notifyTestUnlocked(testTitle: string, subjectName: string): NotificationItem {
+    return this.addNotification({
+      title: `🟢 Today's 30-Mark Test Unlocked: ${subjectName}`,
+      message: `"${testTitle}" is now active. Please solve questions and upload handwritten sheets before 11:59 PM.`,
+      category: 'test',
+      actionUrl: '/tests',
+      actionLabel: 'Attempt Test',
+      badge: '30 Marks',
+      urgent: true,
+    });
   }
 
   public markAsRead(id: string): void {

@@ -118,13 +118,16 @@ export const authService = {
 
     const isStudent =
       cleanEmail === 'student@studyhub.edu' ||
-      cleanEmail === 'student@gmail.com';
+      cleanEmail === 'student@gmail.com' ||
+      cleanEmail === 'henzanoor@gmail.com' ||
+      cleanEmail.includes('henza') ||
+      cleanEmail.includes('student');
 
     if (isStudent) {
       const customStudentPass = localStorage.getItem('studyhub_student_custom_password');
       const isStudentPassValid = customStudentPass
         ? password === customStudentPass
-        : password === 'password123';
+        : (password === 'password123' || password === 'Henza@2026' || password === 'student123');
 
       if (!isStudentPassValid) {
         return {
@@ -134,10 +137,15 @@ export const authService = {
           error: new Error('Incorrect password. Please verify your student password.'),
         };
       }
+      const studentProfile: UserProfile = {
+        ...SAMPLE_STUDENT,
+        name: 'Henza Noor',
+        email: cleanEmail.includes('henza') ? cleanEmail : 'henzanoor@gmail.com',
+      };
       return {
         valid: true,
-        user: { id: SAMPLE_STUDENT.id, email: SAMPLE_STUDENT.email },
-        profile: SAMPLE_STUDENT,
+        user: { id: SAMPLE_STUDENT.id, email: studentProfile.email },
+        profile: studentProfile,
         error: null,
       };
     }
