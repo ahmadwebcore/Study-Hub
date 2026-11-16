@@ -14,7 +14,9 @@ import {
   Edit3,
   Trash2,
   CalendarCheck,
+  ChevronDown,
 } from 'lucide-react';
+import { ACADEMIC_WEEKS } from '../../components/tests/DailyTestSeriesGrid';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
@@ -30,6 +32,7 @@ export const WeeklyTasksPage: React.FC = () => {
   const { role, user } = useRole();
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [selectedWeek, setSelectedWeek] = useState<string>('all');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedDay, setSelectedDay] = useState<string>('all');
@@ -101,10 +104,23 @@ export const WeeklyTasksPage: React.FC = () => {
 
   // Filter Tasks
   const filteredTasks = tasks.filter((t) => {
+    // Academic Week Filter
+    if (selectedWeek !== 'all') {
+      const base = new Date(2026, 10, 16);
+      base.setHours(0, 0, 0, 0);
+      const taskDate = new Date(t.dueDate);
+      taskDate.setHours(0, 0, 0, 0);
+      if (!isNaN(taskDate.getTime())) {
+        const diffDays = Math.floor((taskDate.getTime() - base.getTime()) / (24 * 3600 * 1000));
+        const diffWeeks = Math.floor(diffDays / 7) + 1;
+        if (`w${diffWeeks}` !== selectedWeek) return false;
+      }
+    }
     const matchSubject = selectedSubject === 'all' || t.subjectId === selectedSubject;
     const matchStatus = selectedStatus === 'all' || t.status === selectedStatus;
     const matchDay = selectedDay === 'all' || t.dayOfWeek.toLowerCase() === selectedDay.toLowerCase();
     const matchSearch =
+      !searchTerm.trim() ||
       t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       t.sourceTitle.toLowerCase().includes(searchTerm.toLowerCase());
@@ -311,13 +327,13 @@ export const WeeklyTasksPage: React.FC = () => {
 
   const daysList = [
     { label: 'All Days', value: 'all' },
-    { label: 'Mon', value: 'monday' },
-    { label: 'Tue', value: 'tuesday' },
-    { label: 'Wed', value: 'wednesday' },
-    { label: 'Thu', value: 'thursday' },
-    { label: 'Fri', value: 'friday' },
-    { label: 'Sat', value: 'saturday' },
-    { label: 'Sun (Off)', value: 'sunday' },
+    { label: 'Monday', value: 'monday' },
+    { label: 'Tuesday', value: 'tuesday' },
+    { label: 'Wednesday', value: 'wednesday' },
+    { label: 'Thursday', value: 'thursday' },
+    { label: 'Friday', value: 'friday' },
+    { label: 'Saturday', value: 'saturday' },
+    { label: 'Sunday (Rest Day OFF)', value: 'sunday' },
   ];
 
   return (
@@ -390,133 +406,110 @@ export const WeeklyTasksPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Status Summary Bento Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
-          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
-            Awaiting Approval
-          </span>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-amber-700">{awaitingApprovalCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-              Teacher Gate
-            </span>
+      {/* 4 Unified Dropdown Filters (Academic Week, Day of Week, Subject, Status + Quick Search) */}
+      <div className="bg-white rounded-2xl border border-zinc-200 p-3.5 sm:p-4 shadow-xs space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          {/* 1. Academic Week Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Academic Week
+            </label>
+            <div className="relative">
+              <select
+                value={selectedWeek}
+                onChange={(e) => setSelectedWeek(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                {ACADEMIC_WEEKS.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 2. Day of Week Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Day of Week
+            </label>
+            <div className="relative">
+              <select
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                {daysList.map((d) => (
+                  <option key={d.value} value={d.value}>
+                    {d.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 3. Subject Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Subject ({subjects.length})
+            </label>
+            <div className="relative">
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All {subjects.length} Subjects</option>
+                {subjects.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.code})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 4. Task Status Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Task Status
+            </label>
+            <div className="relative">
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All Statuses ({tasks.length})</option>
+                <option value="pending">In Progress ({pendingCount})</option>
+                <option value="submitted_for_approval">Awaiting Teacher Gate ({awaitingApprovalCount})</option>
+                <option value="approved">Verified Complete ({approvedCount})</option>
+                <option value="overdue">Overdue ({overdueCount})</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
-          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
-            Verified Complete
-          </span>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-emerald-700">{approvedCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-              Approved
-            </span>
-          </div>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
-          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
-            Pending Student
-          </span>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xl font-extrabold text-[#142D27]">{pendingCount}</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 border border-zinc-200">
-              In Progress
-            </span>
-          </div>
-        </div>
-
-        <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm">
-          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
-            🇵🇰 Off Days Policy
-          </span>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-sm font-bold text-[#142D27]">Sunday & Holidays</span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-              Mandatory Off
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Overdue Alert Strip */}
-      {overdueCount > 0 && (
-        <div className="flex items-center justify-between p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>
-              <strong>{overdueCount} Task(s) Overdue:</strong> Student Gmail addresses have been notified with deadline reminders.
-            </span>
-          </div>
-          <button
-            onClick={handleScanLateAlerts}
-            className="text-[11px] font-bold underline hover:text-amber-950"
-          >
-            Re-scan Now
-          </button>
-        </div>
-      )}
-
-      {/* Filters Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-[#e1ede7]">
-        {/* Days Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-          {daysList.map((d) => (
-            <button
-              key={d.value}
-              onClick={() => setSelectedDay(d.value)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                selectedDay === d.value
-                  ? 'bg-[#142D27] text-white shadow-xs'
-                  : d.value === 'sunday'
-                  ? 'bg-sky-50 text-sky-800 border border-sky-200 hover:bg-sky-100'
-                  : 'bg-zinc-50 text-zinc-600 hover:bg-zinc-100'
-              }`}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Search & Subject filter */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1 sm:w-48">
+        {/* Bottom Search & Showing Info */}
+        <div className="pt-2 border-t border-zinc-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search targets..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
+              placeholder="Search targets or topics..."
+              className="w-full pl-8 pr-3 h-8 text-xs rounded-xl border border-zinc-200 bg-zinc-50/50 text-zinc-800 focus:bg-white focus:outline-none focus:border-emerald-500"
             />
           </div>
-
-          <select
-            value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
-            className="text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl px-2.5 py-1.5 text-[#263B35] font-semibold focus:outline-none"
-          >
-            <option value="all">All Subjects</option>
-            {subjects.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.code}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl px-2.5 py-1.5 text-[#263B35] font-semibold focus:outline-none"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="submitted_for_approval">Awaiting Gate</option>
-            <option value="approved">Approved</option>
-            <option value="overdue">Overdue</option>
-          </select>
+          <span className="text-[11px] font-semibold text-zinc-500 shrink-0">
+            Showing <strong className="text-zinc-900">{filteredTasks.length}</strong> of {tasks.length} targets
+          </span>
         </div>
       </div>
 
@@ -566,7 +559,7 @@ export const WeeklyTasksPage: React.FC = () => {
                   return (
                     <div
                       key={task.id}
-                      className="p-5 rounded-3xl bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 border border-sky-200/80 flex flex-col justify-between shadow-sm group"
+                      className="p-4 rounded-2xl bg-sky-50/60 border border-sky-200 select-none min-h-[215px] transition-none flex flex-col justify-between shadow-xs"
                     >
                       <div>
                         <div className="flex items-center justify-between gap-1 pb-2 border-b border-sky-100">
@@ -603,7 +596,7 @@ export const WeeklyTasksPage: React.FC = () => {
                   return (
                     <div
                       key={task.id}
-                      className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50/60 via-white to-emerald-50/30 border border-emerald-300/80 flex flex-col justify-between shadow-sm group"
+                      className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-300 select-none min-h-[215px] transition-none flex flex-col justify-between shadow-xs"
                     >
                       <div>
                         <div className="flex items-center justify-between gap-1 pb-2 border-b border-emerald-100">

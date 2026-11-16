@@ -9,13 +9,12 @@ import {
   Clock,
   Download,
   BookOpen,
-  CalendarCheck,
   PlusCircle,
   Edit3,
   Trash2,
   Paperclip,
   CheckCircle,
-  Upload,
+  ChevronDown,
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -28,7 +27,6 @@ import { syllabusService } from '../../services/syllabusService';
 import { subjectService } from '../../services/subjectService';
 import { taskService } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
-import { mediaService } from '../../services/mediaService';
 
 const chapterSchema = z.object({
   title: z.string().min(3, 'Chapter title must be at least 3 characters'),
@@ -52,6 +50,8 @@ export const SyllabusPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_04');
   const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(SAMPLE_SYLLABUS);
+  const [selectedChapterId, setSelectedChapterId] = useState<string>('all');
+  const [selectedTopicStatus, setSelectedTopicStatus] = useState<string>('all');
   const [activeNotesTopic, setActiveNotesTopic] = useState<{ topic: SyllabusTopic; unitTitle: string } | null>(null);
 
   // Modals
@@ -64,11 +64,6 @@ export const SyllabusPage: React.FC = () => {
   const [deletingTopic, setDeletingTopic] = useState<{ unitId: string; topic: SyllabusTopic } | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Student Syllabus Upload & Auto-Scheduler State
-  const [uploadedSyllabusName, setUploadedSyllabusName] = useState<string>('');
-  const [taskDurationChoice, setTaskDurationChoice] = useState<number>(45); // 30, 45, 60, 90 mins
-  const [paceTargetChoice, setPaceTargetChoice] = useState<'entire_book' | '2_weeks' | '4_weeks' | '8_weeks'>('entire_book');
-  const [isGeneratingPlan, setIsGeneratingPlan] = useState<boolean>(false);
   const [isManualTaskModalOpen, setIsManualTaskModalOpen] = useState<boolean>(false);
   const [manualTaskTitle, setManualTaskTitle] = useState<string>('');
   const [manualTaskMinutes, setManualTaskMinutes] = useState<number>(45);
@@ -140,6 +135,21 @@ export const SyllabusPage: React.FC = () => {
   const completedTopics = allTopics.filter((t) => t.completed || t.progressStatus === 'completed');
   const inProgressTopics = allTopics.filter((t) => t.progressStatus === 'in_progress');
   const overallPercentage = allTopics.length > 0 ? Math.round((completedTopics.length / allTopics.length) * 100) : 0;
+
+  // Filtered chapters & topics based on dropdowns
+  const displayedSyllabusList = syllabusList
+    .filter((unit) => selectedChapterId === 'all' || unit.id === selectedChapterId)
+    .map((unit) => {
+      if (selectedTopicStatus === 'all') return unit;
+      return {
+        ...unit,
+        topics: unit.topics.filter((t) => {
+          const st = t.progressStatus || (t.completed ? 'completed' : 'not_started');
+          return st === selectedTopicStatus;
+        }),
+      };
+    })
+    .filter((unit) => unit.topics.length > 0 || selectedTopicStatus === 'all');
 
   // Toggle student topic progress
   const handleToggleTopic = async (unitId: string, topic: SyllabusTopic) => {
@@ -316,81 +326,6 @@ export const SyllabusPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadedSyllabusName(file.name);
-
-    // Save to Media Center immediately
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    const isImage = ['png', 'jpg', 'jpeg', 'webp'].includes(ext || '');
-    const isDoc = ['doc', 'docx'].includes(ext || '');
-
-    mediaService.addMediaItem({
-      name: file.name,
-      originalName: file.name,
-      category: isImage ? 'image' : 'syllabus',
-      fileType: isImage ? 'image' : isDoc ? 'docx' : 'pdf',
-      fileSizeBytes: file.size,
-      uploadedBy: role === 'teacher' ? 'Ahmad' : 'Student Scholar',
-      uploadedByRole: role,
-      subjectId: selectedSubjectId,
-      subjectName: currentSubject.name,
-      subjectCode: currentSubject.code,
-      description: `Syllabus / course roadmap uploaded for ${currentSubject.name}.`,
-      tasksGenerated: false,
-    });
-
-    setSuccessToast(`"${file.name}" saved to Media Center! Select daily pace below to generate monthly schedule.`);
-    setTimeout(() => setSuccessToast(null), 4000);
-  };
-
-  const handleGenerateStudyTasksFromSyllabus = async () => {
-    setIsGeneratingPlan(true);
-    await new Promise((r) => setTimeout(r, 600));
-
-    if (paceTargetChoice === 'entire_book') {
-      taskService.generateEntireBookTasksAndDailyTests({
-        subjectId: selectedSubjectId,
-        subjectName: currentSubject.name,
-        subjectCode: currentSubject.code,
-        bookTitle: uploadedSyllabusName || `${currentSubject.name} Textbook & Syllabus`,
-        sourceType: uploadedSyllabusName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'syllabus',
-        totalPages: 240,
-        totalChapters: syllabusList.length || 10,
-        studentName: 'Student Scholar',
-      });
-
-      setIsGeneratingPlan(false);
-      setSuccessToast(`🎉 1st Year FA-IT syllabus parsed into daily reading quotas & 30-mark test series through Feb 28! Use the AI Assistant (bottom right) if you want to adjust any dates or series.`);
-      setTimeout(() => setSuccessToast(null), 7000);
-      return;
-    }
-
-    // Extract all topics from syllabus chapters
-    const topicsList = syllabusList.flatMap((unit) =>
-      unit.topics.map((t) => `${unit.title}: ${t.title}`)
-    );
-
-    const weeks = paceTargetChoice === '2_weeks' ? 2 : paceTargetChoice === '8_weeks' ? 8 : 4;
-
-    taskService.generateMonthlyTasksFromSource({
-      sourceType: uploadedSyllabusName?.match(/\.(png|jpg|jpeg|webp)$/i) ? 'screenshot' : 'syllabus',
-      sourceTitle: uploadedSyllabusName || `${currentSubject.name} Official Syllabus`,
-      subjectId: selectedSubjectId,
-      subjectName: currentSubject.name,
-      subjectCode: currentSubject.code,
-      studentName: 'Student Scholar',
-      totalWeeks: weeks,
-      dailyMinutes: taskDurationChoice,
-      customTopics: topicsList.length > 0 ? topicsList : undefined,
-    });
-
-    setIsGeneratingPlan(false);
-    setSuccessToast(`Automated ${weeks}-Week daily study schedule created for ${currentSubject.name} (Sundays strictly OFF)! Check Weekly Tasks.`);
-    setTimeout(() => setSuccessToast(null), 5000);
-  };
-
   const handleCreateManualTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualTaskTitle.trim()) return;
@@ -466,25 +401,75 @@ export const SyllabusPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Subject Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {subjects.map((sub) => (
-          <button
-            key={sub.id}
-            onClick={() => setSelectedSubjectId(sub.id)}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-2 ${
-              selectedSubjectId === sub.id
-                ? 'bg-[#142D27] text-white shadow-sm'
-                : 'bg-white border border-[#e1ede7] text-[#557067] hover:bg-[#F7F9F8] hover:text-[#142D27]'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: sub.accentColor }} />
-            {sub.name}
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/20">
-              {sub.code}
-            </span>
-          </button>
-        ))}
+      {/* 3 Unified Dropdown Filters (Subject, Chapter, Topic Status) */}
+      <div className="bg-white rounded-2xl border border-zinc-200 p-3.5 sm:p-4 shadow-xs space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {/* 1. Subject Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Subject ({subjects.length})
+            </label>
+            <div className="relative">
+              <select
+                value={selectedSubjectId}
+                onChange={(e) => {
+                  setSelectedSubjectId(e.target.value);
+                  setSelectedChapterId('all');
+                }}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                {subjects.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name} ({sub.code})
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 2. Chapter Dropdown */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Chapter Filter
+            </label>
+            <div className="relative">
+              <select
+                value={selectedChapterId}
+                onChange={(e) => setSelectedChapterId(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All {syllabusList.length} Chapters</option>
+                {syllabusList.map((unit) => (
+                  <option key={unit.id} value={unit.id}>
+                    Chapter {unit.unitNumber}: {unit.title}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* 3. Topic Progress Status */}
+          <div className="flex flex-col gap-1">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+              Topic Status
+            </label>
+            <div className="relative">
+              <select
+                value={selectedTopicStatus}
+                onChange={(e) => setSelectedTopicStatus(e.target.value)}
+                className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              >
+                <option value="all">All Topics ({allTopics.length})</option>
+                <option value="completed">Completed ({completedTopics.length})</option>
+                <option value="in_progress">In Progress ({inProgressTopics.length})</option>
+                <option value="not_started">Not Started ({allTopics.length - completedTopics.length - inProgressTopics.length})</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Course Summary & Progress Stat Banner */}
@@ -543,114 +528,10 @@ export const SyllabusPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Student Syllabus Upload & Task Auto-Scheduler Card */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-zinc-200 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-zinc-900 flex items-center gap-2">
-              <CalendarCheck className="w-4 h-4 text-emerald-600" />
-              Upload Syllabus & Auto-Schedule Daily Study Tasks
-            </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Upload your 1st Year / 2nd Year FSc syllabus document or photo to automatically create daily study targets with Sunday rest days.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsManualTaskModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors shadow-xs shrink-0"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-zinc-500" />
-            + Add Task Manually
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-          {/* Step 1: Upload File */}
-          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">
-              1. Syllabus Document / Photo
-            </span>
-            <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-zinc-200 rounded-lg bg-white hover:border-emerald-500 hover:bg-emerald-50/20 cursor-pointer transition-colors text-center">
-              <Upload className="w-5 h-5 text-zinc-400 mb-1" />
-              <span className="text-xs font-semibold text-zinc-700 truncate max-w-[200px]">
-                {uploadedSyllabusName || 'Choose PDF, Doc or Screenshot'}
-              </span>
-              <span className="text-[10px] text-zinc-400">PDF, Word Doc, PNG, JPG up to 25MB</span>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          {/* Step 2: Choose Daily Duration */}
-          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">
-              2. Daily Task Duration
-            </span>
-            <div className="grid grid-cols-2 gap-1.5">
-              {[
-                { mins: 30, label: '30 Mins (Quick)' },
-                { mins: 45, label: '45 Mins (Best)' },
-                { mins: 60, label: '60 Mins (Deep)' },
-                { mins: 90, label: '90 Mins (Intense)' },
-              ].map((opt) => (
-                <button
-                  key={opt.mins}
-                  type="button"
-                  onClick={() => setTaskDurationChoice(opt.mins)}
-                  className={`py-1.5 px-2 text-xs font-semibold rounded-lg border transition-all text-center ${
-                    taskDurationChoice === opt.mins
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                      : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Step 3: Target Pace & Trigger Button */}
-          <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex flex-col justify-between space-y-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">
-                3. Completion Pace
-              </span>
-              <select
-                value={paceTargetChoice}
-                onChange={(e) => setPaceTargetChoice(e.target.value as any)}
-                className="w-full h-8 px-2 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-800 font-medium focus:outline-none"
-              >
-                <option value="entire_book">Entire Book + Daily Tests (Feb 28 Sprint)</option>
-                <option value="2_weeks">2 Weeks (Exam Sprint)</option>
-                <option value="4_weeks">4 Weeks (Standard Semester)</option>
-                <option value="8_weeks">8 Weeks (Comprehensive Review)</option>
-              </select>
-            </div>
-
-            <Button
-              variant="primary"
-              size="sm"
-              className="w-full text-xs font-bold shadow-xs py-2"
-              isLoading={isGeneratingPlan}
-              loadingText="Breaking PDF into Series..."
-              onClick={handleGenerateStudyTasksFromSyllabus}
-            >
-              Break PDF into Series &amp; Auto-Schedule
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* Chapters & Topics List */}
       <div className="space-y-5">
-        {syllabusList.length > 0 ? (
-          syllabusList.map((unit) => (
+        {displayedSyllabusList.length > 0 ? (
+          displayedSyllabusList.map((unit) => (
             <Card key={unit.id} className="p-5 sm:p-6">
               {/* Chapter Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#e1ede7]">

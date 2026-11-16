@@ -217,12 +217,16 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   const filteredTests = tests.filter((t) => {
     // Week filter (Week 1, Week 2, ..., Week 15)
     if (selectedWeek !== 'all') {
-      const matchId = t.id.includes(`_${selectedWeek}`) || t.id.endsWith(`_${selectedWeek}`);
-      if (!matchId) {
+      // Strictly match exact week suffix like _w1, _w2 (prevents _w1 matching _w10, _w11, etc.)
+      const isExactIdMatch = new RegExp(`_${selectedWeek}$`).test(t.id);
+      if (!isExactIdMatch) {
         const base = new Date(2026, 10, 16);
+        base.setHours(0, 0, 0, 0);
         const testDate = new Date(t.date);
+        testDate.setHours(0, 0, 0, 0);
         if (!isNaN(testDate.getTime())) {
-          const diffWeeks = Math.floor((testDate.getTime() - base.getTime()) / (7 * 24 * 3600 * 1000)) + 1;
+          const diffDays = Math.floor((testDate.getTime() - base.getTime()) / (24 * 3600 * 1000));
+          const diffWeeks = Math.floor(diffDays / 7) + 1;
           if (`w${diffWeeks}` !== selectedWeek) return false;
         } else {
           return false;
@@ -237,7 +241,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     const statusMeta = getTestStatus(t);
     if (selectedStatusFilter !== 'all') {
       if (selectedStatusFilter === 'today' && !statusMeta.isToday) return false;
-      if (selectedStatusFilter === 'locked' && !statusMeta.isLocked) return false;
+      if (selectedStatusFilter === 'locked' && !(statusMeta.isLocked || statusMeta.status === 'locked' || statusMeta.isToday)) return false;
       if (selectedStatusFilter === 'passed' && statusMeta.status !== 'passed') return false;
       if (selectedStatusFilter === 'pending' && statusMeta.status !== 'pending' && statusMeta.status !== 'submitted') return false;
       if (selectedStatusFilter === 'retest' && statusMeta.status !== 'failed_retest') return false;

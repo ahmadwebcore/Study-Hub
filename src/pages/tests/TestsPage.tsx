@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,17 +7,10 @@ import { z } from 'zod';
 import {
   PlusCircle,
   Clock,
-  Calendar,
-  FileQuestion,
-  Award,
   CheckCircle,
   Flag,
   ChevronLeft,
   ChevronRight,
-  Eye,
-  Search,
-  LayoutGrid,
-  List,
   Camera,
   Image as ImageIcon,
   Trash2,
@@ -28,12 +21,10 @@ import {
   FileCheck2,
   ShieldCheck,
   Check,
-  BookOpen,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
-import { EmptyState } from '../../components/ui/EmptyState';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
 import {
   TestItem,
@@ -45,7 +36,7 @@ import {
   Student,
 } from '../../types';
 import { useRole } from '../../hooks/useRole';
-import { testService, ensureQuestionsForTest, generateStandardFAITQuestions, extractDayAndCleanTitle } from '../../services/testService';
+import { testService, ensureQuestionsForTest, generateStandardFAITQuestions } from '../../services/testService';
 import { subjectService } from '../../services/subjectService';
 import { notificationService } from '../../services/notificationService';
 import { syllabusService } from '../../services/syllabusService';
@@ -80,9 +71,7 @@ export const TestsPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
   const [students, setStudents] = useState<Student[]>(SAMPLE_STUDENTS_LIST);
   const [units, setUnits] = useState<SyllabusUnit[]>([]);
-  const [filter, setFilter] = useState<'all' | 'scheduled' | 'graded'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewLayout, setViewLayout] = useState<'boxes' | 'cards'>('boxes');
+
 
   // Modals state
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -260,19 +249,7 @@ export const TestsPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 5000);
   };
 
-  const handleSendDeadlineReminder = (t: TestItem) => {
-    emailService.sendDeadlineReminder({
-      studentEmail: emailService.getStudentConfiguredEmail(),
-      studentName: 'Henza Noor',
-      itemTitle: t.title,
-      itemType: 'test',
-      subjectName: t.subjectName,
-      dueDate: `${t.date} at ${t.time}`,
-      instructions: t.instructions,
-    });
-    setSuccessToast(`24-hour countdown reminder for "${t.title}" dispatched to student's Gmail!`);
-    setTimeout(() => setSuccessToast(null), 4000);
-  };
+
 
   // Start Student Examination
   const handleStartExam = async (testItem: TestItem) => {
@@ -477,17 +454,7 @@ export const TestsPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 4000);
   };
 
-  const filteredTests = tests.filter((t) => {
-    const matchesFilter =
-      filter === 'all' ||
-      t.status === filter ||
-      (filter === 'scheduled' && t.status === 'ongoing');
-    const matchesSearch =
-      t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.subjectCode.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+
 
   return (
     <div className="space-y-6">
@@ -534,265 +501,12 @@ export const TestsPage: React.FC = () => {
         )}
       </div>
 
-      {/* View Mode Toggle: Compact Day Boxes vs Detailed Cards */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 bg-[#1a1e1d] border border-white/10 rounded-2xl">
-        <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
-          <button
-            onClick={() => setViewLayout('boxes')}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-              viewLayout === 'boxes'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Compact Boxes</span>
-          </button>
-          <button
-            onClick={() => setViewLayout('cards')}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-              viewLayout === 'cards'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-zinc-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <List className="w-3.5 h-3.5" />
-            <span>Detailed Cards</span>
-          </button>
-        </div>
-
-        <span className="hidden sm:inline text-[11px] font-semibold text-zinc-400 px-3">
-          30 Marks per Test &bull; Sunday Off Policy
-        </span>
-      </div>
-
-      {viewLayout === 'boxes' ? (
-        <DailyTestSeriesGrid
-          tests={tests}
-          onTakeTest={handleStartExam}
-          onGradeTest={(test) => setGradingTest(test)}
-          onRefreshTests={loadData}
-        />
-      ) : (
-        <>
-          {/* Filter and Search Ribbon */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {(['all', 'scheduled', 'graded'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
-                filter === tab
-                  ? 'bg-[#142D27] text-white shadow-sm'
-                  : 'bg-white border border-[#e1ede7] text-[#557067] hover:bg-[#F7F9F8]'
-              }`}
-            >
-              {tab === 'all' ? 'All Assessments' : tab}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search examinations..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
-          />
-        </div>
-      </div>
-
-      {/* Tests Grid */}
-      {tests.length === 0 ? (
-        <div className="p-8 sm:p-12 rounded-3xl bg-white border border-dashed border-zinc-300 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
-            <FileQuestion className="w-7 h-7" />
-          </div>
-          <h3 className="text-lg font-bold text-zinc-900 font-serif">No 30-Mark Tests in Series Yet</h3>
-          <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
-            All 15-week daily assessments across all 7 FA-IT subjects are active and ready.
-          </p>
-          <div className="pt-2">
-            <Link
-              to="/library"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-emerald-100" />
-              <span>📚 Open Textbook Library &amp; Past Papers</span>
-            </Link>
-          </div>
-        </div>
-      ) : filteredTests.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredTests
-            .slice()
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .map((test) => {
-              const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(test.title, test.date);
-
-              return (
-                <div
-                  key={test.id}
-                  className="p-5 rounded-3xl bg-white border border-[#e1ede7] transition-none flex flex-col justify-between shadow-xs select-none"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-[#e1ede7]">
-                      <div className="flex items-center gap-1.5">
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
-                          {day}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-100 text-zinc-700 border border-zinc-200 uppercase tracking-wider">
-                          {test.subjectCode}
-                        </span>
-                      </div>
-                      <Badge
-                        variant={test.status === 'graded' ? 'primary' : 'info'}
-                        size="sm"
-                        dot={test.status === 'scheduled'}
-                      >
-                        {test.status}
-                      </Badge>
-                    </div>
-
-                    <h3
-                      className={`mt-2.5 group-hover:text-emerald-700 transition-colors ${
-                        isUrdu
-                          ? 'font-urdu text-[15px] font-bold text-[#142D27] leading-loose text-right dir-rtl'
-                          : 'text-sm font-bold text-[#142D27] leading-snug'
-                      }`}
-                    >
-                      <bdi>{cleanTitle}</bdi>
-                    </h3>
-                    <p className="text-xs text-[#557067] mt-0.5">{test.subjectName}</p>
-
-                    {/* Syllabus coverage */}
-                    <div className="mt-3 p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7]">
-                      <p className="text-[10px] font-bold text-[#142D27] mb-0.5">Syllabus Covered:</p>
-                      <p className="text-xs text-[#557067] leading-relaxed line-clamp-2">
-                        {test.syllabusCoverage}
-                      </p>
-                    </div>
-
-                    {/* Schedule Info */}
-                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#557067]">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-[#14B866]" />
-                        <span>{test.date}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-sky-600" />
-                        <span>{test.time}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <FileQuestion className="w-3.5 h-3.5 text-amber-600" />
-                        <span>{test.durationMinutes} mins</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Award className="w-3.5 h-3.5 text-purple-600" />
-                        <span>{test.totalMarks} Marks</span>
-                      </div>
-                    </div>
-                  </div>
-
-              {/* Test Footer Actions */}
-              <div className="mt-5 pt-3 border-t border-[#e1ede7] flex items-center justify-between gap-2">
-                {test.studentScore !== undefined ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#557067]">My Score:</span>
-                    <span className="text-sm font-bold text-[#14B866]">
-                      {test.studentScore} / {test.totalMarks}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-[#7d9990]">
-                    Pass Marks: {test.passingMarks || Math.round(test.totalMarks * 0.4)}
-                  </span>
-                )}
-
-                <div className="flex items-center gap-2">
-                  {role === 'teacher' && (
-                    <>
-                      {test.status === 'scheduled' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="Dispatch 24h Countdown Reminder to Student Gmail"
-                          icon={<Clock className="w-3.5 h-3.5 text-rose-600" />}
-                          onClick={() => handleSendDeadlineReminder(test)}
-                        >
-                          24h Reminder
-                        </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon={<PlusCircle className="w-3.5 h-3.5 text-[#14B866]" />}
-                        onClick={() => setAddQuestionModalTest(test)}
-                      >
-                        Questions
-                      </Button>
-                    </>
-                  )}
-
-                  {role === 'student' && test.status !== 'graded' && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      icon={<Clock className="w-3.5 h-3.5" />}
-                      onClick={() => handleStartExam(test)}
-                    >
-                      Start Examination
-                    </Button>
-                  )}
-
-                  {test.status === 'graded' && (
-                    <div className="flex items-center gap-1.5">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        icon={<Eye className="w-3.5 h-3.5" />}
-                        onClick={() => setInspectGradeTest(test)}
-                      >
-                        Inspect Results
-                      </Button>
-                      {role === 'student' &&
-                        (test.myAttempt?.passed === false ||
-                          (test.studentScore !== undefined && test.studentScore < (test.passingMarks || 15))) && (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            icon={<RefreshCw className="w-3.5 h-3.5" />}
-                            onClick={() => handleStartExam(test)}
-                            className="bg-rose-600 hover:bg-rose-700 text-white shadow-xs"
-                          >
-                            Retest / Resubmit
-                          </Button>
-                        )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        </div>
-      ) : (
-        <EmptyState
-          icon={<FileQuestion className="w-8 h-8 text-[#14B866]" />}
-          title="No Assessments Found"
-          description="No formal examinations match your search or selected filter."
-          actionLabel="Reset Search"
-          onAction={() => {
-            setFilter('all');
-            setSearchTerm('');
-          }}
-        />
-      )}
-        </>
-      )}
+      <DailyTestSeriesGrid
+        tests={tests}
+        onTakeTest={handleStartExam}
+        onGradeTest={(test) => setGradingTest(test)}
+        onRefreshTests={loadData}
+      />
 
       {/* STUDENT EXAMINATION RUNNER (LIVE EXAM MODAL VIA PORTAL TO PREVENT ANY CUT-OFF) */}
       {activeExamTest &&
