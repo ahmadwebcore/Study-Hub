@@ -167,7 +167,7 @@ export const LoginPage: React.FC = () => {
       let activeRole: 'teacher' | 'student' = roleMode;
       if (cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail.includes('ahmad') || cleanEmail.includes('teacher')) {
         activeRole = 'teacher';
-      } else if (cleanEmail === 'henzanoor@gmail.com' || cleanEmail.includes('henza') || cleanEmail.includes('student')) {
+      } else {
         activeRole = 'student';
       }
       setRoleMode(activeRole);
@@ -181,11 +181,19 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      // 2. Both Faculty and Student require full 2FA challenge (Google Authenticator or Manual Code)
+      // Faculty Lead direct access without authenticator challenge (User directive)
+      if (activeRole === 'teacher') {
+        completeTwoFactorAuth(cleanEmail, 'teacher');
+        setIsSubmitting(false);
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+
+      // Student 2FA challenge: Enrolled scholar enters Google Authenticator or Manual Code
       setVerifiedEmail(cleanEmail);
       sessionStorage.setItem(
         'studyhub_pending_2fa',
-        JSON.stringify({ email: cleanEmail, roleMode: activeRole })
+        JSON.stringify({ email: cleanEmail, roleMode: 'student' })
       );
 
       const config = twoFactorService.getConfig(cleanEmail);
@@ -432,14 +440,12 @@ export const LoginPage: React.FC = () => {
                         const clean = val.trim().toLowerCase();
                         if (clean === 'ahmadwebcore@gmail.com' || clean.includes('ahmad') || clean.includes('teacher')) {
                           setRoleMode('teacher');
-                        } else if (clean === 'henzanoor@gmail.com' || clean.includes('henza') || clean.includes('student')) {
-                          setRoleMode('student');
                         }
                       }}
                       placeholder={
                         roleMode === 'teacher'
                           ? 'ahmadwebcore@gmail.com'
-                          : 'henzanoor@gmail.com'
+                          : 'Enter registered student email'
                       }
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
@@ -521,7 +527,7 @@ export const LoginPage: React.FC = () => {
                   </div>
                   <div>
                     <span className="font-bold block text-zinc-900 leading-tight">
-                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Enrolled Scholar (Henza Noor)'}
+                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Enrolled Scholar'}
                     </span>
                     <span className="text-[10px] text-zinc-500 font-medium">
                       {verifiedEmail} &bull; BISE DG Khan
@@ -631,7 +637,7 @@ export const LoginPage: React.FC = () => {
 
                     <div className="flex items-center justify-center gap-2">
                       <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
-                        {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234')}
+                        {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026')}
                       </code>
                       <button
                         type="button"

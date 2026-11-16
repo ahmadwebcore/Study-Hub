@@ -60,7 +60,7 @@ const navSections: NavSection[] = [
   {
     title: 'System & Tools',
     items: [
-      { name: 'Platform Integrations', path: '/integrations', icon: Share2, badge: 'WhatsApp', badgeVariant: 'primary' },
+      { name: 'Platform Integrations', path: '/integrations', icon: Share2, badge: 'G-Sheets', badgeVariant: 'primary' },
       { name: 'Settings & Security', path: '/settings', icon: ShieldCheck, badge: '2FA' },
     ],
   },

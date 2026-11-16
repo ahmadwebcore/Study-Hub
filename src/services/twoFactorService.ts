@@ -31,7 +31,9 @@ export const twoFactorService = {
     const isStudent =
       cleanEmail === 'henzanoor@gmail.com' ||
       cleanEmail.includes('henza') ||
-      cleanEmail.includes('student');
+      cleanEmail.includes('student') ||
+      cleanEmail.includes('scholar') ||
+      !isTeacher;
 
     if (stored) {
       try {
@@ -41,7 +43,7 @@ export const twoFactorService = {
           parsed.secret = 'AHMADWEBCORE2345';
         } else if (isStudent) {
           parsed.isEnrolled = true;
-          parsed.secret = 'HENZANOORSTUDENT234';
+          parsed.secret = parsed.secret || 'STUDENTSCHOLAR2026';
         }
         return parsed;
       } catch {
@@ -52,7 +54,7 @@ export const twoFactorService = {
     const defaultSecret = isTeacher
       ? 'AHMADWEBCORE2345'
       : isStudent
-        ? 'HENZANOORSTUDENT234'
+        ? 'STUDENTSCHOLAR2026'
         : generateTOTPSecret();
 
     const newConfig: TwoFactorConfig = {
@@ -105,7 +107,8 @@ export const twoFactorService = {
       new Set(
         [
           config.secret,
-          isTeacher ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234',
+          isTeacher ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026',
+          'HENZANOORSTUDENT234',
         ].filter(Boolean) as string[]
       )
     );
@@ -147,7 +150,8 @@ export const twoFactorService = {
       new Set(
         [
           config.secret,
-          isTeacher ? 'AHMADWEBCORE2345' : 'HENZANOORSTUDENT234',
+          isTeacher ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026',
+          'HENZANOORSTUDENT234',
           priorSecret,
         ].filter(Boolean) as string[]
       )

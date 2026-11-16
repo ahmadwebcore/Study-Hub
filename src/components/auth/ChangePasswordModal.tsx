@@ -68,8 +68,11 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   if (!isOpen) return null;
 
   const targetEmail =
-    user?.email || (role === 'teacher' ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com');
-  const studentOrTeacherName = role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Henza Noor';
+    user?.email ||
+    (role === 'teacher'
+      ? 'ahmadwebcore@gmail.com'
+      : (localStorage.getItem('studyhub_student_configured_gmail') || 'scholar@studyhub.pk'));
+  const studentOrTeacherName = role === 'teacher' ? 'Ahmad (Faculty Lead)' : (localStorage.getItem('studyhub_student_configured_name') || 'Enrolled Scholar');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -619,7 +619,7 @@ class EmailService {
       const stored = localStorage.getItem('studyhub_student_configured_gmail');
       if (stored && !stored.includes('bilal')) return stored;
     } catch {}
-    return 'student@studyhub.edu';
+    return 'scholar@studyhub.pk';
   }
 
   public setStudentConfiguredEmail(email: string): void {

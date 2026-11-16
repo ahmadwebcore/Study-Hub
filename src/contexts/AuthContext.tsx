@@ -31,6 +31,41 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function sanitizeProfile(p: UserProfile | null, fallbackRole: UserRole): UserProfile {
+  if (!p) return fallbackRole === 'teacher' ? { ...SAMPLE_TEACHER } : { ...SAMPLE_STUDENT };
+  const clean = { ...p };
+  try {
+    const emailKey = clean.email ? `studyhub_avatar_${clean.email.toLowerCase()}` : '';
+    const savedEmailAvatar = emailKey ? localStorage.getItem(emailKey) : null;
+    const savedTeacherAvatar = localStorage.getItem('studyhub_custom_avatar_ahmad');
+    const savedStudentAvatar = localStorage.getItem('studyhub_custom_avatar_henza') || localStorage.getItem('studyhub_custom_avatar_student');
+
+    if (savedEmailAvatar) {
+      clean.avatar = savedEmailAvatar;
+    } else if (fallbackRole === 'teacher' && savedTeacherAvatar) {
+      clean.avatar = savedTeacherAvatar;
+    } else if (fallbackRole === 'student' && savedStudentAvatar) {
+      clean.avatar = savedStudentAvatar;
+    }
+  } catch {}
+
+  if (clean.email && clean.email.toLowerCase().includes('bilal')) {
+    clean.name = 'Enrolled Scholar';
+  }
+  if (clean.name && clean.name.toLowerCase().includes('bilal')) {
+    clean.name = 'Enrolled Scholar';
+  }
+  if (clean.email && clean.email.toLowerCase().includes('clara')) {
+    clean.email = 'ahmadwebcore@gmail.com';
+    clean.name = 'Ahmad';
+  }
+  if (clean.name && clean.name.toLowerCase().includes('clara')) {
+    clean.name = 'Ahmad';
+    clean.email = 'ahmadwebcore@gmail.com';
+  }
+  return clean;
+}
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     try {
@@ -68,43 +103,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [session, setSession] = useState<Session | null>(null);
-
-  const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
-    if (!p) return fallbackRole === 'teacher' ? { ...SAMPLE_TEACHER } : { ...SAMPLE_STUDENT };
-    const clean = { ...p };
-    try {
-      const emailKey = clean.email ? `studyhub_avatar_${clean.email.toLowerCase()}` : '';
-      const savedEmailAvatar = emailKey ? localStorage.getItem(emailKey) : null;
-      const savedTeacherAvatar = localStorage.getItem('studyhub_custom_avatar_ahmad');
-      const savedStudentAvatar = localStorage.getItem('studyhub_custom_avatar_henza') || localStorage.getItem('studyhub_custom_avatar_student');
-
-      if (savedEmailAvatar) {
-        clean.avatar = savedEmailAvatar;
-      } else if (fallbackRole === 'teacher' && savedTeacherAvatar) {
-        clean.avatar = savedTeacherAvatar;
-      } else if (fallbackRole === 'student' && savedStudentAvatar) {
-        clean.avatar = savedStudentAvatar;
-      }
-    } catch {}
-
-    if (clean.email && clean.email.toLowerCase().includes('bilal')) {
-      clean.email = 'henzanoor@gmail.com';
-      clean.name = 'Henza Noor';
-    }
-    if (clean.name && (clean.name.toLowerCase().includes('bilal') || clean.name.toLowerCase().includes('scholar'))) {
-      clean.name = 'Henza Noor';
-      clean.email = 'henzanoor@gmail.com';
-    }
-    if (clean.email && clean.email.toLowerCase().includes('clara')) {
-      clean.email = 'ahmadwebcore@gmail.com';
-      clean.name = 'Ahmad';
-    }
-    if (clean.name && clean.name.toLowerCase().includes('clara')) {
-      clean.name = 'Ahmad';
-      clean.email = 'ahmadwebcore@gmail.com';
-    }
-    return clean;
-  };
 
   const [authenticatedRole, setAuthenticatedRole] = useState<UserRole>(() => {
     try {
@@ -161,11 +159,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
-    // Purge any legacy localStorage keys containing bilal, clara, or outdated student names
+    // Purge any legacy localStorage keys containing bilal or clara
     try {
       const studentEmail = localStorage.getItem('studyhub_student_configured_gmail');
-      if (!studentEmail || studentEmail.includes('bilal') || studentEmail.includes('studyhub.edu')) {
-        localStorage.setItem('studyhub_student_configured_gmail', 'henzanoor@gmail.com');
+      if (studentEmail && (studentEmail.includes('bilal') || studentEmail.includes('studyhub.edu'))) {
+        localStorage.removeItem('studyhub_student_configured_gmail');
       }
       const teacherEmail = localStorage.getItem('studyhub_teacher_configured_gmail');
       if (teacherEmail && teacherEmail.includes('clara')) {

@@ -13,14 +13,12 @@ import {
   EyeOff,
   ChevronRight,
   ChevronDown,
-  MessageCircle,
   FileCheck2,
   X,
 } from 'lucide-react';
 import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
 import { extractDayAndCleanTitle } from '../../services/testService';
-import { integrationService } from '../../services/integrationService';
 import { PDFViewerModal } from '../books/PDFViewerModal';
 
 interface DailyTestSeriesGridProps {
@@ -271,23 +269,6 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     } else {
       window.location.href = '/test-submit';
     }
-  };
-
-  const handleShareWhatsAppFromModal = (test: TestItem, score?: number) => {
-    const msg = integrationService.formatTestResultForWhatsApp({
-      studentName: 'Student Scholar',
-      subjectName: test.subjectName,
-      testTitle: test.title,
-      score: score || test.studentScore || 28,
-      maxScore: test.totalMarks || 30,
-      percentage: Math.round(((score || test.studentScore || 28) / (test.totalMarks || 30)) * 100),
-      grade: 'A*',
-      passed: (score || test.studentScore || 28) >= (test.passingMarks || 15),
-      date: test.date,
-      feedback: test.myAttempt?.feedback || 'Reviewed by Ahmad (Faculty Lead).',
-    });
-    const url = integrationService.generateWhatsAppUrl(msg);
-    window.open(url, '_blank');
   };
 
   return (
@@ -704,24 +685,15 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <button
                     type="button"
                     onClick={() => setActivePopupTest(null)}
-                    className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-colors"
+                    className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-50 text-xs font-semibold text-zinc-700 transition-colors"
                   >
                     Close
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handleShareWhatsAppFromModal(activePopupTest, score)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#e8f8f0] hover:bg-[#d4f2e3] text-emerald-800 border border-emerald-300 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>WhatsApp</span>
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => setPdfViewerTest(activePopupTest)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-[#142D27] border border-[#e1ede7] text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 text-[#142D27] border border-[#e1ede7] text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                   >
                     <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
                     <span>View Test in PDF</span>

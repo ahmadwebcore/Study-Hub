@@ -24,6 +24,7 @@ import { studentService } from '../../services/studentService';
 import { notificationService } from '../../services/notificationService';
 import { FebruarySprintTracker } from '../../components/planner/FebruarySprintTracker';
 import { BISEDGKhanBoardWidget } from '../../components/board/BISEDGKhanBoardWidget';
+import { MonthlyAttendanceReport } from '../../components/attendance/MonthlyAttendanceReport';
 
 const testSchema = z.object({
   title: z.string().min(3, 'Test title must be at least 3 characters'),
@@ -125,6 +126,9 @@ export const TeacherDashboard: React.FC = () => {
     });
 
     emailService.setStudentConfiguredEmail(newStudentEmail);
+    if (newStudentName) {
+      localStorage.setItem('studyhub_student_configured_name', newStudentName);
+    }
     setIsInviteStudentOpen(false);
     setSuccessToast(`Invitation sent to ${newStudentEmail} with token ${token}.`);
     setTimeout(() => setSuccessToast(null), 4000);
@@ -302,6 +306,9 @@ export const TeacherDashboard: React.FC = () => {
         </div>
       </div>
 
+      {/* Persistent Monthly Attendance & Student Presence Report */}
+      <MonthlyAttendanceReport />
+
       {/* Task Milestones Series Bento Desk */}
       <div className="space-y-4">
         {/* Filter Bar */}
@@ -467,7 +474,7 @@ export const TeacherDashboard: React.FC = () => {
               type="email"
               value={newStudentEmail}
               onChange={(e) => setNewStudentEmail(e.target.value)}
-              placeholder="e.g. henzanoor@gmail.com"
+              placeholder="e.g. student@gmail.com"
               className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>
