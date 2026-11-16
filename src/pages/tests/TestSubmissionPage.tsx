@@ -293,15 +293,15 @@ export const TestSubmissionPage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-[#142D27] font-serif">Daily Test Submission Terminal</h1>
+            <h1 className="text-2xl font-bold text-white font-serif">Daily Test Submission Terminal</h1>
             <Badge variant="primary" size="sm" dot>
               30 Marks BISE DG Khan Pattern
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-[#557067] mt-1">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
             Official testing desk: review questions on the left, capture multiple answer pages via camera on the right, and submit for teacher evaluation.
           </p>
         </div>
@@ -310,9 +310,9 @@ export const TestSubmissionPage: React.FC = () => {
           {activeTest && (
             <button
               onClick={() => setPdfViewerTest(activeTest)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#e1ede7] text-xs font-bold text-emerald-800 hover:bg-emerald-50 transition-colors shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1c211f] border border-white/10 text-xs font-bold text-zinc-200 hover:bg-white/10 hover:text-white transition-colors shadow-2xs cursor-pointer"
             >
-              <BookOpen className="w-4 h-4 text-emerald-600" />
+              <BookOpen className="w-4 h-4 text-emerald-400" />
               <span>View Textbook in PDF</span>
             </button>
           )}

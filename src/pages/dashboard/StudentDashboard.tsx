@@ -123,17 +123,17 @@ export const StudentDashboard: React.FC = () => {
       )}
 
       {/* 1. Header Greeting & Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-[11px] font-semibold mb-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold mb-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>Global Science Academy &bull; Fatehpur &bull; 1st Year FA-IT</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight font-serif">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-serif">
             Welcome back, {studentName}
           </h1>
-          <p className="text-xs text-zinc-600 mt-1">
-            Faculty Director: <strong className="text-zinc-900">Ahmad</strong> &bull; BISE DG Khan Board &bull; Daily quota &amp; 30-mark diagnostic test.
+          <p className="text-xs text-zinc-400 mt-1">
+            Faculty Director: <strong className="text-zinc-200">Ahmad</strong> &bull; BISE DG Khan Board &bull; Daily quota &amp; 30-mark diagnostic test.
           </p>
         </div>
 
@@ -143,10 +143,10 @@ export const StudentDashboard: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsDailyWelcomeOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-all shadow-2xs cursor-pointer text-center"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 rounded-xl hover:bg-emerald-900/60 transition-all shadow-2xs cursor-pointer text-center"
             title="Open Today's Academic Briefing"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
             <span>Daily Briefing</span>
           </button>
 
@@ -154,25 +154,25 @@ export const StudentDashboard: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsChangePasswordOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs cursor-pointer text-center"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#1c211f] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-2xs cursor-pointer text-center"
             title="Set Password and Google Authenticator 2FA"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Security &amp; 2FA</span>
           </button>
 
           <Link
             to="/chat"
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-2xs text-center"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#1c211f] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-2xs text-center"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
             <span>Message Ahmad</span>
           </Link>
           <Link
             to="/ai-teacher"
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-all shadow-2xs text-center"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-200 bg-[#1c211f] border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-all shadow-2xs text-center"
           >
-            <Compass className="w-3.5 h-3.5 text-emerald-600" />
+            <Compass className="w-3.5 h-3.5 text-emerald-400" />
             <span>AI Assistant</span>
           </Link>
         </div>
@@ -182,10 +182,10 @@ export const StudentDashboard: React.FC = () => {
       <div>
         <div className="flex items-center justify-between pb-3">
           <div>
-            <h2 className="text-lg font-bold text-zinc-900 font-serif">Today's Focus</h2>
-            <p className="text-xs text-zinc-500">Your two core academic priorities for {formattedToday}.</p>
+            <h2 className="text-lg font-bold text-white font-serif">Today's Focus</h2>
+            <p className="text-xs text-zinc-400">Your two core academic priorities for {formattedToday}.</p>
           </div>
-          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+          <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
             Target: May 2027 Board Exams
           </span>
         </div>

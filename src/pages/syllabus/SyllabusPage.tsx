@@ -426,15 +426,15 @@ export const SyllabusPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-[#142D27]">Hierarchical Syllabus & Checkpoints</h1>
+            <h1 className="text-2xl font-bold text-white font-serif">Hierarchical Syllabus &amp; Checkpoints</h1>
             <Badge variant="primary" size="sm" dot>
               {allTopics.length} Total Topics
             </Badge>
           </div>
-          <p className="text-sm text-[#557067] mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             Structured course tree (Course &rarr; Subject &rarr; Chapter &rarr; Topic) with student progress calculations.
           </p>
         </div>

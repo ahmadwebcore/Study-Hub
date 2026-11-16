@@ -497,17 +497,17 @@ export const TestsPage: React.FC = () => {
       )}
 
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-[#142D27]">
+            <h1 className="text-2xl font-bold text-white font-serif">
               {role === 'teacher' ? 'Examination Center' : 'Student Testing & Assessments'}
             </h1>
             <Badge variant="primary" size="sm" dot>
               {tests.filter((t) => t.status === 'scheduled').length} Scheduled Tests
             </Badge>
           </div>
-          <p className="text-sm text-[#557067] mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             Formal invigilated examinations, periodic unit diagnostic assessments, speed drills, and question rubrics.
           </p>
         </div>
@@ -524,33 +524,33 @@ export const TestsPage: React.FC = () => {
       </div>
 
       {/* View Mode Toggle: Compact Day Boxes vs Detailed Cards */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 bg-[#F7F9F8] border border-[#e1ede7] rounded-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1.5 bg-[#1a1e1d] border border-white/10 rounded-2xl">
         <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
           <button
             onClick={() => setViewLayout('boxes')}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
               viewLayout === 'boxes'
-                ? 'bg-white text-emerald-800 border border-[#e1ede7] shadow-xs'
-                : 'text-[#557067] hover:text-[#142D27]'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <LayoutGrid className="w-3.5 h-3.5 text-emerald-600" />
+            <LayoutGrid className="w-3.5 h-3.5" />
             <span>Compact Boxes</span>
           </button>
           <button
             onClick={() => setViewLayout('cards')}
-            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
               viewLayout === 'cards'
-                ? 'bg-white text-emerald-800 border border-[#e1ede7] shadow-xs'
-                : 'text-[#557067] hover:text-[#142D27]'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <List className="w-3.5 h-3.5 text-emerald-600" />
+            <List className="w-3.5 h-3.5" />
             <span>Detailed Cards</span>
           </button>
         </div>
 
-        <span className="hidden sm:inline text-[11px] font-semibold text-[#557067] px-3">
+        <span className="hidden sm:inline text-[11px] font-semibold text-zinc-400 px-3">
           30 Marks per Test &bull; Sunday Off Policy
         </span>
       </div>

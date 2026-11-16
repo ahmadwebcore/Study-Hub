@@ -336,16 +336,16 @@ export const WeeklyTasksPage: React.FC = () => {
       )}
 
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-[#142D27]">Weekly Tasks & Daily Schedule</h1>
+            <h1 className="text-2xl font-bold text-white font-serif">Weekly Tasks &amp; Daily Schedule</h1>
             <Badge variant="primary" size="sm" dot>
               {tasks.length} Total Targets
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-[#557067] mt-1">
-            Daily structured tasks derived from syllabus & books. Monday–Saturday active schedule, <strong>Sunday scheduled OFF</strong>.
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            Daily structured tasks derived from syllabus &amp; books. Monday–Saturday active schedule, <strong className="text-zinc-200">Sunday scheduled OFF</strong>.
           </p>
         </div>
 

@@ -66,15 +66,15 @@ export const ResultsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-[#142D27]">Official Results & Gradebook</h1>
+            <h1 className="text-2xl font-bold text-white font-serif">Official Results &amp; Gradebook</h1>
             <Badge variant="primary" size="sm" dot>
               {role === 'teacher' ? 'Faculty Certified' : 'Student Grade Record'}
             </Badge>
           </div>
-          <p className="text-sm text-[#557067] mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             Certified examination mark sheets, pass/fail status, grade distributions, and instructor evaluations.
           </p>
         </div>
@@ -82,8 +82,9 @@ export const ResultsPage: React.FC = () => {
         <Button
           variant="outline"
           size="sm"
-          icon={<Download className="w-4 h-4 text-[#14B866]" />}
+          icon={<Download className="w-4 h-4 text-emerald-400" />}
           onClick={handleExportTranscript}
+          className="bg-[#1c211f] border-white/10 text-zinc-200 hover:bg-white/10 hover:text-white"
         >
           Export Official Transcript
         </Button>

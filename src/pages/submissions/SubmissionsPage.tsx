@@ -178,23 +178,23 @@ export const SubmissionsPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#142D27] font-serif">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white font-serif">
               Submission Center &amp; Marking Console
             </h1>
             <Badge variant="primary" size="sm" dot>
               {submissions.filter((s) => s.status !== 'graded').length} Pending Marking
             </Badge>
           </div>
-          <p className="text-xs sm:text-sm text-[#557067] mt-1">
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
             Review handwritten problem sets, preview student scripts in-browser, enter rubric scores, and approve finalized marks.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/30">
             {sortedSubmissions.length} Total Submissions
           </span>
         </div>

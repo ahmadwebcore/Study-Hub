@@ -80,7 +80,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        'h-full flex flex-col bg-white border-r border-[#e1ede7] select-none transition-all duration-300',
+        'h-full flex flex-col bg-[#121514] border-r border-white/10 select-none transition-all duration-300 text-zinc-300',
         isCollapsed ? 'w-20' : 'w-64 xl:w-72'
       )}
       aria-label="Main Navigation Sidebar"
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div
         className={cn(
-          'h-16 flex items-center border-b border-[#e1ede7] transition-all',
+          'h-16 flex items-center border-b border-white/10 transition-all',
           isCollapsed ? 'justify-center px-2 relative' : 'justify-between px-4 sm:px-5'
         )}
       >
@@ -103,10 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           {!isCollapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="font-extrabold text-xs sm:text-sm tracking-tight text-[#142D27] leading-tight font-serif truncate">
+              <span className="font-extrabold text-xs sm:text-sm tracking-tight text-white leading-tight font-serif truncate">
                 Global Science Academy
               </span>
-              <span className="text-[10px] font-semibold text-[#14B866] -mt-0.5 tracking-wider uppercase">
+              <span className="text-[10px] font-semibold text-emerald-400 -mt-0.5 tracking-wider uppercase">
                 Fatehpur &bull; DG Khan
               </span>
             </div>
@@ -120,25 +120,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className={cn(
             'p-3 mx-3 my-2.5 rounded-2xl border transition-all shadow-2xs',
             role === 'teacher'
-              ? 'bg-[#F7F9F8] border-[#e1ede7]'
-              : 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-400/30'
+              ? 'bg-[#1a1e1d] border-white/10'
+              : 'bg-emerald-950/80 border-emerald-500/40 ring-1 ring-emerald-500/30'
           )}
         >
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span
               className={cn(
                 'font-semibold uppercase tracking-wider text-[9px] flex items-center gap-1',
-                role === 'teacher' ? 'text-[#557067]' : 'text-emerald-800'
+                role === 'teacher' ? 'text-zinc-400' : 'text-emerald-300'
               )}
             >
               {role === 'teacher' ? (
                 <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#14B866]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   Faculty Authority
                 </>
               ) : (
                 <>
-                  <Eye className="w-3.5 h-3.5 text-emerald-700 animate-pulse" />
+                  <Eye className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                   Student Preview
                 </>
               )}
@@ -147,7 +147,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className={cn(
                 'text-[10px] font-bold px-1.5 py-0.2 rounded-full',
                 role === 'teacher'
-                  ? 'bg-white text-[#142D27] border border-[#e1ede7]'
+                  ? 'bg-[#222826] text-white border border-white/10'
                   : 'bg-emerald-700 text-white shadow-2xs'
               )}
             >
@@ -161,8 +161,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className={cn(
               'w-full flex items-center justify-between py-2 px-2.5 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.98] cursor-pointer shadow-2xs',
               role === 'teacher'
-                ? 'bg-white border border-[#e1ede7] text-[#263B35] hover:bg-[#e8f8f0] hover:text-[#14B866] hover:border-[#14B866]/40'
-                : 'bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-600 shadow-sm'
+                ? 'bg-[#222826] border border-white/10 text-white hover:bg-white/10 hover:border-white/20'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500 shadow-sm'
             )}
             title={
               role === 'teacher'
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="flex items-center gap-1.5">
               {role === 'teacher' ? (
                 <>
-                  <Eye className="w-3.5 h-3.5 text-[#14B866]" />
+                  <Eye className="w-3.5 h-3.5 text-emerald-400" />
                   Preview Student View
                 </>
               ) : (
@@ -184,7 +184,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               )}
             </span>
             <ChevronRight
-              className={cn('w-3.5 h-3.5', role === 'teacher' ? 'text-[#7d9990]' : 'text-emerald-200')}
+              className={cn('w-3.5 h-3.5', role === 'teacher' ? 'text-zinc-400' : 'text-emerald-200')}
             />
           </button>
         </div>
@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           return (
             <div key={section.title} className="space-y-0.5">
               {!isCollapsed && (
-                <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-[#7d9990]">
+                <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
                   {section.title}
                 </p>
               )}
@@ -227,8 +227,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           ? 'justify-center p-2.5'
                           : 'justify-between px-2.5 py-2',
                         isActive
-                          ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/90 font-bold shadow-2xs'
-                          : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27] border border-transparent'
+                          ? 'bg-emerald-600 text-white font-bold shadow-xs'
+                          : 'text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent'
                       )
                     }
                   >
@@ -240,8 +240,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               'shrink-0 transition-colors',
                               isCollapsed ? 'h-5 w-5' : 'h-4 w-4',
                               isActive
-                                ? 'text-emerald-700'
-                                : 'text-[#7d9990] group-hover:text-[#142D27]'
+                                ? 'text-white'
+                                : 'text-zinc-400 group-hover:text-white'
                             )}
                           />
                           {!isCollapsed && <span className="truncate">{item.name}</span>}
@@ -252,14 +252,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             className={cn(
                               'ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0',
                               isActive
-                                ? 'bg-emerald-600 text-white'
+                                ? 'bg-white text-emerald-950'
                                 : item.badgeVariant === 'warning'
-                                ? 'bg-amber-100 text-amber-800'
+                                ? 'bg-amber-950 text-amber-300 border border-amber-800'
                                 : item.badgeVariant === 'info'
-                                ? 'bg-sky-100 text-sky-800'
+                                ? 'bg-sky-950 text-sky-300 border border-sky-800'
                                 : item.badgeVariant === 'holiday'
-                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                : 'bg-[#E7EFEA] text-[#142D27]'
+                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                                : 'bg-white/10 text-zinc-300'
                             )}
                           >
                             {item.badge}
@@ -267,7 +267,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         )}
 
                         {item.badge && isCollapsed && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white" />
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#121514]" />
                         )}
                       </>
                     )}
@@ -280,13 +280,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Bottom Section */}
-      <div className={cn('border-t border-[#e1ede7] space-y-2', isCollapsed ? 'p-2' : 'p-3')}>
+      <div className={cn('border-t border-white/10 space-y-2', isCollapsed ? 'p-2' : 'p-3')}>
         {/* BISE DG Khan Fast Access */}
         <button
           type="button"
           onClick={() => setIsBoardModalOpen(true)}
           className={cn(
-            'w-full rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-[#142D27] hover:bg-emerald-50 hover:border-emerald-300 transition-colors flex items-center group shadow-2xs cursor-pointer',
+            'w-full rounded-xl bg-[#1a1e1d] border border-white/10 text-white hover:bg-white/10 transition-colors flex items-center group shadow-2xs cursor-pointer',
             isCollapsed ? 'justify-center p-2.5' : 'justify-between p-2.5 text-left'
           )}
           title="BISE DG Khan 1st Year FA-IT Desk"
@@ -295,8 +295,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-sm">🇵🇰</span>
             {!isCollapsed && (
               <div>
-                <span className="text-xs font-bold block leading-none text-[#142D27]">BISE DG Khan</span>
-                <span className="text-[10px] text-[#557067] group-hover:text-emerald-700">1st Year FA-IT Desk</span>
+                <span className="text-xs font-bold block leading-none text-white">BISE DG Khan</span>
+                <span className="text-[10px] text-zinc-400 group-hover:text-emerald-400">1st Year FA-IT Desk</span>
               </div>
             )}
           </div>
@@ -307,13 +307,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Pakistan Calendar Badge (Only in expanded view) */}
         {!isCollapsed && (
-          <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-[11px]">
-            <div className="flex items-center gap-1.5 font-bold text-emerald-950">
+          <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-[11px]">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-300">
               <span>🇵🇰</span>
               <span>Pakistan Academic Calendar</span>
             </div>
-            <p className="text-[10px] text-emerald-800 mt-0.5 leading-snug">
-              Sundays & Gazetted Holidays are strictly OFF. No exam submissions or tasks due.
+            <p className="text-[10px] text-emerald-400/90 mt-0.5 leading-snug">
+              Sundays &amp; Gazetted Holidays are strictly OFF. No exam submissions or tasks due.
             </p>
           </div>
         )}
@@ -322,7 +322,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <NavLink
           to="/settings"
           className={cn(
-            'flex items-center rounded-xl text-[11px] font-semibold text-zinc-700 hover:bg-[#F7F9F8] border border-[#e1ede7] transition-all',
+            'flex items-center rounded-xl text-[11px] font-semibold text-zinc-200 hover:bg-white/10 border border-white/10 transition-all',
             isCollapsed ? 'justify-center p-2.5' : 'justify-between p-2'
           )}
           title={role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Henza Noor (Student)'}

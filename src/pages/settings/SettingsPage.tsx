@@ -186,15 +186,15 @@ export const SettingsPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#e1ede7]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-[#142D27]">Platform Settings & Preferences</h1>
+            <h1 className="text-2xl font-bold text-white font-serif">Platform Settings &amp; Preferences</h1>
             <Badge variant="primary" size="sm" dot>
               System v1.0
             </Badge>
           </div>
-          <p className="text-sm text-[#557067] mt-1">
+          <p className="text-sm text-zinc-400 mt-1">
             Manage your personal academic profile, role permissions, notification dispatches, and backend connections.
           </p>
         </div>
@@ -209,24 +209,24 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#e1ede7] pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('gmail_dispatch')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
             activeTab === 'gmail_dispatch'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Mail className="w-4 h-4 text-[#14B866]" />
+          <Mail className="w-4 h-4 text-emerald-400" />
           Gmail Dispatch Center
         </button>
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
             activeTab === 'profile'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <User className="w-4 h-4" />
@@ -235,10 +235,10 @@ export const SettingsPage: React.FC = () => {
         {canSwitchRole && (
           <button
             onClick={() => setActiveTab('roles')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
               activeTab === 'roles'
-                ? 'bg-[#142D27] text-white shadow-sm'
-                : 'text-[#557067] hover:bg-[#E7EFEA]'
+                ? 'bg-emerald-600 text-white shadow-sm'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -247,10 +247,10 @@ export const SettingsPage: React.FC = () => {
         )}
         <button
           onClick={() => setActiveTab('notifications')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             activeTab === 'notifications'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <Bell className="w-4 h-4" />
@@ -258,24 +258,24 @@ export const SettingsPage: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveTab('security')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
             activeTab === 'security'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Lock className="w-4 h-4 text-[#14B866]" />
-          Security & 2FA Authenticator
+          <Lock className="w-4 h-4 text-emerald-400" />
+          Security &amp; 2FA Authenticator
         </button>
         <button
           onClick={() => setActiveTab('ai_engine')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
             activeTab === 'ai_engine'
-              ? 'bg-[#142D27] text-white shadow-sm'
-              : 'text-[#557067] hover:bg-[#E7EFEA]'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-zinc-400 hover:text-white hover:bg-white/5'
           }`}
         >
-          <Cpu className="w-4 h-4 text-[#14B866]" />
+          <Cpu className="w-4 h-4 text-emerald-400" />
           AI Engine &amp; API Key
         </button>
       </div>

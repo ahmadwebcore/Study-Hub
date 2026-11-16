@@ -26,7 +26,7 @@ export const AppLayout: React.FC = () => {
   const isAITeacherPage = location.pathname.startsWith('/ai-teacher');
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#151918] flex flex-col font-sans text-zinc-100">
       {/* Real Mobile App Native Push Banner */}
       <MobileNativePushBanner />
 
@@ -47,16 +47,16 @@ export const AppLayout: React.FC = () => {
           <div className="fixed inset-0 z-50 lg:hidden flex">
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-[#142D27]/50 backdrop-blur-sm transition-opacity"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
               onClick={() => setMobileMenuOpen(false)}
             />
 
             {/* Slide-over menu */}
-            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-dropdown z-10 animate-in slide-in-from-left duration-200">
+            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#121514] shadow-dropdown z-10 animate-in slide-in-from-left duration-200">
               <div className="absolute top-3 right-3 z-20">
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-[#557067] hover:bg-[#E7EFEA] hover:text-[#142D27] transition-colors"
+                  className="p-2 rounded-xl text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -68,7 +68,7 @@ export const AppLayout: React.FC = () => {
         )}
 
         {/* Main Workspace Area (Fluid width, eliminates wonkey white gap, adjusts to sidebar) */}
-        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 bg-[#151918]">
           {/* Active Student Preview Banner (Visible only when Teacher has switched to Student perspective) */}
           {canSwitchRole && role === 'student' && (
             <div className="bg-[#142D27] text-white px-3 sm:px-6 py-2 flex items-center justify-between text-xs sticky top-0 z-30 border-b border-emerald-500/30 shadow-xs">
@@ -97,7 +97,7 @@ export const AppLayout: React.FC = () => {
             onToggleSidebar={toggleSidebarCollapsed}
           />
 
-          <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1720px] transition-all">
+          <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1720px] transition-all bg-[#151918]">
             <Outlet />
           </main>
 
@@ -105,7 +105,7 @@ export const AppLayout: React.FC = () => {
           {!isAITeacherPage && <StudyBotWidget />}
 
           {/* Minimalist 2026 Footer */}
-          <footer className="py-4 px-3 sm:px-6 lg:px-8 border-t border-[#e1ede7] text-xs text-[#7d9990] bg-white/50">
+          <footer className="py-4 px-3 sm:px-6 lg:px-8 border-t border-white/10 text-xs text-zinc-400 bg-[#121514]">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-[1720px]">
               <span>
                 Global Science Academy, Fatehpur &copy; {new Date().getFullYear()} &bull; Academic Portal

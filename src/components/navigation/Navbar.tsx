@@ -67,12 +67,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
   const userInitials = role === 'teacher' ? 'A' : (userName ? userName[0].toUpperCase() : 'H');
 
   return (
-    <header className="h-16 bg-white/95 backdrop-blur-md border-b border-[#e1ede7] sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+    <header className="h-16 bg-[#131615]/95 backdrop-blur-md border-b border-white/10 sticky top-0 z-20 px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-3 text-white">
       {/* Left: Mobile hamburger & Logo & Global Search */}
       <div className="flex items-center gap-2.5 sm:gap-3 flex-1 max-w-lg min-w-0">
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors focus:outline-none"
+          className="lg:hidden flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 text-zinc-300 hover:bg-white/10 hover:text-white transition-colors focus:outline-none"
           aria-label="Open mobile navigation"
         >
           <Menu className="w-5 h-5" />
@@ -84,31 +84,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
             <GraduationCap className="h-4.5 w-4.5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-xs sm:text-sm tracking-tight text-[#142D27] leading-none font-serif">
+            <span className="font-bold text-xs sm:text-sm tracking-tight text-white leading-none font-serif">
               Global Science Academy
             </span>
-            <span className="text-[9px] font-semibold text-[#14B866] tracking-wider uppercase leading-tight mt-0.5">
+            <span className="text-[9px] font-semibold text-emerald-400 tracking-wider uppercase leading-tight mt-0.5">
               Fatehpur
             </span>
           </div>
         </Link>
 
         {/* Divider (Mobile Only) */}
-        <div className="h-5 w-[1px] bg-zinc-200 mx-1 lg:hidden shrink-0" />
+        <div className="h-5 w-[1px] bg-white/10 mx-1 lg:hidden shrink-0" />
 
         {/* Desktop Sidebar Toggle Button */}
         {onToggleSidebar && (
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e1ede7] bg-white text-[#557067] hover:bg-emerald-50/60 hover:text-emerald-800 hover:border-emerald-200 transition-all focus:outline-none cursor-pointer shadow-2xs"
+            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#1c211f] text-zinc-300 hover:bg-white/10 hover:text-white transition-all focus:outline-none cursor-pointer shadow-2xs"
             title={isSidebarCollapsed ? "Expand sidebar to full width" : "Collapse sidebar to compact mode"}
             aria-label="Toggle sidebar collapse"
           >
             {isSidebarCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4 text-emerald-700" />
+              <PanelLeftOpen className="w-4 h-4 text-emerald-400" />
             ) : (
-              <PanelLeftClose className="w-4 h-4 text-[#557067]" />
+              <PanelLeftClose className="w-4 h-4 text-zinc-400" />
             )}
           </button>
         )}
@@ -120,7 +120,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
             type="text"
             aria-label="Global search across subjects and assignments"
             placeholder="Search syllabus, tests, or topics..."
-            className="w-full h-9 pl-8 pr-3 rounded-xl border border-zinc-200 bg-zinc-50 text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:outline-none focus:border-emerald-600 transition-all"
+            className="w-full h-9 pl-8 pr-3 rounded-xl border border-white/10 bg-[#1c211f] text-xs text-white placeholder-zinc-400 focus:bg-[#222826] focus:border-emerald-500 transition-all"
           />
         </div>
       </div>
@@ -131,19 +131,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
         <button
           type="button"
           onClick={() => setIsBoardModalOpen(true)}
-          className="hidden md:inline-flex items-center gap-1.5 h-10 px-3 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-800 text-xs font-semibold hover:bg-emerald-100 transition-colors shadow-2xs"
+          className="hidden md:inline-flex items-center gap-1.5 h-10 px-3 rounded-xl border border-emerald-500/30 bg-emerald-950/60 text-emerald-300 text-xs font-semibold hover:bg-emerald-900 transition-colors shadow-2xs"
           title="BISE D.G. Khan Board Updates & Pairing Scheme"
         >
           <span className="text-xs">🇵🇰</span>
           <span>BISE DG Khan</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         </button>
 
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 
         {/* Divider */}
-        <div className="h-6 w-[1px] bg-zinc-200 mx-0.5 hidden sm:block" />
+        <div className="h-6 w-[1px] bg-white/10 mx-0.5 hidden sm:block" />
 
         {/* User Profile Area */}
         <div className="relative" ref={profileMenuRef}>
@@ -152,14 +152,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
             aria-haspopup="true"
             aria-expanded={showProfileMenu}
             aria-label="User profile menu"
-            className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-zinc-50 border border-zinc-200 shadow-xs transition-colors"
+            className="flex items-center gap-2 p-1 sm:px-2.5 sm:py-1.5 rounded-xl hover:bg-white/10 border border-white/10 shadow-xs transition-colors"
           >
             {profile?.avatar && !imgLoadFailed ? (
               <img
                 src={profile.avatar}
                 alt={userName}
                 onError={() => setImgLoadFailed(true)}
-                className="h-8 w-8 rounded-lg object-cover ring-1 ring-zinc-200"
+                className="h-8 w-8 rounded-lg object-cover ring-1 ring-white/20"
               />
             ) : (
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#142D27] to-[#14B866] text-white flex items-center justify-center font-bold text-xs shadow-xs ring-1 ring-emerald-600/30">
@@ -167,10 +167,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
               </div>
             )}
             <div className="hidden lg:flex flex-col text-left">
-              <span className="text-xs font-bold text-zinc-900 leading-tight">
+              <span className="text-xs font-bold text-white leading-tight">
                 {userName}
               </span>
-              <span className="text-[10px] text-zinc-500 leading-tight">
+              <span className="text-[10px] text-zinc-400 leading-tight">
                 {role === 'teacher' ? 'Faculty Lead' : '1st Year Scholar'}
               </span>
             </div>
