@@ -15,6 +15,7 @@ import {
   BookMarked,
   Share2,
   Eye,
+  X,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
 import { cn } from '../../lib/utils';
@@ -80,15 +81,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside
       className={cn(
-        'h-full flex flex-col bg-[#121514] border-r border-white/10 select-none transition-all duration-300 text-zinc-300',
-        isCollapsed ? 'w-20' : 'w-64 xl:w-72'
+        'h-full w-full flex flex-col bg-[#121514] border-r border-white/10 select-none transition-all duration-300 text-zinc-300',
+        isCollapsed ? 'w-20' : 'w-full lg:w-64 xl:w-72'
       )}
       aria-label="Main Navigation Sidebar"
     >
       {/* Brand Header */}
       <div
         className={cn(
-          'h-16 flex items-center border-b border-white/10 transition-all',
+          'h-16 flex items-center border-b border-white/10 transition-all shrink-0',
           isCollapsed ? 'justify-center px-2 relative' : 'justify-between px-4 sm:px-5'
         )}
       >
@@ -112,6 +113,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </NavLink>
+
+        {/* Mobile Integrated Close Button */}
+        {onCloseMobile && (
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="lg:hidden flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 transition-colors cursor-pointer shrink-0 ml-2"
+            aria-label="Close navigation drawer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Role Perspective Switcher Pill (Only visible to Teacher account - Completely locked from Students) */}
@@ -279,64 +292,67 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* Bottom Section */}
-      <div className={cn('border-t border-white/10 space-y-2', isCollapsed ? 'p-2' : 'p-3')}>
-        {/* BISE DG Khan Fast Access */}
+      {/* Bottom Section: Streamlined & Clutter-Free */}
+      <div className={cn('border-t border-white/10 space-y-1.5 shrink-0', isCollapsed ? 'p-2' : 'p-3')}>
+        {/* BISE DG Khan Fast Access (Sleek 1-line link) */}
         <button
           type="button"
           onClick={() => setIsBoardModalOpen(true)}
           className={cn(
-            'w-full rounded-xl bg-[#1a1e1d] border border-white/10 text-white hover:bg-white/10 transition-colors flex items-center group shadow-2xs cursor-pointer',
-            isCollapsed ? 'justify-center p-2.5' : 'justify-between p-2.5 text-left'
+            'w-full rounded-xl text-zinc-300 hover:text-white hover:bg-white/5 border border-white/5 hover:border-white/10 transition-colors flex items-center group cursor-pointer',
+            isCollapsed ? 'justify-center p-2.5' : 'justify-between px-3 py-2 text-left'
           )}
           title="BISE DG Khan 1st Year FA-IT Desk"
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="text-sm">🇵🇰</span>
             {!isCollapsed && (
-              <div>
-                <span className="text-xs font-bold block leading-none text-white">BISE DG Khan</span>
-                <span className="text-[10px] text-zinc-400 group-hover:text-emerald-400">1st Year FA-IT Desk</span>
-              </div>
-            )}
-          </div>
-          {!isCollapsed && (
-            <ChevronRight className="w-3.5 h-3.5 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
-          )}
-        </button>
-
-        {/* Pakistan Calendar Badge (Only in expanded view) */}
-        {!isCollapsed && (
-          <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-[11px]">
-            <div className="flex items-center gap-1.5 font-bold text-emerald-300">
-              <span>🇵🇰</span>
-              <span>Pakistan Academic Calendar</span>
-            </div>
-            <p className="text-[10px] text-emerald-400/90 mt-0.5 leading-snug">
-              Sundays &amp; Gazetted Holidays are strictly OFF. No exam submissions or tasks due.
-            </p>
-          </div>
-        )}
-
-        {/* User Account Session Info */}
-        <NavLink
-          to="/settings"
-          className={cn(
-            'flex items-center rounded-xl text-[11px] font-semibold text-zinc-200 hover:bg-white/10 border border-white/10 transition-all',
-            isCollapsed ? 'justify-center p-2.5' : 'justify-between p-2'
-          )}
-          title={role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Henza Noor (Student)'}
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <ShieldCheck className="w-4 h-4 text-[#14B866] shrink-0" />
-            {!isCollapsed && (
-              <span className="truncate text-[11px]">
-                {role === 'teacher' ? 'Ahmad (Faculty Lead)' : 'Henza Noor (Student)'}
+              <span className="text-xs font-semibold text-zinc-200 group-hover:text-white truncate">
+                BISE DG Khan Portal
               </span>
             )}
           </div>
-          {!isCollapsed && <ChevronRight className="w-3 h-3 text-zinc-400 shrink-0" />}
-        </NavLink>
+          {!isCollapsed && (
+            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider shrink-0">
+              FA-IT
+            </span>
+          )}
+        </button>
+
+        {/* User Account Session Info */}
+        <div
+          className={cn(
+            'flex items-center rounded-xl border border-white/10 bg-[#161a19] transition-all',
+            isCollapsed ? 'justify-center p-2' : 'justify-between px-2.5 py-2'
+          )}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+              {role === 'teacher' ? 'A' : 'H'}
+            </div>
+            {!isCollapsed && (
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-white block truncate leading-tight">
+                  {role === 'teacher' ? 'Ahmad' : 'Henza Noor'}
+                </span>
+                <span className="text-[10px] text-zinc-400 block leading-tight">
+                  {role === 'teacher' ? 'Faculty Lead' : '1st Year FA-IT'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {!isCollapsed && (
+            <NavLink
+              to="/settings"
+              onClick={onCloseMobile}
+              className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+              title="Settings & 2FA"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            </NavLink>
+          )}
+        </div>
       </div>
 
       {/* BISE DG Khan Modal */}

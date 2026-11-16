@@ -5,7 +5,7 @@ import { Navbar } from '../components/navigation/Navbar';
 import { StudyBotWidget } from '../components/ai/StudyBotWidget';
 import { MobileNativePushBanner } from '../components/notifications/MobileNativePushBanner';
 import { useRole } from '../hooks/useRole';
-import { X, ShieldCheck, Eye } from 'lucide-react';
+import { ShieldCheck, Eye } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const { role, canSwitchRole, switchToTeacher } = useRole();
@@ -47,21 +47,12 @@ export const AppLayout: React.FC = () => {
           <div className="fixed inset-0 z-50 lg:hidden flex">
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+              className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
               onClick={() => setMobileMenuOpen(false)}
             />
 
-            {/* Slide-over menu */}
-            <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#121514] shadow-dropdown z-10 animate-in slide-in-from-left duration-200">
-              <div className="absolute top-3 right-3 z-20">
-                <button
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-zinc-400 hover:bg-white/10 hover:text-white transition-colors"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+            {/* Slide-over drawer */}
+            <div className="relative flex flex-col w-[82vw] max-w-[300px] h-full bg-[#121514] shadow-2xl z-10 animate-in slide-in-from-left duration-200 border-r border-white/10 overflow-hidden">
               <Sidebar onCloseMobile={() => setMobileMenuOpen(false)} />
             </div>
           </div>
