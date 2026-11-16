@@ -216,7 +216,7 @@ export const TestSubmissionPage: React.FC = () => {
   const bookDetails = activeTest ? getTextbookDetailsForTest(activeTest) : null;
   const activeDayAndTitle = activeTest
     ? extractDayAndCleanTitle(activeTest.title, activeTest.date)
-    : { day: 'منگل (Tuesday)', cleanTitle: '', isUrdu: false };
+    : { day: 'Tuesday', cleanTitle: '', isUrdu: false };
 
   // Sort tests: Newest / Today's test at the VERY TOP, past 1-month tests descending
   const sortedTests = [...tests].sort((a, b) => {

@@ -1629,24 +1629,14 @@ export function extractDayAndCleanTitle(title: string, dateStr?: string): { day:
     .replace(/^Series\s*\d+:\s*/i, '')
     .trim();
 
-  const urduMap: Record<string, string> = {
-    Monday: 'پیر (Monday)',
-    Tuesday: 'منگل (Tuesday)',
-    Wednesday: 'بدھ (Wednesday)',
-    Thursday: 'جمعرات (Thursday)',
-    Friday: 'جمعہ (Friday)',
-    Saturday: 'ہفتہ (Saturday)',
-    Sunday: 'اتوار (Sunday)',
-  };
-
-  const reverseUrduMap: Record<string, string> = {
-    'پیر': 'پیر (Monday)',
-    'منگل': 'منگل (Tuesday)',
-    'بدھ': 'بدھ (Wednesday)',
-    'جمعرات': 'جمعرات (Thursday)',
-    'جمعہ': 'جمعہ (Friday)',
-    'ہفتہ': 'ہفتہ (Saturday)',
-    'اتوار': 'اتوار (Sunday)',
+  const urduToEnDayMap: Record<string, string> = {
+    'پیر': 'Monday',
+    'منگل': 'Tuesday',
+    'بدھ': 'Wednesday',
+    'جمعرات': 'Thursday',
+    'جمعہ': 'Friday',
+    'ہفتہ': 'Saturday',
+    'اتوار': 'Sunday',
   };
 
   let day = '';
@@ -1656,7 +1646,7 @@ export function extractDayAndCleanTitle(title: string, dateStr?: string): { day:
   const p1 = cleanTitle.match(/^(پیر|منگل|بدھ|جمعرات|جمعہ|ہفتہ|اتوار)\s*(\([A-Za-z]+\))?\s*[:—–-]?\s*/i);
   if (p1 && p1[0].trim()) {
     const matchedUrdu = p1[1];
-    day = reverseUrduMap[matchedUrdu] || p1[0].replace(/[:—–-]\s*$/, '').trim();
+    day = urduToEnDayMap[matchedUrdu] || 'Tuesday';
     cleanTitle = cleanTitle.slice(p1[0].length).trim();
   }
 
@@ -1665,8 +1655,7 @@ export function extractDayAndCleanTitle(title: string, dateStr?: string): { day:
   if (!day) {
     const p2 = cleanTitle.match(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*(\([^\)]+\))?\s*[:—–-]?\s*/i);
     if (p2 && p2[0].trim()) {
-      const matchedEn = p2[1];
-      day = urduMap[matchedEn] || p2[0].replace(/[:—–-]\s*$/, '').trim();
+      day = p2[1];
       cleanTitle = cleanTitle.slice(p2[0].length).trim();
     }
   }
@@ -1675,8 +1664,7 @@ export function extractDayAndCleanTitle(title: string, dateStr?: string): { day:
   if (!day && dateStr) {
     const d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
-      const enDay = d.toLocaleDateString('en-US', { weekday: 'long' });
-      day = urduMap[enDay] || `${enDay}`;
+      day = d.toLocaleDateString('en-US', { weekday: 'long' });
     }
   }
 
@@ -1685,12 +1673,13 @@ export function extractDayAndCleanTitle(title: string, dateStr?: string): { day:
     .replace(/[:]?\s*(پیر|منگل|بدھ|جمعرات|جمعہ|ہفتہ|اتوار)\s*\((Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\)\s*[:]?/gi, ' ')
     .replace(/[:]?\s*\((Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\)\s*(پیر|منگل|بدھ|جمعرات|جمعہ|ہفتہ|اتوار)?\s*[:]?/gi, ' ')
     .replace(/[:]?\s*\((Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\)\s*[:]?/gi, ' ')
+    .replace(/[:]?\s*(پیر|منگل|بدھ|جمعرات|جمعہ|ہفتہ|اتوار)\s*[:—–-]/gi, ' ')
     .replace(/^[:—–-]\s*/, '')
     .replace(/\s{2,}/g, ' ')
     .trim();
 
   const isUrdu = /[\u0600-\u06FF]/.test(cleanTitle);
-  return { day: day || 'منگل (Tuesday)', cleanTitle, isUrdu };
+  return { day: day || 'Tuesday', cleanTitle, isUrdu };
 }
 
 export function generateStandardFAITQuestions(subjectCode: string, testTitle: string, testId: string = 'test_gen'): TestQuestion[] {
