@@ -334,7 +334,7 @@ export const LibraryPage: React.FC = () => {
       return;
     }
     if (signedUrl.startsWith('#')) {
-      alert(`[Demo Mode] Initiating download for "${book.fileName}" (${book.fileSize})`);
+      alert(`Initiating download for "${book.fileName}" (${book.fileSize})...`);
       return;
     }
     window.open(signedUrl, '_blank');
@@ -507,7 +507,7 @@ export const LibraryPage: React.FC = () => {
           </div>
           <h3 className="text-lg font-bold text-zinc-900 font-serif">Curriculum Book Library is Clean &amp; Ready</h3>
           <p className="text-xs sm:text-sm text-zinc-600 max-w-lg mx-auto leading-relaxed">
-            All demo books have been cleared. Upload your 1st Year FA-IT textbook PDF below. StudyHub will automatically analyze the chapters, schedule daily reading targets (~2.5 pgs/day, Sundays OFF), and construct your 12-week 30-mark test series!
+            Your curriculum book vault is ready. Upload your 1st Year FA-IT textbook PDF below. StudyHub will automatically analyze the chapters, schedule daily reading targets (~2.5 pgs/day, Sundays OFF), and construct your 15-week 30-mark test series!
           </p>
           <div className="pt-2">
             <button

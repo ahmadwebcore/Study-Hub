@@ -15,9 +15,6 @@ import {
   Ticket,
   Send,
   Key,
-  ShieldAlert,
-  QrCode,
-  Zap,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -72,10 +69,7 @@ export const LoginPage: React.FC = () => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [totpCode, setTotpCode] = useState('');
   const [copiedSecret, setCopiedSecret] = useState(false);
-  const [showRecoveryInput, setShowRecoveryInput] = useState(false);
-  const [recoveryCodeInput, setRecoveryCodeInput] = useState('');
   const [copiedRecovery, setCopiedRecovery] = useState(false);
-  const [showQrDrawer, setShowQrDrawer] = useState(false);
 
   // Email Verification State
   const [emailOtpCode, setEmailOtpCode] = useState('');
@@ -152,14 +146,6 @@ export const LoginPage: React.FC = () => {
       loadEnrollmentQrCode(verifiedEmail, config.secret || 'AHMADWEBCORE2345');
     }
   }, [step, verifiedEmail, loadEnrollmentQrCode]);
-
-  const handleResetAuthenticatorKey = () => {
-    if (!verifiedEmail) return;
-    const freshConfig = twoFactorService.resetEnrollment(verifiedEmail);
-    setTfaConfig(freshConfig);
-    loadEnrollmentQrCode(verifiedEmail, freshConfig.secret);
-    setShowQrDrawer(true);
-  };
 
   // ==========================================
   // STEP 1: VALIDATE PRIMARY CREDENTIALS
@@ -291,31 +277,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // Verify Single-Use Backup Recovery Code
-  const handleVerifyRecoveryCode = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-
-    if (!recoveryCodeInput.trim()) {
-      setAuthError('Please enter your backup recovery code (format: SH-XXXX-XXXX).');
-      return;
-    }
-
-    setIsSubmitting(true);
-    const res = twoFactorService.verifyRecoveryCode(verifiedEmail, recoveryCodeInput);
-
-    if (!res.success) {
-      setIsSubmitting(false);
-      setAuthError(res.error || 'Invalid recovery code.');
-      return;
-    }
-
-    // Successfully consumed recovery code
-    completeTwoFactorAuth(verifiedEmail, roleMode);
-    setIsSubmitting(false);
-    navigate('/dashboard', { replace: true });
-  };
-
   // ==========================================
   // STEP 2B: GMAIL / EMAIL VERIFICATION
   // ==========================================
@@ -392,7 +353,6 @@ export const LoginPage: React.FC = () => {
     setTotpCode('');
     setEmailOtpCode('');
     setEmailCodeSent(false);
-    setShowRecoveryInput(false);
   };
 
   // Helper copy handlers
@@ -560,25 +520,6 @@ export const LoginPage: React.FC = () => {
                 >
                   Sign In as {roleMode === 'teacher' ? 'Faculty' : 'Student'}
                 </Button>
-
-                <div className="pt-1 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-zinc-500">Quick Portal Demo:</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (roleMode === 'student') {
-                        setEmail('henzanoor@gmail.com');
-                        setPassword('StudyHub2026!');
-                      } else {
-                        setEmail('ahmadwebcore@gmail.com');
-                        setPassword('StudyHub2026!');
-                      }
-                    }}
-                    className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
-                  >
-                    Auto-Fill {roleMode === 'student' ? 'Henza Noor (Student)' : 'Ahmad (Faculty Lead)'}
-                  </button>
-                </div>
               </form>
 
               {/* Student Invite Link */}
@@ -777,186 +718,48 @@ export const LoginPage: React.FC = () => {
                       </Button>
                     </form>
                   ) : (
-                    /* CASE 2: ALREADY ENROLLED (CLEAN 6-DIGIT PROMPT WITH RE-SCAN OPTION) */
-                    <div>
-                      {!showRecoveryInput ? (
-                        <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
-                          <div className="text-center space-y-1.5 py-1">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
-                              <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-sm font-bold text-zinc-900">
-                              Enter Authenticator Code
-                            </h3>
-                            <p className="text-xs text-zinc-500">
-                              Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
-                            </p>
-                          </div>
+                    /* CASE 2: ALREADY ENROLLED (CLEAN 6-DIGIT PROMPT) */
+                    <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
+                      <div className="text-center space-y-1.5 py-1">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
+                          <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-sm font-bold text-zinc-900">
+                          Enter Authenticator Code
+                        </h3>
+                        <p className="text-xs text-zinc-500">
+                          Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
+                        </p>
+                      </div>
 
-                          <div>
-                            <div className="relative">
-                              <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                autoComplete="one-time-code"
-                                maxLength={6}
-                                value={totpCode}
-                                onChange={(e) => handleTotpCodeChange(e.target.value)}
-                                placeholder="000000"
-                                className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
-                                autoFocus
-                              />
-                            </div>
-                          </div>
+                      <div>
+                        <div className="relative">
+                          <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength={6}
+                            value={totpCode}
+                            onChange={(e) => handleTotpCodeChange(e.target.value)}
+                            placeholder="000000"
+                            className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
 
-                          <Button
-                            type="submit"
-                            variant="primary"
-                            className="w-full h-11 text-xs font-bold shadow-sm"
-                            isLoading={isSubmitting}
-                            loadingText="Verifying Code..."
-                            icon={<ArrowRight className="w-4 h-4" />}
-                          >
-                            Verify & Enter Portal
-                          </Button>
-
-                          {/* Quick Instant Access Button */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              completeTwoFactorAuth(
-                                verifiedEmail || (roleMode === 'teacher' ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'),
-                                roleMode
-                              );
-                              navigate('/dashboard', { replace: true });
-                            }}
-                            className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-98"
-                          >
-                            <Zap className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>
-                              Instant {roleMode === 'teacher' ? 'Faculty Lead Access (Ahmad)' : 'Scholar Access (Henza Noor)'}
-                            </span>
-                          </button>
-
-                          {/* Collapsible Authenticator QR Code & Key Drawer */}
-                          <div className="pt-2 text-center space-y-2 border-t border-zinc-100">
-                            <button
-                              type="button"
-                              onClick={() => setShowQrDrawer(!showQrDrawer)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors"
-                            >
-                              <QrCode className="w-3.5 h-3.5" />
-                              <span>{showQrDrawer ? 'Hide Setup QR Code' : 'Need to Re-scan? Show Authenticator QR & Secret'}</span>
-                            </button>
-
-                            {showQrDrawer && (
-                              <div className="p-3 bg-zinc-50 rounded-2xl border border-zinc-200 text-center space-y-2 animate-in fade-in duration-150">
-                                <p className="text-[11px] text-zinc-600">
-                                  Scan this QR code with <strong>Google Authenticator</strong> on your phone:
-                                </p>
-                                {qrCodeUrl ? (
-                                  <img
-                                    src={qrCodeUrl}
-                                    alt="Google Authenticator QR Code"
-                                    className="w-36 h-36 mx-auto rounded-lg border border-zinc-200 bg-white p-1 shadow-2xs"
-                                  />
-                                ) : (
-                                  <div className="w-36 h-36 mx-auto bg-white rounded-lg flex items-center justify-center text-xs text-zinc-400">
-                                    Generating QR...
-                                  </div>
-                                )}
-                                <div className="space-y-1">
-                                  <span className="text-[10px] text-zinc-400 block">Or enter manual secret key:</span>
-                                  <div className="flex items-center justify-center gap-1.5">
-                                    <code className="text-xs font-mono font-bold text-zinc-800 bg-white px-2 py-0.5 rounded border border-zinc-200 select-all">
-                                      {tfaConfig?.secret || 'AHMADWEBCORE2345'}
-                                    </code>
-                                    <button
-                                      type="button"
-                                      onClick={handleCopySecret}
-                                      className="p-1 rounded bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900"
-                                      title="Copy Key"
-                                    >
-                                      {copiedSecret ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                                    </button>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={handleResetAuthenticatorKey}
-                                  className="text-[10px] text-zinc-500 hover:text-zinc-800 underline block mx-auto pt-1"
-                                >
-                                  Re-generate Fresh Setup Key
-                                </button>
-                              </div>
-                            )}
-
-                            <div>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setShowRecoveryInput(true);
-                                  setAuthError(null);
-                                }}
-                                className="text-xs text-zinc-500 hover:text-zinc-800 underline font-medium"
-                              >
-                                Lost access to phone? Use Backup Recovery Code
-                              </button>
-                            </div>
-                          </div>
-                        </form>
-                      ) : (
-                        /* Recovery Code Input Form */
-                        <form onSubmit={handleVerifyRecoveryCode} className="space-y-3.5">
-                          <div className="text-center space-y-1 py-1">
-                            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
-                              <ShieldAlert className="w-5 h-5" />
-                            </div>
-                            <h3 className="text-xs font-bold text-zinc-900">
-                              Use Single-Use Backup Recovery Code
-                            </h3>
-                            <p className="text-[11px] text-zinc-500">
-                              Enter one of your 4 recovery codes (e.g. SH-8492-3819)
-                            </p>
-                          </div>
-
-                          <div>
-                            <input
-                              type="text"
-                              value={recoveryCodeInput}
-                              onChange={(e) => setRecoveryCodeInput(e.target.value)}
-                              placeholder="SH-XXXX-XXXX"
-                              className="w-full h-10 px-3 text-center text-xs font-mono tracking-wider rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
-                              autoFocus
-                            />
-                          </div>
-
-                          <Button
-                            type="submit"
-                            variant="primary"
-                            className="w-full h-10 text-xs font-bold shadow-sm"
-                            isLoading={isSubmitting}
-                            loadingText="Verifying Recovery Code..."
-                          >
-                            Redeem Recovery Code & Enter
-                          </Button>
-
-                          <div className="text-center pt-1">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowRecoveryInput(false);
-                                setAuthError(null);
-                              }}
-                              className="text-xs text-zinc-500 hover:text-zinc-800 underline font-medium"
-                            >
-                              Back to 6-digit Authenticator Code
-                            </button>
-                          </div>
-                        </form>
-                      )}
-                    </div>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        className="w-full h-11 text-xs font-bold shadow-sm"
+                        isLoading={isSubmitting}
+                        loadingText="Verifying Code..."
+                        icon={<ArrowRight className="w-4 h-4" />}
+                      >
+                        Verify & Enter Portal
+                      </Button>
+                    </form>
                   )}
                 </>
               )}
@@ -1040,24 +843,6 @@ export const LoginPage: React.FC = () => {
                       >
                         Verify Email Code & Enter
                       </Button>
-
-                      {/* Quick Instant Access Button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          completeTwoFactorAuth(
-                            verifiedEmail || (roleMode === 'teacher' ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'),
-                            roleMode
-                          );
-                          navigate('/dashboard', { replace: true });
-                        }}
-                        className="w-full py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-98"
-                      >
-                        <Zap className="w-3.5 h-3.5 text-sky-600" />
-                        <span>
-                          Instant {roleMode === 'teacher' ? 'Faculty Lead Access (Ahmad)' : 'Scholar Access (Henza Noor)'}
-                        </span>
-                      </button>
 
                       {/* Resend Code Button with Cooldown */}
                       <div className="flex items-center justify-between pt-1 text-xs">
