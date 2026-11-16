@@ -116,7 +116,7 @@ export const IntegrationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto font-sans pb-16">
+    <div className="space-y-6 w-full font-sans pb-16">
       {/* Toast Alert */}
       {copiedToast && (
         <div className="fixed bottom-6 right-6 z-50 p-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white flex items-center gap-2.5 text-xs font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2">

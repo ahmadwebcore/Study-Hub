@@ -3,21 +3,18 @@ import {
   X,
   Send,
   GraduationCap,
-  Settings,
-  Key,
   Copy,
   CheckCheck,
   Zap,
   UserCheck,
+  MessageSquare,
 } from 'lucide-react';
 import {
   aiStudyBotService,
   AIChatMessage,
   AIChatAction,
-  AIProviderConfig,
 } from '../../services/aiStudyBotService';
 import { directChatService, DirectChatMessage } from '../../services/directChatService';
-import { Button } from '../ui/Button';
 
 export const StudyBotWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,8 +23,6 @@ export const StudyBotWidget: React.FC = () => {
   const [teacherMessages, setTeacherMessages] = useState<DirectChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [config, setConfig] = useState<AIProviderConfig>(aiStudyBotService.loadConfig());
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -109,12 +104,6 @@ export const StudyBotWidget: React.FC = () => {
     aiStudyBotService.saveChatHistory(updated);
   };
 
-  const handleSaveSettings = (e: React.FormEvent) => {
-    e.preventDefault();
-    aiStudyBotService.saveConfig(config);
-    setShowSettings(false);
-  };
-
   const handleCopyText = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -122,47 +111,31 @@ export const StudyBotWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-40">
-      {/* Floating Launcher Button */}
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
+      {/* WhatsApp-Style Clean Floating Launcher Button */}
       {!isOpen && (
-        <>
-          {/* Mobile Compact Circular Button */}
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            className="sm:hidden flex items-center justify-center w-12 h-12 rounded-full bg-[#18181b] text-white shadow-xl active:scale-90 transition-all border border-emerald-500/40 relative"
-            aria-label="Open Academic Desk"
-          >
-            <GraduationCap className="w-5 h-5 text-emerald-400" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#18181b] animate-ping" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#18181b]" />
-          </button>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-xl hover:shadow-2xl shadow-emerald-950/30 transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-white/40 cursor-pointer"
+          aria-label="Open Academic Chat"
+          title="Chat with Faculty & Academic Tutor"
+        >
+          {/* WhatsApp-style message bubble icon */}
+          <MessageSquare className="w-6 h-6 text-white drop-shadow-xs fill-white/20 transition-transform group-hover:scale-105" />
 
-          {/* Desktop Full Pill */}
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            className="hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-full bg-[#18181b] hover:bg-zinc-800 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-zinc-700/80 cursor-pointer"
-            aria-label="Open Global Science Academy Academic Desk"
-          >
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-emerald-400" />
-              </div>
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            </div>
-            <div className="text-left">
-              <span className="block text-xs font-bold tracking-tight text-zinc-100">Global Science Academy</span>
-              <span className="block text-[10px] text-emerald-400 font-medium">Fatehpur &bull; Academic Desk</span>
-            </div>
-          </button>
-        </>
+          {/* Pulse Ripple & Live Dot */}
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white shadow-xs">
+            1
+          </span>
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-400 animate-ping opacity-75" />
+        </button>
       )}
 
       {/* Slide-over Chat Box (Executive Light-Black Aesthetic) */}
       {isOpen && (
         <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[430px] sm:h-[620px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-[#141518] rounded-3xl border border-zinc-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-zinc-100">
-          {/* Header */}
+          {/* Header (Clean, No Technical Settings Gear) */}
           <div className="p-3.5 bg-[#18181b] border-b border-zinc-800 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center shrink-0">
@@ -182,14 +155,6 @@ export const StudyBotWidget: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setShowSettings(!showSettings)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
-                title="AI Provider Settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -229,63 +194,6 @@ export const StudyBotWidget: React.FC = () => {
             </button>
           </div>
 
-          {/* Settings Sub-modal */}
-          {showSettings && (
-            <div className="p-3 bg-[#18181b] border-b border-zinc-800 text-xs space-y-2.5 animate-in fade-in duration-150 shrink-0 text-zinc-200">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-zinc-100 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-emerald-400" />
-                  AI Engine Configuration
-                </span>
-                <span className="text-[10px] text-zinc-400">Settings</span>
-              </div>
-              <p className="text-[11px] text-zinc-400">
-                Works automatically with offline intelligence or custom API keys.
-              </p>
-              <form onSubmit={handleSaveSettings} className="space-y-2">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <select
-                    value={config.provider}
-                    onChange={(e) =>
-                      setConfig({ ...config, provider: e.target.value as any })
-                    }
-                    className="px-2 py-1.5 rounded-lg border border-zinc-700 text-xs bg-zinc-900 text-zinc-100 focus:outline-none focus:border-emerald-500"
-                  >
-                    <option value="openai">OpenAI (GPT-4o Mini)</option>
-                    <option value="gemini">Google Gemini (Gemini 1.5)</option>
-                    <option value="offline">Offline Academic Model</option>
-                  </select>
-
-                  <input
-                    type="password"
-                    placeholder="API Key"
-                    value={config.apiKey}
-                    onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-zinc-700 text-xs bg-zinc-900 text-zinc-100 focus:outline-none focus:border-emerald-500 font-mono"
-                  />
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Engine Active
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowSettings(false)}
-                      className="px-2.5 py-1 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <Button type="submit" variant="primary" size="sm">
-                      Save
-                    </Button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          )}
-
           {/* Teacher Mode Direct Banner */}
           {chatSource === 'teacher' && (
             <div className="p-2.5 bg-blue-950/40 border-b border-blue-800/40 flex items-center gap-2 text-xs shrink-0">
@@ -296,7 +204,7 @@ export const StudyBotWidget: React.FC = () => {
             </div>
           )}
 
-          {/* Messages Scroll Area (Deep Sleek Dark Surface with Clear Contrasting Bubbles) */}
+          {/* Messages Scroll Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#101114]">
             {chatSource === 'ai' ? (
               // AI / Academic Tutor Messages

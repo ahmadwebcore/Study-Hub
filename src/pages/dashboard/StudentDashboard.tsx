@@ -104,7 +104,7 @@ export const StudentDashboard: React.FC = () => {
   }).format(new Date());
 
   return (
-    <div className="space-y-7 font-sans max-w-5xl mx-auto pb-12">
+    <div className="space-y-7 font-sans w-full pb-12">
       {/* Toast Notification */}
       {successToast && (
         <div className="p-3.5 rounded-2xl bg-white border border-emerald-300 text-zinc-900 flex items-center justify-between text-xs font-semibold shadow-md animate-in fade-in duration-150">

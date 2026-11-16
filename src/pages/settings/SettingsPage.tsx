@@ -19,11 +19,13 @@ import { Badge } from '../../components/ui/Badge';
 import { ComposeEmailModal } from '../../components/mail/ComposeEmailModal';
 import { useRole } from '../../hooks/useRole';
 import { emailService } from '../../services/emailService';
+import { aiStudyBotService, AIProviderConfig } from '../../services/aiStudyBotService';
+import { Cpu, Zap } from 'lucide-react';
 import { BASE32_SECRET, verifyTOTP } from '../../lib/totp';
 
 export const SettingsPage: React.FC = () => {
   const { role, user, toggleRole, userProfile } = useRole();
-  const [activeTab, setActiveTab] = useState<'profile' | 'roles' | 'gmail_dispatch' | 'notifications' | 'security'>(
+  const [activeTab, setActiveTab] = useState<'profile' | 'roles' | 'gmail_dispatch' | 'notifications' | 'security' | 'ai_engine'>(
     'gmail_dispatch'
   );
   const [teacherEmailInput, setTeacherEmailInput] = useState(emailService.getTeacherConfiguredEmail());
@@ -32,6 +34,9 @@ export const SettingsPage: React.FC = () => {
   const [guardianEmailInput, setGuardianEmailInput] = useState('parent.ahmad@gmail.com');
   const [isComposeOpen, setIsComposeOpen] = useState(false);
   const [isTestingDispatch, setIsTestingDispatch] = useState(false);
+  const [aiConfig, setAiConfig] = useState<AIProviderConfig>(() => aiStudyBotService.loadConfig());
+  const [aiTestResult, setAiTestResult] = useState<{ success: boolean; message: string; latencyMs: number } | null>(null);
+  const [isTestingAi, setIsTestingAi] = useState(false);
   const [is2FAEnabled, setIs2FAEnabled] = useState(() => {
     return localStorage.getItem(`studyhub_2fa_enabled_${role}`) === 'true';
   });
@@ -65,6 +70,26 @@ export const SettingsPage: React.FC = () => {
       }));
     }
   }, [userProfile]);
+
+  const handleSaveAiConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    aiStudyBotService.saveConfig(aiConfig);
+    setSuccessToast('AI Model configuration and API keys saved successfully!');
+    setTimeout(() => setSuccessToast(null), 4000);
+  };
+
+  const handleTestAiConnection = async () => {
+    setIsTestingAi(true);
+    setAiTestResult(null);
+    try {
+      const res = await aiStudyBotService.testConnection(aiConfig);
+      setAiTestResult(res);
+    } catch (err: any) {
+      setAiTestResult({ success: false, message: err.message || 'Connection failed', latencyMs: 0 });
+    } finally {
+      setIsTestingAi(false);
+    }
+  };
 
   const handleSaveSettings = () => {
     emailService.setTeacherConfiguredEmail(teacherEmailInput);
@@ -240,6 +265,17 @@ export const SettingsPage: React.FC = () => {
         >
           <Lock className="w-4 h-4 text-[#14B866]" />
           Security & 2FA Authenticator
+        </button>
+        <button
+          onClick={() => setActiveTab('ai_engine')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 ${
+            activeTab === 'ai_engine'
+              ? 'bg-[#142D27] text-white shadow-sm'
+              : 'text-[#557067] hover:bg-[#E7EFEA]'
+          }`}
+        >
+          <Cpu className="w-4 h-4 text-[#14B866]" />
+          AI Engine &amp; API Key
         </button>
       </div>
 
@@ -844,6 +880,129 @@ export const SettingsPage: React.FC = () => {
                 </div>
               </form>
             </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Tab: AI Model & API Configuration */}
+      {activeTab === 'ai_engine' && (
+        <div className="space-y-6">
+          <Card className="space-y-6">
+            <CardHeader className="pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <CardTitle>AI Tutor Engine &amp; Model Architecture</CardTitle>
+                  <Badge variant="primary" size="sm" dot pulseDot>
+                    {aiConfig.provider.toUpperCase()} Active
+                  </Badge>
+                </div>
+                <CardDescription>
+                  Configure the backend intelligence powering the Global Science Academy Academic Tutor. You can connect Google Gemini 1.5, OpenAI (GPT-4o Mini / GPT-4o), or use the built-in offline intelligence.
+                </CardDescription>
+              </div>
+            </CardHeader>
+
+            <form onSubmit={handleSaveAiConfig} className="p-4 sm:p-6 space-y-4 border-t border-[#e1ede7]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#142D27] mb-1.5">
+                    AI Provider Service
+                  </label>
+                  <select
+                    value={aiConfig.provider}
+                    onChange={(e) =>
+                      setAiConfig({ ...aiConfig, provider: e.target.value as any })
+                    }
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
+                  >
+                    <option value="openai">OpenAI (GPT-4o Mini / GPT-4o)</option>
+                    <option value="gemini">Google Gemini (Gemini 1.5 Flash)</option>
+                    <option value="offline">Offline Academic Knowledge Engine</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#142D27] mb-1.5">
+                    Selected Model
+                  </label>
+                  {aiConfig.provider === 'openai' ? (
+                    <select
+                      value={aiConfig.model || 'gpt-4o-mini'}
+                      onChange={(e) => setAiConfig({ ...aiConfig, model: e.target.value })}
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
+                    >
+                      <option value="gpt-4o-mini">gpt-4o-mini (Fast &amp; High Accuracy - Recommended)</option>
+                      <option value="gpt-4o">gpt-4o (Deep Reasoning &amp; Complex Proofs)</option>
+                    </select>
+                  ) : aiConfig.provider === 'gemini' ? (
+                    <input
+                      type="text"
+                      disabled
+                      value="gemini-1.5-flash (Google DeepMind)"
+                      className="w-full px-3.5 py-2.5 text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl text-zinc-600 cursor-not-allowed"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      disabled
+                      value="offline-local-kb (Punjab Board FA-IT)"
+                      className="w-full px-3.5 py-2.5 text-xs bg-zinc-50 border border-[#e1ede7] rounded-xl text-zinc-600 cursor-not-allowed"
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#142D27] mb-1.5">
+                  Private API Key (Stored securely in local storage)
+                </label>
+                <div className="relative">
+                  <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <input
+                    type="password"
+                    placeholder={aiConfig.provider === 'gemini' ? 'AIzaSy...' : 'sk-proj-...'}
+                    value={aiConfig.apiKey}
+                    onChange={(e) => setAiConfig({ ...aiConfig, apiKey: e.target.value })}
+                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none font-mono"
+                  />
+                </div>
+                <p className="text-[11px] text-[#7d9990] mt-1.5">
+                  This configuration is strictly managed here in Settings. The student chatbot interface remains clean, simple, and distraction-free.
+                </p>
+              </div>
+
+              {/* Test Connection Results */}
+              {aiTestResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs flex items-center justify-between ${aiTestResult.success ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}`}
+                >
+                  <span className="font-medium">{aiTestResult.message}</span>
+                  {aiTestResult.latencyMs > 0 && (
+                    <span className="font-bold text-[10px] px-2 py-0.5 rounded-full bg-white/80 border">
+                      {aiTestResult.latencyMs}ms latency
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#e1ede7]">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTestAiConnection}
+                  disabled={isTestingAi}
+                >
+                  <Zap className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
+                  {isTestingAi ? 'Testing Connection...' : 'Test Connection'}
+                </Button>
+
+                <Button type="submit" variant="primary" size="sm">
+                  <Save className="w-3.5 h-3.5 mr-1.5" />
+                  Save AI Configuration
+                </Button>
+              </div>
+            </form>
           </Card>
         </div>
       )}

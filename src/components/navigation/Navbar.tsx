@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Menu, Search, ChevronDown, LogOut, Lock, Camera, X, GraduationCap } from 'lucide-react';
+import { Menu, Search, ChevronDown, LogOut, Lock, Camera, X, GraduationCap, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { NotificationDropdown } from './NotificationDropdown';
 import { Badge } from '../ui/Badge';
@@ -10,9 +10,11 @@ import { Button } from '../ui/Button';
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
+  isSidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarCollapsed, onToggleSidebar }) => {
   const { role, profile, signOut, updateAvatar } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -93,6 +95,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu }) => {
 
         {/* Divider (Mobile Only) */}
         <div className="h-5 w-[1px] bg-zinc-200 mx-1 lg:hidden shrink-0" />
+
+        {/* Desktop Sidebar Toggle Button */}
+        {onToggleSidebar && (
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors focus:outline-none cursor-pointer"
+            title={isSidebarCollapsed ? "Expand sidebar to full width" : "Collapse sidebar to compact mode"}
+            aria-label="Toggle sidebar collapse"
+          >
+            {isSidebarCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4 text-emerald-700" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4 text-zinc-600" />
+            )}
+          </button>
+        )}
 
         {/* Global Search Bar */}
         <div className="relative w-full hidden md:block">

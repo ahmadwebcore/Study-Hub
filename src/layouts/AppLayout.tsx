@@ -8,6 +8,18 @@ import { X } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    return localStorage.getItem('studyhub_sidebar_collapsed') === 'true';
+  });
+
+  const toggleSidebarCollapsed = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('studyhub_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
+
   const location = useLocation();
   const isAITeacherPage = location.pathname.startsWith('/ai-teacher');
 
@@ -15,10 +27,18 @@ export const AppLayout: React.FC = () => {
     <div className="min-h-screen bg-[#F7F9F8] flex flex-col font-sans">
       {/* Real Mobile App Native Push Banner */}
       <MobileNativePushBanner />
+
       <div className="flex-1 flex w-full">
-        {/* Desktop Sidebar */}
-        <div className="hidden lg:block shrink-0 sticky top-0 h-screen">
-          <Sidebar />
+        {/* Desktop Sidebar (Adjusts width seamlessly between w-20 and w-64/w-72) */}
+        <div
+          className={`hidden lg:block shrink-0 sticky top-0 h-screen transition-all duration-300 ${
+            isSidebarCollapsed ? 'w-20' : 'w-64 xl:w-72'
+          }`}
+        >
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={toggleSidebarCollapsed}
+          />
         </div>
 
         {/* Mobile Navigation Drawer */}
@@ -46,20 +66,24 @@ export const AppLayout: React.FC = () => {
           </div>
         )}
 
-        {/* Main Workspace Area */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <Navbar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+        {/* Main Workspace Area (Fluid width, eliminates wonkey white gap, adjusts to sidebar) */}
+        <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+          <Navbar
+            onOpenMobileMenu={() => setMobileMenuOpen(true)}
+            isSidebarCollapsed={isSidebarCollapsed}
+            onToggleSidebar={toggleSidebarCollapsed}
+          />
 
-          <main className="flex-1 w-full mx-auto max-w-7xl py-[40px] px-[10px] sm:py-[40px] sm:px-[20px] lg:py-[60px] lg:px-[10px]">
+          <main className="flex-1 w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 max-w-[1720px] transition-all">
             <Outlet />
           </main>
 
-          {/* Floating AI Study Assistant (Hidden when on dedicated AI Teacher page) */}
+          {/* Floating WhatsApp-Style Academic Chat Widget */}
           {!isAITeacherPage && <StudyBotWidget />}
 
           {/* Minimalist 2026 Footer */}
-          <footer className="py-4 px-6 border-t border-[#e1ede7] text-center text-xs text-[#7d9990] bg-white/50">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
+          <footer className="py-4 px-3 sm:px-6 lg:px-8 border-t border-[#e1ede7] text-xs text-[#7d9990] bg-white/50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-[1720px]">
               <span>
                 Global Science Academy, Fatehpur &copy; {new Date().getFullYear()} &bull; Academic Portal
               </span>
