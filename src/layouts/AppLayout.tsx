@@ -4,9 +4,11 @@ import { Sidebar } from '../components/navigation/Sidebar';
 import { Navbar } from '../components/navigation/Navbar';
 import { StudyBotWidget } from '../components/ai/StudyBotWidget';
 import { MobileNativePushBanner } from '../components/notifications/MobileNativePushBanner';
-import { X } from 'lucide-react';
+import { useRole } from '../hooks/useRole';
+import { X, ShieldCheck, Eye } from 'lucide-react';
 
 export const AppLayout: React.FC = () => {
+  const { role, canSwitchRole, switchToTeacher } = useRole();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     return localStorage.getItem('studyhub_sidebar_collapsed') === 'true';
@@ -67,6 +69,28 @@ export const AppLayout: React.FC = () => {
 
         {/* Main Workspace Area (Fluid width, eliminates wonkey white gap, adjusts to sidebar) */}
         <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+          {/* Active Student Preview Banner (Visible only when Teacher has switched to Student perspective) */}
+          {canSwitchRole && role === 'student' && (
+            <div className="bg-[#142D27] text-white px-3 sm:px-6 py-2 flex items-center justify-between text-xs sticky top-0 z-30 border-b border-emerald-500/30 shadow-xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-semibold text-emerald-100 flex items-center gap-1.5 text-[11px] sm:text-xs truncate">
+                  <Eye className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  Viewing Portal as Student: <strong className="text-white">Henza Noor Preview</strong>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={switchToTeacher}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-xs cursor-pointer active:scale-95 shrink-0 ml-2"
+                title="Convert / Switch back to Faculty Lead Ahmad"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Convert to Teacher</span>
+              </button>
+            </div>
+          )}
+
           <Navbar
             onOpenMobileMenu={() => setMobileMenuOpen(true)}
             isSidebarCollapsed={isSidebarCollapsed}

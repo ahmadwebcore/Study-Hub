@@ -13,9 +13,23 @@ export const useRole = (): {
   userProfile: UserProfile | null;
   setRole: (role: UserRole) => void;
   toggleRole: () => void;
+  switchToTeacher: () => void;
+  switchToStudent: () => void;
+  canSwitchRole: boolean;
+  authenticatedRole: UserRole;
   isConfigured: boolean;
 } => {
-  const { role, profile, setRole, toggleDemoRole, isConfigured } = useAuth();
+  const {
+    role,
+    profile,
+    setRole,
+    toggleDemoRole,
+    switchToTeacher,
+    switchToStudent,
+    canSwitchRole,
+    authenticatedRole,
+    isConfigured,
+  } = useAuth();
   const fallbackUser = role === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
 
   return {
@@ -24,6 +38,10 @@ export const useRole = (): {
     userProfile: profile,
     setRole,
     toggleRole: toggleDemoRole,
+    switchToTeacher,
+    switchToStudent,
+    canSwitchRole,
+    authenticatedRole,
     isConfigured,
   };
 };

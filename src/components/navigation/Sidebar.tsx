@@ -14,6 +14,7 @@ import {
   FolderArchive,
   BookMarked,
   Share2,
+  Eye,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
 import { cn } from '../../lib/utils';
@@ -73,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   isCollapsed = false,
 }) => {
-  const { role, toggleRole } = useRole();
+  const { role, toggleRole, canSwitchRole } = useRole();
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
 
   return (
@@ -113,25 +114,78 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </NavLink>
       </div>
 
-      {/* Role Perspective Switcher Pill (Teacher only - locked from student) */}
-      {!isCollapsed && role === 'teacher' && (
-        <div className="p-3 mx-3 my-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7]">
+      {/* Role Perspective Switcher Pill (Only visible to Teacher account - Completely locked from Students) */}
+      {!isCollapsed && canSwitchRole && (
+        <div
+          className={cn(
+            'p-3 mx-3 my-2.5 rounded-2xl border transition-all shadow-2xs',
+            role === 'teacher'
+              ? 'bg-[#F7F9F8] border-[#e1ede7]'
+              : 'bg-emerald-50/90 border-emerald-300 ring-1 ring-emerald-400/30'
+          )}
+        >
           <div className="flex items-center justify-between text-xs mb-1.5">
-            <span className="text-[#557067] font-semibold uppercase tracking-wider text-[9px]">
-              Perspective Mode
+            <span
+              className={cn(
+                'font-semibold uppercase tracking-wider text-[9px] flex items-center gap-1',
+                role === 'teacher' ? 'text-[#557067]' : 'text-emerald-800'
+              )}
+            >
+              {role === 'teacher' ? (
+                <>
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#14B866]" />
+                  Faculty Authority
+                </>
+              ) : (
+                <>
+                  <Eye className="w-3.5 h-3.5 text-emerald-700 animate-pulse" />
+                  Student Preview
+                </>
+              )}
             </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#142D27]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#14B866]" />
-              Faculty Lead
+            <span
+              className={cn(
+                'text-[10px] font-bold px-1.5 py-0.2 rounded-full',
+                role === 'teacher'
+                  ? 'bg-white text-[#142D27] border border-[#e1ede7]'
+                  : 'bg-emerald-700 text-white shadow-2xs'
+              )}
+            >
+              {role === 'teacher' ? 'Ahmad' : 'Henza View'}
             </span>
           </div>
+
           <button
+            type="button"
             onClick={toggleRole}
-            className="w-full flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs font-semibold bg-white border border-[#e1ede7] text-[#263B35] hover:bg-[#e8f8f0] hover:text-[#14B866] hover:border-[#14B866]/40 transition-all duration-150 active:scale-[0.98]"
-            title="Preview student perspective"
+            className={cn(
+              'w-full flex items-center justify-between py-2 px-2.5 rounded-xl text-xs font-bold transition-all duration-150 active:scale-[0.98] cursor-pointer shadow-2xs',
+              role === 'teacher'
+                ? 'bg-white border border-[#e1ede7] text-[#263B35] hover:bg-[#e8f8f0] hover:text-[#14B866] hover:border-[#14B866]/40'
+                : 'bg-emerald-700 hover:bg-emerald-800 text-white border border-emerald-600 shadow-sm'
+            )}
+            title={
+              role === 'teacher'
+                ? 'Preview student perspective (Henza Noor)'
+                : 'Convert / Switch back to Teacher (Faculty Lead Ahmad)'
+            }
           >
-            <span>Preview Student View</span>
-            <ChevronRight className="w-3.5 h-3.5 text-[#7d9990]" />
+            <span className="flex items-center gap-1.5">
+              {role === 'teacher' ? (
+                <>
+                  <Eye className="w-3.5 h-3.5 text-[#14B866]" />
+                  Preview Student View
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                  Convert to Teacher (Ahmad)
+                </>
+              )}
+            </span>
+            <ChevronRight
+              className={cn('w-3.5 h-3.5', role === 'teacher' ? 'text-[#7d9990]' : 'text-emerald-200')}
+            />
           </button>
         </div>
       )}

@@ -22,6 +22,10 @@ interface AuthContextType {
   updatePassword: (password: string) => Promise<{ error: Error | null }>;
   toggleDemoRole: () => void;
   setRole: (role: UserRole) => void;
+  switchToTeacher: () => void;
+  switchToStudent: () => void;
+  authenticatedRole: UserRole;
+  canSwitchRole: boolean;
   updateAvatar: (avatarUrl: string) => void;
 }
 
@@ -67,6 +71,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return clean;
   };
+
+  const [authenticatedRole, setAuthenticatedRole] = useState<UserRole>(() => {
+    try {
+      const savedAuthRole = localStorage.getItem('studyhub_authenticated_role') as UserRole;
+      if (savedAuthRole === 'teacher' || savedAuthRole === 'student') return savedAuthRole;
+      const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+      if (savedUserStr) {
+        const parsed = JSON.parse(savedUserStr);
+        if (parsed.email?.toLowerCase().includes('henza') || parsed.name?.toLowerCase().includes('henza')) {
+          return 'student';
+        }
+      }
+    } catch {}
+    return 'teacher';
+  });
+
+  const canSwitchRole = authenticatedRole === 'teacher';
 
   const [demoRole, setDemoRole] = useState<UserRole>(() => {
     try {
@@ -239,7 +260,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authedUser as User);
       const sanitized = sanitizeProfile(authedProfile, roleMode);
       setProfile(sanitized);
+      setAuthenticatedRole(roleMode);
       try {
+        localStorage.setItem('studyhub_authenticated_role', roleMode);
         localStorage.setItem('studyhub_active_role', roleMode);
         localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
       } catch {}
@@ -249,11 +272,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const completeTwoFactorAuth = (email: string, targetRole: UserRole = 'teacher') => {
     setRole(targetRole);
+    setAuthenticatedRole(targetRole);
     const base = targetRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT;
     const authedProfile = sanitizeProfile({ ...base, email }, targetRole);
     setUser({ id: authedProfile.id, email } as User);
     setProfile(authedProfile);
     try {
+      localStorage.setItem('studyhub_authenticated_role', targetRole);
       localStorage.setItem('studyhub_active_role', targetRole);
       localStorage.setItem('studyhub_logged_in_user', JSON.stringify(authedProfile));
     } catch {}
@@ -294,8 +319,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSession(null);
     try {
       localStorage.removeItem('studyhub_logged_in_user');
+      localStorage.removeItem('studyhub_active_role');
+      localStorage.removeItem('studyhub_authenticated_role');
     } catch {}
-    setProfile(sanitizeProfile(demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, demoRole));
+    setAuthenticatedRole('teacher');
+    setDemoRole('teacher');
+    setProfile(sanitizeProfile(SAMPLE_TEACHER, 'teacher'));
   };
 
   const resetPassword = async (email: string) => {
@@ -311,11 +340,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const toggleDemoRole = () => {
+    if (!canSwitchRole) {
+      console.warn('Access denied: Student accounts cannot convert perspective to teacher.');
+      return;
+    }
     const nextRole = demoRole === 'teacher' ? 'student' : 'teacher';
     setRole(nextRole);
   };
 
   const setRole = (newRole: UserRole) => {
+    if (newRole === 'teacher' && !canSwitchRole) {
+      console.warn('Access denied: Student accounts cannot convert their role to teacher.');
+      return;
+    }
     try {
       localStorage.setItem('studyhub_active_role', newRole);
     } catch {}
@@ -328,6 +365,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {}
   };
 
+  const switchToTeacher = () => {
+    if (!canSwitchRole) return;
+    setRole('teacher');
+  };
+
+  const switchToStudent = () => {
+    if (!canSwitchRole) return;
+    setRole('student');
+  };
+
   const currentRole: UserRole = profile?.role || demoRole;
   const currentUserProfile: UserProfile = profile || (demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
 
@@ -337,6 +384,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         profile: currentUserProfile,
         role: currentRole,
+        authenticatedRole,
+        canSwitchRole,
         session,
         loading,
         isConfigured: configured,
@@ -350,6 +399,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatePassword,
         toggleDemoRole,
         setRole,
+        switchToTeacher,
+        switchToStudent,
         updateAvatar,
       }}
     >

@@ -12,6 +12,7 @@ import {
   Smartphone,
   Copy,
   Check,
+  Eye,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -24,7 +25,7 @@ import { Cpu, Zap } from 'lucide-react';
 import { BASE32_SECRET, verifyTOTP } from '../../lib/totp';
 
 export const SettingsPage: React.FC = () => {
-  const { role, user, toggleRole, userProfile } = useRole();
+  const { role, user, userProfile, canSwitchRole, switchToTeacher, switchToStudent } = useRole();
   const [activeTab, setActiveTab] = useState<'profile' | 'roles' | 'gmail_dispatch' | 'notifications' | 'security' | 'ai_engine'>(
     'gmail_dispatch'
   );
@@ -231,7 +232,7 @@ export const SettingsPage: React.FC = () => {
           <User className="w-4 h-4" />
           Profile Credentials
         </button>
-        {role === 'teacher' && (
+        {canSwitchRole && (
           <button
             onClick={() => setActiveTab('roles')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
@@ -564,13 +565,13 @@ export const SettingsPage: React.FC = () => {
       )}
 
       {/* Tab 2: Role Switcher (Teacher Only) */}
-      {activeTab === 'roles' && role === 'teacher' && (
+      {activeTab === 'roles' && canSwitchRole && (
         <Card className="space-y-6">
           <CardHeader className="pb-3">
             <div>
               <CardTitle>Role Perspective Switcher</CardTitle>
               <CardDescription>
-                Global Science Academy supports both Faculty Lead and Student workspaces. Toggle perspectives instantly.
+                Global Science Academy supports both Faculty Lead and Student workspaces. As the Faculty Lead (Ahmad), you can toggle perspectives or convert between student view and teacher mode.
               </CardDescription>
             </div>
           </CardHeader>
@@ -579,7 +580,7 @@ export const SettingsPage: React.FC = () => {
             {/* Teacher Option */}
             <div
               onClick={() => {
-                if (role !== 'teacher') toggleRole();
+                if (role !== 'teacher') switchToTeacher();
               }}
               className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
                 role === 'teacher'
@@ -588,7 +589,7 @@ export const SettingsPage: React.FC = () => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#142D27]">Teacher / Admin Role</span>
+                <span className="font-bold text-sm text-[#142D27]">Teacher / Faculty Lead (Ahmad)</span>
                 {role === 'teacher' && (
                   <Badge variant="primary" size="sm">
                     Active
@@ -598,19 +599,50 @@ export const SettingsPage: React.FC = () => {
               <p className="text-xs text-[#557067] mt-2 leading-relaxed">
                 Full administrative authority: schedule tests, grade student submissions, manage cohorts, assign homework, and review cohort analytics.
               </p>
+              {role !== 'teacher' && (
+                <button
+                  type="button"
+                  onClick={() => switchToTeacher()}
+                  className="mt-3 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Convert to Teacher
+                </button>
+              )}
             </div>
 
             {/* Student Option */}
             <div
-              onClick={() => toggleRole()}
-              className="p-5 rounded-2xl border-2 transition-all cursor-pointer border-[#e1ede7] bg-white hover:border-[#14B866]/40"
+              onClick={() => {
+                if (role !== 'student') switchToStudent();
+              }}
+              className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                role === 'student'
+                  ? 'border-[#14B866] bg-[#e8f8f0]/40 shadow-card'
+                  : 'border-[#e1ede7] bg-white hover:border-[#14B866]/40'
+              }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-[#142D27]">Preview Student Perspective</span>
+                <span className="font-bold text-sm text-[#142D27]">Preview Student Perspective (Henza Noor)</span>
+                {role === 'student' && (
+                  <Badge variant="primary" size="sm">
+                    Active
+                  </Badge>
+                )}
               </div>
               <p className="text-xs text-[#557067] mt-2 leading-relaxed">
-                Learner perspective: preview how enrolled scholars view today's study schedule, 5-box daily tests, homework submissions, and teacher feedback.
+                Learner perspective: preview how enrolled scholars view today's study schedule, daily tests, submissions, and teacher feedback.
               </p>
+              {role !== 'student' && (
+                <button
+                  type="button"
+                  onClick={() => switchToStudent()}
+                  className="mt-3 px-3.5 py-1.5 rounded-xl bg-[#142D27] hover:bg-[#1f3f37] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  Preview Student View
+                </button>
+              )}
             </div>
           </div>
         </Card>
