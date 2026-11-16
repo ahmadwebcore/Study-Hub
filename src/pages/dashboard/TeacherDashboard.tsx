@@ -198,12 +198,12 @@ export const TeacherDashboard: React.FC = () => {
     <div className="space-y-6 font-sans max-w-6xl mx-auto">
       {/* Toast Notification */}
       {successToast && (
-        <div className="p-3 rounded-lg bg-zinc-900 text-white flex items-center justify-between text-xs font-medium">
+        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between text-xs font-semibold shadow-xs">
           <span className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-400" />
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
             {successToast}
           </span>
-          <button onClick={() => setSuccessToast(null)} className="text-zinc-400 hover:text-white text-sm">
+          <button onClick={() => setSuccessToast(null)} className="text-emerald-700 hover:text-emerald-950 text-base font-bold">
             &times;
           </button>
         </div>
@@ -314,7 +314,7 @@ export const TeacherDashboard: React.FC = () => {
                 onClick={() => setTaskFilter(tab.id as any)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   taskFilter === tab.id
-                    ? 'bg-zinc-900 text-white shadow-xs'
+                    ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
                 }`}
               >
@@ -444,7 +444,7 @@ export const TeacherDashboard: React.FC = () => {
             <button
               type="button"
               onClick={handleSendInvite}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800"
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 shadow-xs"
             >
               Send Invitation Token
             </button>
@@ -618,7 +618,7 @@ export const TeacherDashboard: React.FC = () => {
             <button
               type="button"
               onClick={handleConfirmApproval}
-              className="px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg shadow-xs"
+              className="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-xs"
             >
               Save Marks & Sign Off
             </button>

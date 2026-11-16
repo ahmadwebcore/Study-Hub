@@ -373,7 +373,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                   <button
                     type="submit"
                     disabled={loading}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl transition-colors shadow-sm disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-xs disabled:opacity-50"
                   >
                     {loading ? (
                       <>
@@ -467,7 +467,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                 <button
                   type="submit"
                   disabled={totpCode.trim().length !== 6}
-                  className="flex-1 py-2 px-3 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 rounded-xl transition-all shadow-xs"
+                  className="flex-1 py-2 px-3 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 rounded-xl transition-all shadow-xs"
                 >
                   Verify &amp; Confirm
                 </button>

@@ -139,30 +139,30 @@ export const MobileNativePushBanner: React.FC = () => {
           : 'opacity-100 translate-y-0 scale-100 animate-in slide-in-from-top-4 duration-300'
       }`}
     >
-      <div className="relative overflow-hidden rounded-2xl bg-zinc-950/95 text-white backdrop-blur-2xl border border-white/20 shadow-2xl p-3.5 space-y-2.5 ring-1 ring-white/10">
-        {/* Ambient Top Glow */}
-        <div className="absolute -top-12 -left-12 w-32 h-32 bg-emerald-500/25 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-white/95 text-[#142D27] backdrop-blur-2xl border border-[#e1ede7] shadow-2xl p-3.5 space-y-2.5 ring-1 ring-black/5">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute -top-12 -left-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-12 -right-12 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
 
         {/* Header: Native App Pill */}
-        <div className="relative flex items-center justify-between pb-1 border-b border-white/10 text-[11px]">
+        <div className="relative flex items-center justify-between pb-1 border-b border-[#e1ede7] text-[11px]">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center font-extrabold text-[10px] text-zinc-950 shadow-xs">
+            <div className="w-5 h-5 rounded-md bg-[#142D27] flex items-center justify-center font-extrabold text-[10px] text-[#14B866] shadow-xs">
               GSA
             </div>
-            <span className="font-bold tracking-tight text-white/90">Global Science Academy</span>
-            <span className="text-white/40">&bull;</span>
-            <span className="text-emerald-400 font-medium">Fatehpur</span>
+            <span className="font-bold tracking-tight text-[#142D27]">Global Science Academy</span>
+            <span className="text-zinc-300">&bull;</span>
+            <span className="text-[#14B866] font-semibold">Fatehpur</span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10">
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
               {notif.badge || 'Push Alert'}
             </span>
             <button
               type="button"
               onClick={dismissAlert}
-              className="p-1 rounded-md text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1 rounded-md text-[#7d9990] hover:text-[#142D27] hover:bg-[#E7EFEA] transition-colors cursor-pointer"
               aria-label="Dismiss notification"
             >
               <X className="w-3.5 h-3.5" />
@@ -172,27 +172,27 @@ export const MobileNativePushBanner: React.FC = () => {
 
         {/* Content Body */}
         <div className="relative space-y-1">
-          <h4 className="text-xs sm:text-sm font-bold text-white tracking-tight leading-snug line-clamp-1">
+          <h4 className="text-xs sm:text-sm font-bold text-[#142D27] tracking-tight leading-snug line-clamp-1">
             {notif.title}
           </h4>
-          <p className="text-[11px] sm:text-xs text-zinc-300 leading-relaxed line-clamp-2">
+          <p className="text-[11px] sm:text-xs text-[#557067] leading-relaxed line-clamp-2">
             {notif.message}
           </p>
         </div>
 
         {/* Action Row */}
-        <div className="relative flex items-center justify-end gap-2 pt-1 border-t border-white/5">
+        <div className="relative flex items-center justify-end gap-2 pt-1 border-t border-[#e1ede7]">
           <button
             type="button"
             onClick={dismissAlert}
-            className="px-2.5 py-1 text-[11px] font-medium text-white/60 hover:text-white transition-colors"
+            className="px-2.5 py-1 text-[11px] font-medium text-[#7d9990] hover:text-[#142D27] transition-colors cursor-pointer"
           >
             Dismiss
           </button>
           <button
             type="button"
             onClick={handleAction}
-            className="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold text-zinc-950 bg-gradient-to-r from-emerald-400 to-emerald-300 hover:brightness-105 rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
+            className="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
           >
             <span>{notif.actionLabel || 'View Details'}</span>
             <ChevronRight className="w-3 h-3" />
@@ -200,8 +200,8 @@ export const MobileNativePushBanner: React.FC = () => {
         </div>
 
         {/* Animated Progress Countdown Bar */}
-        <div className="absolute bottom-0 inset-x-0 h-0.5 bg-white/10">
-          <div className="h-full bg-gradient-to-r from-emerald-400 to-indigo-400 animate-[shrink_6.5s_linear_forwards]" />
+        <div className="absolute bottom-0 inset-x-0 h-0.5 bg-emerald-100">
+          <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 animate-[shrink_6.5s_linear_forwards]" />
         </div>
       </div>
     </div>

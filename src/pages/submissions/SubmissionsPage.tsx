@@ -336,24 +336,24 @@ export const SubmissionsPage: React.FC = () => {
           </div>
 
           {/* Solution Sheet Visual Preview Box */}
-          <div className="p-3.5 rounded-xl bg-zinc-900 text-white space-y-2">
+          <div className="p-3.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-[#142D27] space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
+              <span className="font-semibold text-emerald-700 flex items-center gap-1.5">
                 📄 Student Solution Sheet (FSc Exam Script)
               </span>
               <button
                 type="button"
                 onClick={() => gradingSubmission && handleDownloadFile(gradingSubmission)}
-                className="text-[11px] text-zinc-300 hover:text-white flex items-center gap-1"
+                className="text-[11px] text-[#557067] hover:text-[#142D27] flex items-center gap-1 cursor-pointer"
               >
-                <Download className="w-3 h-3" />
+                <Download className="w-3 h-3 text-[#14B866]" />
                 Download Original
               </button>
             </div>
-            <div className="p-3 rounded-lg bg-zinc-800 border border-zinc-700 font-mono text-[11px] text-zinc-300 space-y-1">
-              <p className="text-emerald-300 font-bold">&bull; Worked Solution Script Preview:</p>
-              <p className="text-zinc-400 italic">"Q1. Resolved vector components along orthogonal axes: F_x = F cos(θ), F_y = F sin(θ). Resultant magnitude R = √(F_x² + F_y²) = 25.4 N. Proof verified."</p>
-              <div className="pt-1 text-[10px] text-zinc-500">Document: {gradingSubmission?.fileName || 'FSc_Physics_Paper.pdf'}</div>
+            <div className="p-3 rounded-lg bg-white border border-[#e1ede7] text-xs text-[#263B35] space-y-1">
+              <p className="text-emerald-700 font-bold">&bull; Worked Solution Script Preview:</p>
+              <p className="text-[#557067] italic">"Q1. Resolved vector components along orthogonal axes: F_x = F cos(θ), F_y = F sin(θ). Resultant magnitude R = √(F_x² + F_y²) = 25.4 N. Proof verified."</p>
+              <div className="pt-1 text-[10px] text-[#7d9990]">Document: {gradingSubmission?.fileName || 'FSc_Physics_Paper.pdf'}</div>
             </div>
           </div>
 

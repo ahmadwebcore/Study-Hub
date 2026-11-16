@@ -119,8 +119,8 @@ export const IntegrationsPage: React.FC = () => {
     <div className="space-y-6 w-full font-sans pb-16">
       {/* Toast Alert */}
       {copiedToast && (
-        <div className="fixed bottom-6 right-6 z-50 p-3.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white flex items-center gap-2.5 text-xs font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="fixed bottom-6 right-6 z-50 p-3.5 rounded-xl bg-white border border-[#e1ede7] text-[#142D27] flex items-center gap-2.5 text-xs font-semibold shadow-2xl animate-in fade-in slide-in-from-bottom-2 ring-1 ring-black/5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{copiedToast}</span>
         </div>
       )}

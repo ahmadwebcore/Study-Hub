@@ -195,8 +195,8 @@ export const DirectChatPage: React.FC = () => {
           </Link>
 
           {/* Channel 3: BISE DG Khan Broadcast Alerts */}
-          <div className="p-3 rounded-xl bg-zinc-100/60 border border-zinc-200/80 flex items-start gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0">
+          <div className="p-3 rounded-xl bg-white border border-[#e1ede7] flex items-start gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center text-xs font-bold shrink-0">
               🇵🇰
             </div>
             <div className="flex-1 min-w-0">

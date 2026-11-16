@@ -608,9 +608,9 @@ export const TestsPage: React.FC = () => {
           <div className="pt-2">
             <Link
               to="/library"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-sm active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
-              <Upload className="w-4 h-4 text-emerald-400" />
+              <Upload className="w-4 h-4 text-emerald-100" />
               <span>⚡ Upload Book PDF &amp; Generate Series</span>
             </Link>
           </div>
@@ -1566,20 +1566,20 @@ export const TestsPage: React.FC = () => {
             </div>
 
             {/* Student Solution Sheet & Answers Preview */}
-            <div className="p-3.5 rounded-2xl bg-zinc-900 text-white space-y-2">
+            <div className="p-3.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] text-[#142D27] space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-emerald-400" />
+                <span className="font-bold text-emerald-700 flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-emerald-600" />
                   Submitted Solution Sheet (Handwritten Paper)
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
                   BISE DG Khan Pattern
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-800 border border-zinc-700 font-mono text-[11px] text-zinc-300 space-y-1">
-                <p className="text-emerald-300 font-bold">&bull; Question 1 (MCQ Section): Option B Selected (Correct)</p>
-                <p className="text-zinc-300">&bull; Question 2 (Short Conceptual): "Differentiated Bus & Star topologies with single point of failure analysis."</p>
-                <p className="text-zinc-300">&bull; Question 3 (Handwritten Upload): Scanned answer sheet with neatly drawn topology diagrams and pinouts.</p>
+              <div className="p-3 rounded-xl bg-white border border-[#e1ede7] text-xs text-[#263B35] space-y-1">
+                <p className="text-emerald-700 font-bold">&bull; Question 1 (MCQ Section): Option B Selected (Correct)</p>
+                <p className="text-[#557067]">&bull; Question 2 (Short Conceptual): "Differentiated Bus & Star topologies with single point of failure analysis."</p>
+                <p className="text-[#557067]">&bull; Question 3 (Handwritten Upload): Scanned answer sheet with neatly drawn topology diagrams and pinouts.</p>
               </div>
             </div>
 

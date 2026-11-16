@@ -389,7 +389,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           <div className="pt-2">
             <Link
               to="/library"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-xs"
             >
               <Upload className="w-3.5 h-3.5" />
               <span>⚡ Upload Book PDF &amp; Generate Series</span>
@@ -526,7 +526,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         const score = activePopupTest.studentScore ?? activePopupTest.myAttempt?.totalScore;
 
         return createPortal(
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
             <div className="relative w-full max-w-lg bg-white rounded-3xl border border-zinc-200 shadow-2xl overflow-hidden flex flex-col text-zinc-900">
               {/* Modal Header */}
               <div className="p-4 sm:p-5 border-b border-[#e1ede7] bg-[#F7F9F8] flex items-start justify-between gap-3">

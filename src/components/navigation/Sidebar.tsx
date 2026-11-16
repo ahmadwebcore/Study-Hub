@@ -199,8 +199,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           ? 'justify-center p-2.5'
                           : 'justify-between px-2.5 py-2',
                         isActive
-                          ? 'bg-[#142D27] text-white shadow-sm'
-                          : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27]'
+                          ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/90 font-bold shadow-2xs'
+                          : 'text-[#557067] hover:bg-[#E7EFEA]/70 hover:text-[#142D27] border border-transparent'
                       )
                     }
                   >
@@ -212,7 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                               'shrink-0 transition-colors',
                               isCollapsed ? 'h-5 w-5' : 'h-4 w-4',
                               isActive
-                                ? 'text-[#14B866]'
+                                ? 'text-emerald-700'
                                 : 'text-[#7d9990] group-hover:text-[#142D27]'
                             )}
                           />
@@ -224,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             className={cn(
                               'ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0',
                               isActive
-                                ? 'bg-emerald-700 text-white'
+                                ? 'bg-emerald-600 text-white'
                                 : item.badgeVariant === 'warning'
                                 ? 'bg-amber-100 text-amber-800'
                                 : item.badgeVariant === 'info'
@@ -258,7 +258,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           onClick={() => setIsBoardModalOpen(true)}
           className={cn(
-            'w-full rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 transition-colors flex items-center group shadow-2xs cursor-pointer',
+            'w-full rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-[#142D27] hover:bg-emerald-50 hover:border-emerald-300 transition-colors flex items-center group shadow-2xs cursor-pointer',
             isCollapsed ? 'justify-center p-2.5' : 'justify-between p-2.5 text-left'
           )}
           title="BISE DG Khan 1st Year FA-IT Desk"
@@ -267,8 +267,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-sm">🇵🇰</span>
             {!isCollapsed && (
               <div>
-                <span className="text-xs font-bold block leading-none">BISE DG Khan</span>
-                <span className="text-[10px] text-zinc-400">1st Year FA-IT Desk</span>
+                <span className="text-xs font-bold block leading-none text-[#142D27]">BISE DG Khan</span>
+                <span className="text-[10px] text-[#557067] group-hover:text-emerald-700">1st Year FA-IT Desk</span>
               </div>
             )}
           </div>

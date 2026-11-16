@@ -287,7 +287,7 @@ export const MediaCenterPage: React.FC = () => {
               onClick={() => setActiveCategory(cat.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 activeCategory === cat.id
-                  ? 'bg-zinc-900 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : 'bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50'
               }`}
             >
@@ -414,10 +414,10 @@ export const MediaCenterPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleGenerateMonthlyTasks(item)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-xl shadow-xs transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors"
                       title="Automatically schedules 24 daily tasks over 4 weeks with Sundays OFF"
                     >
-                      <CalendarCheck className="w-3.5 h-3.5 text-emerald-300" />
+                      <CalendarCheck className="w-3.5 h-3.5 text-emerald-100" />
                       Auto-Schedule (Sundays OFF)
                     </button>
                   )}
@@ -570,7 +570,7 @@ export const MediaCenterPage: React.FC = () => {
         >
           <div className="space-y-4">
             {previewItem.fileType === 'image' ? (
-              <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-900 max-h-[460px] flex items-center justify-center">
+              <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-zinc-100 max-h-[460px] flex items-center justify-center p-2">
                 <img
                   src={previewItem.fileUrl}
                   alt={previewItem.name}

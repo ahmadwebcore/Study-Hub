@@ -605,7 +605,7 @@ export const SyllabusPage: React.FC = () => {
                   onClick={() => setTaskDurationChoice(opt.mins)}
                   className={`py-1.5 px-2 text-xs font-semibold rounded-lg border transition-all text-center ${
                     taskDurationChoice === opt.mins
-                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-xs'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                       : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100'
                   }`}
                 >

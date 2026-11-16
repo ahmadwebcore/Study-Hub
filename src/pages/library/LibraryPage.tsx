@@ -512,9 +512,9 @@ export const LibraryPage: React.FC = () => {
           <div className="pt-2">
             <button
               onClick={() => setIsUploadModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-all shadow-sm active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 cursor-pointer"
             >
-              <Upload className="w-4 h-4 text-emerald-400" />
+              <Upload className="w-4 h-4 text-emerald-100" />
               <span>⚡ Upload Book PDF &amp; Break into Series</span>
             </button>
           </div>

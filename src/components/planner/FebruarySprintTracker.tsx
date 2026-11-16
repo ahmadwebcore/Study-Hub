@@ -234,7 +234,7 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
               <div className="pt-2">
                 <Link
                   to="/library"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-xs"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   <span>Upload Book PDF in Library</span>
