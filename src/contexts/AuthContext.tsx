@@ -32,7 +32,41 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(() => {
+    try {
+      const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+      if (isExplicitLoggedOut) return null;
+
+      const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+      const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || 'teacher';
+      if (savedUserStr) {
+        const parsed = JSON.parse(savedUserStr);
+        return sanitizeProfile(parsed, savedRole);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+      if (isExplicitLoggedOut) return null;
+
+      const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+      if (savedUserStr) {
+        const parsed = JSON.parse(savedUserStr);
+        if (parsed && (parsed.id || parsed.email)) {
+          return { id: parsed.id || 'usr_persisted', email: parsed.email || 'user@studyhub.edu' } as User;
+        }
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
   const [session, setSession] = useState<Session | null>(null);
 
   const sanitizeProfile = (p: UserProfile | null, fallbackRole: UserRole): UserProfile => {
@@ -97,21 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return 'teacher';
   });
 
-  const [profile, setProfile] = useState<UserProfile | null>(() => {
-    try {
-      const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
-      const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || 'teacher';
-      if (savedUserStr) {
-        const parsed = JSON.parse(savedUserStr);
-        return sanitizeProfile(parsed, savedRole);
-      }
-      return sanitizeProfile(savedRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT, savedRole);
-    } catch {
-      return sanitizeProfile(SAMPLE_TEACHER, 'teacher');
-    }
-  });
-
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const configured = isSupabaseConfigured();
   const isDemoMode = !configured || user === null;
@@ -156,15 +176,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async function initAuth() {
       // Check stored session first
       try {
-        const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
-        const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
-        if (savedUserStr) {
-          const parsed = JSON.parse(savedUserStr);
-          const sanitized = sanitizeProfile(parsed, savedRole);
-          if (mounted) {
-            setProfile(sanitized);
-            setUser({ id: sanitized.id, email: sanitized.email } as User);
-            setDemoRole(savedRole);
+        const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+        if (!isExplicitLoggedOut) {
+          const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+          const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
+          if (savedUserStr) {
+            const parsed = JSON.parse(savedUserStr);
+            const sanitized = sanitizeProfile(parsed, savedRole);
+            if (mounted) {
+              setProfile(sanitized);
+              setUser({ id: sanitized.id, email: sanitized.email } as User);
+              setDemoRole(savedRole);
+            }
           }
         }
       } catch {}
@@ -184,6 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const sanitized = sanitizeProfile(userProfile, demoRole);
             setProfile(sanitized);
             try {
+              localStorage.removeItem('studyhub_logged_out');
               localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
             } catch {}
           }
@@ -210,27 +234,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               const sanitized = sanitizeProfile(userProfile, demoRole);
               setProfile(sanitized);
               try {
+                localStorage.removeItem('studyhub_logged_out');
                 localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
               } catch {}
             }
           } else if (event === 'SIGNED_OUT') {
-            // Only clear user if the user deliberately signed out
-            const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
-            if (!savedUserStr) {
+            const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+            if (isExplicitLoggedOut) {
               setSession(null);
               setUser(null);
+              setProfile(null);
             }
           } else {
             // Keep local persistent session alive indefinitely (never kick user out automatically)
             try {
-              const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
-              const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
-              if (savedUserStr) {
-                const parsed = JSON.parse(savedUserStr);
-                const sanitized = sanitizeProfile(parsed, savedRole);
-                setUser({ id: sanitized.id, email: sanitized.email } as User);
-                setProfile(sanitized);
-                setDemoRole(savedRole);
+              const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+              if (!isExplicitLoggedOut) {
+                const savedUserStr = localStorage.getItem('studyhub_logged_in_user');
+                const savedRole = (localStorage.getItem('studyhub_active_role') as UserRole) || demoRole;
+                if (savedUserStr) {
+                  const parsed = JSON.parse(savedUserStr);
+                  const sanitized = sanitizeProfile(parsed, savedRole);
+                  setUser({ id: sanitized.id, email: sanitized.email } as User);
+                  setProfile(sanitized);
+                  setDemoRole(savedRole);
+                }
               }
             } catch {}
           }
@@ -262,6 +290,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setProfile(sanitized);
       setAuthenticatedRole(roleMode);
       try {
+        localStorage.removeItem('studyhub_logged_out');
         localStorage.setItem('studyhub_authenticated_role', roleMode);
         localStorage.setItem('studyhub_active_role', roleMode);
         localStorage.setItem('studyhub_logged_in_user', JSON.stringify(sanitized));
@@ -278,6 +307,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser({ id: authedProfile.id, email } as User);
     setProfile(authedProfile);
     try {
+      localStorage.removeItem('studyhub_logged_out');
       localStorage.setItem('studyhub_authenticated_role', targetRole);
       localStorage.setItem('studyhub_active_role', targetRole);
       localStorage.setItem('studyhub_logged_in_user', JSON.stringify(authedProfile));
@@ -295,6 +325,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (authedUser) {
       setUser(authedUser as User);
       setProfile(authedProfile);
+      try {
+        localStorage.removeItem('studyhub_logged_out');
+      } catch {}
     }
     return { error: null };
   };
@@ -309,22 +342,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (authedUser) {
       setUser(authedUser as User);
       setProfile(authedProfile);
+      try {
+        localStorage.removeItem('studyhub_logged_out');
+      } catch {}
     }
     return { error: null };
   };
 
   const signOut = async () => {
-    await authService.signOut();
-    setUser(null);
-    setSession(null);
     try {
+      localStorage.setItem('studyhub_logged_out', 'true');
       localStorage.removeItem('studyhub_logged_in_user');
       localStorage.removeItem('studyhub_active_role');
       localStorage.removeItem('studyhub_authenticated_role');
+      sessionStorage.removeItem('studyhub_pending_2fa');
     } catch {}
+    await authService.signOut();
+    setUser(null);
+    setSession(null);
+    setProfile(null);
     setAuthenticatedRole('teacher');
     setDemoRole('teacher');
-    setProfile(sanitizeProfile(SAMPLE_TEACHER, 'teacher'));
   };
 
   const resetPassword = async (email: string) => {

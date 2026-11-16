@@ -30,14 +30,27 @@ import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { AcceptInvitePage } from '../pages/auth/AcceptInvitePage';
 import { LandingPage } from '../pages/landing/LandingPage';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 export const AppRoutes: React.FC = () => {
+  const { user, profile } = useAuth();
+  const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+  const isAuthenticated =
+    !isExplicitLoggedOut &&
+    (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+
   return (
     <Routes>
       {/* Public Landing & Authentication Screens */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/welcome" element={<Navigate to="/" replace />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+      />
+      <Route path="/welcome" element={<Navigate to="/dashboard" replace />} />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+      />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/accept-invite" element={<AcceptInvitePage />} />

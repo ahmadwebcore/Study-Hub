@@ -35,7 +35,17 @@ interface Pending2FASession {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, completeTwoFactorAuth } = useAuth();
+  const { signIn, completeTwoFactorAuth, user, profile } = useAuth();
+
+  useEffect(() => {
+    const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+    const isAuthed =
+      !isExplicitLoggedOut &&
+      (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+    if (isAuthed) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, profile, navigate]);
 
   // Step state
   const [step, setStep] = useState<AuthStep>('credentials');

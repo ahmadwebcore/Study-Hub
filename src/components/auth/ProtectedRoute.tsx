@@ -14,7 +14,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
 }) => {
-  const { user, role, loading, isDemoMode } = useAuth();
+  const { user, profile, role, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -25,8 +25,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // If user is not authenticated and not in demo mode, redirect to login
-  if (!user && !isDemoMode) {
+  const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+  const hasPersistentSession =
+    !isExplicitLoggedOut &&
+    (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+
+  // If user is not authenticated and has no persistent session, redirect to login
+  if (!hasPersistentSession) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

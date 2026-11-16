@@ -41,7 +41,7 @@ export const NotFoundPage: React.FC = () => {
           variant="primary"
           size="sm"
           icon={<Home className="w-4 h-4" />}
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/dashboard')}
         >
           Return to Dashboard
         </Button>
@@ -55,13 +55,13 @@ export const NotFoundPage: React.FC = () => {
           Go Back
         </Button>
 
-        <Link to="/welcome">
+        <Link to="/dashboard">
           <Button
             variant="ghost"
             size="sm"
             icon={<Compass className="w-4 h-4 text-[#14B866]" />}
           >
-            Welcome & Get Started
+            Go to Academic Dashboard
           </Button>
         </Link>
       </div>

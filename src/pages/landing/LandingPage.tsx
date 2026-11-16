@@ -1,10 +1,22 @@
 import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GraduationCap, ArrowRight } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { user, profile } = useAuth();
+
+  useEffect(() => {
+    const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
+    const isAuthed =
+      !isExplicitLoggedOut &&
+      (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+    if (isAuthed) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, profile, navigate]);
 
   useEffect(() => {
     // Ensure video plays smoothly across all browsers
