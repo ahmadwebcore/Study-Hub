@@ -74,7 +74,7 @@ export const authService = {
       const customTeacherPass = localStorage.getItem('studyhub_teacher_custom_password');
       const isTeacherPassValid = customTeacherPass
         ? password === customTeacherPass
-        : (password === 'password123' || password === 'Ahmad@2026');
+        : (password === 'password123' || password === 'Ahmad@2026' || password === 'StudyHub2026!');
 
       if (!isTeacherPassValid) {
         return {
@@ -127,7 +127,7 @@ export const authService = {
       const customStudentPass = localStorage.getItem('studyhub_student_custom_password');
       const isStudentPassValid = customStudentPass
         ? password === customStudentPass
-        : (password === 'password123' || password === 'Henza@2026' || password === 'student123');
+        : (password === 'password123' || password === 'Henza@2026' || password === 'student123' || password === 'StudyHub2026!');
 
       if (!isStudentPassValid) {
         return {
@@ -304,7 +304,7 @@ export const authService = {
       const storedTeacherPass = localStorage.getItem('studyhub_teacher_custom_password');
       const validCurrent = storedTeacherPass
         ? currentPass === storedTeacherPass
-        : currentPass === 'password123' || currentPass === 'Ahmad@2026';
+        : (currentPass === 'password123' || currentPass === 'Ahmad@2026' || currentPass === 'StudyHub2026!');
 
       if (!validCurrent) {
         return { success: false, error: 'Current faculty password is incorrect.' };
@@ -320,7 +320,7 @@ export const authService = {
       const storedStudentPass = localStorage.getItem('studyhub_student_custom_password');
       const validCurrent = storedStudentPass
         ? currentPass === storedStudentPass
-        : currentPass === 'password123';
+        : (currentPass === 'password123' || currentPass === 'Henza@2026' || currentPass === 'student123' || currentPass === 'StudyHub2026!');
 
       if (!validCurrent) {
         return { success: false, error: 'Current student password is incorrect.' };

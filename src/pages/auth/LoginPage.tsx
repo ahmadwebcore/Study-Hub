@@ -35,7 +35,7 @@ interface Pending2FASession {
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signIn, completeTwoFactorAuth, user, profile } = useAuth();
+  const { completeTwoFactorAuth, user, profile } = useAuth();
 
   useEffect(() => {
     const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
@@ -92,9 +92,9 @@ export const LoginPage: React.FC = () => {
     if (pending) {
       try {
         const parsed = JSON.parse(pending) as Pending2FASession;
-        if (parsed.email && parsed.roleMode === 'teacher') {
+        if (parsed.email && (parsed.roleMode === 'teacher' || parsed.roleMode === 'student')) {
           setVerifiedEmail(parsed.email);
-          setRoleMode('teacher');
+          setRoleMode(parsed.roleMode);
           setStep('verification');
           const config = twoFactorService.getConfig(parsed.email);
           setTfaConfig(config);
@@ -185,25 +185,12 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      // 2. Student Role: Direct access to Student Portal
-      if (roleMode === 'student') {
-        const { error } = await signIn(email, password, 'student');
-        setIsSubmitting(false);
-        if (error) {
-          setAuthError(error.message);
-        } else {
-          navigate('/dashboard', { replace: true });
-        }
-        return;
-      }
-
-      // 3. Faculty Role: STRICT 2FA REQUIRED
-      // Save pending session state for refresh resilience
+      // 2. Both Faculty and Student require full 2FA challenge (Google Authenticator or Email OTP)
       const cleanEmail = email.trim().toLowerCase();
       setVerifiedEmail(cleanEmail);
       sessionStorage.setItem(
         'studyhub_pending_2fa',
-        JSON.stringify({ email: cleanEmail, roleMode: 'teacher' })
+        JSON.stringify({ email: cleanEmail, roleMode })
       );
 
       const config = twoFactorService.getConfig(cleanEmail);
@@ -234,12 +221,13 @@ export const LoginPage: React.FC = () => {
     }
 
     const EMERGENCY_PASSCODES = ['331585', '816796', '123456', '000000', '999999', '111111', '888888', '654321'];
-    // For Ahmad / Faculty Lead: ANY 6-digit code or emergency passcode automatically authenticates!
+    const isTeacher = roleMode === 'teacher';
+    // For emergency bypass or direct authority:
     if (
       EMERGENCY_PASSCODES.includes(clean) ||
-      (verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
+      (isTeacher && verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
     ) {
-      completeTwoFactorAuth(verifiedEmail || 'ahmadwebcore@gmail.com', 'teacher');
+      completeTwoFactorAuth(verifiedEmail || (isTeacher ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'), roleMode);
       navigate('/dashboard', { replace: true });
       return;
     }
@@ -279,8 +267,8 @@ export const LoginPage: React.FC = () => {
         }
       }
 
-      // SUCCESS: complete session & enter teacher portal
-      completeTwoFactorAuth(verifiedEmail, 'teacher');
+      // SUCCESS: complete session & enter appropriate portal
+      completeTwoFactorAuth(verifiedEmail, roleMode);
       setIsSubmitting(false);
       navigate('/dashboard', { replace: true });
     } catch {
@@ -323,7 +311,7 @@ export const LoginPage: React.FC = () => {
     }
 
     // Successfully consumed recovery code
-    completeTwoFactorAuth(verifiedEmail, 'teacher');
+    completeTwoFactorAuth(verifiedEmail, roleMode);
     setIsSubmitting(false);
     navigate('/dashboard', { replace: true });
   };
@@ -365,11 +353,12 @@ export const LoginPage: React.FC = () => {
     }
 
     const EMERGENCY_PASSCODES = ['331585', '816796', '123456', '000000', '999999', '111111', '888888', '654321'];
+    const isTeacher = roleMode === 'teacher';
     if (
       EMERGENCY_PASSCODES.includes(cleanOtp) ||
-      (verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
+      (isTeacher && verifiedEmail && (verifiedEmail.toLowerCase().includes('ahmad') || verifiedEmail.toLowerCase().includes('teacher') || verifiedEmail.toLowerCase().includes('global')))
     ) {
-      completeTwoFactorAuth(verifiedEmail || 'ahmadwebcore@gmail.com', 'teacher');
+      completeTwoFactorAuth(verifiedEmail || (isTeacher ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'), roleMode);
       navigate('/dashboard', { replace: true });
       return;
     }
@@ -385,8 +374,8 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      // Success: establish teacher session
-      completeTwoFactorAuth(verifiedEmail, 'teacher');
+      // Success: establish session
+      completeTwoFactorAuth(verifiedEmail, roleMode);
       setIsSubmitting(false);
       navigate('/dashboard', { replace: true });
     } catch {
@@ -627,9 +616,11 @@ export const LoginPage: React.FC = () => {
                     <ShieldCheck className="w-4 h-4 shrink-0" />
                   </div>
                   <div>
-                    <span className="font-bold block text-zinc-900 leading-tight">Faculty Lead (Ahmad)</span>
+                    <span className="font-bold block text-zinc-900 leading-tight">
+                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Enrolled Scholar (Henza Noor)'}
+                    </span>
                     <span className="text-[10px] text-zinc-500 font-medium">
-                      Faculty Director &bull; BISE DG Khan
+                      {verifiedEmail} &bull; BISE DG Khan
                     </span>
                   </div>
                 </div>
@@ -830,17 +821,22 @@ export const LoginPage: React.FC = () => {
                             Verify & Enter Portal
                           </Button>
 
-                          {/* Quick Instant Access Button for Faculty */}
+                          {/* Quick Instant Access Button */}
                           <button
                             type="button"
                             onClick={() => {
-                              completeTwoFactorAuth(verifiedEmail || 'ahmadwebcore@gmail.com', 'teacher');
+                              completeTwoFactorAuth(
+                                verifiedEmail || (roleMode === 'teacher' ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'),
+                                roleMode
+                              );
                               navigate('/dashboard', { replace: true });
                             }}
                             className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-98"
                           >
                             <Zap className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Instant Faculty Lead Access (Ahmad)</span>
+                            <span>
+                              Instant {roleMode === 'teacher' ? 'Faculty Lead Access (Ahmad)' : 'Scholar Access (Henza Noor)'}
+                            </span>
                           </button>
 
                           {/* Collapsible Authenticator QR Code & Key Drawer */}
@@ -1045,17 +1041,22 @@ export const LoginPage: React.FC = () => {
                         Verify Email Code & Enter
                       </Button>
 
-                      {/* Quick Instant Access Button for Faculty */}
+                      {/* Quick Instant Access Button */}
                       <button
                         type="button"
                         onClick={() => {
-                          completeTwoFactorAuth(verifiedEmail || 'ahmadwebcore@gmail.com', 'teacher');
+                          completeTwoFactorAuth(
+                            verifiedEmail || (roleMode === 'teacher' ? 'ahmadwebcore@gmail.com' : 'henzanoor@gmail.com'),
+                            roleMode
+                          );
                           navigate('/dashboard', { replace: true });
                         }}
                         className="w-full py-2.5 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer active:scale-98"
                       >
                         <Zap className="w-3.5 h-3.5 text-sky-600" />
-                        <span>Instant Faculty Lead Access (Ahmad)</span>
+                        <span>
+                          Instant {roleMode === 'teacher' ? 'Faculty Lead Access (Ahmad)' : 'Scholar Access (Henza Noor)'}
+                        </span>
                       </button>
 
                       {/* Resend Code Button with Cooldown */}
