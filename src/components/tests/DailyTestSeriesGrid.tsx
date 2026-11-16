@@ -23,6 +23,7 @@ import { TestItem } from '../../types';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
 import { testService } from '../../services/testService';
 import { integrationService } from '../../services/integrationService';
+import { PDFViewerModal } from '../books/PDFViewerModal';
 
 interface DailyTestSeriesGridProps {
   tests: TestItem[];
@@ -45,6 +46,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   const [selectedStatusFilter] = useState<string>('all');
   const [hideCompleted, setHideCompleted] = useState<boolean>(false);
   const [activePopupTest, setActivePopupTest] = useState<TestItem | null>(null);
+  const [pdfViewerTest, setPdfViewerTest] = useState<TestItem | null>(null);
 
   // Completed / Graded local map for reactive live status
   const [completedMap, setCompletedMap] = useState<Record<string, { status: TestDisplayStatus; score?: number }>>(() => {
@@ -479,16 +481,31 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     </h4>
                   </div>
 
-                  {/* Bottom Timing / Unlocks Indicator */}
-                  <div className="mt-3 pt-2 border-t border-zinc-800 flex items-center justify-between text-[10px]">
+                  {/* Bottom Timing / Unlocks Indicator & Quick PDF Viewer */}
+                  <div className="mt-3 pt-2 border-t border-zinc-800 flex items-center justify-between text-[10px] gap-1">
                     <span className="text-zinc-400 font-medium truncate flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-zinc-500 shrink-0" />
                       <span>{test.date}</span>
                     </span>
 
-                    <span className="text-[10px] font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors shrink-0">
-                      View &rarr;
-                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPdfViewerTest(test);
+                        }}
+                        className="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-emerald-400 border border-zinc-700 font-bold text-[9px] transition-colors flex items-center gap-0.5 cursor-pointer shadow-2xs"
+                        title="View attached chapter and pages in textbook PDF"
+                      >
+                        <BookOpen className="w-2.5 h-2.5" />
+                        <span>PDF</span>
+                      </button>
+
+                      <span className="text-[10px] font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                        View &rarr;
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
@@ -674,6 +691,15 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
                     <span>WhatsApp</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPdfViewerTest(activePopupTest)}
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-emerald-300 border border-zinc-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>View Test in PDF</span>
+                  </button>
                 </div>
 
                 {!meta.isLocked && (
@@ -715,6 +741,19 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           document.body
         );
       })()}
+
+      {/* Textbook PDF Viewer Modal */}
+      {pdfViewerTest && (
+        <PDFViewerModal
+          isOpen={!!pdfViewerTest}
+          onClose={() => setPdfViewerTest(null)}
+          testId={pdfViewerTest.id}
+          testTitle={pdfViewerTest.title}
+          subjectCode={pdfViewerTest.subjectCode}
+          subjectName={pdfViewerTest.subjectName}
+          syllabusCoverage={pdfViewerTest.syllabusCoverage}
+        />
+      )}
     </div>
   );
 };

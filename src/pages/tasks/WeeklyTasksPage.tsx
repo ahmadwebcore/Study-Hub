@@ -22,6 +22,7 @@ import { taskService, DailyTask } from '../../services/taskService';
 import { subjectService } from '../../services/subjectService';
 import { mediaService } from '../../services/mediaService';
 import { Subject } from '../../types';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 import { useRole } from '../../hooks/useRole';
 
 export const WeeklyTasksPage: React.FC = () => {
@@ -32,6 +33,7 @@ export const WeeklyTasksPage: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [pdfTaskTarget, setPdfTaskTarget] = useState<DailyTask | null>(null);
 
   // Modals state
   const [submittingTask, setSubmittingTask] = useState<DailyTask | null>(null);
@@ -732,6 +734,16 @@ export const WeeklyTasksPage: React.FC = () => {
 
                   {/* Actions based on Role and Status */}
                   <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setPdfTaskTarget(task)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer"
+                      title="View attached textbook chapter & pages in PDF reader"
+                    >
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>View in PDF {task.pagesRange ? `(${task.pagesRange})` : ''}</span>
+                    </button>
+
                     {/* Student Action: Submit Work */}
                     {task.status !== 'approved' && (
                       <Button
@@ -1346,7 +1358,20 @@ export const WeeklyTasksPage: React.FC = () => {
             </div>
           </form>
         )}
-      </Modal>
+            </Modal>
+
+      {/* PDF Textbook Reader Modal with Attached Pages */}
+      {pdfTaskTarget && (
+        <PDFViewerModal
+          isOpen={true}
+          onClose={() => setPdfTaskTarget(null)}
+          testTitle={pdfTaskTarget.title}
+          subjectCode={pdfTaskTarget.subjectCode}
+          subjectName={pdfTaskTarget.subjectName}
+          pagesRange={pdfTaskTarget.pagesRange}
+          syllabusCoverage={pdfTaskTarget.description}
+        />
+      )}
     </div>
   );
 };

@@ -2,14 +2,19 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { BookItem } from '../types';
 import { SAMPLE_BOOKS } from '../data/sampleData';
 
-const BOOKS_STORAGE_KEY = 'studyhub_custom_books_v3';
+const BOOKS_STORAGE_KEY = 'studyhub_custom_books_v5';
 
 export function getLocalBooks(): BookItem[] {
   try {
     const raw = localStorage.getItem(BOOKS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    saveLocalBooks(SAMPLE_BOOKS);
+    return SAMPLE_BOOKS;
   } catch {
-    return [];
+    return SAMPLE_BOOKS;
   }
 }
 

@@ -13,7 +13,7 @@ export interface DirectChatMessage {
   read: boolean;
 }
 
-const STORAGE_KEY = 'studyhub_direct_chat_v1';
+const STORAGE_KEY = 'gsa_direct_chat_v3';
 
 const INITIAL_MESSAGES: DirectChatMessage[] = [
   {
@@ -21,7 +21,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
     senderId: 'usr_t_01',
     senderName: 'Ahmad',
     senderRole: 'teacher',
-    text: 'Assalam-o-Alaikum! Welcome to your private 1-on-1 StudyHub portal. We have a target to complete all 6 books before February 28th. How is your revision going?',
+    text: 'Assalam-o-Alaikum! Welcome to your Global Science Academy (Fatehpur) study portal. We have a target to complete all 7 books before February 28th. How is your revision going?',
     timestamp: 'Yesterday at 04:30 PM',
     isoTime: new Date(Date.now() - 86400000).toISOString(),
     read: true,
@@ -31,7 +31,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
     senderId: 'usr_s_01',
     senderName: 'Henza Noor',
     senderRole: 'student',
-    text: 'Walaikum Assalam Sir Ahmad! I have started the Computer Science and Urdu chapters. The daily reading quotas are very clear.',
+    text: 'Walaikum Assalam Sir Ahmad! I have started the daily study quota and test series according to the 7-book schedule. The daily tasks are clear.',
     timestamp: 'Yesterday at 05:15 PM',
     isoTime: new Date(Date.now() - 82800000).toISOString(),
     read: true,
@@ -41,7 +41,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
     senderId: 'usr_t_01',
     senderName: 'Ahmad',
     senderRole: 'teacher',
-    text: 'Excellent. Remember each daily test has 30 marks (passing is 15). Keep your handwriting clean and always attempt every short question. You can ask me any questions directly here.',
+    text: 'Excellent. Remember each daily test has 30 marks (passing is 15). Keep your handwriting clean and review the attached textbook pages before attempting. You can ask me any questions directly here.',
     timestamp: 'Yesterday at 05:30 PM',
     isoTime: new Date(Date.now() - 82000000).toISOString(),
     read: true,
@@ -61,7 +61,7 @@ const INITIAL_MESSAGES: DirectChatMessage[] = [
     senderId: 'usr_t_01',
     senderName: 'Ahmad',
     senderRole: 'teacher',
-    text: 'Good luck! Be sure to draw the 400m track baton exchange zones clearly with a pencil.',
+    text: 'Good luck! Be sure to review all board short questions and diagrams carefully.',
     timestamp: 'Today at 09:25 AM',
     isoTime: new Date(Date.now() - 13500000).toISOString(),
     read: true,

@@ -29,8 +29,8 @@ export interface AIProviderConfig {
   model: string;
 }
 
-const STORAGE_KEY_AI_CONFIG = 'studyhub_ai_config_v2';
-const STORAGE_KEY_CHAT_HISTORY = 'studyhub_ai_chat_history_v3';
+const STORAGE_KEY_AI_CONFIG = 'gsa_ai_config_v3';
+const STORAGE_KEY_CHAT_HISTORY = 'gsa_academic_chat_history_v6';
 
 // 1st Year Intermediate Computer Science Academic Knowledge Base
 const CS_KNOWLEDGE = [
@@ -340,8 +340,8 @@ export class AIStudyBotService {
     // Clean minimal default initial greeting - no suggestion buttons
     return [
       {
-        id: 'msg_hi',
-        sender: 'assistant',
+        id: 'msg_u_init',
+        sender: 'user',
         text: 'Hi',
         timestamp: 'Just now',
       },

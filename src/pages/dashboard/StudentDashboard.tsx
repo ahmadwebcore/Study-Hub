@@ -27,6 +27,7 @@ import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
 import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
 import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 
 export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
@@ -38,6 +39,7 @@ export const StudentDashboard: React.FC = () => {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
   const [isDailyWelcomeOpen, setIsDailyWelcomeOpen] = useState(false);
+  const [pdfModalData, setPdfModalData] = useState<{ isOpen: boolean; test?: TestItem; task?: DailyTask } | null>(null);
 
   const todayStr = new Date().toISOString().slice(0, 10);
 
@@ -209,14 +211,23 @@ export const StudentDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-2 border-t border-zinc-800 flex items-center gap-2">
+            <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center gap-2">
               {activeTodayTask ? (
                 <>
+                  <button
+                    type="button"
+                    onClick={() => setPdfModalData({ isOpen: true, task: activeTodayTask })}
+                    className="inline-flex items-center gap-1.5 py-2 px-3 text-xs font-semibold text-emerald-300 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/60 rounded-xl transition-all cursor-pointer"
+                    title="View attached textbook pages in PDF"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>View in PDF {activeTodayTask.pagesRange ? `(${activeTodayTask.pagesRange})` : ''}</span>
+                  </button>
                   <Link
                     to="/weekly-tasks"
                     className="flex-1 py-2 px-3 text-center text-xs font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl transition-colors"
                   >
-                    View Weekly Schedule
+                    Weekly Tasks
                   </Link>
                   <button
                     type="button"
@@ -261,16 +272,27 @@ export const StudentDashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-2 border-t border-zinc-800 flex items-center gap-2">
+            <div className="pt-2 border-t border-zinc-800 flex flex-wrap items-center gap-2">
               {activeTodayTest ? (
-                <Link
-                  to={`/test-submit?testId=${activeTodayTest.id}`}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
-                >
-                  <FileCheck2 className="w-3.5 h-3.5 text-white" />
-                  <span>Start 30-Mark Test</span>
-                  <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-                </Link>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setPdfModalData({ isOpen: true, test: activeTodayTest })}
+                    className="inline-flex items-center gap-1.5 py-2.5 px-3 text-xs font-semibold text-emerald-300 bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/60 rounded-xl transition-all cursor-pointer"
+                    title="View test chapter & 30-mark past paper questions in PDF"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>View Test in PDF</span>
+                  </button>
+                  <Link
+                    to={`/test-submit?testId=${activeTodayTest.id}`}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                  >
+                    <FileCheck2 className="w-3.5 h-3.5 text-white" />
+                    <span>Start 30-Mark Test</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+                  </Link>
+                </>
               ) : (
                 <Link
                   to="/library"
@@ -485,6 +507,20 @@ export const StudentDashboard: React.FC = () => {
         isOpen={isBoardModalOpen}
         onClose={() => setIsBoardModalOpen(false)}
       />
+
+      {/* PDF Textbook Reader Modal with Attached Pages */}
+      {pdfModalData?.isOpen && (
+        <PDFViewerModal
+          isOpen={true}
+          onClose={() => setPdfModalData(null)}
+          testId={pdfModalData.test?.id}
+          testTitle={pdfModalData.test?.title || pdfModalData.task?.title}
+          subjectCode={pdfModalData.test?.subjectCode || pdfModalData.task?.subjectCode}
+          subjectName={pdfModalData.test?.subjectName || pdfModalData.task?.subjectName}
+          pagesRange={pdfModalData.task?.pagesRange}
+          syllabusCoverage={pdfModalData.test?.syllabusCoverage || pdfModalData.task?.description}
+        />
+      )}
     </div>
   );
 };

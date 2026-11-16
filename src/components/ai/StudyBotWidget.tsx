@@ -32,14 +32,20 @@ export const StudyBotWidget: React.FC = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const loadAllChatData = () => {
     setMessages(aiStudyBotService.getChatHistory());
     setTeacherMessages(directChatService.getMessages());
+  };
+
+  useEffect(() => {
+    loadAllChatData();
   }, []);
 
   useEffect(() => {
     if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
     }
   }, [messages, teacherMessages, chatSource, isOpen]);
 
@@ -48,7 +54,7 @@ export const StudyBotWidget: React.FC = () => {
     if (!text || isLoading) return;
 
     if (chatSource === 'teacher') {
-      // Direct talk with Faculty Lead Ahmad
+      // Direct message with Faculty Lead Ahmad
       const newMsg = directChatService.sendMessage({
         text,
         senderRole: 'student',
@@ -58,7 +64,7 @@ export const StudyBotWidget: React.FC = () => {
       return;
     }
 
-    // AI Study Assistant Mode
+    // Academic Tutor Mode
     const userMsg: AIChatMessage = {
       id: `msg_u_${Date.now()}`,
       sender: 'user',
@@ -97,9 +103,6 @@ export const StudyBotWidget: React.FC = () => {
       text: result.messageText,
       actionExecuted: result.actionExecuted,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      actions: [
-        { id: 'act_check', label: 'View Certified Marks (28/30)', actionType: 'check_marks' },
-      ],
     };
     const updated = [...messages, actionMsg];
     setMessages(updated);
@@ -123,55 +126,57 @@ export const StudyBotWidget: React.FC = () => {
       {/* Floating Launcher Button */}
       {!isOpen && (
         <>
-          {/* Mobile Compact Circular FAB */}
+          {/* Mobile Compact Circular Button */}
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="sm:hidden flex items-center justify-center w-12 h-12 rounded-full bg-[#142D27] text-white shadow-xl active:scale-90 transition-all border border-emerald-400/40 relative"
-            aria-label="Open Academic Study Assistant"
+            className="sm:hidden flex items-center justify-center w-12 h-12 rounded-full bg-[#18181b] text-white shadow-xl active:scale-90 transition-all border border-emerald-500/40 relative"
+            aria-label="Open Academic Desk"
           >
-            <GraduationCap className="w-5 h-5 text-emerald-300" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27] animate-ping" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#142D27]" />
+            <GraduationCap className="w-5 h-5 text-emerald-400" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#18181b] animate-ping" />
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-[#18181b]" />
           </button>
 
           {/* Desktop Full Pill */}
           <button
             type="button"
             onClick={() => setIsOpen(true)}
-            className="hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-full bg-[#142D27] hover:bg-[#193a32] text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-emerald-500/30"
-            aria-label="Open Academic Study Assistant"
+            className="hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-full bg-[#18181b] hover:bg-zinc-800 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all border border-zinc-700/80 cursor-pointer"
+            aria-label="Open Global Science Academy Academic Desk"
           >
             <div className="relative">
-              <GraduationCap className="w-5 h-5 text-emerald-300" />
+              <div className="w-8 h-8 rounded-full bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-emerald-400" />
+              </div>
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             </div>
             <div className="text-left">
-              <span className="block text-xs font-bold tracking-tight">GSA Academic Tutor</span>
-              <span className="block text-[10px] text-emerald-200 font-medium">Ahmad &amp; Senior Faculty</span>
+              <span className="block text-xs font-bold tracking-tight text-zinc-100">Global Science Academy</span>
+              <span className="block text-[10px] text-emerald-400 font-medium">Fatehpur &bull; Academic Desk</span>
             </div>
           </button>
         </>
       )}
 
-      {/* Slide-over Chat Box (Crisp Light-Themed Professional UI) */}
+      {/* Slide-over Chat Box (Executive Light-Black Aesthetic) */}
       {isOpen && (
-        <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[420px] sm:h-[600px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-white rounded-3xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-zinc-900">
+        <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[430px] sm:h-[620px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-[#141518] rounded-3xl border border-zinc-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-zinc-100">
           {/* Header */}
-          <div className="p-3.5 bg-[#142D27] text-white flex items-center justify-between shrink-0">
+          <div className="p-3.5 bg-[#18181b] border-b border-zinc-800 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-4 h-4 text-emerald-300" />
+              <div className="w-8 h-8 rounded-xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                <GraduationCap className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <h4 className="text-xs font-bold flex items-center gap-1.5 text-white">
-                  Global Science Academy Tutor
+                <h4 className="text-xs font-bold flex items-center gap-1.5 text-zinc-100">
+                  Global Science Academy
                   <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                    Live
+                    Fatehpur &bull; Live
                   </span>
                 </h4>
-                <p className="text-[10px] text-zinc-300">
-                  Fatehpur &bull; English, Urdu &amp; Roman Urdu
+                <p className="text-[10px] text-zinc-400">
+                  Academic Support &amp; Evaluation &bull; Henza Noor
                 </p>
               </div>
             </div>
@@ -180,15 +185,15 @@ export const StudyBotWidget: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowSettings(!showSettings)}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-                title="AI Provider Settings (OpenAI / Gemini)"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                title="AI Provider Settings"
               >
                 <Settings className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
                 aria-label="Close Chat"
               >
                 <X className="w-4 h-4" />
@@ -196,46 +201,46 @@ export const StudyBotWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Mode Switcher: Academic Tutor vs Direct with Ahmad (Teacher) */}
-          <div className="grid grid-cols-2 p-1.5 bg-[#F7F9F8] border-b border-zinc-200 text-xs">
+          {/* Mode Switcher: Academic Tutor vs Faculty Lead (Ahmad) */}
+          <div className="grid grid-cols-2 p-1.5 bg-[#18181b]/90 border-b border-zinc-800 text-xs gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => setChatSource('ai')}
-              className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 chatSource === 'ai'
-                  ? 'bg-white text-[#142D27] shadow-xs border border-zinc-200'
-                  : 'text-zinc-500 hover:text-zinc-800'
+                  ? 'bg-zinc-800 text-emerald-400 shadow-xs border border-zinc-700'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
               }`}
             >
-              <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
+              <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
               <span>Academic Tutor</span>
             </button>
             <button
               type="button"
               onClick={() => setChatSource('teacher')}
-              className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                 chatSource === 'teacher'
-                  ? 'bg-white text-[#142D27] shadow-xs border border-zinc-200'
-                  : 'text-zinc-500 hover:text-zinc-800'
+                  ? 'bg-zinc-800 text-blue-400 shadow-xs border border-zinc-700'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
               }`}
             >
-              <UserCheck className="w-3.5 h-3.5 text-blue-600" />
+              <UserCheck className="w-3.5 h-3.5 text-blue-400" />
               <span>Faculty Lead (Ahmad)</span>
             </button>
           </div>
 
           {/* Settings Sub-modal */}
           {showSettings && (
-            <div className="p-3 bg-zinc-50 border-b border-zinc-200 text-xs space-y-2.5 animate-in fade-in duration-150 shrink-0">
+            <div className="p-3 bg-[#18181b] border-b border-zinc-800 text-xs space-y-2.5 animate-in fade-in duration-150 shrink-0 text-zinc-200">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-zinc-900 flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-emerald-600" />
-                  AI Provider Configuration
+                <span className="font-bold text-zinc-100 flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-emerald-400" />
+                  AI Engine Configuration
                 </span>
-                <span className="text-[10px] text-zinc-500">Settings</span>
+                <span className="text-[10px] text-zinc-400">Settings</span>
               </div>
-              <p className="text-[11px] text-zinc-600">
-                You can insert your Google Gemini or OpenAI key anytime. The system works out-of-the-box with built-in intelligence.
+              <p className="text-[11px] text-zinc-400">
+                Works automatically with offline intelligence or custom API keys.
               </p>
               <form onSubmit={handleSaveSettings} className="space-y-2">
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -244,48 +249,36 @@ export const StudyBotWidget: React.FC = () => {
                     onChange={(e) =>
                       setConfig({ ...config, provider: e.target.value as any })
                     }
-                    className="px-2 py-1.5 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-800 focus:outline-none focus:border-emerald-600"
+                    className="px-2 py-1.5 rounded-lg border border-zinc-700 text-xs bg-zinc-900 text-zinc-100 focus:outline-none focus:border-emerald-500"
                   >
-                    <option value="openai">OpenAI (GPT-4o Mini / GPT-4o)</option>
+                    <option value="openai">OpenAI (GPT-4o Mini)</option>
                     <option value="gemini">Google Gemini (Gemini 1.5)</option>
-                    <option value="anthropic">Anthropic Claude</option>
                     <option value="offline">Offline Academic Model</option>
                   </select>
 
-                  {config.provider === 'openai' && (
-                    <select
-                      value={config.model || 'gpt-4o-mini'}
-                      onChange={(e) => setConfig({ ...config, model: e.target.value })}
-                      className="px-2 py-1.5 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-800 focus:outline-none"
-                    >
-                      <option value="gpt-4o-mini">gpt-4o-mini (Fast &amp; Accurate - Recommended)</option>
-                      <option value="gpt-4o">gpt-4o (Deep Reasoning)</option>
-                    </select>
-                  )}
-
                   <input
                     type="password"
-                    placeholder="API Key (sk-...)"
+                    placeholder="API Key"
                     value={config.apiKey}
                     onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
-                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 text-xs bg-white text-zinc-800 focus:outline-none focus:border-emerald-600 font-mono"
+                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-zinc-700 text-xs bg-zinc-900 text-zinc-100 focus:outline-none focus:border-emerald-500 font-mono"
                   />
                 </div>
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                  <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    OpenAI Key Live
+                    Engine Active
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setShowSettings(false)}
-                      className="px-2.5 py-1 text-xs text-zinc-600 hover:text-zinc-900"
+                      className="px-2.5 py-1 text-xs text-zinc-400 hover:text-zinc-200 cursor-pointer"
                     >
                       Cancel
                     </button>
                     <Button type="submit" variant="primary" size="sm">
-                      Save Key
+                      Save
                     </Button>
                   </div>
                 </div>
@@ -293,30 +286,30 @@ export const StudyBotWidget: React.FC = () => {
             </div>
           )}
 
-          {/* Teacher Mode Banner */}
+          {/* Teacher Mode Direct Banner */}
           {chatSource === 'teacher' && (
-            <div className="p-2.5 bg-blue-50 border-b border-blue-200 flex items-center gap-2 text-xs shrink-0">
-              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span className="text-blue-900 font-semibold">
+            <div className="p-2.5 bg-blue-950/40 border-b border-blue-800/40 flex items-center gap-2 text-xs shrink-0">
+              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-blue-300 font-semibold text-[11px]">
                 Direct Academic Channel with Ahmad (Faculty Lead Evaluator)
               </span>
             </div>
           )}
 
-          {/* Messages Scroll Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#FAFCFB]">
+          {/* Messages Scroll Area (Deep Sleek Dark Surface with Clear Contrasting Bubbles) */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#101114]">
             {chatSource === 'ai' ? (
-              // AI Messages
+              // AI / Academic Tutor Messages
               messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[92%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                    className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-sm'
-                        : 'bg-[#121316] text-zinc-100 border border-zinc-800 rounded-tl-xs shadow-md'
+                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-md'
+                        : 'bg-[#18181b] text-zinc-100 border border-zinc-700/80 rounded-tl-xs shadow-md'
                     }`}
                   >
                     {/* Action Executed Banner */}
@@ -327,43 +320,55 @@ export const StudyBotWidget: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Message Text - Bold & Direct */}
-                    <p className={`whitespace-pre-line text-[12px] leading-relaxed font-bold ${msg.sender === 'user' ? 'text-white' : 'text-zinc-100'}`}>
+                    {/* Sender Header */}
+                    <div className="flex items-center gap-1.5 mb-1.5 text-[10px]">
+                      <span className={msg.sender === 'user' ? 'text-emerald-100 font-bold' : 'text-emerald-400 font-bold'}>
+                        {msg.sender === 'user' ? 'You (Henza)' : 'GSA Academic Tutor'}
+                      </span>
+                      {msg.sender === 'assistant' && (
+                        <span className="px-1.5 py-0.2 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[8px] font-bold">
+                          Verified
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Message Body */}
+                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${msg.sender === 'user' ? 'text-white' : 'text-zinc-100'}`}>
                       {msg.text}
                     </p>
 
-                    {/* Urdu Explanation */}
+                    {/* Urdu Nastaliq Content if present */}
                     {msg.urduText && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-800 space-y-2">
-                        <p className="font-urdu text-[13px] text-zinc-200 leading-relaxed text-right dir-rtl whitespace-pre-line font-bold">
+                      <div className="mt-2.5 pt-2 border-t border-zinc-700/60 space-y-1.5">
+                        <p className="font-urdu text-[13px] text-zinc-200 leading-relaxed text-right dir-rtl whitespace-pre-line font-medium">
                           {msg.urduText}
                         </p>
                       </div>
                     )}
 
-                    {/* Practical Analogy Box */}
+                    {/* Practical Analogy if present */}
                     {msg.analogy && (
-                      <div className="mt-2 p-2.5 rounded-xl bg-zinc-850 bg-zinc-900/90 border border-zinc-700/80 text-[11px] text-zinc-300 leading-relaxed whitespace-pre-line">
+                      <div className="mt-2 p-2.5 rounded-xl bg-zinc-900 border border-zinc-700/80 text-[11px] text-zinc-300 leading-relaxed whitespace-pre-line">
                         {msg.analogy}
                       </div>
                     )}
 
-                    {/* Code snippet or Diagram */}
+                    {/* Code snippet if present */}
                     {msg.codeSnippet && (
                       <div className="mt-2 p-2.5 rounded-lg bg-black text-emerald-400 font-mono text-[10px] overflow-x-auto whitespace-pre border border-zinc-800">
                         {msg.codeSnippet}
                       </div>
                     )}
 
-                    {/* Single Suggestion Pill at Bottom */}
+                    {/* Action buttons only if explicitly provided for interactive actions */}
                     {msg.actions && msg.actions.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-800 flex items-center">
-                        {msg.actions.slice(0, 1).map((act) => (
+                      <div className="mt-2.5 pt-2 border-t border-zinc-700/60 flex items-center">
+                        {msg.actions.map((act) => (
                           <button
                             key={act.id}
                             type="button"
                             onClick={() => handleActionClick(act)}
-                            className="px-2.5 py-1 rounded-lg bg-zinc-800/90 hover:bg-zinc-700 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs"
+                            className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
                           >
                             <Zap className="w-3 h-3 text-emerald-400" />
                             <span>{act.label}</span>
@@ -373,63 +378,72 @@ export const StudyBotWidget: React.FC = () => {
                     )}
 
                     {/* Message Footer */}
-                    <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-zinc-800/60">
-                      <span>{msg.timestamp}</span>
-                      {msg.sender === 'assistant' && (
+                    <div className="mt-2 flex items-center justify-between text-[10px] pt-1.5 border-t border-white/10">
+                      <span className={msg.sender === 'user' ? 'text-emerald-100' : 'text-zinc-400'}>
+                        {msg.timestamp}
+                      </span>
+                      {msg.sender === 'assistant' ? (
                         <button
                           type="button"
                           onClick={() => handleCopyText(msg.id, msg.text)}
-                          className="text-zinc-400 hover:text-zinc-200 flex items-center gap-1"
+                          className="text-zinc-400 hover:text-zinc-200 flex items-center gap-1 cursor-pointer"
                         >
                           {copiedId === msg.id ? (
                             <>
                               <CheckCheck className="w-3 h-3 text-emerald-400" />
-                              <span>Copied</span>
+                              <span className="text-[9px]">Copied</span>
                             </>
                           ) : (
                             <>
                               <Copy className="w-3 h-3" />
-                              <span>Copy</span>
+                              <span className="text-[9px]">Copy</span>
                             </>
                           )}
                         </button>
+                      ) : (
+                        <span className="text-white font-bold text-[9px]">✓✓</span>
                       )}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              // Teacher Direct Messages
+              // Faculty Lead (Ahmad) Direct Messages
               teacherMessages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${msg.senderRole === 'student' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
+                    className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                       msg.senderRole === 'student'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200 rounded-tl-xs shadow-2xs'
+                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-md'
+                        : 'bg-[#18181b] text-zinc-100 border border-zinc-700/80 rounded-tl-xs shadow-md'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1 text-[10px] font-semibold">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-600 font-bold'}>
+                    {/* Header: Sender & Badge */}
+                    <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-semibold">
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-100 font-bold' : 'text-blue-400 font-bold'}>
                         {msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}
                       </span>
                       {msg.senderRole === 'teacher' && (
-                        <span className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[8px] font-bold">
-                          Verified
+                        <span className="px-1.5 py-0.5 rounded-md bg-blue-950/80 text-blue-300 border border-blue-800/60 text-[8px] font-bold">
+                          Faculty Director
                         </span>
                       )}
                     </div>
-                    <p className={`whitespace-pre-line text-xs font-medium leading-relaxed ${msg.senderRole === 'student' ? 'text-white' : 'text-zinc-900'}`}>
+
+                    {/* Message Body */}
+                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${msg.senderRole === 'student' ? 'text-white' : 'text-zinc-100'}`}>
                       {msg.text}
                     </p>
-                    <div className="mt-1 flex items-center justify-end text-[9px] gap-1">
+
+                    {/* Footer */}
+                    <div className="mt-2 flex items-center justify-end text-[9px] gap-1 pt-1.5 border-t border-white/10">
                       <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-zinc-400'}>
                         {msg.timestamp}
                       </span>
-                      {msg.senderRole === 'student' && <span className="text-white/90 font-bold">✓✓</span>}
+                      {msg.senderRole === 'student' && <span className="text-white font-bold">✓✓</span>}
                     </div>
                   </div>
                 </div>
@@ -437,10 +451,10 @@ export const StudyBotWidget: React.FC = () => {
             )}
 
             {isLoading && (
-              <div className="flex items-center gap-1.5 bg-white border border-zinc-200 px-3.5 py-2.5 rounded-2xl rounded-tl-xs shadow-2xs w-fit">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:-0.3s]"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:-0.15s]"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce"></span>
+              <div className="flex items-center gap-1.5 bg-[#18181b] border border-zinc-700/80 px-3.5 py-2.5 rounded-2xl rounded-tl-xs shadow-2xs w-fit">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.3s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.15s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce"></span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -452,7 +466,7 @@ export const StudyBotWidget: React.FC = () => {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="p-2.5 bg-white border-t border-zinc-200 flex items-center gap-2 shrink-0"
+            className="p-3 bg-[#18181b] border-t border-zinc-800 flex items-center gap-2 shrink-0"
           >
             <input
               type="text"
@@ -463,12 +477,12 @@ export const StudyBotWidget: React.FC = () => {
               }
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
-              className="flex-1 px-3 py-2 text-xs rounded-xl border border-zinc-200 bg-zinc-50 focus:bg-white focus:outline-none focus:border-emerald-600 text-zinc-900 placeholder-zinc-400"
+              className="flex-1 px-3.5 py-2 text-xs rounded-xl border border-zinc-700 bg-zinc-900 focus:bg-zinc-850 focus:outline-none focus:border-emerald-500 text-zinc-100 placeholder-zinc-500"
             />
             <button
               type="submit"
               disabled={!inputQuery.trim() || isLoading}
-              className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white transition-all shadow-xs active:scale-95 shrink-0"
+              className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer"
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />

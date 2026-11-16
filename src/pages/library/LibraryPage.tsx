@@ -8,7 +8,6 @@ import {
   Download,
   Eye,
   Search,
-  FileText,
   Trash2,
   CheckCircle,
   FileUp,
@@ -22,6 +21,7 @@ import { Modal } from '../../components/ui/Modal';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CircularProgress } from '../../components/ui/CircularProgress';
 import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 import { BookItem, Subject } from '../../types';
 import { useRole } from '../../hooks/useRole';
 import { bookService } from '../../services/bookService';
@@ -841,60 +841,20 @@ export const LibraryPage: React.FC = () => {
         )}
       </Modal>
 
-      {/* Document Reader / Preview Modal */}
-      <Modal
-        isOpen={!!previewBook}
-        onClose={() => setPreviewBook(null)}
-        title={previewBook?.title || 'Document Reader'}
-        description={`Published in ${previewBook?.subjectName} (${previewBook?.category}).`}
-      >
-        {previewBook && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-[#e8f8f0]/50 border border-[#14B866]/30 flex items-start justify-between gap-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#14B866] bg-white px-2 py-0.5 rounded">
-                  {previewBook.category}
-                </span>
-                <h4 className="text-sm font-bold text-[#142D27] mt-1.5">{previewBook.title}</h4>
-                <p className="text-xs text-[#557067] mt-1">{previewBook.description}</p>
-              </div>
-              <Badge variant="primary" size="sm">
-                v{previewBook.version}.0
-              </Badge>
-            </div>
-
-            {/* Simulated Reader Container */}
-            <div className="p-6 rounded-2xl bg-white border border-[#e1ede7] text-center space-y-3 shadow-subtle">
-              <div className="w-12 h-12 rounded-2xl bg-[#E7EFEA] flex items-center justify-center mx-auto text-[#142D27]">
-                <FileText className="w-6 h-6 text-[#14B866]" />
-              </div>
-              <div>
-                <h5 className="text-xs font-bold text-[#142D27]">{previewBook.fileName}</h5>
-                <p className="text-[11px] text-[#7d9990] mt-0.5">
-                  Certified Academic File &bull; {previewBook.fileSize} &bull; Stored in private Supabase bucket
-                </p>
-              </div>
-              <p className="text-xs text-[#557067] max-w-sm mx-auto leading-relaxed italic">
-                "Previewing authenticated chapter excerpts and verified mathematical derivations."
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <Button variant="ghost" size="sm" onClick={() => setPreviewBook(null)}>
-                Close Reader
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                icon={<Download className="w-3.5 h-3.5" />}
-                onClick={() => handleDownload(previewBook)}
-              >
-                Download Full Book ({previewBook.fileSize})
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
+      {/* Full Interactive PDF Reader Modal for 7 Books */}
+      {previewBook && (
+        <PDFViewerModal
+          isOpen={!!previewBook}
+          onClose={() => setPreviewBook(null)}
+          bookId={previewBook.id}
+          bookTitle={previewBook.title}
+          bookCoverUrl={previewBook.coverUrl || previewBook.fileUrl}
+          pdfFileName={previewBook.fileName}
+          totalPages={previewBook.totalPages}
+          subjectCode={previewBook.subjectCode}
+          subjectName={previewBook.subjectName}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal

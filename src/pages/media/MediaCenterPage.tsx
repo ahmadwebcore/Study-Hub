@@ -21,6 +21,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { mediaService, MediaItem } from '../../services/mediaService';
 import { taskService } from '../../services/taskService';
 import { SAMPLE_SUBJECTS } from '../../data/sampleData';
+import { BookOpen } from 'lucide-react';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 
 export const MediaCenterPage: React.FC = () => {
   const { role, profile } = useAuth();
@@ -41,6 +43,7 @@ export const MediaCenterPage: React.FC = () => {
 
   // Item Preview Modal State
   const [previewItem, setPreviewItem] = useState<MediaItem | null>(null);
+  const [isPdfReaderOpen, setIsPdfReaderOpen] = useState(false);
 
   useEffect(() => {
     loadItems();
@@ -599,7 +602,19 @@ export const MediaCenterPage: React.FC = () => {
                 Uploaded by {previewItem.uploadedBy}
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                {previewItem.fileType === 'pdf' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsPdfReaderOpen(true)}
+                    className="border-emerald-600/40 text-emerald-700 hover:bg-emerald-50"
+                  >
+                    <BookOpen className="w-4 h-4 mr-1.5 text-emerald-600" />
+                    Open in PDF Reader
+                  </Button>
+                )}
+
                 {!previewItem.tasksGenerated && (
                   <Button
                     variant="primary"
@@ -624,7 +639,20 @@ export const MediaCenterPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </Modal>
+                </Modal>
+      )}
+
+      {/* Interactive PDF Reader for Media Items */}
+      {isPdfReaderOpen && previewItem && (
+        <PDFViewerModal
+          isOpen={true}
+          onClose={() => setIsPdfReaderOpen(false)}
+          bookTitle={previewItem.name}
+          bookCoverUrl={previewItem.thumbnailUrl || previewItem.fileUrl}
+          pdfFileName={previewItem.originalName}
+          subjectName={previewItem.subjectName}
+          syllabusCoverage={previewItem.description}
+        />
       )}
     </div>
   );
