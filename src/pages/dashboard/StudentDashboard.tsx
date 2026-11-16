@@ -87,6 +87,21 @@ export const StudentDashboard: React.FC = () => {
   const activeTodayTask = todayTasks[0];
   const activeTodayTest = tests.find((t) => t.status === 'ongoing' || t.status === 'scheduled');
 
+  useEffect(() => {
+    if (isDailyWelcomeOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setIsDailyWelcomeOpen(false);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = original || 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isDailyWelcomeOpen]);
+
   const handleQuickCompleteQuota = (task?: DailyTask) => {
     const targetTask = task || todayTasks[0];
     if (targetTask) {
@@ -460,74 +475,85 @@ export const StudentDashboard: React.FC = () => {
       {/* DYNAMIC DAILY WELCOME POPUP MODAL (Portaled to body) */}
       {isDailyWelcomeOpen &&
         createPortal(
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl border border-zinc-200 max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 relative text-zinc-900">
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={handleDismissDailyWelcome}
-                className="absolute top-5 right-5 p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
-                aria-label="Dismiss Briefing"
-              >
-                <X className="w-4 h-4" />
-              </button>
-
-              {/* Institution Header Badge */}
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Global Science Academy &bull; Fatehpur</span>
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
+            onClick={handleDismissDailyWelcome}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl border border-zinc-200 max-w-lg w-full max-h-[92dvh] sm:max-h-[88vh] shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto animate-in zoom-in-95 duration-200"
+            >
+              {/* Header (Fixed) */}
+              <div className="shrink-0 p-5 sm:p-6 border-b border-zinc-100 bg-[#F7F9F8] flex items-start justify-between gap-3 relative">
+                <div className="space-y-1.5 min-w-0 flex-1">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Global Science Academy &bull; Fatehpur</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight font-serif text-zinc-900">
+                    Daily Briefing &bull; {studentName}
+                  </h2>
+                  <p className="text-xs text-zinc-500 font-medium flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>{formattedToday}</span>
+                    <span className="text-zinc-300">&bull;</span>
+                    <span>1st Year FA-IT (BISE DG Khan)</span>
+                  </p>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight font-serif text-zinc-900">
-                  Daily Briefing &bull; {studentName}
-                </h2>
-                <p className="text-xs text-zinc-500 font-medium flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>{formattedToday}</span>
-                  <span className="text-zinc-300">&bull;</span>
-                  <span>1st Year FA-IT (BISE DG Khan)</span>
-                </p>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleDismissDailyWelcome}
+                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/70 transition-colors cursor-pointer shrink-0 ml-1"
+                  aria-label="Dismiss Briefing"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
-              {/* Daily Checklist Cards */}
-              <div className="space-y-3 pt-1">
-                <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                    <BookOpen className="w-4 h-4" />
+              {/* Scrollable Body */}
+              <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4">
+                {/* Daily Checklist Cards */}
+                <div className="space-y-3">
+                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <BookOpen className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 space-y-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                        Reading Quota: 2.5 Pages Target
+                      </span>
+                      <h4 className="text-xs font-bold text-zinc-900">
+                        Computer Science: Read Pages 96–98
+                      </h4>
+                      <p className="text-[11px] text-zinc-600 leading-relaxed">
+                        Chapter 2: Information Networks. Review Network Topologies (Bus, Star, Ring, Mesh).
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                      Reading Quota: 2.5 Pages Target
-                    </span>
-                    <h4 className="text-xs font-bold text-zinc-900">
-                      Computer Science: Read Pages 96–98
-                    </h4>
-                    <p className="text-[11px] text-zinc-600 leading-relaxed">
-                      Chapter 2: Information Networks. Review Network Topologies (Bus, Star, Ring, Mesh).
-                    </p>
-                  </div>
-                </div>
 
-                <div className="p-4 rounded-2xl bg-white border border-emerald-200 flex items-start gap-3 shadow-2xs">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
-                    <Award className="w-4 h-4 text-emerald-700" />
-                  </div>
-                  <div className="flex-1 space-y-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                      Today's Assessment: 30 Marks
-                    </span>
-                    <h4 className="text-xs font-bold text-zinc-900">
-                      Chapter 2 Diagnostic Assessment
-                    </h4>
-                    <p className="text-[11px] text-zinc-600 leading-relaxed">
-                      10 MCQs + 4 Short Questions. Passing score is 15 marks. Evaluated by Ahmad.
-                    </p>
+                  <div className="p-4 rounded-2xl bg-white border border-emerald-200 flex items-start gap-3 shadow-2xs">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+                      <Award className="w-4 h-4 text-emerald-700" />
+                    </div>
+                    <div className="flex-1 space-y-0.5">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                        Today's Assessment: 30 Marks
+                      </span>
+                      <h4 className="text-xs font-bold text-zinc-900">
+                        Chapter 2 Diagnostic Assessment
+                      </h4>
+                      <p className="text-[11px] text-zinc-600 leading-relaxed">
+                        10 MCQs + 4 Short Questions. Passing score is 15 marks. Evaluated by Ahmad.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Primary Action Button */}
-              <div className="pt-2">
+              {/* Fixed Footer */}
+              <div className="shrink-0 p-4 sm:p-5 border-t border-zinc-100 bg-[#F7F9F8]">
                 <button
                   type="button"
                   onClick={handleDismissDailyWelcome}

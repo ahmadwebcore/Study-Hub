@@ -73,6 +73,22 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     };
   }, []);
 
+  // Lock body scroll and listen for Escape key when popup test is open
+  useEffect(() => {
+    if (activePopupTest) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setActivePopupTest(null);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = originalOverflow || 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [activePopupTest]);
+
   // Compute test timing, locking, and live evaluation status
   const getTestStatus = (test: TestItem): {
     status: TestDisplayStatus;
@@ -494,12 +510,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         const { day: modalDay, cleanTitle: modalCleanTitle, isUrdu: modalIsUrdu } = extractDayAndCleanTitle(activePopupTest.title, activePopupTest.date);
 
         return createPortal(
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-white rounded-3xl border border-zinc-200 shadow-2xl overflow-hidden flex flex-col text-zinc-900">
-              {/* Modal Header */}
-              <div className="p-4 sm:p-5 border-b border-[#e1ede7] bg-[#F7F9F8] flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
+            onClick={() => setActivePopupTest(null)}
+          >
+            <div
+              className="relative w-full max-w-lg max-h-[92dvh] sm:max-h-[88vh] bg-white rounded-3xl border border-zinc-200 shadow-2xl overflow-hidden flex flex-col text-zinc-900 my-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header (Fixed, shrink-0) */}
+              <div className="shrink-0 p-4 sm:p-5 border-b border-[#e1ede7] bg-[#F7F9F8] flex items-start justify-between gap-3">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 font-urdu-compact">
                       {modalDay}
                     </span>
@@ -518,7 +540,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <h3
                     className={`text-base font-bold text-[#142D27] mt-1.5 ${
                       modalIsUrdu
-                        ? 'font-urdu text-xl font-bold leading-loose text-right dir-rtl'
+                        ? 'font-urdu text-lg sm:text-xl font-bold leading-loose text-right dir-rtl'
                         : ''
                     }`}
                   >
@@ -532,14 +554,15 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <button
                   type="button"
                   onClick={() => setActivePopupTest(null)}
-                  className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                  className="p-2 rounded-xl text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/70 transition-colors cursor-pointer shrink-0 ml-1"
+                  aria-label="Close dialog"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Modal Body */}
-              <div className="p-4 sm:p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* Modal Body (Scrollable, flex-1) */}
+              <div className="flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5 space-y-4">
                 {/* Lock / Active Status Banner */}
                 {meta.isLocked && (
                   <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 text-xs flex items-start gap-2.5 text-zinc-700">
@@ -652,8 +675,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 </div>
               </div>
 
-              {/* Modal Actions Footer */}
-              <div className="p-3.5 border-t border-[#e1ede7] bg-[#F7F9F8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+              {/* Modal Actions Footer (Fixed at bottom) */}
+              <div className="shrink-0 p-3 sm:p-4 border-t border-[#e1ede7] bg-[#F7F9F8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

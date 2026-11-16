@@ -342,6 +342,112 @@ export const TEXTBOOK_KNOWLEDGE_BASE: Record<string, BookContentData> = {
       },
     ],
   },
+
+  // 6. Computer Science & Entrepreneurship (IT Series by Tariq Mahmood & Imran Saeed)
+  'FAIT-CSC-11': {
+    bookId: 'book_henza_08',
+    bookTitle: 'Computer Science and Entrepreneurship 11 (IT Series)',
+    urduBookTitle: 'کمپیوٹر سائنس اینڈ انٹرپرینیورشپ 11 (آئی ٹی سیریز — طارق محمود، عمران سعید)',
+    author: 'Tariq Mahmood, Imran Saeed (Reviewed by Tasleem Mustafa) — IT Series / PECTAA',
+    totalPages: 280,
+    coverUrl: '/covers/cover_computer_itseries.jpg',
+    pdfFileName: 'computer_science_entrepreneurship_11_itseries.pdf',
+    subjectCode: 'FAIT-CSC-11',
+    chapters: [
+      {
+        chapterNum: 1,
+        title: 'Basics of Information Technology & Computer Systems',
+        urduTitle: 'باب اول: انفارمیشن ٹیکنالوجی کی بنیادی باتیں، کمپیوٹر سسٹم اور ہارڈویئر آرکیٹیکچر',
+        pagesRange: 'Pages 1-28',
+        pageStart: 1,
+        pageEnd: 28,
+        summary: 'کمپیوٹر ایک الیکٹرانک مشین ہے جو خام ڈیٹا کو بطور ان پٹ لے کر ہدایات کے مطابق پراسیس کرتی ہے اور بامقصد نتائج (انفارمیشن) فراہم کرتی ہے۔ کمپیوٹر سسٹم کے دو اہم پہلو ہیں: ہارڈویئر (فزیکل اجزاء) اور سافٹ ویئر (پروگرامز اور ہدایات)۔',
+        keyPoints: [
+          'ڈیٹا (Data) خام حقائق و اعداد و شمار کو کہتے ہیں، جبکہ انفارمیشن (Information) پراسیس شدہ بامعنی شکل ہے۔',
+          'سنٹرل پراسیسنگ یونٹ (CPU) کمپیوٹر کا دماغ کہلاتا ہے اور اس کے اہم حصے ALU, CU اور رجسٹرز ہیں۔',
+          'پرائمری میموری (RAM/ROM) تیز ترین داخلی اسٹوریج فراہم کرتی ہے۔ RAM عارضی (Volatile) ہے جبکہ ROM مستقل (Non-volatile) ہے۔',
+          'ان پٹ اور آؤٹ پٹ ڈیوائسز صارف اور کمپیوٹر کے درمیان رابطے کا ذریعہ بنتی ہیں۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'ڈیٹا اور انفارمیشن کے درمیان فرق واضح کریں۔ (Differentiate between Data and Information)',
+            answer: 'ڈیٹا غیر منظم خام حقائق (Unprocessed facts) ہیں جیسے امتحانی نمبرات۔ انفارمیشن پراسیس شدہ ڈیٹا ہے جیسے طلبہ کا حتمی گریڈ یا رزلٹ کارڈ۔',
+            marks: 2,
+            type: 'short',
+          },
+          {
+            question: 'ریم (RAM) اور روم (ROM) میں کیا بنیادی فرق ہے؟',
+            answer: 'RAM ایک عارضی اور وولٹائل میموری ہے جس میں بجلی بند ہونے پر ڈیٹا مٹ جاتا ہے۔ ROM ایک غیر وولٹائل مستقل میموری ہے جس میں کمپیوٹر کے بنیادی بوٹ اسٹریپ پروگرامز محفوظ ہوتے ہیں۔',
+            marks: 2,
+            type: 'short',
+          },
+          {
+            question: 'سنٹرل پراسیسنگ یونٹ (CPU) کے افعال اور اس کے بنیادی اجزاء (ALU, CU, Registers) پر تفصیلی نوٹ لکھیں۔',
+            answer: 'CPU کے افعال: 1. ہدایات حاصل کرنا (Fetch) 2. ڈی کوڈ کرنا 3. عمل درآمد (Execute)۔ ALU تمام حسابی و منطقی عمل کرتا ہے، CU کنٹرول سگنلز بھیجتا ہے، اور Registers تیز ترین ڈیٹا اسٹوریج دیتے ہیں۔',
+            marks: 8,
+            type: 'long',
+          },
+        ],
+      },
+      {
+        chapterNum: 2,
+        title: 'Information Networks & Topologies',
+        urduTitle: 'باب دوم: انفارمیشن نیٹ ورکس، ٹوپولوجیز اور OSI ماڈل',
+        pagesRange: 'Pages 29-60',
+        pageStart: 29,
+        pageEnd: 60,
+        summary: 'کمپیوٹر نیٹ ورک دو یا زیادہ کمپیوٹرز کا باہمی ربط ہے جو وسائل، پرنٹرز اور انٹرنیٹ شیئر کرنے کے کام آتا ہے۔ LAN, MAN اور WAN نیٹ ورک کی وسعت کی بنیادی اقسام ہیں۔ نیٹ ورک ٹوپولوجیز کمپیوٹرز کی باہمی فزیکل لے آؤٹ کو ظاہر کرتی ہیں۔',
+        keyPoints: [
+          'سٹار ٹوپولوجی (Star Topology) میں تمام نوڈز مرکزی سوئچ یا ہب سے جڑی ہوتی ہیں، یہ سب سے زیادہ استعمال ہونے والی ٹوپولوجی ہے۔',
+          'بس ٹوپولوجی (Bus Topology) میں ایک سنگل کیبل بیک بون کے طور پر کام کرتی ہے اور سروں پر ٹرمینیٹرز لگے ہوتے ہیں۔',
+          'او ایس آئی ماڈل (OSI 7-Layers): فزیکل، ڈیٹا لنک، نیٹ ورک، ٹرانسپورٹ، سیشن، پریزنٹیشن اور ایپلیکیشن لیئر۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'سٹار اور بس ٹوپولوجی کا موازنہ کریں۔ (Compare Star vs Bus Topology)',
+            answer: 'سٹار ٹوپولوجی زیادہ قابل اعتماد ہے کیونکہ ایک کیبل ٹوٹنے پر بقیہ نیٹ ورک چلتا رہتا ہے۔ بس ٹوپولوجی میں بیک بون کیبل خراب ہونے سے پورا نیٹ ورک معطل ہو جاتا ہے۔',
+            marks: 2,
+            type: 'short',
+          },
+          {
+            question: 'او ایس آئی (OSI) ماڈل کی تمام 7 پرتوں کے نام ترتیب سے لکھیں۔',
+            answer: '1. Physical 2. Data Link 3. Network 4. Transport 5. Session 6. Presentation 7. Application Layer.',
+            marks: 2,
+            type: 'short',
+          },
+        ],
+      },
+      {
+        chapterNum: 4,
+        title: 'Problem Solving & Python Programming',
+        urduTitle: 'باب چہارم: مسئلہ حل کرنے کے مراحل اور پائتھن پروگرامنگ (Python)',
+        pagesRange: 'Pages 95-145',
+        pageStart: 95,
+        pageEnd: 145,
+        summary: 'پروگرامنگ کمپیوٹر سے مسائل حل کروانے کا عمل ہے۔ پائتھن (Python) جدید ترین ہائی لیول پروگرامنگ زبان ہے جس کا سینٹیکس پڑھنے میں آسان اور سیدھا ہے۔ اس میں ویری ایبلز، کنڈیشنل اسٹیٹمنٹس (if-elif-else) اور لوپس (for, while) پروگرام کے فلو کو کنٹرول کرتے ہیں۔',
+        keyPoints: [
+          'الگورتھم کسی مسئلے کو حل کرنے کی مرحلہ وار تحریری ترکیب ہے۔',
+          'فلو چارٹ الگورتھم کی تصویری اور ہندسی اشکال کے ذریعے نمائندگی ہے۔',
+          'پائتھن ایک انٹرپریٹڈ زبان ہے جس میں متغیر کی قسم خودکار طور پر متعین ہوتی ہے۔',
+          'انٹرپرینیورشپ میں پروگرامنگ اور سافٹ ویئر ڈویلپمنٹ جدید فری لانسنگ اور آئی ٹی اسٹارٹ اپس کی بنیاد ہے۔',
+        ],
+        boardQuestions: [
+          {
+            question: 'الگورتھم اور فلو چارٹ میں کیا فرق ہے؟',
+            answer: 'الگورتھم مرحلہ وار متن پر مبنی ہدایات ہیں، جبکہ فلو چارٹ اسی مسئلے کی تصویری اور سمبولک نمائندگی ہے۔',
+            marks: 2,
+            type: 'short',
+          },
+          {
+            question: 'پائتھن میں print() اور input() کے افعال بیان کریں۔',
+            answer: 'print() نتائج اسکرین پر ظاہر کرنے کے لیے استعمال ہوتا ہے، جبکہ input() کی بورڈ سے صارف کا ڈیٹا حاصل کرتا ہے۔',
+            marks: 2,
+            type: 'short',
+          },
+        ],
+      },
+    ],
+  },
 };
 
 // Helper function to resolve textbook info from a test or task item
@@ -358,6 +464,8 @@ export function getTextbookDetailsForTest(params: {
   let matchedKey = 'FAIT-URD-11';
   if (code.includes('PED') || sName.includes('physical')) {
     matchedKey = 'FAIT-PED-11';
+  } else if (code.includes('CSC') || sName.includes('computer') || title.includes('Computer') || title.includes('کمپیوٹر') || title.includes('Python')) {
+    matchedKey = 'FAIT-CSC-11';
   } else if (code.includes('URD') || sName.includes('urdu') || title.includes('اُردو') || title.includes('سرمایہ')) {
     matchedKey = 'FAIT-URD-11';
   } else if (code.includes('ENG') || sName.includes('english') || title.includes('English') || title.includes('Sunshine')) {
@@ -370,7 +478,7 @@ export function getTextbookDetailsForTest(params: {
     matchedKey = 'FAIT-URD-11'; // defaults to primary language
   }
 
-  const bookData = TEXTBOOK_KNOWLEDGE_BASE[matchedKey];
+  const bookData = TEXTBOOK_KNOWLEDGE_BASE[matchedKey] || TEXTBOOK_KNOWLEDGE_BASE['FAIT-CSC-11'];
   const chapter = bookData.chapters[0];
 
   return {

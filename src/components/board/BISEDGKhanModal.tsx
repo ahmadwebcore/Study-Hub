@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X,
@@ -41,18 +41,32 @@ export const BISEDGKhanModal: React.FC<BISEDGKhanModalProps> = ({
   const daysToFeb = biseDGKhanService.getDaysUntilFebruaryTarget();
   const daysToExams = biseDGKhanService.getDaysUntilAnnualExams();
 
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = original || 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
-      }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
+      onClick={onClose}
     >
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-white text-zinc-900 rounded-3xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-4xl max-h-[92dvh] sm:max-h-[88vh] bg-white text-zinc-900 rounded-3xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden my-auto animate-in zoom-in-95 duration-150"
+      >
         {/* Modal Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-200 bg-white flex items-start justify-between gap-3 shrink-0">
           <div className="space-y-1 min-w-0">

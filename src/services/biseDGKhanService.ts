@@ -82,7 +82,7 @@ const BISE_DG_KHAN_UPDATES: BISEDGKhanUpdate[] = [
 const PAIRING_SCHEMES: PairingSchemeItem[] = [
   {
     subjectId: 'sub_04',
-    subjectName: 'Computer Science (FA-IT Group)',
+    subjectName: 'Computer Science and Entrepreneurship (IT Series — Tariq Mahmood & Imran Saeed)',
     totalMarks: 75,
     mcqsBreakdown: [
       { chapter: 'Chapter 1: Basics of Information Technology', mcqsCount: 2 },

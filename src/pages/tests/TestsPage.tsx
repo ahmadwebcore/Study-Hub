@@ -137,6 +137,17 @@ export const TestsPage: React.FC = () => {
     loadData();
   }, [role, user.id]);
 
+  // Lock body scroll when activeExamTest is open
+  useEffect(() => {
+    if (activeExamTest) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original || 'unset';
+      };
+    }
+  }, [activeExamTest]);
+
   // Schedule Test Form
   const {
     register,
@@ -786,8 +797,8 @@ export const TestsPage: React.FC = () => {
       {/* STUDENT EXAMINATION RUNNER (LIVE EXAM MODAL VIA PORTAL TO PREVENT ANY CUT-OFF) */}
       {activeExamTest &&
         createPortal(
-          <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 pt-10 sm:pt-6 pb-6 animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200 overflow-hidden text-zinc-900">
+          <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-5 pt-8 sm:pt-6 pb-6 overflow-y-auto overscroll-contain animate-in fade-in duration-200">
+            <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[94dvh] sm:max-h-[88vh] flex flex-col shadow-2xl border border-zinc-200 overflow-hidden text-zinc-900 my-auto">
               {/* Exam Header */}
               <div className="px-5 py-3.5 bg-[#142D27] text-white flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">

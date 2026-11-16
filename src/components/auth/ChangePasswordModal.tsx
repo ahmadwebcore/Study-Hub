@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Lock,
@@ -49,6 +49,21 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   const [totpError, setTotpError] = useState<string | null>(null);
   const [totpSuccess, setTotpSuccess] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = original || 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -181,38 +196,49 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   const strength = getPasswordStrength();
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl border border-zinc-200 shadow-2xl p-6 sm:p-7 overflow-hidden text-zinc-900">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-5 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg max-h-[92dvh] sm:max-h-[88vh] bg-white rounded-3xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto"
+      >
         {/* Subtle top ambient bar */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-600 via-[#14B866] to-[#142D27]" />
 
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
-          disabled={loading}
-          aria-label="Close dialog"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        {/* Header (Fixed) */}
+        <div className="shrink-0 p-5 sm:p-6 border-b border-zinc-100 bg-[#F7F9F8] flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+              <Shield className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-zinc-900 tracking-tight font-serif">
+                Account Security &amp; Credentials
+              </h2>
+              <p className="text-xs text-zinc-500">
+                Manage credentials for {studentOrTeacherName} ({targetEmail})
+              </p>
+            </div>
+          </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
-            <Shield className="w-5 h-5 text-emerald-600" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-zinc-900 tracking-tight font-serif">
-              Account Security &amp; Credentials
-            </h2>
-            <p className="text-xs text-zinc-500">
-              Manage credentials for {studentOrTeacherName} ({targetEmail})
-            </p>
-          </div>
+          {/* Close Button */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/70 transition-colors shrink-0 cursor-pointer"
+            disabled={loading}
+            aria-label="Close dialog"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Tab Switcher: Password vs Google Authenticator */}
-        <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl mb-4 text-xs font-semibold">
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4">
+          {/* Tab Switcher: Password vs Google Authenticator */}
+          <div className="grid grid-cols-2 p-1 bg-zinc-100 rounded-xl text-xs font-semibold">
           <button
             type="button"
             onClick={() => setActiveTab('password')}
@@ -499,6 +525,7 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>,
     document.body

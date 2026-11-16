@@ -59,6 +59,21 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
+  React.useEffect(() => {
+    if (isOpen) {
+      const original = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = original || 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   // Resolve book data
@@ -99,11 +114,15 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150">
+    <div
+      className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150 overflow-y-auto overscroll-contain"
+      onClick={onClose}
+    >
       <div
+        onClick={(e) => e.stopPropagation()}
         className={`relative w-full max-w-5xl ${
-          isFullscreen ? 'h-[98vh]' : 'h-[90vh]'
-        } bg-white rounded-3xl border border-[#e1ede7] shadow-2xl overflow-hidden flex flex-col text-[#142D27] font-sans`}
+          isFullscreen ? 'h-[98dvh]' : 'h-[92dvh] sm:h-[90vh]'
+        } bg-white rounded-3xl border border-[#e1ede7] shadow-2xl overflow-hidden flex flex-col text-[#142D27] font-sans my-auto`}
       >
         {/* 1. Modal Top Bar */}
         <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-[#142D27] text-white border-b border-[#142D27] flex items-center justify-between gap-3 shrink-0">
