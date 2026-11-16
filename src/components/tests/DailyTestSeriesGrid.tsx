@@ -31,8 +31,8 @@ interface DailyTestSeriesGridProps {
 export type TestDisplayStatus = 'locked' | 'today' | 'passed' | 'failed_retest' | 'submitted' | 'pending';
 
 export const ACADEMIC_WEEKS = [
-  { id: 'all', label: 'All Weeks (1 to 15)' },
   { id: 'w1', label: 'Week 1 (Nov 17 - Nov 21) • Current' },
+  { id: 'all', label: 'All 15 Weeks (Full Timetable • 90 Tests)' },
   { id: 'w2', label: 'Week 2 (Nov 24 - Nov 28)' },
   { id: 'w3', label: 'Week 3 (Dec 01 - Dec 05)' },
   { id: 'w4', label: 'Week 4 (Dec 08 - Dec 12)' },
@@ -56,7 +56,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
   onRefreshTests: _onRefreshTests,
 }) => {
   const { role } = useRole();
-  const [selectedWeek, setSelectedWeek] = useState<string>('all');
+  const [selectedWeek, setSelectedWeek] = useState<string>('w1');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('all');
   const [hideCompleted, setHideCompleted] = useState<boolean>(false);
@@ -326,10 +326,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
         </div>
 
         {/* 3 Unified Filter Dropdowns (Week, Subject, Status) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2 border-t border-zinc-100">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-zinc-100">
           {/* 1. Academic Week Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <label className="text-[11px] font-bold text-zinc-600 uppercase tracking-wider block px-0.5">
               Academic Week
             </label>
             <div className="relative">
@@ -349,8 +349,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </div>
 
           {/* 2. Subject Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <label className="text-[11px] font-bold text-zinc-600 uppercase tracking-wider block px-0.5">
               Subject ({SAMPLE_SUBJECTS.length})
             </label>
             <div className="relative">
@@ -371,8 +371,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </div>
 
           {/* 3. Status Dropdown */}
-          <div className="flex flex-col gap-1">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <label className="text-[11px] font-bold text-zinc-600 uppercase tracking-wider block px-0.5">
               Test Status
             </label>
             <div className="relative">
@@ -381,10 +381,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 onChange={(e) => setSelectedStatusFilter(e.target.value)}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
-                <option value="all">All Statuses ({tests.length} Tests)</option>
-                <option value="today">Today's Active Test</option>
-                <option value="locked">Locked (Future Scheduled)</option>
-                <option value="passed">Passed (15-30 Marks)</option>
+                <option value="all">All Tests &bull; Active &amp; Scheduled</option>
+                <option value="today">Today's Active Test (Unlocked Now)</option>
+                <option value="locked">Upcoming Tests (Locked Until Test Day)</option>
+                <option value="passed">Passed Tests (&ge;15 Marks)</option>
                 <option value="retest">Retest Needed (&lt;15 Marks)</option>
                 <option value="pending">Submitted / Under Review</option>
               </select>
@@ -406,12 +406,26 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </p>
         </div>
       ) : displayTests.length === 0 ? (
-        <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-2">
-          <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-          <h3 className="text-sm font-bold text-zinc-900">No Tests Found in this Filter</h3>
+        <div className="p-8 rounded-2xl bg-white border border-zinc-200 text-center space-y-3">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600 shadow-2xs">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <h3 className="text-sm font-bold text-zinc-900">No Tests Found Matching Filters</h3>
           <p className="text-xs text-zinc-500 max-w-md mx-auto">
-            Switch week or subject filter dropdown above to review tests.
+            Try resetting your filters or switching academic week / subject above to view scheduled tests.
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedWeek('all');
+              setSelectedSubjectId('all');
+              setSelectedStatusFilter('all');
+              setHideCompleted(false);
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-2xs cursor-pointer active:scale-95"
+          >
+            <span>Reset All Filters</span>
+          </button>
         </div>
       ) : (
         <div className="space-y-3">
@@ -424,7 +438,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 <div
                   key={test.id}
                   onClick={() => setActivePopupTest(test)}
-                  className={`relative p-4 rounded-2xl border cursor-pointer flex flex-col justify-between select-none w-full h-[185px] shadow-xs ${
+                  className={`relative p-4 rounded-2xl border cursor-pointer flex flex-col justify-between select-none w-full min-h-[190px] shadow-xs transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md ${
                     meta.isToday
                       ? 'bg-white border-2 border-emerald-500 ring-2 ring-emerald-500/20 text-[#142D27]'
                       : meta.isLocked
