@@ -531,22 +531,22 @@ export const TestsPage: React.FC = () => {
             onClick={() => setViewLayout('boxes')}
             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
               viewLayout === 'boxes'
-                ? 'bg-[#142D27] text-white shadow-xs'
+                ? 'bg-white text-emerald-800 border border-[#e1ede7] shadow-xs'
                 : 'text-[#557067] hover:text-[#142D27]'
             }`}
           >
-            <LayoutGrid className="w-3.5 h-3.5" />
+            <LayoutGrid className="w-3.5 h-3.5 text-emerald-600" />
             <span>Compact Boxes</span>
           </button>
           <button
             onClick={() => setViewLayout('cards')}
             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
               viewLayout === 'cards'
-                ? 'bg-[#142D27] text-white shadow-xs'
+                ? 'bg-white text-emerald-800 border border-[#e1ede7] shadow-xs'
                 : 'text-[#557067] hover:text-[#142D27]'
             }`}
           >
-            <List className="w-3.5 h-3.5" />
+            <List className="w-3.5 h-3.5 text-emerald-600" />
             <span>Detailed Cards</span>
           </button>
         </div>

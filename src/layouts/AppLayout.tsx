@@ -37,7 +37,6 @@ export const AppLayout: React.FC = () => {
         >
           <Sidebar
             isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={toggleSidebarCollapsed}
           />
         </div>
 

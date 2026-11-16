@@ -30,7 +30,7 @@ export interface AIProviderConfig {
 }
 
 const STORAGE_KEY_AI_CONFIG = 'gsa_ai_config_v3';
-const STORAGE_KEY_CHAT_HISTORY = 'gsa_academic_chat_history_v6';
+const STORAGE_KEY_CHAT_HISTORY = 'gsa_academic_chat_history_v8';
 
 // 1st Year Intermediate Computer Science Academic Knowledge Base
 const CS_KNOWLEDGE = [
@@ -296,60 +296,36 @@ export class AIStudyBotService {
   }
 
   public getActiveStudentName(): string {
-    try {
-      const stored = localStorage.getItem('studyhub_logged_in_user');
-      if (stored) {
-        const u = JSON.parse(stored);
-        if (u.name && !u.name.toLowerCase().includes('bilal') && !u.name.toLowerCase().includes('scholar')) {
-          return u.name.split(' ')[0] || 'Henza';
-        }
-      }
-    } catch {}
     return 'Henza';
   }
 
   public getChatHistory(): AIChatMessage[] {
-    const studentName = this.getActiveStudentName();
     try {
       const stored = localStorage.getItem(STORAGE_KEY_CHAT_HISTORY);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If legacy long welcome text exists in local storage, upgrade to clean greeting
-          if (
-            parsed[0]?.text?.includes('Explain a topic') ||
-            parsed[0]?.text?.includes('Welcome to StudyHub') ||
-            parsed[0]?.text?.includes('Academic Copilot') ||
-            parsed[0]?.actions?.length ||
-            !parsed[0]?.text?.includes(studentName)
-          ) {
-            parsed[0] = {
-              id: 'msg_welcome',
-              sender: 'assistant',
-              text: `Hi ${studentName}, how can we help you?`,
-              timestamp: 'Just now',
-            };
-            this.saveChatHistory(parsed);
+          const cleanHistory = parsed.filter((m) => !(m.id === 'msg_u_init' && m.text === 'Hi'));
+          if (cleanHistory.length > 0) {
+            if (cleanHistory[0]?.text?.includes('Ahmad') || cleanHistory[0]?.text?.includes('Explain a topic') || cleanHistory[0]?.text?.includes('Welcome to StudyHub')) {
+              cleanHistory[0] = {
+                id: 'msg_welcome',
+                sender: 'assistant',
+                text: 'Hi Henza, how can we help you today with your 1st Year FA-IT syllabus or tests?',
+                timestamp: 'Just now',
+              };
+            }
+            return cleanHistory;
           }
-          return parsed;
         }
       }
-    } catch {
-      // fallback
-    }
-    // Clean minimal default initial greeting - no suggestion buttons
+    } catch {}
     return [
-      {
-        id: 'msg_u_init',
-        sender: 'user',
-        text: 'Hi',
-        timestamp: 'Just now',
-      },
       {
         id: 'msg_welcome',
         sender: 'assistant',
-        text: `Hi ${studentName}, how can we help you?`,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: 'Hi Henza, how can we help you today with your 1st Year FA-IT syllabus or tests?',
+        timestamp: 'Just now',
       },
     ];
   }
@@ -799,3 +775,4 @@ Offer actionable advice, practical real-world analogies, and board exam tips.`;
 }
 
 export const aiStudyBotService = new AIStudyBotService();
+

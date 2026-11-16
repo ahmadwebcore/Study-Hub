@@ -14,8 +14,6 @@ import {
   FolderArchive,
   BookMarked,
   Share2,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
 import { cn } from '../../lib/utils';
@@ -69,13 +67,11 @@ const navSections: NavSection[] = [
 interface SidebarProps {
   onCloseMobile?: () => void;
   isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
   isCollapsed = false,
-  onToggleCollapse,
 }) => {
   const { role, toggleRole } = useRole();
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -101,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={onCloseMobile}
           title="Global Science Academy, Fatehpur"
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#142D27] text-[#14B866] shadow-sm ring-1 ring-black/5 group-hover:scale-105 transition-transform duration-200">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs group-hover:scale-105 transition-transform duration-200">
             <GraduationCap className="h-5 w-5" />
           </div>
           {!isCollapsed && (
@@ -115,28 +111,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
         </NavLink>
-
-        {/* Collapse / Expand Toggle Button on Desktop */}
-        {onToggleCollapse && (
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            className={cn(
-              'hidden lg:flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer',
-              isCollapsed
-                ? 'absolute -right-3 top-5 w-6 h-6 rounded-full bg-white border border-[#e1ede7] shadow-sm text-zinc-600 hover:text-emerald-600 z-30'
-                : 'p-1.5'
-            )}
-            title={isCollapsed ? 'Expand sidebar (Full width)' : 'Collapse sidebar (Compact rail)'}
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {isCollapsed ? (
-              <PanelLeftOpen className="w-3.5 h-3.5" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4" />
-            )}
-          </button>
-        )}
       </div>
 
       {/* Role Perspective Switcher Pill (Teacher only - locked from student) */}

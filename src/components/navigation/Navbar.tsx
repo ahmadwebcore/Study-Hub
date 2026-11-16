@@ -101,14 +101,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, isSidebarColla
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 transition-colors focus:outline-none cursor-pointer"
+            className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e1ede7] bg-white text-[#557067] hover:bg-emerald-50/60 hover:text-emerald-800 hover:border-emerald-200 transition-all focus:outline-none cursor-pointer shadow-2xs"
             title={isSidebarCollapsed ? "Expand sidebar to full width" : "Collapse sidebar to compact mode"}
             aria-label="Toggle sidebar collapse"
           >
             {isSidebarCollapsed ? (
               <PanelLeftOpen className="w-4 h-4 text-emerald-700" />
             ) : (
-              <PanelLeftClose className="w-4 h-4 text-zinc-600" />
+              <PanelLeftClose className="w-4 h-4 text-[#557067]" />
             )}
           </button>
         )}

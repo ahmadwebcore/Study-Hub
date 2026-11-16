@@ -136,19 +136,19 @@ export const StudyBotWidget: React.FC = () => {
       {isOpen && (
         <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[430px] sm:h-[620px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-white rounded-3xl border border-[#e1ede7] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-[#142D27]">
           {/* Header (Clean, No Technical Settings Gear) */}
-          <div className="p-3.5 bg-[#142D27] text-white flex items-center justify-between shrink-0">
+          <div className="p-3.5 bg-white border-b border-[#e1ede7] text-[#142D27] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                <GraduationCap className="w-4 h-4 text-emerald-400" />
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                <GraduationCap className="w-4 h-4 text-emerald-700" />
               </div>
               <div>
-                <h4 className="text-xs font-bold flex items-center gap-1.5 text-white">
+                <h4 className="text-xs font-bold flex items-center gap-1.5 text-[#142D27]">
                   Global Science Academy
-                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
                     Fatehpur &bull; Live
                   </span>
                 </h4>
-                <p className="text-[10px] text-zinc-300">
+                <p className="text-[10px] text-[#557067]">
                   Academic Support &amp; Evaluation &bull; Henza Noor
                 </p>
               </div>
@@ -158,7 +158,7 @@ export const StudyBotWidget: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-[#7d9990] hover:text-[#142D27] hover:bg-[#E7EFEA] transition-colors cursor-pointer"
                 aria-label="Close Chat"
               >
                 <X className="w-4 h-4" />
@@ -216,7 +216,7 @@ export const StudyBotWidget: React.FC = () => {
                   <div
                     className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
+                        ? 'bg-[#dcf8c6] text-[#142D27] border border-[#c4f4be] rounded-tr-xs shadow-xs'
                         : 'bg-white text-[#142D27] border border-[#e1ede7] rounded-tl-xs shadow-xs'
                     }`}
                   >
@@ -230,7 +230,7 @@ export const StudyBotWidget: React.FC = () => {
 
                     {/* Sender Header */}
                     <div className="flex items-center gap-1.5 mb-1.5 text-[10px]">
-                      <span className={msg.sender === 'user' ? 'text-emerald-100 font-bold' : 'text-emerald-700 font-bold'}>
+                      <span className={msg.sender === 'user' ? 'text-emerald-800 font-bold' : 'text-emerald-700 font-bold'}>
                         {msg.sender === 'user' ? 'You (Henza)' : 'GSA Academic Tutor'}
                       </span>
                       {msg.sender === 'assistant' && (
@@ -241,7 +241,7 @@ export const StudyBotWidget: React.FC = () => {
                     </div>
 
                     {/* Message Body */}
-                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${msg.sender === 'user' ? 'text-white' : 'text-[#142D27]'}`}>
+                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${'text-[#142D27]'}`}>
                       {msg.text}
                     </p>
 
@@ -263,7 +263,7 @@ export const StudyBotWidget: React.FC = () => {
 
                     {/* Code snippet if present */}
                     {msg.codeSnippet && (
-                      <div className="mt-2 p-2.5 rounded-lg bg-zinc-900 text-emerald-400 font-mono text-[10px] overflow-x-auto whitespace-pre border border-zinc-800">
+                      <div className="mt-2 p-2.5 rounded-lg bg-[#F7F9F8] text-emerald-900 font-mono text-[10px] overflow-x-auto whitespace-pre border border-[#e1ede7]">
                         {msg.codeSnippet}
                       </div>
                     )}
@@ -287,7 +287,7 @@ export const StudyBotWidget: React.FC = () => {
 
                     {/* Message Footer */}
                     <div className="mt-2 flex items-center justify-between text-[10px] pt-1.5 border-t border-zinc-100">
-                      <span className={msg.sender === 'user' ? 'text-emerald-100' : 'text-[#7d9990]'}>
+                      <span className={msg.sender === 'user' ? 'text-emerald-800/80' : 'text-[#7d9990]'}>
                         {msg.timestamp}
                       </span>
                       {msg.sender === 'assistant' ? (
@@ -309,7 +309,7 @@ export const StudyBotWidget: React.FC = () => {
                           )}
                         </button>
                       ) : (
-                        <span className="text-white font-bold text-[9px]">✓✓</span>
+                        <span className="text-emerald-700 font-bold text-[9px]">✓✓</span>
                       )}
                     </div>
                   </div>
@@ -325,13 +325,13 @@ export const StudyBotWidget: React.FC = () => {
                   <div
                     className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
                       msg.senderRole === 'student'
-                        ? 'bg-emerald-600 text-white rounded-tr-xs shadow-xs'
+                        ? 'bg-[#dcf8c6] text-[#142D27] border border-[#c4f4be] rounded-tr-xs shadow-xs'
                         : 'bg-white text-[#142D27] border border-blue-200 rounded-tl-xs shadow-xs'
                     }`}
                   >
                     {/* Header: Sender & Badge */}
                     <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-semibold">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-100 font-bold' : 'text-blue-700 font-bold'}>
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-800 font-bold' : 'text-blue-700 font-bold'}>
                         {msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}
                       </span>
                       {msg.senderRole === 'teacher' && (
@@ -342,16 +342,16 @@ export const StudyBotWidget: React.FC = () => {
                     </div>
 
                     {/* Message Body */}
-                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${msg.senderRole === 'student' ? 'text-white' : 'text-[#142D27]'}`}>
+                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${'text-[#142D27]'}`}>
                       {msg.text}
                     </p>
 
                     {/* Footer */}
                     <div className="mt-2 flex items-center justify-end text-[9px] gap-1 pt-1.5 border-t border-zinc-100">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-100' : 'text-[#7d9990]'}>
+                      <span className={msg.senderRole === 'student' ? 'text-emerald-800/80' : 'text-[#7d9990]'}>
                         {msg.timestamp}
                       </span>
-                      {msg.senderRole === 'student' && <span className="text-white font-bold">✓✓</span>}
+                      {msg.senderRole === 'student' && <span className="text-emerald-700 font-bold">✓✓</span>}
                     </div>
                   </div>
                 </div>
