@@ -250,6 +250,33 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     window.open(url, '_blank');
   };
 
+  const getDayLabel = (dateStr: string, title?: string): { dayEn: string; dayUr: string; combined: string } => {
+    if (title?.includes('بدھ') || title?.toLowerCase().includes('wednesday')) return { dayEn: 'Wednesday', dayUr: 'بدھ', combined: 'بدھ (Wednesday)' };
+    if (title?.includes('منگل') || title?.toLowerCase().includes('tuesday')) return { dayEn: 'Tuesday', dayUr: 'منگل', combined: 'منگل (Tuesday)' };
+    if (title?.includes('جمعرات') || title?.toLowerCase().includes('thursday')) return { dayEn: 'Thursday', dayUr: 'جمعرات', combined: 'جمعرات (Thursday)' };
+    if (title?.includes('جمعہ') || title?.toLowerCase().includes('friday')) return { dayEn: 'Friday', dayUr: 'جمعہ', combined: 'جمعہ (Friday)' };
+    if (title?.includes('ہفتہ') || title?.toLowerCase().includes('saturday')) return { dayEn: 'Saturday', dayUr: 'ہفتہ', combined: 'ہفتہ (Saturday)' };
+    if (title?.includes('پیر') || title?.toLowerCase().includes('monday')) return { dayEn: 'Monday', dayUr: 'پیر', combined: 'پیر (Monday)' };
+    if (title?.includes('اتوار') || title?.toLowerCase().includes('sunday')) return { dayEn: 'Sunday', dayUr: 'اتوار', combined: 'اتوار (Sunday)' };
+
+    try {
+      const d = new Date(dateStr);
+      const dayNum = d.getDay();
+      const days = [
+        { dayEn: 'Sunday', dayUr: 'اتوار', combined: 'اتوار (Sunday)' },
+        { dayEn: 'Monday', dayUr: 'پیر', combined: 'پیر (Monday)' },
+        { dayEn: 'Tuesday', dayUr: 'منگل', combined: 'منگل (Tuesday)' },
+        { dayEn: 'Wednesday', dayUr: 'بدھ', combined: 'بدھ (Wednesday)' },
+        { dayEn: 'Thursday', dayUr: 'جمعرات', combined: 'جمعرات (Thursday)' },
+        { dayEn: 'Friday', dayUr: 'جمعہ', combined: 'جمعہ (Friday)' },
+        { dayEn: 'Saturday', dayUr: 'ہفتہ', combined: 'ہفتہ (Saturday)' },
+      ];
+      return days[dayNum] || { dayEn: 'Day', dayUr: 'دن', combined: 'Day' };
+    } catch {
+      return { dayEn: 'Day', dayUr: 'دن', combined: 'Day' };
+    }
+  };
+
   return (
     <div className="space-y-4 font-sans">
       {/* Top Filter and Controls Bar */}
@@ -376,82 +403,103 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
-          {filteredTests.map((test, index) => {
-            const meta = getTestStatus(test);
-            const isLastOdd = index === filteredTests.length - 1 && filteredTests.length % 2 !== 0;
+        <div className="space-y-1">
+          <div className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3 pb-3 pt-1 no-scrollbar snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
+            {filteredTests.map((test) => {
+              const meta = getTestStatus(test);
+              const dayMeta = getDayLabel(test.date, test.title);
+              const isUrduTest =
+                test.subjectCode?.includes('URD') ||
+                test.subjectName?.toLowerCase().includes('urdu') ||
+                test.title?.includes('اُردو') ||
+                test.title?.includes('سرمایہ') ||
+                test.title?.match(/[\u0600-\u06FF]/);
 
-            return (
-              <div
-                key={test.id}
-                onClick={() => setActivePopupTest(test)}
-                className={`group relative p-2.5 sm:p-3 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-full ${
-                  isLastOdd ? 'col-span-2 sm:col-span-1' : ''
-                } ${
-                  meta.isToday
-                    ? 'bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20 hover:border-emerald-600'
-                    : meta.isLocked
-                    ? 'bg-zinc-50/80 border-zinc-200/90 hover:bg-zinc-100/90 text-zinc-600'
-                    : meta.status === 'passed'
-                    ? 'bg-emerald-50/30 border-emerald-200 hover:bg-emerald-50/60'
-                    : meta.status === 'failed_retest'
-                    ? 'bg-rose-50/40 border-rose-200 hover:bg-rose-50/70'
-                    : meta.status === 'pending'
-                    ? 'bg-amber-50/30 border-amber-200 hover:bg-amber-50/60'
-                    : 'bg-white border-zinc-200 hover:border-zinc-300 shadow-2xs'
-                }`}
-                title="Click to view details popup"
-              >
-                {/* Top Badge & Lock Status */}
-                <div>
-                  <div className="flex items-center justify-between gap-1 mb-1.5">
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border ${meta.badgeClass}`}
-                    >
-                      {meta.isToday && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                      )}
-                      {meta.isLocked && <Lock className="w-2.5 h-2.5" />}
-                      {!meta.isLocked && meta.status === 'passed' && (
-                        <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
-                      )}
-                      {!meta.isLocked && meta.status === 'failed_retest' && (
-                        <AlertCircle className="w-2.5 h-2.5 text-rose-600" />
-                      )}
-                      <span>{meta.label}</span>
-                    </span>
+              return (
+                <div
+                  key={test.id}
+                  onClick={() => setActivePopupTest(test)}
+                  className={`group relative p-3 sm:p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between select-none w-[220px] sm:w-[240px] lg:w-auto shrink-0 snap-start shadow-2xs hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${
+                    meta.isToday
+                      ? 'bg-white border-emerald-500 shadow-sm ring-2 ring-emerald-500/20 hover:border-emerald-600'
+                      : meta.isLocked
+                      ? 'bg-zinc-50/90 border-zinc-200/90 hover:bg-zinc-100 text-zinc-600'
+                      : meta.status === 'passed'
+                      ? 'bg-emerald-50/40 border-emerald-200 hover:bg-emerald-50/70'
+                      : meta.status === 'failed_retest'
+                      ? 'bg-rose-50/40 border-rose-200 hover:bg-rose-50/70'
+                      : meta.status === 'pending'
+                      ? 'bg-amber-50/40 border-amber-200 hover:bg-amber-50/70'
+                      : 'bg-white border-zinc-200 hover:border-zinc-300 shadow-2xs'
+                  }`}
+                  title="Click to view details popup"
+                >
+                  {/* Top Badge & Day Row */}
+                  <div>
+                    <div className="flex items-center justify-between gap-1 mb-2">
+                      {/* Day Pill */}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-800 border border-zinc-200/80 truncate">
+                        {dayMeta.combined}
+                      </span>
 
-                    <span className="text-[9px] font-bold text-zinc-400">
-                      30M
-                    </span>
+                      {/* Status Pill */}
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border shrink-0 ${meta.badgeClass}`}
+                      >
+                        {meta.isToday && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        )}
+                        {meta.isLocked && <Lock className="w-2.5 h-2.5" />}
+                        {!meta.isLocked && meta.status === 'passed' && (
+                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                        )}
+                        {!meta.isLocked && meta.status === 'failed_retest' && (
+                          <AlertCircle className="w-2.5 h-2.5 text-rose-600" />
+                        )}
+                        <span>{meta.label}</span>
+                      </span>
+                    </div>
+
+                    {/* Subject Name & 30M Badge */}
+                    <div className="flex items-center justify-between gap-1 text-[10px] text-zinc-500 font-semibold pb-1.5 border-b border-zinc-100">
+                      <div className="flex items-center gap-1 truncate">
+                        <BookOpen className="w-3 h-3 text-zinc-400 shrink-0" />
+                        <span className="truncate">{test.subjectName.split('(')[0]}</span>
+                      </div>
+                      <span className="text-[9px] font-bold text-zinc-400 shrink-0">
+                        30M
+                      </span>
+                    </div>
+
+                    {/* Test Title (In Urdu for Urdu book / subjects, no 'Series' text) */}
+                    <h4 className={`mt-2 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors ${
+                      isUrduTest ? 'font-urdu text-[13px] font-bold text-zinc-900 text-right dir-rtl' : 'text-xs font-bold text-zinc-900'
+                    }`}>
+                      {test.title.replace(/^Daily Test Series:\s*/i, '')}
+                    </h4>
                   </div>
 
-                  {/* Subject Name */}
-                  <div className="flex items-center gap-1 text-[10px] text-zinc-500 font-semibold truncate">
-                    <BookOpen className="w-3 h-3 text-zinc-400 shrink-0" />
-                    <span className="truncate">{test.subjectName.split('(')[0]}</span>
+                  {/* Bottom Timing / Unlocks Indicator */}
+                  <div className="mt-3 pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px]">
+                    <span className="text-zinc-500 font-medium truncate flex items-center gap-1">
+                      <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
+                      <span>{test.date}</span>
+                    </span>
+
+                    <span className="text-[10px] font-bold text-emerald-700 group-hover:text-emerald-800 transition-colors shrink-0">
+                      View &rarr;
+                    </span>
                   </div>
-
-                  {/* Test Title */}
-                  <h4 className="text-xs font-bold text-zinc-900 mt-1 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
-                    {test.title}
-                  </h4>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Bottom Timing / Unlocks Indicator */}
-                <div className="mt-3 pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px]">
-                  <span className="text-zinc-500 font-medium truncate flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
-                    <span>{test.date}</span>
-                  </span>
-
-                  <span className="text-[10px] font-bold text-zinc-600 group-hover:text-zinc-900 transition-colors shrink-0">
-                    View &rarr;
-                  </span>
-                </div>
-              </div>
-            );
-          })}
+          {/* Mobile Swipe Hint Bar */}
+          <div className="lg:hidden flex items-center justify-between px-1 pt-0.5 text-[11px] text-zinc-400 font-medium">
+            <span>&larr; Swipe to view all 5 daily tests &rarr;</span>
+            <span className="text-emerald-700 font-semibold">{filteredTests.length} tests active</span>
+          </div>
         </div>
       )}
 
@@ -466,7 +514,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               {/* Modal Header */}
               <div className="p-4 sm:p-5 border-b border-zinc-200 bg-zinc-50 flex items-start justify-between gap-3">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-md bg-zinc-200/80 text-zinc-800 text-[10px] font-bold">
+                      {getDayLabel(activePopupTest.date, activePopupTest.title).combined}
+                    </span>
                     <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md border ${meta.badgeClass}`}>
                       {meta.isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                       <span>{meta.label}</span>
@@ -479,8 +530,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-zinc-900 mt-1">
-                    {activePopupTest.title}
+                  <h3 className={`text-base font-bold text-zinc-900 mt-1.5 ${
+                    activePopupTest.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
+                  }`}>
+                    {activePopupTest.title.replace(/^Daily Test Series:\s*/i, '')}
                   </h3>
                   <p className="text-xs text-zinc-500">
                     {activePopupTest.subjectName} &bull; BISE DG Khan FA-IT Pattern

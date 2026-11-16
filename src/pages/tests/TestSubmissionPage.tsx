@@ -185,7 +185,11 @@ export const TestSubmissionPage: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-[#142D27] mt-2.5">{test.title}</h3>
+                  <h3 className={`text-base font-bold text-[#142D27] mt-2.5 ${
+                    test.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
+                  }`}>
+                    {test.title}
+                  </h3>
                   <p className="text-xs text-[#557067] mt-0.5">{test.subjectName}</p>
 
                   <div className="mt-3 p-3 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs">

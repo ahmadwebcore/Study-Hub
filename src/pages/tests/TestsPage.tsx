@@ -625,7 +625,11 @@ export const TestsPage: React.FC = () => {
                   </Badge>
                 </div>
 
-                <h3 className="text-base font-bold text-[#142D27] mt-3">{test.title}</h3>
+                <h3 className={`text-base font-bold text-[#142D27] mt-3 ${
+                  test.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-lg leading-relaxed text-right dir-rtl' : ''
+                }`}>
+                  {test.title}
+                </h3>
                 <p className="text-xs text-[#557067] mt-0.5">{test.subjectName}</p>
 
                 {/* Syllabus coverage */}
@@ -775,7 +779,9 @@ export const TestsPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <h2 className="text-sm sm:text-base font-bold mt-1 text-white truncate">
+                    <h2 className={`text-sm sm:text-base font-bold mt-1 text-white truncate ${
+                      activeExamTest.title?.match(/[\u0600-\u06FF]/) ? 'font-urdu text-base sm:text-lg leading-relaxed' : ''
+                    }`}>
                       {activeExamTest.title}
                     </h2>
                   </div>

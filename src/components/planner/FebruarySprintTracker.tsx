@@ -164,21 +164,21 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
+        <div className="flex overflow-x-auto lg:grid lg:grid-cols-7 gap-2 pb-2 text-xs no-scrollbar snap-x snap-mandatory">
           {[
-            { day: 'Tuesday', subject: 'Physical Education', focus: 'Anatomy & Athletics', color: '#10B981', code: 'FAIT-PED' },
-            { day: 'Wednesday', subject: 'Urdu & Grammar', focus: 'Prose & Grammar', color: '#8B5CF6', code: 'FAIT-URD' },
-            { day: 'Thursday', subject: 'English & Grammar', focus: 'Stories & Composition', color: '#3B82F6', code: 'FAIT-ENG' },
-            { day: 'Friday', subject: 'Tarjuma-tul-Quran', focus: 'Quranic Translation', color: '#0EA5E9', code: 'FAIT-TQM' },
-            { day: 'Saturday', subject: 'Islamiyat Lazmi', focus: 'Creed & Zakat System', color: '#14B866', code: 'FAIT-ISL' },
-            { day: 'Sunday', subject: 'Rest & Consolidation', focus: 'Mandatory Weekly Rest', color: '#EF4444', isOff: true },
-            { day: 'Monday', subject: 'Weekly Synthesis', focus: '5-Year Past Papers Drill', color: '#6366F1', code: 'FAIT-REV' },
+            { day: 'Tuesday', urduDay: 'منگل', subject: 'صحت و جسمانی تعلیم', focus: 'ہڈیاں و 400m ٹریک', color: '#10B981', code: 'FAIT-PED' },
+            { day: 'Wednesday', urduDay: 'بدھ', subject: 'اُردو 11 و شرح سرمایہ', focus: 'اسوہ حسنہ خلاصہ و قواعد', color: '#8B5CF6', code: 'FAIT-URD' },
+            { day: 'Thursday', urduDay: 'جمعرات', subject: 'English 11 & Sunshine', focus: 'Button Button & Tenses', color: '#3B82F6', code: 'FAIT-ENG' },
+            { day: 'Friday', urduDay: 'جمعہ', subject: 'ترجمۃ القرآن المجید', focus: 'سورۃ البقرہ ترجمہ', color: '#0EA5E9', code: 'FAIT-TQM' },
+            { day: 'Saturday', urduDay: 'ہفتہ', subject: 'اسلامیات لازمی', focus: 'عقائد و نظام زکوٰۃ', color: '#14B866', code: 'FAIT-ISL' },
+            { day: 'Sunday', urduDay: 'اتوار', subject: 'Rest Day (چھٹی)', focus: 'ہفتہ وار مکمل ریسٹ', color: '#EF4444', isOff: true },
+            { day: 'Monday', urduDay: 'پیر', subject: 'ہفتہ وار ریویژن', focus: '5 سالہ ماضی پیپرز', color: '#6366F1', code: 'FAIT-REV' },
           ].map((item) => {
             const isToday = todayName.toLowerCase() === item.day.toLowerCase();
             return (
               <div
                 key={item.day}
-                className={`p-2.5 rounded-xl border transition-all ${item.day === 'Monday' ? 'col-span-2 sm:col-span-1' : '' } ${
+                className={`p-2.5 rounded-xl border transition-all w-[140px] sm:w-[155px] lg:w-auto shrink-0 snap-start ${
                   isToday
                     ? 'bg-emerald-50/80 border-[#14B866] shadow-sm ring-1 ring-[#14B866]/30'
                     : item.isOff
@@ -187,8 +187,8 @@ export const FebruarySprintTracker: React.FC<FebruarySprintTrackerProps> = ({ co
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className={`text-[11px] font-bold ${isToday ? 'text-emerald-700' : 'text-zinc-500'}`}>
-                    {item.day.slice(0, 3)}
+                  <span className={`text-[11px] font-bold ${isToday ? 'text-emerald-700' : 'text-zinc-600'}`}>
+                    {item.urduDay} ({item.day.slice(0, 3)})
                   </span>
                   {isToday && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#14B866] text-white font-bold">

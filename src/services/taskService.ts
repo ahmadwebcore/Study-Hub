@@ -684,7 +684,9 @@ class TaskService {
             subjectCode: params.subjectCode,
             sourceType: params.sourceType || 'book_pdf',
             sourceTitle: params.bookTitle,
-            title: `Week ${w + 1} Deep Study: Chapter ${chapterNum} (Pages ${chStartPage}–${chEndPage})`,
+            title: params.subjectCode?.includes('URD') || params.subjectName?.toLowerCase().includes('urdu')
+              ? `سبق ${chapterNum}: اُردو 11 لازمی و شرح سرمایہ (صفحات ${chStartPage} تا ${chEndPage})`
+              : `Week ${w + 1} Deep Study: Chapter ${chapterNum} (Pages ${chStartPage}–${chEndPage})`,
             description: `Primary subject study day for ${params.subjectName}. Read chapter ${chapterNum} in ${params.bookTitle}, complete numericals & practice questions, then prepare for the 50-mark Daily Test.`,
             assignedDate: dateStr,
             dueDate: dateStr,
@@ -707,7 +709,9 @@ class TaskService {
             subjectCode: params.subjectCode,
             sourceType: params.sourceType || 'book_pdf',
             sourceTitle: params.bookTitle,
-            title: `Daily Reading Quota: ${params.subjectName} (Target: ~2.5 Pages)`,
+            title: params.subjectCode?.includes('URD') || params.subjectName?.toLowerCase().includes('urdu')
+              ? `روزانہ مطالعہ قسط: اُردو 11 و شرح سرمایہ (ہدف: ~2.5 صفحات)`
+              : `Daily Reading Quota: ${params.subjectName} (Target: ~2.5 Pages)`,
             description: `Review Chapter ${chapterNum} key definitions and 3 board exam short questions from ${params.bookTitle} (Page ~${dailySubPage}).`,
             assignedDate: dateStr,
             dueDate: dateStr,

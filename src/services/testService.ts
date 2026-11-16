@@ -3,18 +3,18 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { TestItem, ResultRecord, TestQuestion, TestAttempt, TestAnswer } from '../types';
 import { SAMPLE_TESTS, SAMPLE_RESULTS } from '../data/sampleData';
 
-const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v5';
+const CUSTOM_TESTS_KEY = 'studyhub_custom_tests_v6';
 
 try {
-  ['v1', 'v2', 'v3', 'v4'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
+  ['v1', 'v2', 'v3', 'v4', 'v5'].forEach(v => localStorage.removeItem('studyhub_custom_tests_' + v));
 } catch {}
 
 const INITIAL_HENZA_TESTS: TestItem[] = [
   {
     id: 'test_henza_ped_01',
-    title: 'Physical Education: Human Anatomy & 400m Track Specifications',
+    title: 'منگل (Tuesday): صحت و جسمانی تعلیم — انسانی ڈھانچہ و 400 میٹر ٹریک رولز',
     subjectId: 'sub_01',
-    subjectName: 'Physical Education',
+    subjectName: 'Physical Education (جسمانی تعلیم)',
     subjectCode: 'FAIT-PED-11',
     date: 'Nov 17, 2026',
     time: '10:00 AM',
@@ -29,9 +29,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     id: 'test_henza_urd_01',
-    title: 'Urdu Lazmi & Sharh Sarmaya: Uswa-e-Hasna & Ilm-e-Bayan',
+    title: 'بدھ (Wednesday): اُردو 11 و شرح سرمایہ — سبق اسوہ حسنہ خلاصہ و علم بیان',
     subjectId: 'sub_02',
-    subjectName: 'Urdu & Grammar',
+    subjectName: 'اُردو لازمی و شرح سرمایہ (Urdu)',
     subjectCode: 'FAIT-URD-11',
     date: 'Nov 18, 2026',
     time: '10:00 AM',
@@ -39,14 +39,14 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
     totalMarks: 30,
     passingMarks: 15,
     type: 'Unit Assessment',
-    syllabusCoverage: 'اُردو 11 لازمی و شرح سرمایہ (پروفیسر راؤ خالد محمود) — سبق اسوہ حسنہ اور تشبیہ و استعارہ کے اصول',
-    instructions: 'Attempt all sections. Write application clearly and upload handwritten sheet via Camera/Gallery. Passing: 15/30.',
+    syllabusCoverage: 'اُردو 11 لازمی (PECTAA) و شرح سرمایہ اردو (پروفیسر راؤ خالد محمود) — سبق اسوہ حسنہ خلاصہ، خط نویسی اور ارکان تشبیہ',
+    instructions: 'سبق اسوہ حسنہ کا خلاصہ اور خط نویسی حل کریں۔ جوابی کاپی کیمرہ یا گیلری سے اپلوڈ کریں۔ کل نمبر: 30۔ پاسنگ مارکس: 15۔',
     status: 'scheduled',
     assignedStudentName: 'Henza Noor',
   },
   {
     id: 'test_henza_eng_01',
-    title: 'English & Sunshine Grammar: Button Button & Active/Passive Voice',
+    title: 'جمعرات (Thursday): English 11 & Sunshine — Story 1 "Button, Button" & Master Tenses',
     subjectId: 'sub_03',
     subjectName: 'English & Grammar',
     subjectCode: 'FAIT-ENG-11',
@@ -63,9 +63,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     id: 'test_henza_tqm_01',
-    title: 'ترجمۃ القرآن المجید: سورۃ البقرہ آیات 1 تا 25 لفظی و با محاورہ ترجمہ',
+    title: 'جمعہ (Friday): ترجمۃ القرآن المجید — سورۃ البقرہ رکوع 1 تا 2 با محاورہ ترجمہ',
     subjectId: 'sub_05',
-    subjectName: 'Tarjuma-tul-Quran',
+    subjectName: 'ترجمۃ القرآن المجید (Quran)',
     subjectCode: 'FAIT-TQM-11',
     date: 'Nov 20, 2026',
     time: '10:00 AM',
@@ -80,9 +80,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     id: 'test_henza_isl_01',
-    title: 'اسلامیات لازمی: عقیدہ توحید، رسالت اور نظام زکوٰۃ',
+    title: 'ہفتہ (Saturday): اسلامیات لازمی — عقیدہ توحید، رسالت اور نظام زکوٰۃ',
     subjectId: 'sub_06',
-    subjectName: 'Islamiyat Lazmi',
+    subjectName: 'اسلامیات لازمی (Islamiyat)',
     subjectCode: 'FAIT-ISL-11',
     date: 'Nov 21, 2026',
     time: '10:00 AM',
@@ -97,9 +97,9 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   },
   {
     id: 'test_henza_rev_01',
-    title: 'ہفتہ وار جائزہ: BISE DG Khan 5 سالہ ماضی ماڈل پیپرز کمپلیشن',
+    title: 'پیر (Monday): ہفتہ وار بورڈ جائزہ — BISE DG Khan 5 سالہ ماضی پیپرز مشق',
     subjectId: 'sub_01',
-    subjectName: 'Weekly Revision Drill',
+    subjectName: 'ہفتہ وار جائزہ (Past Papers Drill)',
     subjectCode: 'FAIT-REV-11',
     date: 'Nov 23, 2026',
     time: '10:00 AM',
@@ -118,8 +118,33 @@ function getCustomTests(): TestItem[] {
   try {
     const raw = localStorage.getItem(CUSTOM_TESTS_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      let parsed = JSON.parse(raw) as TestItem[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        let modified = false;
+        parsed = parsed.map((t) => {
+          if (t.title?.includes('Daily Test Series') || t.title?.includes('Urdu Lazmi & Sharh')) {
+            modified = true;
+            if (t.subjectCode?.includes('URD') || t.subjectName?.toLowerCase().includes('urdu')) {
+              t.title = 'بدھ (Wednesday): اُردو 11 و شرح سرمایہ — سبق اسوہ حسنہ خلاصہ و علم بیان';
+            } else if (t.subjectCode?.includes('PED')) {
+              t.title = 'منگل (Tuesday): ہیلتھ اینڈ فزیکل ایجوکیشن — انسانی ڈھانچہ و 400 میٹر ٹریک رولز';
+            } else if (t.subjectCode?.includes('ENG')) {
+              t.title = 'جمعرات (Thursday): English 11 & Sunshine — Story 1 "Button, Button" & Master Tenses';
+            } else if (t.subjectCode?.includes('TQM')) {
+              t.title = 'جمعہ (Friday): ترجمۃ القرآن المجید — سورۃ البقرہ رکوع 1 تا 2 با محاورہ ترجمہ';
+            } else if (t.subjectCode?.includes('ISL')) {
+              t.title = 'ہفتہ (Saturday): اسلامیات لازمی — عقیدہ توحید، رسالت اور نظام زکوٰۃ';
+            } else if (t.subjectCode?.includes('REV')) {
+              t.title = 'پیر (Monday): ہفتہ وار بورڈ جائزہ — BISE DG Khan 5 سالہ ماضی پیپرز مشق';
+            }
+          }
+          return t;
+        });
+        if (modified) {
+          saveCustomTests(parsed);
+        }
+        return parsed;
+      }
     }
   } catch {}
   return [...INITIAL_HENZA_TESTS];
@@ -805,7 +830,32 @@ export const testService = {
 
       const newTest: TestItem = {
         id: `test_daily_${params.subjectId}_${w + 1}_${Date.now()}`,
-        title: `Daily Test Series: Chapter ${w + 1} (${params.subjectName})`,
+        title: (() => {
+          const isUrduLang = params.subjectCode?.includes('URD') || params.subjectName?.toLowerCase().includes('urdu') || params.bookTitle?.includes('اُردو') || params.bookTitle?.includes('سرمایہ');
+          const isIslamic = params.subjectCode?.includes('TQM') || params.subjectCode?.includes('ISL') || params.subjectName?.includes('Quran') || params.subjectName?.includes('Islam');
+          const isPed = params.subjectCode?.includes('PED') || params.subjectName?.toLowerCase().includes('physical');
+          const dayNamesUrdu: Record<string, string> = {
+            Monday: 'پیر',
+            Tuesday: 'منگل',
+            Wednesday: 'بدھ',
+            Thursday: 'جمعرات',
+            Friday: 'جمعہ',
+            Saturday: 'ہفتہ',
+          };
+          const urduDayName = dayNamesUrdu[targetDay] || targetDay;
+
+          if (isUrduLang) {
+            return `${urduDayName} (${targetDay}): اُردو 11 و شرح سرمایہ — سبق ${w + 1} خلاصہ و امتحانی مشق`;
+          } else if (isIslamic) {
+            if (params.subjectCode?.includes('TQM')) {
+              return `${urduDayName} (${targetDay}): ترجمۃ القرآن المجید — رکوع ${w + 1} با محاورہ ترجمہ`;
+            }
+            return `${urduDayName} (${targetDay}): اسلامیات لازمی — سبق ${w + 1} خلاصہ و اہم سوالات`;
+          } else if (isPed) {
+            return `${urduDayName} (${targetDay}): صحت و جسمانی تعلیم — باب ${w + 1} جسمانی ساخت و قواعد`;
+          }
+          return `${targetDay} (${urduDayName}): ${params.subjectName} — Chapter ${w + 1} Assessment`;
+        })(),
         subjectId: params.subjectId,
         subjectName: params.subjectName,
         subjectCode: params.subjectCode,
