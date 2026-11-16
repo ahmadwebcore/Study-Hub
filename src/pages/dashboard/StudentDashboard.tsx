@@ -21,7 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
 import { taskService, DailyTask } from '../../services/taskService';
-import { testService } from '../../services/testService';
+import { testService, extractDayAndCleanTitle } from '../../services/testService';
 import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
@@ -193,27 +193,46 @@ export const StudentDashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Card 1: Daily Reading Quota (Crisp White Card) */}
           <div className="p-5 rounded-3xl bg-white border border-[#e1ede7] shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4 text-[#142D27]">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                  Step 1 &bull; Daily Quota
-                </span>
-                <span className="text-xs font-semibold text-[#557067] flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                  {activeTodayTask ? `~${activeTodayTask.estimatedMinutes || 45} Mins` : '~45 Mins (2.5 Pgs)'}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-[#142D27] font-serif">
-                {activeTodayTask
-                  ? `${activeTodayTask.subjectName}: ${activeTodayTask.title}`
-                  : 'No Daily Reading Task Scheduled'}
-              </h3>
-              <p className="text-xs text-[#557067] leading-relaxed">
-                {activeTodayTask
-                  ? activeTodayTask.description
-                  : 'Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate daily study targets and page quotas (Sundays OFF).'}
-              </p>
-            </div>
+            {(() => {
+              const todayTaskMeta = activeTodayTask ? extractDayAndCleanTitle(activeTodayTask.title) : null;
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                        Step 1 &bull; Daily Quota
+                      </span>
+                      {todayTaskMeta && (
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-urdu-compact">
+                          {todayTaskMeta.day}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-semibold text-[#557067] flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                      {activeTodayTask ? `~${activeTodayTask.estimatedMinutes || 45} Mins` : '~45 Mins (2.5 Pgs)'}
+                    </span>
+                  </div>
+                  {activeTodayTask?.subjectName && (
+                    <span className="text-[11px] font-semibold text-emerald-700 block">
+                      {activeTodayTask.subjectName}
+                    </span>
+                  )}
+                  <h3 className={`font-serif ${
+                    todayTaskMeta?.isUrdu
+                      ? 'font-urdu text-[16px] font-bold text-[#142D27] leading-loose text-right dir-rtl'
+                      : 'text-base font-bold text-[#142D27]'
+                  }`}>
+                    <bdi>{todayTaskMeta ? todayTaskMeta.cleanTitle : 'No Daily Reading Task Scheduled'}</bdi>
+                  </h3>
+                  <p className="text-xs text-[#557067] leading-relaxed">
+                    {activeTodayTask
+                      ? activeTodayTask.description
+                      : 'Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate daily study targets and page quotas (Sundays OFF).'}
+                  </p>
+                </div>
+              );
+            })()}
 
             <div className="pt-2 border-t border-[#e1ede7] flex flex-wrap items-center gap-2">
               {activeTodayTask ? (
@@ -255,58 +274,75 @@ export const StudentDashboard: React.FC = () => {
           </div>
 
           {/* Card 2: Today's 30-Mark Test (Crisp White Card with Emerald Accent) */}
-          <div className="p-5 rounded-3xl bg-white border-2 border-emerald-500/80 shadow-md hover:border-emerald-500 hover:shadow-lg transition-all flex flex-col justify-between space-y-4 text-[#142D27]">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                  Step 2 &bull; 30-Mark Test
-                </span>
-                <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                  <Award className="w-3.5 h-3.5 text-emerald-600" />
-                  {activeTodayTest ? `Pass: ${activeTodayTest.passingMarks}/${activeTodayTest.totalMarks} Marks` : 'Pass: 15/30 Marks'}
-                </span>
-              </div>
-              <h3 className="text-base font-bold text-[#142D27] font-serif">
-                {activeTodayTest ? activeTodayTest.title : 'No 30-Mark Test Scheduled'}
-              </h3>
-              <p className="text-xs text-[#557067] leading-relaxed">
-                {activeTodayTest
-                  ? activeTodayTest.syllabusCoverage || activeTodayTest.instructions
-                  : 'Upload your textbook PDF to break chapters into weekly 30-mark assessments mapped to BISE DG Khan pattern.'}
-              </p>
-            </div>
+          {(() => {
+            const todayTestMeta = activeTodayTest ? extractDayAndCleanTitle(activeTodayTest.title, activeTodayTest.date) : null;
 
-            <div className="pt-2 border-t border-[#e1ede7] flex flex-wrap items-center gap-2">
-              {activeTodayTest ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setPdfModalData({ isOpen: true, test: activeTodayTest })}
-                    className="inline-flex items-center gap-1.5 py-2.5 px-3 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all cursor-pointer shadow-2xs"
-                    title="View test chapter & 30-mark past paper questions in PDF"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>View Test in PDF</span>
-                  </button>
-                  <Link
-                    to={`/test-submit?testId=${activeTodayTest.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
-                  >
-                    <FileCheck2 className="w-3.5 h-3.5 text-white" />
-                    <span>Start 30-Mark Test</span>
-                    <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  to="/library"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all"
-                >
-                  <span>⚡ Schedule Tests from Book PDF</span>
-                </Link>
-              )}
-            </div>
-          </div>
+            return (
+              <div className="p-5 rounded-3xl bg-white border-2 border-emerald-500/80 shadow-md hover:border-emerald-500 hover:shadow-lg transition-all flex flex-col justify-between space-y-4 text-[#142D27]">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                        Step 2 &bull; 30-Mark Test
+                      </span>
+                      {todayTestMeta && (
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-urdu-compact">
+                          {todayTestMeta.day}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                      <Award className="w-3.5 h-3.5 text-emerald-600" />
+                      {activeTodayTest ? `Pass: ${activeTodayTest.passingMarks}/${activeTodayTest.totalMarks} Marks` : 'Pass: 15/30 Marks'}
+                    </span>
+                  </div>
+                  <h3 className={`font-serif ${
+                    todayTestMeta?.isUrdu
+                      ? 'font-urdu text-[16px] font-bold text-[#142D27] leading-loose text-right dir-rtl'
+                      : 'text-base font-bold text-[#142D27]'
+                  }`}>
+                    <bdi>{todayTestMeta ? todayTestMeta.cleanTitle : 'No 30-Mark Test Scheduled'}</bdi>
+                  </h3>
+                  <p className="text-xs text-[#557067] leading-relaxed">
+                    {activeTodayTest
+                      ? activeTodayTest.syllabusCoverage || activeTodayTest.instructions
+                      : 'Upload your textbook PDF to break chapters into weekly 30-mark assessments mapped to BISE DG Khan pattern.'}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-[#e1ede7] flex flex-wrap items-center gap-2">
+                  {activeTodayTest ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setPdfModalData({ isOpen: true, test: activeTodayTest })}
+                        className="inline-flex items-center gap-1.5 py-2.5 px-3 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all cursor-pointer shadow-2xs"
+                        title="View test chapter & 30-mark past paper questions in PDF"
+                      >
+                        <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>View Test in PDF</span>
+                      </button>
+                      <Link
+                        to={`/test-submit?testId=${activeTodayTest.id}`}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
+                      >
+                        <FileCheck2 className="w-3.5 h-3.5 text-white" />
+                        <span>Start 30-Mark Test</span>
+                        <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      to="/library"
+                      className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all"
+                    >
+                      <span>⚡ Schedule Tests from Book PDF</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 

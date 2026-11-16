@@ -17,7 +17,7 @@ import { Modal } from '../../components/ui/Modal';
 import { ComposeEmailModal } from '../../components/mail/ComposeEmailModal';
 import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
 import { useRole } from '../../hooks/useRole';
-import { testService } from '../../services/testService';
+import { testService, extractDayAndCleanTitle } from '../../services/testService';
 import { taskService, DailyTask } from '../../services/taskService';
 import { emailService } from '../../services/emailService';
 import { studentService } from '../../services/studentService';
@@ -262,47 +262,51 @@ export const TeacherDashboard: React.FC = () => {
       {/* BISE DG Khan Official Board Widget */}
       <BISEDGKhanBoardWidget />
 
-      {/* Plain Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-            Total Tasks
+      {/* Metrics Row: 1-col on mobile, 2-col on sm, 4-col on lg */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
+            Total Targets
           </span>
-          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-2xl sm:text-3xl font-extrabold text-[#142D27] font-serif mt-1 block tracking-tight">
             {tasks.length}
           </span>
+          <p className="text-[11px] text-[#7d9990] mt-0.5">Syllabus breakdown milestones</p>
         </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Due Today
           </span>
-          <span className="text-3xl font-bold text-zinc-900 mt-1 block tracking-tight">
+          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-700 font-serif mt-1 block tracking-tight">
             {todayCount}
           </span>
+          <p className="text-[11px] text-[#7d9990] mt-0.5">Active reading targets</p>
         </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Awaiting Review
           </span>
-          <span className="text-3xl font-bold text-amber-600 mt-1 block tracking-tight">
+          <span className="text-2xl sm:text-3xl font-extrabold text-amber-600 font-serif mt-1 block tracking-tight">
             {awaitingCount}
           </span>
+          <p className="text-[11px] text-amber-700 mt-0.5 font-semibold">Requires faculty check</p>
         </div>
-        <div className="p-4 rounded-xl bg-white border border-zinc-200">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-[#e1ede7] text-[#142D27] shadow-sm hover:shadow-md transition-all">
+          <span className="text-[11px] font-bold text-[#557067] uppercase tracking-wider block">
             Verified Complete
           </span>
-          <span className="text-3xl font-bold text-emerald-600 mt-1 block tracking-tight">
+          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-serif mt-1 block tracking-tight">
             {approvedCount}
           </span>
+          <p className="text-[11px] text-emerald-700 mt-0.5 font-semibold">Approved by Ahmad Sir</p>
         </div>
       </div>
 
-      {/* Plain Tasks Table / Desk */}
-      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-xs">
+      {/* Task Milestones Series Bento Desk */}
+      <div className="space-y-4">
         {/* Filter Bar */}
-        <div className="p-3.5 border-b border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-zinc-50/70">
-          <div className="flex items-center gap-1.5">
+        <div className="p-3.5 rounded-2xl border border-[#e1ede7] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white shadow-2xs">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             {[
               { id: 'all', label: 'All', count: tasks.length },
               { id: 'today', label: 'Due Today', count: todayCount },
@@ -312,10 +316,10 @@ export const TeacherDashboard: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setTaskFilter(tab.id as any)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-all whitespace-nowrap ${
                   taskFilter === tab.id
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60'
+                    ? 'bg-emerald-700 text-white shadow-2xs'
+                    : 'text-[#557067] hover:text-[#142D27] hover:bg-[#F7F9F8]'
                 }`}
               >
                 {tab.label} <span className="opacity-70 text-[11px]">({tab.count})</span>
@@ -323,81 +327,116 @@ export const TeacherDashboard: React.FC = () => {
             ))}
           </div>
 
-          <div className="relative w-full sm:w-56">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <div className="relative w-full sm:w-60">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1 text-xs bg-white border border-zinc-200 rounded-md text-zinc-900 focus:outline-none focus:border-zinc-400"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:outline-none focus:border-emerald-500 shadow-2xs"
             />
           </div>
         </div>
 
-        {/* Task Rows List */}
-        <div className="divide-y divide-zinc-100">
-          {filteredTasks.length === 0 ? (
-            <div className="p-8 text-center text-xs text-zinc-500">
-              No tasks found under this filter.
-            </div>
-          ) : (
-            filteredTasks.map((task) => (
-              <div
-                key={task.id}
-                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/80 transition-colors"
-              >
-                <div className="space-y-0.5 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-zinc-900 truncate">
-                      {task.title}
-                    </span>
-                    <span className="text-[10px] text-zinc-500 px-1.5 py-0.5 rounded bg-zinc-100 border border-zinc-200">
-                      {task.subjectName}
-                    </span>
+        {/* Task Cards Grid: 1-col on mobile, 2-col on sm, 3-col on lg, Latest on top */}
+        {filteredTasks.length === 0 ? (
+          <div className="p-10 text-center text-xs text-[#557067] bg-white rounded-3xl border border-[#e1ede7]">
+            No tasks found under this filter.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredTasks
+              .slice()
+              .sort((a, b) => {
+                if (a.status === 'submitted_for_approval' && b.status !== 'submitted_for_approval') return -1;
+                if (b.status === 'submitted_for_approval' && a.status !== 'submitted_for_approval') return 1;
+                if (a.dueDate === todayStr && b.dueDate !== todayStr) return -1;
+                if (b.dueDate === todayStr && a.dueDate !== todayStr) return 1;
+                return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+              })
+              .map((task) => {
+                const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(task.title);
+
+                return (
+                  <div
+                    key={task.id}
+                    className="p-5 rounded-3xl bg-white border border-[#e1ede7] hover:border-emerald-400 hover:shadow-md transition-all flex flex-col justify-between shadow-sm group"
+                  >
+                    <div>
+                      {/* Top Pill Row */}
+                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact">
+                            {day || task.dayOfWeek}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                            {task.subjectCode}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-[#7d9990] font-medium">
+                          {task.dueDate}
+                        </span>
+                      </div>
+
+                      {/* Subject & Title */}
+                      <div className="mt-2.5">
+                        <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
+                          {task.subjectName}
+                        </span>
+                        <h4
+                          className={`mt-1 group-hover:text-emerald-700 transition-colors ${
+                            isUrdu
+                              ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
+                              : 'text-sm font-bold text-[#142D27]'
+                          }`}
+                        >
+                          <bdi>{cleanTitle}</bdi>
+                        </h4>
+                      </div>
+
+                      {/* Description Snippet */}
+                      {task.description && (
+                        <div className="mt-2.5 p-2 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs text-[#557067] line-clamp-2 leading-relaxed">
+                          {task.description}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Status / Action Footer */}
+                    <div className="pt-3 mt-3.5 border-t border-[#e1ede7] flex items-center justify-between gap-2">
+                      <span className="text-[11px] text-[#7d9990] font-medium">
+                        {task.estimatedMinutes || 45} Mins Quota
+                      </span>
+
+                      {task.status === 'submitted_for_approval' ? (
+                        <button
+                          onClick={() => setApprovingTask(task)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-500 transition-all shadow-xs cursor-pointer active:scale-95"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>Approve &amp; Mark</span>
+                        </button>
+                      ) : task.status === 'approved' ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                          <CheckCircle className="w-3 h-3 text-emerald-600" />
+                          Verified
+                        </span>
+                      ) : task.isSundayOff || task.isPakistanHoliday ? (
+                        <span className="text-[10px] font-semibold text-sky-800 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-200">
+                          🇵🇰 Rest Day
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-zinc-600 px-2.5 py-1 rounded-full bg-zinc-100 border border-zinc-200">
+                          Pending
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[11px] text-zinc-500 line-clamp-1">
-                    {task.description}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0 text-xs">
-                  <span className="text-zinc-500 text-[11px]">
-                    {task.dueDate}
-                  </span>
-
-                  {task.status === 'submitted_for_approval' && (
-                    <button
-                      onClick={() => setApprovingTask(task)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors shadow-xs"
-                    >
-                      <Check className="w-3 h-3" />
-                      Approve Work
-                    </button>
-                  )}
-
-                  {task.status === 'approved' && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
-                      Verified
-                    </span>
-                  )}
-
-                  {task.status === 'pending' && !task.isSundayOff && !task.isPakistanHoliday && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-zinc-600 bg-zinc-100 rounded-lg border border-zinc-200">
-                      Pending
-                    </span>
-                  )}
-
-                  {(task.isSundayOff || task.isPakistanHoliday) && (
-                    <span className="px-2.5 py-1 text-[11px] font-semibold text-zinc-600 bg-zinc-100 rounded-lg border border-zinc-200">
-                      🇵🇰 Rest Day
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+                );
+              })}
+          </div>
+        )}
       </div>
 
       {/* Modal: Invite Student by Email */}
@@ -521,10 +560,24 @@ export const TeacherDashboard: React.FC = () => {
         title="Check & Grade Student Submission"
       >
         <div className="space-y-4">
-          <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200">
-            <span className="text-[10px] uppercase font-bold text-zinc-500 block">Task Assignment</span>
-            <p className="text-xs font-bold text-zinc-900 mt-0.5">{approvingTask?.title}</p>
-            <p className="text-[11px] text-zinc-600 mt-0.5">{approvingTask?.subjectName} &bull; Due: {approvingTask?.dueDate}</p>
+          <div className="p-3.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7]">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] uppercase font-bold text-[#7d9990] block">Task Assignment</span>
+              {approvingTask && (
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold font-urdu-compact">
+                  {extractDayAndCleanTitle(approvingTask.title).day}
+                </span>
+              )}
+            </div>
+            {(() => {
+              const meta = approvingTask ? extractDayAndCleanTitle(approvingTask.title) : null;
+              return (
+                <p className={`font-bold text-[#142D27] ${meta?.isUrdu ? 'font-urdu text-[15px] leading-loose text-right dir-rtl' : 'text-xs'}`}>
+                  <bdi>{meta ? meta.cleanTitle : ''}</bdi>
+                </p>
+              );
+            })()}
+            <p className="text-[11px] text-[#557067] mt-1">{approvingTask?.subjectName} &bull; Due: {approvingTask?.dueDate}</p>
           </div>
 
           {/* Solution Sheet Preview */}

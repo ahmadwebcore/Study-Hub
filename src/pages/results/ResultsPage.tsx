@@ -12,7 +12,7 @@ import { Modal } from '../../components/ui/Modal';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { SAMPLE_RESULTS } from '../../data/sampleData';
 import { ResultRecord } from '../../types';
-import { testService } from '../../services/testService';
+import { testService, extractDayAndCleanTitle } from '../../services/testService';
 import { useRole } from '../../hooks/useRole';
 
 export const ResultsPage: React.FC = () => {
@@ -173,95 +173,196 @@ export const ResultsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Results Table */}
+      {/* Results Display: Mobile Series Cards (1-col) + Desktop Table */}
       {filteredResults.length > 0 ? (
-        <Card padding="none" className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-[#e1ede7] bg-[#F7F9F8]/80 text-[11px] font-bold text-[#557067] uppercase tracking-wider">
-                  <th className="py-3 px-4 sm:px-6">Test & Discipline</th>
-                  <th className="py-3 px-4">Student</th>
-                  <th className="py-3 px-4">Score</th>
-                  <th className="py-3 px-4">Grade</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 sm:px-6">Evaluation Remarks</th>
-                  <th className="py-3 px-4 text-right">Details</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e1ede7]/80 text-xs text-[#263B35]">
-                {filteredResults.map((item) => {
-                  const percentage =
-                    item.percentage !== undefined
-                      ? item.percentage
-                      : Math.round((item.score / item.maxScore) * 100);
-                  const isPassed =
-                    item.passed !== undefined
-                      ? item.passed
-                      : item.score >= (item.passingMarks || 40);
+        <div className="space-y-4">
+          {/* Mobile Series Cards (1-col on mobile, 2-col on sm) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+            {filteredResults
+              .slice()
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .map((item) => {
+                const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(item.testTitle, item.date);
+                const percentage =
+                  item.percentage !== undefined
+                    ? item.percentage
+                    : Math.round((item.score / item.maxScore) * 100);
+                const isPassed =
+                  item.passed !== undefined
+                    ? item.passed
+                    : item.score >= (item.passingMarks || 15);
 
-                  return (
-                    <tr key={item.id} className="hover:bg-[#F7F9F8]/60 transition-colors">
-                      <td className="py-4 px-4 sm:px-6">
-                        <div className="font-bold text-[#142D27]">{item.testTitle}</div>
-                        <div className="text-[11px] text-[#557067] mt-0.5">
-                          {item.subjectName} ({item.subjectCode}) &bull; {item.date}
+                return (
+                  <div
+                    key={item.id}
+                    className="p-5 rounded-3xl bg-white border border-[#e1ede7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                  >
+                    <div>
+                      {/* Top Meta */}
+                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact">
+                            {day}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                            {item.subjectCode}
+                          </span>
                         </div>
-                      </td>
+                        <span className="text-[10px] text-[#7d9990] font-medium">{item.date}</span>
+                      </div>
 
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={item.studentAvatar}
-                            alt={item.studentName}
-                            className="w-6 h-6 rounded-full object-cover ring-1 ring-[#e1ede7]"
-                          />
-                          <span className="font-semibold text-[#142D27]">{item.studentName}</span>
-                        </div>
-                      </td>
-
-                      <td className="py-4 px-4">
-                        <div className="font-extrabold text-[#14B866] text-sm">
-                          {item.score} / {item.maxScore}
-                        </div>
-                        <span className="text-[10px] text-[#7d9990]">{percentage}%</span>
-                      </td>
-
-                      <td className="py-4 px-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          {item.grade}
+                      {/* Subject Name & Title in Clean Urdu */}
+                      <div className="mt-2.5">
+                        <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
+                          {item.subjectName}
                         </span>
-                      </td>
-
-                      <td className="py-4 px-4">
-                        <Badge variant={isPassed ? 'primary' : 'danger'} size="sm">
-                          {isPassed ? 'Passed' : 'Needs Retest'}
-                        </Badge>
-                      </td>
-
-                      <td className="py-4 px-4 sm:px-6 max-w-xs">
-                        <p className="text-xs text-[#557067] line-clamp-2 leading-relaxed">
-                          {item.feedback}
-                        </p>
-                      </td>
-
-                      <td className="py-4 px-4 text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          icon={<Eye className="w-3.5 h-3.5 text-[#14B866]" />}
-                          onClick={() => setSelectedResultDetail(item)}
+                        <h4
+                          className={`mt-1 ${
+                            isUrdu
+                              ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
+                              : 'text-sm font-bold text-[#142D27]'
+                          }`}
                         >
-                          Certificate
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          <bdi>{cleanTitle}</bdi>
+                        </h4>
+                      </div>
+
+                      {/* Score Box */}
+                      <div className="mt-3 p-2.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] text-[#7d9990] block">Score Awarded:</span>
+                          <span className="text-base font-extrabold text-[#142D27]">
+                            {item.score} / {item.maxScore} Marks
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-bold text-emerald-700 block">
+                            {percentage}% &bull; Grade {item.grade}
+                          </span>
+                          <span className={`inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                            isPassed
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                              : 'bg-rose-50 text-rose-800 border border-rose-200'
+                          }`}>
+                            {isPassed ? 'PASSED ✅' : 'RETEST ⚠️'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Feedback Snippet */}
+                      {item.feedback && (
+                        <p className="mt-2.5 text-[11px] text-[#557067] italic bg-emerald-50/40 p-2 rounded-xl border border-emerald-100">
+                          &quot;{item.feedback}&quot;
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Bottom Action */}
+                    <div className="pt-3 border-t border-[#e1ede7]">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-center text-xs font-bold"
+                        icon={<Eye className="w-3.5 h-3.5 text-emerald-600" />}
+                        onClick={() => setSelectedResultDetail(item)}
+                      >
+                        View Official Certificate
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
-        </Card>
+
+          {/* Desktop Table View */}
+          <Card padding="none" className="hidden md:block overflow-hidden rounded-3xl border border-[#e1ede7]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#e1ede7] bg-[#F7F9F8]/80 text-[11px] font-bold text-[#557067] uppercase tracking-wider">
+                    <th className="py-3 px-4 sm:px-6">Test &amp; Discipline</th>
+                    <th className="py-3 px-4">Student</th>
+                    <th className="py-3 px-4">Score</th>
+                    <th className="py-3 px-4">Grade</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 sm:px-6">Evaluation Remarks</th>
+                    <th className="py-3 px-4 text-right">Details</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e1ede7]/80 text-xs text-[#263B35]">
+                  {filteredResults.map((item) => {
+                    const percentage =
+                      item.percentage !== undefined
+                        ? item.percentage
+                        : Math.round((item.score / item.maxScore) * 100);
+                    const isPassed =
+                      item.passed !== undefined
+                        ? item.passed
+                        : item.score >= (item.passingMarks || 40);
+
+                    return (
+                      <tr key={item.id} className="hover:bg-[#F7F9F8]/60 transition-colors">
+                        <td className="py-4 px-4 sm:px-6">
+                          <div className="font-bold text-[#142D27]">{item.testTitle}</div>
+                          <div className="text-[11px] text-[#557067] mt-0.5">
+                            {item.subjectName} ({item.subjectCode}) &bull; {item.date}
+                          </div>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={item.studentAvatar}
+                              alt={item.studentName}
+                              className="w-6 h-6 rounded-full object-cover ring-1 ring-[#e1ede7]"
+                            />
+                            <span className="font-semibold text-[#142D27]">{item.studentName}</span>
+                          </div>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <div className="font-extrabold text-[#14B866] text-sm">
+                            {item.score} / {item.maxScore}
+                          </div>
+                          <span className="text-[10px] text-[#7d9990]">{percentage}%</span>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {item.grade}
+                          </span>
+                        </td>
+
+                        <td className="py-4 px-4">
+                          <Badge variant={isPassed ? 'primary' : 'danger'} size="sm">
+                            {isPassed ? 'Passed' : 'Needs Retest'}
+                          </Badge>
+                        </td>
+
+                        <td className="py-4 px-4 sm:px-6 max-w-xs">
+                          <p className="text-xs text-[#557067] line-clamp-2 leading-relaxed">
+                            {item.feedback}
+                          </p>
+                        </td>
+
+                        <td className="py-4 px-4 text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            icon={<Eye className="w-3.5 h-3.5 text-[#14B866]" />}
+                            onClick={() => setSelectedResultDetail(item)}
+                          >
+                            Certificate
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
       ) : (
         <EmptyState
           icon={<Award className="w-8 h-8 text-[#14B866]" />}

@@ -19,6 +19,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Modal } from '../../components/ui/Modal';
 import { taskService, DailyTask } from '../../services/taskService';
+import { extractDayAndCleanTitle } from '../../services/testService';
 import { subjectService } from '../../services/subjectService';
 import { mediaService } from '../../services/mediaService';
 import { Subject } from '../../types';
@@ -519,8 +520,8 @@ export const WeeklyTasksPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Task Cards List */}
-      <div className="space-y-3">
+      {/* Task Cards Bento Grid: 1-col on mobile, 2-col on sm, 3-col on lg, Latest on top */}
+      <div>
         {tasks.length === 0 ? (
           <div className="text-center py-12 sm:py-16 bg-white rounded-3xl border border-dashed border-zinc-300 p-8 space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
@@ -545,264 +546,258 @@ export const WeeklyTasksPage: React.FC = () => {
             <CalendarDays className="w-10 h-10 text-[#7d9990] mx-auto mb-2 opacity-50" />
             <h3 className="text-sm font-bold text-[#142D27]">No Tasks Found</h3>
             <p className="text-xs text-[#557067] mt-1">
-              There are no tasks matching your selected filters. Click "Upload PDF & Auto-Schedule" or "+ Add Task Manually" to create some.
+              There are no tasks matching your selected filters. Click &quot;Upload PDF &amp; Auto-Schedule&quot; or &quot;+ Add Task Manually&quot; to create some.
             </p>
           </div>
         ) : (
-          filteredTasks.map((task) => {
-            if (task.isSundayOff) {
-              return (
-                /* Sunday OFF Dedicated Card */
-                <div
-                  key={task.id}
-                  className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-sky-50/70 via-emerald-50/40 to-white border border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-sky-100 border border-sky-200 text-sky-700 flex items-center justify-center shrink-0">
-                      <Coffee className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200">
-                          Sunday Off • Rest Day
-                        </span>
-                        <span className="text-xs font-semibold text-[#7d9990]">{task.assignedDate}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredTasks
+              .slice()
+              .sort((a, b) => {
+                const todayStr = new Date().toISOString().slice(0, 10);
+                if (a.dueDate === todayStr && b.dueDate !== todayStr) return -1;
+                if (b.dueDate === todayStr && a.dueDate !== todayStr) return 1;
+                return new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime();
+              })
+              .map((task) => {
+                const { day, cleanTitle, isUrdu } = extractDayAndCleanTitle(task.title);
+
+                if (task.isSundayOff) {
+                  return (
+                    <div
+                      key={task.id}
+                      className="p-5 rounded-3xl bg-gradient-to-br from-sky-50/70 via-white to-sky-50/30 border border-sky-200/80 flex flex-col justify-between shadow-sm group"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-1 pb-2 border-b border-sky-100">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200">
+                            Sunday Off &bull; Rest Day
+                          </span>
+                          <span className="text-[10px] text-[#7d9990] font-medium">{task.assignedDate}</span>
+                        </div>
+
+                        <div className="mt-3 flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                            <Coffee className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-[#142D27]">
+                              {task.title}
+                            </h4>
+                            <p className="text-xs text-[#557067] mt-1 leading-relaxed">
+                              {task.description}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <h4 className="text-sm font-bold text-[#142D27] mt-1">
-                        {task.title}
-                      </h4>
-                      <p className="text-xs text-[#557067] mt-0.5 leading-relaxed">
-                        {task.description}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="shrink-0 text-left sm:text-right">
-                    <span className="text-[11px] font-bold text-sky-700 block">
-                      Policy Verified
-                    </span>
-                    <span className="text-[10px] text-[#7d9990]">Zero Deadlines Today</span>
-                  </div>
-                </div>
-              );
-            }
-
-            if (task.isPakistanHoliday) {
-              return (
-                /* Pakistan Gazetted Holiday Card */
-                <div
-                  key={task.id}
-                  className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-[#f0f9f4] to-white border border-emerald-300/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0 text-lg">
-                      🇵🇰
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-                          🇵🇰 Pakistan Gazetted Holiday
-                        </span>
-                        <span className="text-xs font-semibold text-[#7d9990]">{task.assignedDate}</span>
+                      <div className="pt-3 mt-3.5 border-t border-sky-100 flex items-center justify-between text-xs">
+                        <span className="text-[11px] font-bold text-sky-700">Policy Verified</span>
+                        <span className="text-[10px] text-[#7d9990]">Zero Deadlines Today</span>
                       </div>
-                      <h4 className="text-sm font-bold text-[#142D27] mt-1">
-                        {task.title}
-                      </h4>
-                      <p className="text-xs text-[#557067] mt-0.5 leading-relaxed">
-                        {task.description}
-                      </p>
                     </div>
-                  </div>
+                  );
+                }
 
-                  <div className="shrink-0 text-left sm:text-right">
-                    <span className="text-[11px] font-bold text-emerald-800 block">
-                      Gazetted Off Day
-                    </span>
-                    <span className="text-[10px] text-[#7d9990]">Zero Homework Due</span>
-                  </div>
-                </div>
-              );
-            }
+                if (task.isPakistanHoliday) {
+                  return (
+                    <div
+                      key={task.id}
+                      className="p-5 rounded-3xl bg-gradient-to-br from-emerald-50/60 via-white to-emerald-50/30 border border-emerald-300/80 flex flex-col justify-between shadow-sm group"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between gap-1 pb-2 border-b border-emerald-100">
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
+                            🇵🇰 Gazetted Holiday
+                          </span>
+                          <span className="text-[10px] text-[#7d9990] font-medium">{task.assignedDate}</span>
+                        </div>
 
-            return (
-              /* Regular Weekday Task Card */
-              <div
-                key={task.id}
-                className={`p-4 sm:p-5 rounded-2xl bg-white border transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4 text-[#142D27] shadow-sm hover:shadow-md ${
-                  task.status === 'approved'
-                    ? 'border-emerald-300'
-                    : task.status === 'submitted_for_approval'
-                    ? 'border-amber-300'
-                    : task.status === 'overdue'
-                    ? 'border-rose-300'
-                    : 'border-[#e1ede7] hover:border-emerald-300'
-                }`}
-              >
-                {/* Left: Info */}
-                <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                        <div className="mt-3 flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 text-base">
+                            🇵🇰
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-[#142D27]">
+                              {task.title}
+                            </h4>
+                            <p className="text-xs text-[#557067] mt-1 leading-relaxed">
+                              {task.description}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-3.5 border-t border-emerald-100 flex items-center justify-between text-xs">
+                        <span className="text-[11px] font-bold text-emerald-800">Gazetted Off</span>
+                        <span className="text-[10px] text-[#7d9990]">Zero Homework Due</span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    key={task.id}
+                    className={`p-5 rounded-3xl bg-white border transition-all duration-150 flex flex-col justify-between shadow-sm hover:shadow-md group ${
                       task.status === 'approved'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        ? 'border-emerald-300'
                         : task.status === 'submitted_for_approval'
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        ? 'border-amber-300'
                         : task.status === 'overdue'
-                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        ? 'border-rose-300'
+                        : 'border-[#e1ede7] hover:border-emerald-300'
                     }`}
                   >
-                    {task.status === 'approved' ? (
-                      <Check className="w-5 h-5 text-emerald-400" />
-                    ) : task.status === 'submitted_for_approval' ? (
-                      <Clock className="w-5 h-5 text-amber-400" />
-                    ) : task.status === 'overdue' ? (
-                      <AlertTriangle className="w-5 h-5 text-rose-400" />
-                    ) : (
-                      <BookOpen className="w-5 h-5 text-emerald-400" />
-                    )}
-                  </div>
+                    <div>
+                      {/* Top Pill Row */}
+                      <div className="flex items-center justify-between gap-1 pb-2 border-b border-[#e1ede7]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-urdu-compact">
+                            {day || task.dayOfWeek}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200">
+                            {task.subjectCode}
+                          </span>
+                        </div>
 
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
-                        {task.subjectCode}
-                      </span>
-                      <span className="text-[11px] font-bold text-[#557067]">
-                        {task.dayOfWeek} • {task.assignedDate}
-                      </span>
-                      {task.pagesRange && (
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">
-                          {task.pagesRange}
+                        <span className="text-[10px] text-[#7d9990] font-medium">
+                          {task.assignedDate}
                         </span>
+                      </div>
+
+                      {/* Subject Name & Title in Authentic Urdu */}
+                      <div className="mt-2.5">
+                        <span className="text-[10px] font-bold text-[#557067] uppercase tracking-wider block">
+                          {task.subjectName}
+                        </span>
+                        <h4
+                          className={`mt-1 group-hover:text-emerald-700 transition-colors ${
+                            isUrdu
+                              ? 'font-urdu text-[15px] font-bold text-[#142D27] text-right dir-rtl leading-loose'
+                              : 'text-sm font-bold text-[#142D27]'
+                          }`}
+                        >
+                          <bdi>{cleanTitle}</bdi>
+                        </h4>
+                      </div>
+
+                      {/* Description & Pages Range Snippet */}
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-xs space-y-1">
+                        <p className="text-[#557067] line-clamp-2 leading-relaxed">
+                          {task.description}
+                        </p>
+                        <div className="flex items-center justify-between pt-1 border-t border-[#e1ede7] text-[10px] text-[#7d9990]">
+                          <span>{task.pagesRange ? `Coverage: ${task.pagesRange}` : 'Daily Quota'}</span>
+                          <span>{task.estimatedMinutes || 45} mins</span>
+                        </div>
+                      </div>
+
+                      {/* Student submission notes or teacher feedback excerpt */}
+                      {task.approval?.feedback && (
+                        <div className="mt-2 p-2 rounded-xl bg-emerald-50/60 border border-emerald-200 text-[11px] text-emerald-900 italic">
+                          <strong>Verification:</strong> &quot;{task.approval.feedback}&quot;
+                        </div>
                       )}
-                      <span className="text-[10px] text-zinc-500">
-                        ({task.estimatedMinutes} mins)
-                      </span>
                     </div>
 
-                    <h4 className="text-sm font-bold text-[#142D27] mt-1 truncate">
-                      {task.title}
-                    </h4>
-                    <p className="text-xs text-[#557067] mt-0.5 line-clamp-2 leading-relaxed">
-                      {task.description}
-                    </p>
+                    {/* Bottom Actions & Status Footer */}
+                    <div className="pt-3.5 mt-3.5 border-t border-[#e1ede7] flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        {task.status === 'approved' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            Approved
+                          </span>
+                        ) : task.status === 'submitted_for_approval' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            Awaiting Review
+                          </span>
+                        ) : task.status === 'overdue' ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
+                            <AlertTriangle className="w-3 h-3 text-rose-600" />
+                            Late
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-[#557067] px-2 py-0.5 rounded-full bg-zinc-100">
+                            Pending Work
+                          </span>
+                        )}
 
-                    {/* Source label */}
-                    <p className="text-[11px] text-zinc-500 mt-1">
-                      Source: <strong className="text-zinc-400">{task.sourceTitle}</strong>
-                    </p>
-
-                    {/* Student notes or teacher feedback excerpt if available */}
-                    {task.studentSubmission?.notes && (
-                      <div className="mt-2 text-xs bg-zinc-50 p-2 rounded-lg border border-zinc-200 text-zinc-700">
-                        <strong className="text-zinc-200">Student Work Log:</strong> &quot;{task.studentSubmission.notes}&quot;
+                        <button
+                          type="button"
+                          onClick={() => setPdfTaskTarget(task)}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>View in PDF</span>
+                        </button>
                       </div>
-                    )}
-                    {task.approval?.feedback && (
-                      <div className="mt-1.5 text-xs bg-emerald-50 p-2 rounded-lg border border-emerald-200 text-emerald-800">
-                        <strong className="text-emerald-200">Teacher Verification:</strong> &quot;{task.approval.feedback}&quot; ({task.approval.approvedBy})
+
+                      {/* Main Action CTAs */}
+                      <div className="flex items-center gap-2 pt-1">
+                        {task.status !== 'approved' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 justify-center text-xs"
+                            onClick={() => {
+                              setSubmittingTask(task);
+                              setSubmissionNotes('');
+                              setSubmissionFileName('');
+                            }}
+                          >
+                            {task.status === 'submitted_for_approval' ? 'Update Work' : 'Submit Work'}
+                          </Button>
+                        )}
+
+                        {role === 'teacher' && task.status === 'submitted_for_approval' && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="flex-1 justify-center text-xs font-bold"
+                            icon={<Check className="w-3.5 h-3.5" />}
+                            onClick={() => {
+                              setApprovingTask(task);
+                              setTeacherFeedback('Excellent attention to detail. Certified complete.');
+                            }}
+                          >
+                            Approve
+                          </Button>
+                        )}
+
+                        {/* Edit & Delete Controls */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingTask(task);
+                              setEditTitle(task.title);
+                              setEditDueDate(task.dueDate);
+                              setEditMinutes(task.estimatedMinutes);
+                              setEditDescription(task.description);
+                            }}
+                            className="p-1.5 rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                            title="Edit Task"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteTask(task)}
+                            className="p-1.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                            title="Delete Task"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-
-                {/* Right: Status Pill & Action Buttons */}
-                <div className="flex flex-wrap items-center justify-between md:justify-end gap-2.5 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-[#e1ede7]">
-                  {/* Status Badge */}
-                  <div>
-                    {task.status === 'approved' ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        Teacher Approved
-                      </span>
-                    ) : task.status === 'submitted_for_approval' ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
-                        <Clock className="w-3.5 h-3.5 text-amber-600" />
-                        Awaiting Teacher Gate
-                      </span>
-                    ) : task.status === 'overdue' ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200">
-                        <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
-                        Late • Alert Sent
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-semibold text-[#557067] px-2.5 py-1 rounded-full bg-zinc-100">
-                        Pending Student Work
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Actions based on Role and Status */}
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setPdfTaskTarget(task)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all cursor-pointer"
-                      title="View attached textbook chapter & pages in PDF reader"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>View in PDF {task.pagesRange ? `(${task.pagesRange})` : ''}</span>
-                    </button>
-
-                    {/* Student Action: Submit Work */}
-                    {task.status !== 'approved' && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          setSubmittingTask(task);
-                          setSubmissionNotes('');
-                          setSubmissionFileName('');
-                        }}
-                      >
-                        {task.status === 'submitted_for_approval' ? 'Update Submission' : 'Submit Work'}
-                      </Button>
-                    )}
-
-                    {/* Teacher Action: Approve Work (Teacher Gate) */}
-                    {role === 'teacher' && task.status === 'submitted_for_approval' && (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        icon={<Check className="w-3.5 h-3.5" />}
-                        onClick={() => {
-                          setApprovingTask(task);
-                          setTeacherFeedback('Excellent attention to detail and rigorous step working. Certified complete.');
-                        }}
-                      >
-                        Approve Work
-                      </Button>
-                    )}
-
-                    {/* Manual Task Controls: Edit & Delete */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingTask(task);
-                        setEditTitle(task.title);
-                        setEditDueDate(task.dueDate);
-                        setEditMinutes(task.estimatedMinutes);
-                        setEditDescription(task.description);
-                      }}
-                      className="p-1.5 rounded-lg border border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
-                      title="Edit Task Manually"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteTask(task)}
-                      className="p-1.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                      title="Delete Task"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })
+                );
+              })}
+          </div>
         )}
       </div>
 

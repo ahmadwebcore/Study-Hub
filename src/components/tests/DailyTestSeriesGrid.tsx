@@ -666,18 +666,18 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                   <button
                     type="button"
                     onClick={() => handleShareWhatsAppFromModal(activePopupTest, score)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 text-xs font-semibold transition-colors"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#e8f8f0] hover:bg-[#d4f2e3] text-emerald-800 border border-emerald-300 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                   >
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
                     <span>WhatsApp</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setPdfViewerTest(activePopupTest)}
-                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-emerald-300 border border-zinc-700 text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
+                    className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-emerald-50 text-[#142D27] border border-[#e1ede7] text-xs font-semibold transition-colors cursor-pointer shadow-2xs"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                    <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
                     <span>View Test in PDF</span>
                   </button>
                 </div>
@@ -698,8 +698,8 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                         <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     ) : (
-                      <span className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-950/40 border border-blue-800/80 text-blue-300 text-xs font-semibold text-center">
-                        <Clock className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold text-center">
+                        <Clock className="w-3.5 h-3.5 text-blue-600" />
                         <span>Awaiting Teacher Evaluation by Ahmad</span>
                       </span>
                     )
