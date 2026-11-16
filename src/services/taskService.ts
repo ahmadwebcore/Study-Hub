@@ -2601,7 +2601,7 @@ class TaskService {
 
     // Dispatch Student Gmail Alert
     emailService.dispatchManualNotification({
-      recipientEmail: 'student@studyhub.edu',
+      recipientEmail: 'dbaddiesvlog@gmail.com',
       recipientName: studentName,
       subject: `📚 Entire Book Loaded: Daily Tasks & Test Series for ${params.subjectName}`,
       message: `Faculty Lead Ahmad uploaded "${params.bookTitle}". The entire book has been broken into daily targets and a 30-mark Daily Test Series scheduled every ${designatedDay} through February 28th.`,
@@ -2751,7 +2751,7 @@ class TaskService {
       ) {
         // Dispatch late alert to student Gmail!
         emailService.sendDeadlineReminder({
-          studentEmail: 'student@studyhub.edu',
+          studentEmail: 'dbaddiesvlog@gmail.com',
           studentName: task.studentName,
           itemTitle: task.title,
           itemType: 'assignment',

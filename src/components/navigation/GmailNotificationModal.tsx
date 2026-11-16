@@ -31,7 +31,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [recipientFilter, setRecipientFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [testEmailAddress, setTestEmailAddress] = useState<string>('student@studyhub.edu');
+  const [testEmailAddress, setTestEmailAddress] = useState<string>('dbaddiesvlog@gmail.com');
   const [dispatchFeedback, setDispatchFeedback] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'inbox' | 'dispatch_test'>('inbox');
 
@@ -239,7 +239,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
               aria-label="Filter emails by recipient"
             >
               <option value="all">All Student Accounts</option>
-              <option value="student@studyhub.edu">student@studyhub.edu</option>
+              <option value="dbaddiesvlog@gmail.com">dbaddiesvlog@gmail.com</option>
             </select>
 
             <select
@@ -271,7 +271,7 @@ export const GmailNotificationModal: React.FC<GmailNotificationModalProps> = ({
                   type="email"
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
-                  placeholder="student@studyhub.edu"
+                  placeholder="dbaddiesvlog@gmail.com"
                   className="flex-1 px-3 py-2 text-xs rounded-xl border border-[#e1ede7] bg-white focus:outline-none focus:border-[#14B866]"
                 />
               </div>

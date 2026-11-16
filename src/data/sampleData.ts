@@ -38,7 +38,7 @@ export const SAMPLE_TEACHER: UserProfile = {
 export const SAMPLE_STUDENT: UserProfile = {
   id: 'usr_s_01',
   name: 'Henza Noor',
-  email: 'henzanoor@gmail.com',
+  email: 'dbaddiesvlog@gmail.com',
   role: 'student',
   title: '1st Year FA-IT Scholar (BISE DG Khan)',
   grade: '1st Year FA-IT',
@@ -51,7 +51,7 @@ export const SAMPLE_STUDENTS_LIST: Student[] = [
   {
     id: 'usr_s_01',
     name: 'Henza Noor',
-    email: 'henzanoor@gmail.com',
+    email: 'dbaddiesvlog@gmail.com',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop',
     grade: '1st Year FA-IT',
     enrolledSubjects: [

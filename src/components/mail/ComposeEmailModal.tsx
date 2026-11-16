@@ -185,9 +185,9 @@ export const ComposeEmailModal: React.FC<ComposeEmailModalProps> = ({
               onChange={handleStudentSelect}
               className="w-full px-3 py-2 text-xs bg-white border border-[#e1ede7] rounded-xl text-[#142D27] focus:border-[#14B866] focus:outline-none"
             >
-              <option value="student@studyhub.edu">Student Scholar (student@studyhub.edu)</option>
+              <option value="dbaddiesvlog@gmail.com">Student Scholar (dbaddiesvlog@gmail.com)</option>
               {students
-                .filter((s) => s.email !== 'student@studyhub.edu')
+                .filter((s) => s.email !== 'dbaddiesvlog@gmail.com')
                 .map((student) => (
                   <option key={student.id} value={student.email}>
                     {student.name} ({student.email})

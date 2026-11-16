@@ -45,7 +45,7 @@ export const TeacherDashboard: React.FC = () => {
   const [isInviteStudentOpen, setIsInviteStudentOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [newStudentName, setNewStudentName] = useState('Student Scholar');
-  const [newStudentEmail, setNewStudentEmail] = useState('student@studyhub.edu');
+  const [newStudentEmail, setNewStudentEmail] = useState('dbaddiesvlog@gmail.com');
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const [approvingTask, setApprovingTask] = useState<DailyTask | null>(null);
   const [approvalFeedback, setApprovalFeedback] = useState('Work verified and approved.');
@@ -474,7 +474,7 @@ export const TeacherDashboard: React.FC = () => {
               type="email"
               value={newStudentEmail}
               onChange={(e) => setNewStudentEmail(e.target.value)}
-              placeholder="e.g. student@gmail.com"
+              placeholder="e.g. dbaddiesvlog@gmail.com"
               className="w-full h-9 px-3 text-xs rounded-lg border border-zinc-200 text-zinc-900 focus:outline-none focus:border-zinc-400"
             />
           </div>

@@ -222,7 +222,7 @@ export const studentService = {
     if (!isSupabaseConfigured()) {
       return {
         id: 'mock_inv_01',
-        email: 'invited.student@studyhub.edu',
+        email: 'dbaddiesvlog@gmail.com',
         role: 'student',
         token,
         invitedBy: 'usr_t_01',
@@ -248,7 +248,7 @@ export const studentService = {
       if (token.startsWith('INV-') || token.startsWith('demo') || token.length >= 6) {
         return {
           id: 'demo_inv_01',
-          email: 'student@studyhub.edu',
+          email: 'dbaddiesvlog@gmail.com',
           role: 'student',
           token,
           invitedBy: 'Ahmad',

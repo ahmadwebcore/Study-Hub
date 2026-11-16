@@ -26,13 +26,12 @@ export const twoFactorService = {
 
     const isTeacher =
       cleanEmail === 'ahmadwebcore@gmail.com' ||
-      cleanEmail === 'teacher@studyhub.edu';
+      cleanEmail.includes('ahmad');
 
     const isStudent =
-      cleanEmail === 'henzanoor@gmail.com' ||
-      cleanEmail.includes('henza') ||
-      cleanEmail.includes('student') ||
-      cleanEmail.includes('scholar') ||
+      cleanEmail === 'dbaddiesvlog@gmail.com' ||
+      cleanEmail === 'dbaddiesvlogs@gmail.com' ||
+      cleanEmail.includes('dbaddies') ||
       !isTeacher;
 
     if (stored) {

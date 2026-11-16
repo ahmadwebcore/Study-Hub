@@ -34,7 +34,7 @@ const STORAGE_KEY = 'studyhub_dispatched_emails_v3';
 const INITIAL_EMAILS: EmailMessage[] = [
   {
     id: 'em_001',
-    recipientEmail: 'student@studyhub.edu',
+    recipientEmail: 'dbaddiesvlog@gmail.com',
     recipientName: 'Henza Noor',
     senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
@@ -100,7 +100,7 @@ const INITIAL_EMAILS: EmailMessage[] = [
         </div>
         <div style="background: #F7F9F8; padding: 16px; text-align: center; border-top: 1px solid #e1ede7;">
           <p style="color: #7d9990; font-size: 11px; margin: 0;">
-            StudyHub LMS • Automated Notification Engine • Sent to student@studyhub.edu
+            StudyHub LMS • Automated Notification Engine • Sent to dbaddiesvlog@gmail.com
           </p>
         </div>
       </div>
@@ -108,10 +108,10 @@ const INITIAL_EMAILS: EmailMessage[] = [
   },
   {
     id: 'em_002',
-    recipientEmail: 'student@studyhub.edu',
+    recipientEmail: 'dbaddiesvlog@gmail.com',
     recipientName: 'Henza Noor',
     senderName: 'StudyHub Academic Scheduler',
-    senderEmail: 'scheduler@studyhub.edu',
+    senderEmail: 'ahmadwebcore@gmail.com',
     subject: '⏰ Urgent Reminder: Quantum Mechanics Assessment Due in 24 Hours',
     previewText: 'Assessment window closes tomorrow at 04:00 PM. Please ensure your submission is finalized.',
     category: 'deadline_reminder',
@@ -150,14 +150,14 @@ const INITIAL_EMAILS: EmailMessage[] = [
           </div>
         </div>
         <div style="background: #F7F9F8; padding: 14px; text-align: center; border-top: 1px solid #e1ede7;">
-          <p style="color: #7d9990; font-size: 11px; margin: 0;">Sent to student@studyhub.edu • StudyHub Notification Scheduler</p>
+          <p style="color: #7d9990; font-size: 11px; margin: 0;">Sent to dbaddiesvlog@gmail.com • StudyHub Notification Scheduler</p>
         </div>
       </div>
     `,
   },
   {
     id: 'em_003',
-    recipientEmail: 'student@studyhub.edu',
+    recipientEmail: 'dbaddiesvlog@gmail.com',
     recipientName: 'Henza Noor',
     senderName: 'Ahmad',
     senderEmail: 'ahmadwebcore@gmail.com',
@@ -215,7 +215,7 @@ class EmailService {
         this.emails = parsed.map((e) => {
           const sanitized = { ...e };
           if (sanitized.recipientEmail && sanitized.recipientEmail.includes('bilal')) {
-            sanitized.recipientEmail = 'student@studyhub.edu';
+            sanitized.recipientEmail = 'dbaddiesvlog@gmail.com';
             sanitized.recipientName = 'Henza Noor';
           }
           if (sanitized.senderName && (sanitized.senderName.includes('Clara') || sanitized.senderName.includes('clara'))) {
@@ -290,7 +290,7 @@ class EmailService {
       recipientEmail: params.studentEmail,
       recipientName: params.studentName,
       senderName: params.teacherName || 'Faculty Department',
-      senderEmail: 'faculty.admissions@studyhub.edu',
+      senderEmail: 'ahmadwebcore@gmail.com',
       subject: `✉️ Faculty Invitation: ${params.teacherName} invited you to StudyHub LMS`,
       previewText: `Join ${params.course} (${params.board}). Accept your invite to access books, syllabus, and assessments.`,
       category: 'invitation',
@@ -362,7 +362,7 @@ class EmailService {
       recipientEmail: params.studentEmail,
       recipientName: params.studentName,
       senderName: params.teacherName || 'Faculty Examination Board',
-      senderEmail: 'examinations@studyhub.edu',
+      senderEmail: 'ahmadwebcore@gmail.com',
       subject: `📅 New Test Scheduled: ${params.testTitle} (${params.subjectName})`,
       previewText: `Scheduled for ${params.date} at ${params.time}. Duration: ${params.durationMinutes} mins. Total Marks: ${params.totalMarks}.`,
       category: 'new_test',
@@ -454,7 +454,7 @@ class EmailService {
       recipientEmail: params.studentEmail,
       recipientName: params.studentName,
       senderName: 'StudyHub Deadline Bot',
-      senderEmail: 'reminders@studyhub.edu',
+      senderEmail: 'ahmadwebcore@gmail.com',
       subject: `⏰ Urgent Reminder: "${params.itemTitle}" Due in 24 Hours!`,
       previewText: `Final reminder: Your ${params.itemType} in ${params.subjectName} is scheduled for ${params.dueDate}.`,
       category: 'deadline_reminder',
@@ -527,7 +527,7 @@ class EmailService {
       recipientEmail: params.studentEmail,
       recipientName: params.studentName,
       senderName: params.teacherName || 'Faculty Evaluator',
-      senderEmail: 'grading@studyhub.edu',
+      senderEmail: 'ahmadwebcore@gmail.com',
       subject: `🎓 Exam Graded: ${params.testTitle} - ${isPassed ? 'PASSED ✅' : 'NEEDS RETAKE ⚠️'} (${params.score}/${params.maxScore})`,
       previewText: `Your exam has been checked. Score: ${params.score}/${params.maxScore} (${percentage}%). ${isPassed ? 'Congratulations on passing!' : 'Please review teacher feedback.'}`,
       category: 'grade_result',
@@ -619,7 +619,7 @@ class EmailService {
       const stored = localStorage.getItem('studyhub_student_configured_gmail');
       if (stored && !stored.includes('bilal')) return stored;
     } catch {}
-    return 'scholar@studyhub.pk';
+    return 'dbaddiesvlog@gmail.com';
   }
 
   public setStudentConfiguredEmail(email: string): void {
@@ -762,7 +762,7 @@ class EmailService {
       recipientEmail: params.email,
       recipientName: params.recipientName || 'StudyHub User',
       senderName: 'StudyHub Security Gate',
-      senderEmail: 'security@studyhub.edu',
+      senderEmail: 'ahmadwebcore@gmail.com',
       subject: `🔐 Your StudyHub Login Verification Code: ${params.code}`,
       previewText: `Use verification code ${params.code} to complete your secure academic portal login.`,
       category: 'system',

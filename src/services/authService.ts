@@ -58,8 +58,7 @@ export const authService = {
 
     // 1. Teacher Credential Verification
     const isTeacher =
-      cleanEmail === 'ahmadwebcore@gmail.com' ||
-      cleanEmail === 'teacher@studyhub.edu';
+      cleanEmail === 'ahmadwebcore@gmail.com' || cleanEmail.includes('ahmadwebcore');
 
     if (roleMode === 'teacher') {
       if (!isTeacher) {
@@ -67,14 +66,14 @@ export const authService = {
           valid: false,
           user: null,
           profile: null,
-          error: new Error('Unrecognized faculty email. Only registered faculty can access this portal.'),
+          error: new Error('Unrecognized faculty email. Only authorized faculty (ahmadwebcore@gmail.com) can access this portal.'),
         };
       }
 
       const customTeacherPass = localStorage.getItem('studyhub_teacher_custom_password');
       const isTeacherPassValid = customTeacherPass
         ? password === customTeacherPass
-        : (password === 'password123' || password === 'Ahmad@2026' || password === 'StudyHub2026!');
+        : (password === 'Ahmad@2026' || password === 'StudyHub2026!' || password === 'password123');
 
       if (!isTeacherPassValid) {
         return {
@@ -95,7 +94,7 @@ export const authService = {
 
     // 2. Student Credential Verification
     if (registered) {
-      if (password !== registered.password && password !== 'Scholar@2026!' && password !== 'StudyHub2026!') {
+      if (password !== registered.password && password !== 'Scholar@2026!' && password !== 'Dbaddies@2026!' && password !== 'StudyHub2026!') {
         return {
           valid: false,
           user: null,
@@ -118,34 +117,32 @@ export const authService = {
 
     const configuredStudentEmail = (localStorage.getItem('studyhub_student_configured_gmail') || '').trim().toLowerCase();
     const isStudent =
-      roleMode === 'student' ||
+      cleanEmail === 'dbaddiesvlog@gmail.com' ||
+      cleanEmail === 'dbaddiesvlogs@gmail.com' ||
+      cleanEmail.includes('dbaddies') ||
       (configuredStudentEmail && cleanEmail === configuredStudentEmail) ||
-      cleanEmail === 'student@studyhub.edu' ||
-      cleanEmail === 'student@gmail.com' ||
-      cleanEmail === 'henzanoor@gmail.com' ||
-      cleanEmail.includes('henza') ||
-      cleanEmail.includes('student') ||
-      cleanEmail.includes('scholar');
+      roleMode === 'student';
 
     if (isStudent) {
       const customStudentPass = localStorage.getItem('studyhub_student_custom_password');
       const isStudentPassValid = customStudentPass
-        ? (password === customStudentPass || password === 'Scholar@2026!' || password === 'StudyHub2026!')
-        : (password === 'Scholar@2026!' || password === 'StudyHub2026!' || password === 'password123' || password === 'Henza@2026' || password === 'student123');
+        ? (password === customStudentPass || password === 'Scholar@2026!' || password === 'Dbaddies@2026!' || password === 'StudyHub2026!')
+        : (password === 'Scholar@2026!' || password === 'Dbaddies@2026!' || password === 'StudyHub2026!' || password === 'password123');
 
       if (!isStudentPassValid) {
         return {
           valid: false,
           user: null,
           profile: null,
-          error: new Error('Incorrect password. Please verify your student password.'),
+          error: new Error('Incorrect password. Please verify your student password (Scholar@2026!).'),
         };
       }
-      const savedStudentName = localStorage.getItem('studyhub_student_configured_name') || 'Enrolled Scholar';
+      const savedStudentName = localStorage.getItem('studyhub_student_configured_name') || 'Student Scholar';
+      const resolvedEmail = cleanEmail.includes('dbaddies') ? cleanEmail : (configuredStudentEmail || 'dbaddiesvlog@gmail.com');
       const studentProfile: UserProfile = {
         ...SAMPLE_STUDENT,
         name: savedStudentName,
-        email: cleanEmail,
+        email: resolvedEmail,
       };
       return {
         valid: true,
@@ -302,7 +299,7 @@ export const authService = {
     const cleanEmail = (email || '').trim().toLowerCase();
     const isTeacher =
       cleanEmail === 'ahmadwebcore@gmail.com' ||
-      cleanEmail === 'teacher@studyhub.edu' ||
+      cleanEmail.includes('ahmad') ||
       role === 'teacher';
 
     if (isTeacher) {

@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (savedUserStr) {
         const parsed = JSON.parse(savedUserStr);
         if (parsed && (parsed.id || parsed.email)) {
-          return { id: parsed.id || 'usr_persisted', email: parsed.email || 'user@studyhub.edu' } as User;
+          return { id: parsed.id || 'usr_persisted', email: parsed.email || 'dbaddiesvlog@gmail.com' } as User;
         }
       }
       return null;

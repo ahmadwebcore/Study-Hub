@@ -104,7 +104,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   <input
                     type="email"
                     {...register('email')}
-                    placeholder="name@studyhub.edu"
+                    placeholder="e.g. dbaddiesvlog@gmail.com"
                     className="w-full h-11 pl-10 pr-4 rounded-xl border border-[#e1ede7] bg-white text-xs sm:text-sm text-[#263B35] focus:outline-none focus:border-[#14B866]"
                   />
                 </div>

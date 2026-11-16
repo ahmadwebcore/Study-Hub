@@ -440,12 +440,14 @@ export const LoginPage: React.FC = () => {
                         const clean = val.trim().toLowerCase();
                         if (clean === 'ahmadwebcore@gmail.com' || clean.includes('ahmad') || clean.includes('teacher')) {
                           setRoleMode('teacher');
+                        } else if (clean === 'dbaddiesvlog@gmail.com' || clean.includes('dbaddies') || clean.includes('student')) {
+                          setRoleMode('student');
                         }
                       }}
                       placeholder={
                         roleMode === 'teacher'
                           ? 'ahmadwebcore@gmail.com'
-                          : 'Enter registered student email'
+                          : 'dbaddiesvlog@gmail.com'
                       }
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
