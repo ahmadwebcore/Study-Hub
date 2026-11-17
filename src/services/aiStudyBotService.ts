@@ -30,7 +30,6 @@ export interface AIProviderConfig {
 }
 
 const STORAGE_KEY_AI_CONFIG = 'gsa_ai_config_v3';
-const STORAGE_KEY_CHAT_HISTORY = 'gsa_academic_chat_history_v8';
 
 // 1st Year Intermediate Computer Science Academic Knowledge Base
 const CS_KNOWLEDGE = [
@@ -295,44 +294,67 @@ export class AIStudyBotService {
     }
   }
 
-  public getActiveStudentName(): string {
-    return 'Henza';
+  public getCurrentUserContext(): { role: 'teacher' | 'student'; name: string } {
+    try {
+      const role = (localStorage.getItem('studyhub_active_role') as 'teacher' | 'student') || 'teacher';
+      const userStr = localStorage.getItem('studyhub_logged_in_user');
+      let name = role === 'teacher' ? 'Sir Ahmad' : 'Henza Noor';
+      if (userStr) {
+        const parsed = JSON.parse(userStr);
+        if (parsed.name && !parsed.name.toLowerCase().includes('scholar')) {
+          name = parsed.name;
+        }
+      }
+      return { role, name };
+    } catch {
+      return { role: 'teacher', name: 'Sir Ahmad' };
+    }
   }
 
-  public getChatHistory(): AIChatMessage[] {
+  public getActiveStudentName(): string {
+    const ctx = this.getCurrentUserContext();
+    return ctx.role === 'teacher' ? 'Sir Ahmad' : 'Henza Noor';
+  }
+
+  public getChatHistory(roleOverride?: 'teacher' | 'student'): AIChatMessage[] {
+    const currentRole = roleOverride || this.getCurrentUserContext().role;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v9`;
     try {
-      const stored = localStorage.getItem(STORAGE_KEY_CHAT_HISTORY);
+      const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const cleanHistory = parsed.filter((m) => !(m.id === 'msg_u_init' && m.text === 'Hi'));
-          if (cleanHistory.length > 0) {
-            if (cleanHistory[0]?.text?.includes('Ahmad') || cleanHistory[0]?.text?.includes('Explain a topic') || cleanHistory[0]?.text?.includes('Welcome to StudyHub')) {
-              cleanHistory[0] = {
-                id: 'msg_welcome',
-                sender: 'assistant',
-                text: 'Hi Henza, how can we help you today with your 1st Year FA-IT syllabus or tests?',
-                timestamp: 'Just now',
-              };
-            }
-            return cleanHistory;
-          }
+          return parsed;
         }
       }
     } catch {}
+
+    if (currentRole === 'teacher') {
+      return [
+        {
+          id: 'msg_welcome_teacher',
+          sender: 'assistant',
+          text: 'Salam Sir Ahmad! Welcome to the GSA Academic Faculty Assistant. How can I assist you today with student performance tracking, 30-mark test rubrics, or BISE DG Khan curriculum pacing?',
+          timestamp: 'Just now',
+        },
+      ];
+    }
+
     return [
       {
-        id: 'msg_welcome',
+        id: 'msg_welcome_student',
         sender: 'assistant',
-        text: 'Hi Henza, how can we help you today with your 1st Year FA-IT syllabus or tests?',
+        text: 'Salam Henza! Welcome to your GSA Academic Study Tutor. Ask me any concept from your 1st Year FA-IT textbooks, Urdu grammar, or past paper questions.',
         timestamp: 'Just now',
       },
     ];
   }
 
-  public saveChatHistory(history: AIChatMessage[]): void {
+  public saveChatHistory(history: AIChatMessage[], roleOverride?: 'teacher' | 'student'): void {
+    const currentRole = roleOverride || this.getCurrentUserContext().role;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v9`;
     try {
-      localStorage.setItem(STORAGE_KEY_CHAT_HISTORY, JSON.stringify(history.slice(-30)));
+      localStorage.setItem(storageKey, JSON.stringify(history.slice(-30)));
     } catch {
       // ignore
     }
@@ -432,11 +454,14 @@ export class AIStudyBotService {
     // Simple Greeting Intent
     const isGreeting = /^(hi|hello|hey|salam|assalam|aoa|adaab|greetings)\b/i.test(qLower);
     if (isGreeting) {
-      const studentName = this.getActiveStudentName() === 'Henza' ? 'Henza Noor' : this.getActiveStudentName();
+      const { role } = this.getCurrentUserContext();
+      const text = role === 'teacher'
+        ? `Salam Sir Ahmad! Welcome to the Faculty AI Desk. How can I assist you today with student evaluations, syllabus pacing, or BISE DG Khan examination standards?`
+        : `Salam Henza! How can I help you today with your 1st Year FA-IT textbooks, Urdu grammar, or 30-mark test preparation?`;
       return {
         id: `msg_greet_${Date.now()}`,
         sender: 'assistant',
-        text: `Hi ${studentName}, how can we help you?`,
+        text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
     }

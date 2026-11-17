@@ -9,6 +9,7 @@ import {
   UserCheck,
   MessageSquare,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   aiStudyBotService,
   AIChatMessage,
@@ -17,10 +18,13 @@ import {
 import { directChatService, DirectChatMessage } from '../../services/directChatService';
 
 export const StudyBotWidget: React.FC = () => {
+  const { role } = useAuth();
+  const isTeacher = role === 'teacher';
+
   const [isOpen, setIsOpen] = useState(false);
-  const [chatSource, setChatSource] = useState<'ai' | 'teacher'>('ai');
+  const [chatSource, setChatSource] = useState<'ai' | 'direct'>('ai');
   const [messages, setMessages] = useState<AIChatMessage[]>([]);
-  const [teacherMessages, setTeacherMessages] = useState<DirectChatMessage[]>([]);
+  const [directMessages, setDirectMessages] = useState<DirectChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -28,13 +32,13 @@ export const StudyBotWidget: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const loadAllChatData = () => {
-    setMessages(aiStudyBotService.getChatHistory());
-    setTeacherMessages(directChatService.getMessages());
+    setMessages(aiStudyBotService.getChatHistory(role as 'teacher' | 'student'));
+    setDirectMessages(directChatService.getMessages());
   };
 
   useEffect(() => {
     loadAllChatData();
-  }, []);
+  }, [role]);
 
   useEffect(() => {
     if (isOpen) {
@@ -42,24 +46,24 @@ export const StudyBotWidget: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 50);
     }
-  }, [messages, teacherMessages, chatSource, isOpen]);
+  }, [messages, directMessages, chatSource, isOpen]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const text = (textToSend || inputQuery).trim();
     if (!text || isLoading) return;
 
-    if (chatSource === 'teacher') {
-      // Direct message with Faculty Lead Ahmad
+    if (chatSource === 'direct') {
+      // Direct messaging between Teacher Ahmad & Student Henza Noor
       const newMsg = directChatService.sendMessage({
         text,
-        senderRole: 'student',
+        senderRole: isTeacher ? 'teacher' : 'student',
       });
-      setTeacherMessages((prev) => [...prev, newMsg]);
+      setDirectMessages((prev) => [...prev, newMsg]);
       setInputQuery('');
       return;
     }
 
-    // Academic Tutor Mode
+    // AI Academic / Faculty Assistant Mode
     const userMsg: AIChatMessage = {
       id: `msg_u_${Date.now()}`,
       sender: 'user',
@@ -76,7 +80,7 @@ export const StudyBotWidget: React.FC = () => {
       const response = await aiStudyBotService.askAI(text);
       const newHistory = [...updatedHistory, response];
       setMessages(newHistory);
-      aiStudyBotService.saveChatHistory(newHistory);
+      aiStudyBotService.saveChatHistory(newHistory, role as 'teacher' | 'student');
     } catch {
       const fallbackMsg: AIChatMessage = {
         id: `msg_err_${Date.now()}`,
@@ -101,7 +105,7 @@ export const StudyBotWidget: React.FC = () => {
     };
     const updated = [...messages, actionMsg];
     setMessages(updated);
-    aiStudyBotService.saveChatHistory(updated);
+    aiStudyBotService.saveChatHistory(updated, role as 'teacher' | 'student');
   };
 
   const handleCopyText = (id: string, text: string) => {
@@ -119,7 +123,7 @@ export const StudyBotWidget: React.FC = () => {
           onClick={() => setIsOpen(true)}
           className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-xl hover:shadow-2xl shadow-emerald-950/30 transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-white/40 cursor-pointer"
           aria-label="Open Academic Chat"
-          title="Chat with Faculty & Academic Tutor"
+          title={isTeacher ? 'Chat with Faculty Assistant & Henza Noor' : 'Chat with Faculty & Academic Tutor'}
         >
           {/* WhatsApp-style message bubble icon */}
           <MessageSquare className="w-6 h-6 text-white drop-shadow-xs fill-white/20 transition-transform group-hover:scale-105" />
@@ -132,10 +136,10 @@ export const StudyBotWidget: React.FC = () => {
         </button>
       )}
 
-      {/* Slide-over Chat Box (Crisp White Executive WhatsApp/Linear Aesthetic) */}
+      {/* Slide-over Chat Box */}
       {isOpen && (
         <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[430px] sm:h-[620px] h-[92vh] max-h-[92vh] sm:max-h-[85vh] bg-white rounded-3xl border border-[#e1ede7] shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-[#142D27]">
-          {/* Header (Clean, No Technical Settings Gear) */}
+          {/* Header */}
           <div className="p-3.5 bg-white border-b border-[#e1ede7] text-[#142D27] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
@@ -149,7 +153,9 @@ export const StudyBotWidget: React.FC = () => {
                   </span>
                 </h4>
                 <p className="text-[10px] text-[#557067]">
-                  Academic Support &amp; Evaluation &bull; Henza Noor
+                  {isTeacher
+                    ? 'Faculty Lead & Evaluator Desk \u2022 Sir Ahmad'
+                    : '1st Year Scholar Desk \u2022 Henza Noor'}
                 </p>
               </div>
             </div>
@@ -166,7 +172,7 @@ export const StudyBotWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Mode Switcher: Academic Tutor vs Faculty Lead (Ahmad) */}
+          {/* Mode Switcher: AI Assistant vs Direct Contact */}
           <div className="grid grid-cols-2 p-1.5 bg-[#F7F9F8] border-b border-[#e1ede7] text-xs gap-1.5 shrink-0">
             <button
               type="button"
@@ -178,28 +184,30 @@ export const StudyBotWidget: React.FC = () => {
               }`}
             >
               <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Academic Tutor</span>
+              <span>{isTeacher ? 'Faculty AI Assistant' : 'Academic Tutor'}</span>
             </button>
             <button
               type="button"
-              onClick={() => setChatSource('teacher')}
+              onClick={() => setChatSource('direct')}
               className={`py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                chatSource === 'teacher'
+                chatSource === 'direct'
                   ? 'bg-white text-blue-800 shadow-2xs border border-[#e1ede7]'
                   : 'text-[#557067] hover:text-[#142D27] hover:bg-white/60'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>Faculty Lead (Ahmad)</span>
+              <span>{isTeacher ? 'Student (Henza Noor)' : 'Faculty Lead (Sir Ahmad)'}</span>
             </button>
           </div>
 
-          {/* Teacher Mode Direct Banner */}
-          {chatSource === 'teacher' && (
+          {/* Direct Mode Banner */}
+          {chatSource === 'direct' && (
             <div className="p-2.5 bg-blue-50 border-b border-blue-200 flex items-center gap-2 text-xs shrink-0">
               <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
               <span className="text-blue-900 font-semibold text-[11px]">
-                Direct Academic Channel with Ahmad (Faculty Lead Evaluator)
+                {isTeacher
+                  ? 'Direct Academic Channel with Henza Noor (1st Year FA-IT Scholar)'
+                  : 'Direct Academic Channel with Sir Ahmad (Faculty Lead Evaluator)'}
               </span>
             </div>
           )}
@@ -231,7 +239,9 @@ export const StudyBotWidget: React.FC = () => {
                     {/* Sender Header */}
                     <div className="flex items-center gap-1.5 mb-1.5 text-[10px]">
                       <span className={msg.sender === 'user' ? 'text-emerald-800 font-bold' : 'text-emerald-700 font-bold'}>
-                        {msg.sender === 'user' ? 'You (Henza)' : 'GSA Academic Tutor'}
+                        {msg.sender === 'user'
+                          ? (isTeacher ? 'You (Sir Ahmad)' : 'You (Henza Noor)')
+                          : (isTeacher ? 'GSA Faculty Assistant' : 'GSA Academic Tutor')}
                       </span>
                       {msg.sender === 'assistant' && (
                         <span className="px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[8px] font-bold">
@@ -241,7 +251,7 @@ export const StudyBotWidget: React.FC = () => {
                     </div>
 
                     {/* Message Body */}
-                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${'text-[#142D27]'}`}>
+                    <p className="whitespace-pre-line text-xs font-normal leading-relaxed text-[#142D27]">
                       {msg.text}
                     </p>
 
@@ -316,46 +326,59 @@ export const StudyBotWidget: React.FC = () => {
                 </div>
               ))
             ) : (
-              // Faculty Lead (Ahmad) Direct Messages
-              teacherMessages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.senderRole === 'student' ? 'items-end' : 'items-start'}`}
-                >
+              // Direct Messages between Teacher and Student
+              directMessages.map((msg) => {
+                const isMyMessage = isTeacher
+                  ? msg.senderRole === 'teacher'
+                  : msg.senderRole === 'student';
+
+                return (
                   <div
-                    className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
-                      msg.senderRole === 'student'
-                        ? 'bg-[#dcf8c6] text-[#142D27] border border-[#c4f4be] rounded-tr-xs shadow-xs'
-                        : 'bg-white text-[#142D27] border border-blue-200 rounded-tl-xs shadow-xs'
-                    }`}
+                    key={msg.id}
+                    className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'}`}
                   >
-                    {/* Header: Sender & Badge */}
-                    <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-semibold">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-800 font-bold' : 'text-blue-700 font-bold'}>
-                        {msg.senderRole === 'teacher' ? 'Ahmad (Faculty Lead)' : 'You (Henza)'}
-                      </span>
-                      {msg.senderRole === 'teacher' && (
-                        <span className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[8px] font-bold">
-                          Faculty Director
+                    <div
+                      className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                        isMyMessage
+                          ? 'bg-[#dcf8c6] text-[#142D27] border border-[#c4f4be] rounded-tr-xs shadow-xs'
+                          : 'bg-white text-[#142D27] border border-blue-200 rounded-tl-xs shadow-xs'
+                      }`}
+                    >
+                      {/* Header: Sender & Badge */}
+                      <div className="flex items-center gap-1.5 mb-1.5 text-[10px] font-semibold">
+                        <span className={isMyMessage ? 'text-emerald-800 font-bold' : 'text-blue-700 font-bold'}>
+                          {msg.senderRole === 'teacher'
+                            ? (isTeacher ? 'You (Sir Ahmad)' : 'Sir Ahmad (Faculty Lead)')
+                            : (isTeacher ? 'Henza Noor (Student)' : 'You (Henza Noor)')}
                         </span>
-                      )}
-                    </div>
+                        {msg.senderRole === 'teacher' && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-[8px] font-bold">
+                            Faculty Director
+                          </span>
+                        )}
+                        {msg.senderRole === 'student' && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[8px] font-bold">
+                            1st Year Scholar
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Message Body */}
-                    <p className={`whitespace-pre-line text-xs font-normal leading-relaxed ${'text-[#142D27]'}`}>
-                      {msg.text}
-                    </p>
+                      {/* Message Body */}
+                      <p className="whitespace-pre-line text-xs font-normal leading-relaxed text-[#142D27]">
+                        {msg.text}
+                      </p>
 
-                    {/* Footer */}
-                    <div className="mt-2 flex items-center justify-end text-[9px] gap-1 pt-1.5 border-t border-zinc-100">
-                      <span className={msg.senderRole === 'student' ? 'text-emerald-800/80' : 'text-[#7d9990]'}>
-                        {msg.timestamp}
-                      </span>
-                      {msg.senderRole === 'student' && <span className="text-emerald-700 font-bold">✓✓</span>}
+                      {/* Footer */}
+                      <div className="mt-2 flex items-center justify-end text-[9px] gap-1 pt-1.5 border-t border-zinc-100">
+                        <span className={isMyMessage ? 'text-emerald-800/80' : 'text-[#7d9990]'}>
+                          {msg.timestamp}
+                        </span>
+                        {isMyMessage && <span className="text-emerald-700 font-bold">✓✓</span>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
 
             {isLoading && (
@@ -379,9 +402,9 @@ export const StudyBotWidget: React.FC = () => {
             <input
               type="text"
               placeholder={
-                chatSource === 'ai'
-                  ? "Ask in English, Urdu, or Roman Urdu..."
-                  : "Message Faculty Lead Ahmad directly..."
+                chatSource === 'direct'
+                  ? (isTeacher ? 'Message Henza Noor directly...' : 'Message Sir Ahmad directly...')
+                  : (isTeacher ? 'Ask Faculty AI about curriculum, grading rubrics, student pacing...' : 'Ask about Computer Science, Urdu grammar, daily test...')
               }
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}

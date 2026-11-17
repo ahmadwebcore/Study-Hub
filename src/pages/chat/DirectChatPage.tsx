@@ -30,10 +30,10 @@ export const DirectChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const counterpartName = isTeacher ? 'Student Scholar' : 'Ahmad';
+  const counterpartName = isTeacher ? 'Henza Noor' : 'Sir Ahmad';
   const counterpartRoleTitle = isTeacher
-    ? 'Enrolled Scholar (1st Year FA-IT, BISE DG Khan)'
-    : 'Faculty Lead & Academic Director (Ahmad)';
+    ? '1st Year FA-IT Scholar (Roll # GSA-2026-042)'
+    : 'Faculty Lead & Academic Director (Sir Ahmad)';
 
   const loadMessages = () => {
     const list = directChatService.getMessages();
@@ -265,7 +265,7 @@ export const DirectChatPage: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-zinc-50/40">
           <div className="text-center my-1">
             <span className="text-[10px] font-medium text-zinc-500 bg-white px-3 py-1 rounded-full border border-zinc-200 shadow-2xs">
-              Private 1-on-1 Academic Mentorship Channel between Ahmad & Student Scholar
+              Private 1-on-1 Academic Mentorship Channel between Sir Ahmad &amp; Henza Noor
             </span>
           </div>
 
