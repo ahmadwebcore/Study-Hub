@@ -16,7 +16,6 @@ import {
   Eye,
   EyeOff,
   Ticket,
-  Send,
   QrCode,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -26,12 +25,6 @@ import { twoFactorService, TwoFactorConfig } from '../../services/twoFactorServi
 import { emailVerificationService } from '../../services/emailVerificationService';
 
 type AuthStep = 'credentials' | 'verification';
-type VerificationMethod = 'authenticator' | 'email';
-
-interface Pending2FASession {
-  email: string;
-  roleMode: 'teacher' | 'student';
-}
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -63,9 +56,8 @@ export const LoginPage: React.FC = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Step 2: Verification State
+  // Step 2: Verification State (Google Authenticator)
   const [verifiedEmail, setVerifiedEmail] = useState('');
-  const [verificationMethod, setVerificationMethod] = useState<VerificationMethod>('authenticator');
   const [tfaConfig, setTfaConfig] = useState<TwoFactorConfig | null>(null);
 
   // Google Authenticator State
@@ -74,53 +66,11 @@ export const LoginPage: React.FC = () => {
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
 
-  // Email Verification State (Gmail)
-  const [emailOtpCode, setEmailOtpCode] = useState('');
-  const [emailCodeSent, setEmailCodeSent] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const [expiryCountdown, setExpiryCountdown] = useState(0);
-
-  // Check for restored verification session on page refresh
+  // Initialize clean session on mount (never auto-restore 2FA to prevent state leakage in new tabs)
   useEffect(() => {
     twoFactorService.initTimeSync();
-
-    const pending = sessionStorage.getItem('studyhub_pending_2fa');
-    if (pending) {
-      try {
-        const parsed = JSON.parse(pending) as Pending2FASession;
-        if (parsed.email && (parsed.roleMode === 'teacher' || parsed.roleMode === 'student')) {
-          setVerifiedEmail(parsed.email);
-          setRoleMode(parsed.roleMode);
-          setStep('verification');
-          const config = twoFactorService.getConfig(parsed.email);
-          setTfaConfig(config);
-        }
-      } catch {
-        sessionStorage.removeItem('studyhub_pending_2fa');
-      }
-    }
+    sessionStorage.removeItem('studyhub_pending_2fa');
   }, []);
-
-  // Cooldown & Expiry Timers for Email Verification
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (resendCooldown > 0) {
-      timer = setInterval(() => {
-        setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (expiryCountdown > 0) {
-      timer = setInterval(() => {
-        setExpiryCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [expiryCountdown]);
 
   // Generate QR code only when entering enrollment mode
   const loadEnrollmentQrCode = useCallback(async (targetEmail: string, secret: string) => {
@@ -248,69 +198,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  // ==========================================
-  // STEP 2B: MANUAL / EMAIL CODE VERIFICATION
-  // ==========================================
-  const handleSendEmailVerification = async () => {
-    setAuthError(null);
-    setIsSubmitting(true);
-
-    try {
-      const res = await emailVerificationService.sendVerificationCode(verifiedEmail);
-
-      setIsSubmitting(false);
-      if (res.success) {
-        setEmailCodeSent(true);
-        setResendCooldown(60);
-        setExpiryCountdown(res.expiresInSeconds || 300);
-      } else {
-        setAuthError(res.error || 'Failed to dispatch verification code. Please try again.');
-      }
-    } catch {
-      setIsSubmitting(false);
-      setAuthError('Failed to send verification code. Please check your connection.');
-    }
-  };
-
-  const handleVerifyEmailCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-
-    const cleanOtp = (emailOtpCode || '').trim().replace(/\D/g, '');
-    if (!cleanOtp || cleanOtp.length !== 6) {
-      setAuthError('Please enter the 6-digit verification code.');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const res = await emailVerificationService.verifyCode(verifiedEmail, cleanOtp);
-
-      if (!res.success) {
-        setIsSubmitting(false);
-        setAuthError(res.error || 'Incorrect or expired verification code.');
-        return;
-      }
-
-      // Success: establish session
-      completeTwoFactorAuth(verifiedEmail, roleMode);
-      setIsSubmitting(false);
-      navigate('/dashboard', { replace: true });
-    } catch {
-      setIsSubmitting(false);
-      setAuthError('Failed to verify code. Please try again.');
-    }
-  };
-
   // Reset back to Credentials Step
   const handleBackToLogin = () => {
     sessionStorage.removeItem('studyhub_pending_2fa');
     setStep('credentials');
     setAuthError(null);
     setTotpCode('');
-    setEmailOtpCode('');
-    setEmailCodeSent(false);
     setShowQrModal(false);
   };
 
@@ -321,12 +214,6 @@ export const LoginPage: React.FC = () => {
       setCopiedSecret(true);
       setTimeout(() => setCopiedSecret(false), 2000);
     }
-  };
-
-  const formatCountdown = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
@@ -433,11 +320,7 @@ export const LoginPage: React.FC = () => {
                           setRoleMode('student');
                         }
                       }}
-                      placeholder={
-                        roleMode === 'teacher'
-                          ? 'ahmadwebcore@gmail.com'
-                          : 'dbaddiesvlog@gmail.com'
-                      }
+                      placeholder="name@example.com"
                       className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
                       autoFocus
@@ -476,9 +359,6 @@ export const LoginPage: React.FC = () => {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-zinc-400 mt-1">
-                    Default {roleMode === 'teacher' ? 'faculty' : 'student'} password: <code className="text-zinc-700 font-mono font-bold">{roleMode === 'teacher' ? 'Ahmad@2026' : 'Scholar@2026!'}</code>
-                  </p>
                 </div>
 
                 <Button
@@ -519,20 +399,23 @@ export const LoginPage: React.FC = () => {
           {/* ========================================================= */}
           {/* STEP 2: TWO-FACTOR VERIFICATION SCREEN (FACULTY ONLY)     */}
           {/* ========================================================= */}
+          {/* ========================================================= */}
+          {/* STEP 2: TWO-FACTOR VERIFICATION (GOOGLE AUTHENTICATOR)    */}
+          {/* ========================================================= */}
           {step === 'verification' && (
             <div className="space-y-4">
-              {/* Authenticated Account Bar (Email Masked) */}
-              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs gap-3">
-                <div className="flex items-center gap-2 text-emerald-950 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-600/15 flex items-center justify-center text-emerald-700 shrink-0">
+              {/* Authenticated Account Bar (Email Strictly Masked for Privacy) */}
+              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs gap-3">
+                <div className="flex items-center gap-2.5 text-emerald-950 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600/15 flex items-center justify-center text-emerald-700 shrink-0">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
                   </div>
                   <div className="min-w-0">
                     <span className="font-bold block text-zinc-900 leading-tight truncate">
-                      {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Henza Noor (Student)'}
+                      {roleMode === 'teacher' ? 'Faculty Lead' : 'Enrolled Student'}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium truncate block">
-                      {verifiedEmail} &bull; BISE DG Khan
+                    <span className="text-[11px] text-zinc-500 font-mono truncate block">
+                      {emailVerificationService.maskEmail(verifiedEmail)} &bull; Two-Factor Protected
                     </span>
                   </div>
                 </div>
@@ -542,244 +425,101 @@ export const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Method Switcher Tabs: Google Authenticator (Default) vs Gmail Verification Code */}
-              <div className="grid grid-cols-2 p-1 rounded-xl bg-zinc-100 border border-zinc-200">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVerificationMethod('authenticator');
-                    setAuthError(null);
-                  }}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    verificationMethod === 'authenticator'
-                      ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200'
-                      : 'text-zinc-500 hover:text-zinc-900'
-                  }`}
-                >
-                  <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
-                  Google Authenticator
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setVerificationMethod('email');
-                    setAuthError(null);
-                    if (!emailCodeSent) {
-                      handleSendEmailVerification();
-                    }
-                  }}
-                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    verificationMethod === 'email'
-                      ? 'bg-white text-zinc-900 shadow-xs border border-zinc-200'
-                      : 'text-zinc-500 hover:text-zinc-900'
-                  }`}
-                >
-                  <Mail className="w-3.5 h-3.5 text-sky-600" />
-                  Gmail Verification Code
-                </button>
-              </div>
-
-              {/* ----------------------------------------------------------- */}
-              {/* WAY 1: GOOGLE AUTHENTICATOR (DEFAULT)                       */}
-              {/* ----------------------------------------------------------- */}
-              {verificationMethod === 'authenticator' && (
-                <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
-                  <div className="text-center space-y-1.5 py-1">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
-                      <ShieldCheck className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-sm font-bold text-zinc-900">
-                      Enter Authenticator Code
-                    </h3>
-                    <p className="text-xs text-zinc-500">
-                      Open <strong>Google Authenticator</strong> on your phone and enter your 6-digit code.
-                    </p>
+              {/* Google Authenticator TOTP Form */}
+              <form onSubmit={handleVerifyAuthenticatorCode} className="space-y-4">
+                <div className="text-center space-y-1.5 py-1">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200 shadow-xs">
+                    <KeyRound className="w-6 h-6" />
                   </div>
+                  <h3 className="text-sm font-bold text-zinc-900">
+                    Google Authenticator Code
+                  </h3>
+                  <p className="text-xs text-zinc-500 max-w-xs mx-auto leading-relaxed">
+                    Open <strong>Google Authenticator</strong> on your phone and enter your current 6-digit verification code.
+                  </p>
+                </div>
 
-                  <div>
-                    <div className="relative">
-                      <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        maxLength={6}
-                        value={totpCode}
-                        onChange={(e) => handleTotpCodeChange(e.target.value)}
-                        placeholder="000000"
-                        className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
-                        autoFocus
-                      />
-                    </div>
+                <div>
+                  <div className="relative">
+                    <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      value={totpCode}
+                      onChange={(e) => handleTotpCodeChange(e.target.value)}
+                      placeholder="000000"
+                      className="w-full h-12 pl-10 pr-4 text-center text-xl font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
+                      autoFocus
+                    />
                   </div>
+                </div>
 
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    className="w-full h-11 text-xs font-bold shadow-sm"
-                    isLoading={isSubmitting}
-                    loadingText="Verifying Code..."
-                    icon={<ArrowRight className="w-4 h-4" />}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-full h-11 text-xs font-bold shadow-sm"
+                  isLoading={isSubmitting}
+                  loadingText="Verifying Code..."
+                  icon={<ArrowRight className="w-4 h-4" />}
+                >
+                  Verify Authenticator Code & Enter
+                </Button>
+
+                {/* Collapsed Pair New Device Option (Hidden by default because Authenticator is already set up) */}
+                <div className="pt-1 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowQrModal(!showQrModal)}
+                    className="text-[11px] text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer inline-flex items-center gap-1"
                   >
-                    Verify Authenticator Code & Enter
-                  </Button>
+                    <QrCode className="w-3 h-3" />
+                    <span>{showQrModal ? 'Hide Device Setup Key' : 'Pair a new phone or view setup key?'}</span>
+                  </button>
 
-                  {/* Collapsed Pair New Device Option (Hidden by default because Authenticator is already set up) */}
-                  <div className="pt-1 text-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowQrModal(!showQrModal)}
-                      className="text-[11px] text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer inline-flex items-center gap-1"
-                    >
-                      <QrCode className="w-3 h-3" />
-                      <span>{showQrModal ? 'Hide Device Setup Key' : 'Pair a new phone or view setup key?'}</span>
-                    </button>
-
-                    {showQrModal && (
-                      <div className="mt-2.5 p-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-center space-y-2 animate-in fade-in duration-150">
-                        <span className="text-[11px] text-zinc-600 font-medium block">
-                          Authenticator Setup Key (Only for New Device):
-                        </span>
-                        <div className="flex items-center justify-center gap-2">
-                          <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
-                            {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026')}
-                          </code>
-                          <button
-                            type="button"
-                            onClick={handleCopySecret}
-                            className="p-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer"
-                            title="Copy Key"
-                          >
-                            {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                          </button>
-                        </div>
-
-                        {qrCodeUrl && (
-                          <div className="pt-1">
-                            <img
-                              src={qrCodeUrl}
-                              alt="Google Authenticator QR Code"
-                              className="w-32 h-32 mx-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-xs"
-                            />
-                            <p className="text-[10px] text-zinc-500 pt-1">
-                              Scan once with Google Authenticator
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </form>
-              )}
-
-              {/* ----------------------------------------------------------- */}
-              {/* WAY 2: GMAIL VERIFICATION CODE                              */}
-              {/* ----------------------------------------------------------- */}
-              {verificationMethod === 'email' && (
-                <div className="space-y-4">
-                  <div className="text-center space-y-1 py-1">
-                    <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <h3 className="text-xs font-bold text-zinc-900">
-                      Gmail Security Verification
-                    </h3>
-                    <p className="text-[11px] text-zinc-500">
-                      Authorized security verification for <strong>{verifiedEmail}</strong>
-                    </p>
-                  </div>
-
-                  {emailCodeSent ? (
-                    <div className="p-3.5 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl text-center space-y-1.5 shadow-xs animate-in fade-in duration-150">
-                      <div className="flex items-center justify-center gap-1.5 text-emerald-900 text-xs font-bold">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        <span>Verification Code Dispatched to Gmail</span>
-                      </div>
-                      <p className="text-[11px] text-emerald-800 leading-relaxed max-w-xs mx-auto">
-                        An official 6-digit verification code has been dispatched to <strong>{verifiedEmail}</strong>. Please check your Gmail Inbox or Spam folder.
-                      </p>
-                    </div>
-                  ) : (
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={handleSendEmailVerification}
-                      className="w-full h-11 text-xs font-bold shadow-sm"
-                      isLoading={isSubmitting}
-                      loadingText="Sending Code to Gmail..."
-                      icon={<Send className="w-3.5 h-3.5" />}
-                    >
-                      Send 6-Digit Code to My Gmail
-                    </Button>
-                  )}
-
-                  <form onSubmit={handleVerifyEmailCode} className="space-y-3.5">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs font-semibold text-zinc-800">
-                          Enter 6-Digit Code from Gmail
-                        </label>
-                        {expiryCountdown > 0 && (
-                          <span className="text-[10px] font-mono text-zinc-400">
-                            Valid for: {formatCountdown(expiryCountdown)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <KeyRound className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={6}
-                          value={emailOtpCode}
-                          onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, ''))}
-                          placeholder="000000"
-                          className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
-                          autoFocus
-                        />
-                      </div>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      className="w-full h-11 text-xs font-bold shadow-sm"
-                      isLoading={isSubmitting}
-                      loadingText="Verifying Code..."
-                      icon={<ArrowRight className="w-4 h-4" />}
-                    >
-                      Verify Gmail Code & Enter
-                    </Button>
-
-                    <div className="flex items-center justify-between pt-1 text-xs">
-                      <span className="text-[11px] text-zinc-400">
-                        Didn't receive email?
+                  {showQrModal && (
+                    <div className="mt-2.5 p-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-center space-y-2 animate-in fade-in duration-150">
+                      <span className="text-[11px] text-zinc-600 font-medium block">
+                        Authenticator Setup Key (Only for New Device):
                       </span>
-                      {resendCooldown > 0 ? (
-                        <span className="text-[11px] font-medium text-zinc-400">
-                          Resend in {resendCooldown}s
-                        </span>
-                      ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
+                          {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026')}
+                        </code>
                         <button
                           type="button"
-                          onClick={handleSendEmailVerification}
-                          disabled={isSubmitting}
-                          className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+                          onClick={handleCopySecret}
+                          className="p-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer"
+                          title="Copy Key"
                         >
-                          Resend Code to Gmail
+                          {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
+                      </div>
+
+                      {qrCodeUrl && (
+                        <div className="pt-1">
+                          <img
+                            src={qrCodeUrl}
+                            alt="Google Authenticator QR Code"
+                            className="w-32 h-32 mx-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-xs"
+                          />
+                          <p className="text-[10px] text-zinc-500 pt-1">
+                            Scan once with Google Authenticator
+                          </p>
+                        </div>
                       )}
                     </div>
-                  </form>
+                  )}
                 </div>
-              )}
+              </form>
 
               {/* Navigation: Back to Login */}
               <div className="pt-2 border-t border-zinc-200 text-center">
                 <button
                   type="button"
                   onClick={handleBackToLogin}
-                  className="text-xs text-zinc-500 hover:text-zinc-800 font-medium transition-colors"
+                  className="text-xs text-zinc-500 hover:text-zinc-800 font-medium transition-colors cursor-pointer"
                 >
                   &larr; Back to Sign In / Change Account
                 </button>
