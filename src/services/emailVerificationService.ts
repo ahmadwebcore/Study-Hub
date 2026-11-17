@@ -56,19 +56,20 @@ export const emailVerificationService = {
 
     sessionStorage.setItem(PENDING_STORAGE_KEY, JSON.stringify(pendingData));
 
-    // Attempt Supabase email dispatch in background (fire-and-forget)
+    // Attempt Supabase email dispatch to the registered Gmail
     if (isSupabaseConfigured()) {
       try {
-        supabase.auth.signInWithOtp({
+        const { error: otpError } = await supabase.auth.signInWithOtp({
           email: cleanEmail,
           options: {
             shouldCreateUser: true,
           },
-        }).catch((err) => {
-          console.warn('Supabase signInWithOtp background dispatch notice:', err);
         });
-      } catch {
-        // Ignored, manualCode is available
+        if (otpError) {
+          console.warn('Supabase signInWithOtp notice:', otpError.message);
+        }
+      } catch (err) {
+        console.warn('Supabase email dispatch exception:', err);
       }
     }
 
@@ -76,7 +77,6 @@ export const emailVerificationService = {
       success: true,
       maskedEmail: masked,
       expiresInSeconds: 300,
-      manualCode: generatedCode,
     };
   },
 

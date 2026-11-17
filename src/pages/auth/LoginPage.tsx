@@ -6,15 +6,17 @@ import {
   ShieldCheck,
   UserCheck,
   Check,
+  CheckCircle2,
   Copy,
   AlertCircle,
   KeyRound,
   ArrowRight,
   Mail,
   Lock,
+  Eye,
+  EyeOff,
   Ticket,
   Send,
-  Key,
   QrCode,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -57,6 +59,7 @@ export const LoginPage: React.FC = () => {
   // Step 1: Credentials Form
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,10 +74,9 @@ export const LoginPage: React.FC = () => {
   const [copiedSecret, setCopiedSecret] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
 
-  // Email / Manual Verification State
+  // Email Verification State (Gmail)
   const [emailOtpCode, setEmailOtpCode] = useState('');
   const [emailCodeSent, setEmailCodeSent] = useState(false);
-  const [manualCode, setManualCode] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
   const [expiryCountdown, setExpiryCountdown] = useState(0);
 
@@ -261,9 +263,6 @@ export const LoginPage: React.FC = () => {
         setEmailCodeSent(true);
         setResendCooldown(60);
         setExpiryCountdown(res.expiresInSeconds || 300);
-        if (res.manualCode) {
-          setManualCode(res.manualCode);
-        }
       } else {
         setAuthError(res.error || 'Failed to dispatch verification code. Please try again.');
       }
@@ -311,7 +310,6 @@ export const LoginPage: React.FC = () => {
     setAuthError(null);
     setTotpCode('');
     setEmailOtpCode('');
-    setManualCode('');
     setEmailCodeSent(false);
     setShowQrModal(false);
   };
@@ -462,14 +460,25 @@ export const LoginPage: React.FC = () => {
                   <div className="relative">
                     <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter account password"
-                      className="w-full h-10 pl-10 pr-4 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
+                      className="w-full h-10 pl-10 pr-10 rounded-xl border border-zinc-200 bg-white text-xs text-zinc-900 focus:outline-none focus:border-[#14B866] transition-colors"
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1 text-zinc-400 hover:text-zinc-700 absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer transition-colors"
+                      title={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
+                  <p className="text-[11px] text-zinc-400 mt-1">
+                    Default {roleMode === 'teacher' ? 'faculty' : 'student'} password: <code className="text-zinc-700 font-mono font-bold">{roleMode === 'teacher' ? 'Ahmad@2026' : 'Scholar@2026!'}</code>
+                  </p>
                 </div>
 
                 <Button
@@ -513,26 +522,27 @@ export const LoginPage: React.FC = () => {
           {step === 'verification' && (
             <div className="space-y-4">
               {/* Authenticated Account Bar (Email Masked) */}
-              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-emerald-950">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-600/15 flex items-center justify-center text-emerald-700">
+              <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs gap-3">
+                <div className="flex items-center gap-2 text-emerald-950 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600/15 flex items-center justify-center text-emerald-700 shrink-0">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
                   </div>
-                  <div>
-                    <span className="font-bold block text-zinc-900 leading-tight">
+                  <div className="min-w-0">
+                    <span className="font-bold block text-zinc-900 leading-tight truncate">
                       {roleMode === 'teacher' ? 'Faculty Lead (Ahmad)' : 'Henza Noor (Student)'}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium">
+                    <span className="text-[10px] text-zinc-500 font-medium truncate block">
                       {verifiedEmail} &bull; BISE DG Khan
                     </span>
                   </div>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-white px-2 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
-                  Password Verified
-                </span>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-emerald-800 text-[11px] font-bold border border-emerald-300 shadow-2xs whitespace-nowrap shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Password Verified</span>
+                </div>
               </div>
 
-              {/* Method Switcher Tabs: Google Authenticator (Default) vs Manual Code */}
+              {/* Method Switcher Tabs: Google Authenticator (Default) vs Gmail Verification Code */}
               <div className="grid grid-cols-2 p-1 rounded-xl bg-zinc-100 border border-zinc-200">
                 <button
                   type="button"
@@ -564,8 +574,8 @@ export const LoginPage: React.FC = () => {
                       : 'text-zinc-500 hover:text-zinc-900'
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
-                  Manual Verification Code
+                  <Mail className="w-3.5 h-3.5 text-sky-600" />
+                  Gmail Verification Code
                 </button>
               </div>
 
@@ -663,45 +673,30 @@ export const LoginPage: React.FC = () => {
               )}
 
               {/* ----------------------------------------------------------- */}
-              {/* WAY 2: MANUAL VERIFICATION CODE                             */}
+              {/* WAY 2: GMAIL VERIFICATION CODE                              */}
               {/* ----------------------------------------------------------- */}
               {verificationMethod === 'email' && (
                 <div className="space-y-4">
                   <div className="text-center space-y-1 py-1">
                     <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto border border-sky-200">
-                      <ShieldCheck className="w-5 h-5" />
+                      <Mail className="w-5 h-5" />
                     </div>
                     <h3 className="text-xs font-bold text-zinc-900">
-                      Manual Security Verification Code
+                      Gmail Security Verification
                     </h3>
                     <p className="text-[11px] text-zinc-500">
-                      Authorized security verification for {verifiedEmail}
+                      Authorized security verification for <strong>{verifiedEmail}</strong>
                     </p>
                   </div>
 
-                  {manualCode ? (
-                    <div className="p-3.5 bg-sky-50/80 border border-sky-200/80 rounded-2xl text-center space-y-2 shadow-xs">
-                      <div className="flex items-center justify-center gap-1.5 text-sky-900 text-xs font-bold">
-                        <Key className="w-3.5 h-3.5 text-sky-600" />
-                        <span>Active Session Verification Code</span>
+                  {emailCodeSent ? (
+                    <div className="p-3.5 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl text-center space-y-1.5 shadow-xs animate-in fade-in duration-150">
+                      <div className="flex items-center justify-center gap-1.5 text-emerald-900 text-xs font-bold">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Verification Code Dispatched to Gmail</span>
                       </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <span className="font-mono text-2xl font-bold tracking-widest text-sky-950 bg-white px-3.5 py-1 rounded-xl border border-sky-200 shadow-2xs select-all">
-                          {manualCode}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEmailOtpCode(manualCode);
-                            navigator.clipboard.writeText(manualCode);
-                          }}
-                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white transition-colors cursor-pointer"
-                        >
-                          Fill Code
-                        </button>
-                      </div>
-                      <p className="text-[11px] text-sky-700">
-                        Enter this 6-digit code below to safely authorize your login.
+                      <p className="text-[11px] text-emerald-800 leading-relaxed max-w-xs mx-auto">
+                        An official 6-digit verification code has been dispatched to <strong>{verifiedEmail}</strong>. Please check your Gmail Inbox or Spam folder.
                       </p>
                     </div>
                   ) : (
@@ -711,10 +706,10 @@ export const LoginPage: React.FC = () => {
                       onClick={handleSendEmailVerification}
                       className="w-full h-11 text-xs font-bold shadow-sm"
                       isLoading={isSubmitting}
-                      loadingText="Generating Code..."
+                      loadingText="Sending Code to Gmail..."
                       icon={<Send className="w-3.5 h-3.5" />}
                     >
-                      Generate 6-Digit Manual Verification Code
+                      Send 6-Digit Code to My Gmail
                     </Button>
                   )}
 
@@ -722,7 +717,7 @@ export const LoginPage: React.FC = () => {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="text-xs font-semibold text-zinc-800">
-                          Enter 6-Digit Code
+                          Enter 6-Digit Code from Gmail
                         </label>
                         {expiryCountdown > 0 && (
                           <span className="text-[10px] font-mono text-zinc-400">
@@ -739,7 +734,7 @@ export const LoginPage: React.FC = () => {
                           value={emailOtpCode}
                           onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, ''))}
                           placeholder="000000"
-                          className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600"
+                          className="w-full h-11 pl-10 pr-4 text-center text-lg font-mono tracking-widest rounded-xl border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-emerald-600 shadow-xs"
                           autoFocus
                         />
                       </div>
@@ -753,24 +748,25 @@ export const LoginPage: React.FC = () => {
                       loadingText="Verifying Code..."
                       icon={<ArrowRight className="w-4 h-4" />}
                     >
-                      Verify Manual Code & Enter
+                      Verify Gmail Code & Enter
                     </Button>
 
                     <div className="flex items-center justify-between pt-1 text-xs">
                       <span className="text-[11px] text-zinc-400">
-                        Need a fresh code?
+                        Didn't receive email?
                       </span>
                       {resendCooldown > 0 ? (
                         <span className="text-[11px] font-medium text-zinc-400">
-                          Refresh in {resendCooldown}s
+                          Resend in {resendCooldown}s
                         </span>
                       ) : (
                         <button
                           type="button"
                           onClick={handleSendEmailVerification}
-                          className="text-xs text-emerald-700 hover:text-emerald-800 font-semibold cursor-pointer"
+                          disabled={isSubmitting}
+                          className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
                         >
-                          Generate New Code
+                          Resend Code to Gmail
                         </button>
                       )}
                     </div>
