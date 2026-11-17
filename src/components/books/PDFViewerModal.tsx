@@ -100,7 +100,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     return '/books/urdu_compulsory_11_pectaa.pdf';
   }, [subjectCode, pdfFileName, bookTitle, testTitle]);
 
-  const [viewerTab, setViewerTab] = useState<'real_pdf' | 'slices'>('real_pdf');
+  const [viewerTab, setViewerTab] = useState<'slices' | 'real_pdf'>('slices');
   const [activePageIndex, setActivePageIndex] = useState<number>(initialPage); // 1-based index (1 to totalPages)
   const [viewMode, setViewMode] = useState<'single' | 'continuous' | 'spread'>('single');
   const [showThumbnails, setShowThumbnails] = useState<boolean>(true);
@@ -178,15 +178,15 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-6xl ${
+        className={`relative w-full max-w-5xl ${
           isFullscreen ? 'h-[98dvh]' : 'h-[93dvh] sm:h-[90vh]'
-        } bg-[#121215] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col text-white font-sans my-auto`}
+        } bg-[#121215] rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col text-white font-sans my-auto`}
       >
         {/* 1. TOP HEADER BAR */}
-        <div className="px-4 py-3 sm:px-6 bg-[#09090b] text-white border-b border-white/10 flex items-center justify-between gap-3 shrink-0">
+        <div className="px-3.5 py-2.5 sm:px-6 sm:py-3 bg-[#09090b] text-white border-b border-white/10 flex items-center justify-between gap-2.5 shrink-0">
           {/* Book Info */}
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-12 bg-zinc-800 rounded-lg border border-white/20 shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-10 sm:w-9 sm:h-12 bg-zinc-800 rounded-lg border border-white/20 shadow-xs flex items-center justify-center shrink-0 overflow-hidden">
               <img
                 src={bookCoverUrl || '/covers/cover_urdu_ptb.jpg'}
                 alt="Book Cover"
@@ -197,29 +197,29 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
               />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   {subjectCode || bookSlice.subjectCode}
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/20">
-                  {pagesRange || bookSlice.pagesRange} &bull; {totalPages} Book Pages
+                <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-white border border-white/20">
+                  {pagesRange || bookSlice.pagesRange} &bull; {totalPages} Pages
                 </span>
                 <span className="text-[10px] text-zinc-400 font-medium hidden md:inline">
-                  &bull; Official BISE DG Khan Curriculum
+                  &bull; BISE DG Khan Key Book Extract
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-white truncate mt-0.5">
+              <h3 className="text-xs sm:text-base font-bold text-white truncate mt-0.5">
                 {bookTitle || bookSlice.urduBookTitle || bookSlice.bookTitle}
               </h3>
             </div>
           </div>
 
           {/* Action Tools: Print, Download, Fullscreen, Close */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
             <button
               type="button"
               onClick={handlePrint}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:inline-flex cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:inline-flex cursor-pointer"
               title="Print This Chapter Pages"
             >
               <Printer className="w-4 h-4" />
@@ -227,7 +227,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <button
               type="button"
               onClick={handleDownload}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               title="Download Full Textbook PDF"
             >
               <Download className="w-4 h-4" />
@@ -235,7 +235,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <button
               type="button"
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:inline-flex cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:inline-flex cursor-pointer"
               title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
             >
               <Maximize2 className="w-4 h-4" />
@@ -243,7 +243,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Close Book Viewer"
             >
               <X className="w-5 h-5" />
@@ -251,37 +251,37 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           </div>
         </div>
 
-        {/* TAB SWITCHER: REAL SCANNED PDF vs CHAPTER SLICE */}
-        <div className="px-4 py-2 sm:px-6 bg-[#09090b] border-b border-white/10 flex items-center justify-between gap-3 shrink-0 text-xs">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setViewerTab('real_pdf')}
-              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewerTab === 'real_pdf'
-                  ? 'bg-emerald-600 text-white shadow-md'
-                  : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" />
-              <span>1. Official Scanned Book PDF (PCTB / Taleem360)</span>
-            </button>
-
+        {/* TAB SWITCHER: CHAPTER SLICE (PRIMARY) vs FULL BOOK PDF */}
+        <div className="px-3 py-2 sm:px-6 bg-[#09090b] border-b border-white/10 flex flex-wrap items-center justify-between gap-2 shrink-0 text-xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
             <button
               type="button"
               onClick={() => setViewerTab('slices')}
-              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer truncate ${
                 viewerTab === 'slices'
                   ? 'bg-emerald-600 text-white shadow-md'
                   : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>2. Test Syllabus Slices ({totalPages} Pages)</span>
+              <BookOpen className="w-3.5 h-3.5 shrink-0 text-emerald-300" />
+              <span className="truncate">1. Test Syllabus Pages ({totalPages}P)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewerTab('real_pdf')}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer truncate ${
+                viewerTab === 'real_pdf'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">2. Full Book PDF</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <a
               href={realPdfUrl}
               target="_blank"
@@ -296,16 +296,16 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
 
         {viewerTab === 'real_pdf' ? (
           <div className="flex-1 w-full h-full flex flex-col bg-zinc-950 overflow-hidden relative">
-            <div className="px-4 py-2.5 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
-              <div className="flex items-center gap-2 text-zinc-300">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-bold text-white">Genuine Scanned Textbook PDF</span>
-                <span className="text-zinc-500 hidden md:inline">
+            <div className="px-3 py-2 sm:px-6 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-2.5 text-xs shrink-0">
+              <div className="flex items-center gap-2 text-zinc-300 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-bold text-white truncate">Full Scanned Textbook PDF</span>
+                <span className="text-zinc-500 hidden md:inline truncate">
                   &bull; Official Punjab Curriculum &amp; Textbook Authority (PECTAA) Edition
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <div className="flex items-center gap-1.5 bg-[#09090b] border border-white/10 rounded-xl px-2.5 py-1">
                   <span className="text-[11px] text-zinc-400 font-semibold">Page:</span>
                   <input
@@ -326,7 +326,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Full Screen View</span>
+                  <span>Full Screen</span>
                 </a>
 
                 <button
@@ -335,7 +335,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/10 transition-all cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Download Book File</span>
+                  <span className="hidden sm:inline">Download</span>
                 </button>
               </div>
             </div>
@@ -350,65 +350,65 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
         ) : (
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* 2. READER TOOLBAR */}
-        <div className="px-4 py-2 sm:px-6 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0 text-xs">
-          {/* View Mode Switcher */}
-          <div className="flex items-center gap-1.5 bg-[#09090b] p-1 rounded-xl border border-white/10">
-            <button
-              type="button"
-              onClick={() => setViewMode('single')}
-              className={`px-2.5 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'single'
-                  ? 'bg-emerald-600 text-white shadow-2xs'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Single Page Sheet"
-            >
-              <Square className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Page View</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('spread')}
-              className={`px-2.5 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'spread'
-                  ? 'bg-emerald-600 text-white shadow-2xs'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Two-Page Book Spread (کھلی کتاب)"
-            >
-              <Columns className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">2-Page Spread</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('continuous')}
-              className={`px-2.5 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'continuous'
-                  ? 'bg-emerald-600 text-white shadow-2xs'
-                  : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Continuous Vertical Scroll (All 15 Pages)"
-            >
-              <List className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">All {totalPages} Pages</span>
-            </button>
-          </div>
+            <div className="px-3 py-2 sm:px-6 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-2.5 shrink-0 text-xs">
+              {/* View Mode Switcher */}
+              <div className="flex items-center gap-1 bg-[#09090b] p-1 rounded-xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('single')}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                    viewMode === 'single'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Single Page Sheet"
+                >
+                  <Square className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Page View</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('spread')}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all hidden sm:flex items-center gap-1.5 cursor-pointer ${
+                    viewMode === 'spread'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Two-Page Book Spread (کھلی کتاب)"
+                >
+                  <Columns className="w-3.5 h-3.5" />
+                  <span>2-Page Spread</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('continuous')}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                    viewMode === 'continuous'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Continuous Vertical Scroll (All 15 Pages)"
+                >
+                  <List className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">All {totalPages} Pages</span>
+                </button>
+              </div>
 
-          {/* Thumbnails Sidebar Toggle */}
-          <button
-            type="button"
-            onClick={() => setShowThumbnails(!showThumbnails)}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer hidden md:flex items-center gap-1.5 ${
-              showThumbnails
-                ? 'bg-white/10 border-white/20 text-white'
-                : 'bg-[#09090b] border-white/10 text-zinc-400 hover:text-white'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Thumbnails ({totalPages})</span>
-          </button>
+              {/* Thumbnails Sidebar Toggle */}
+              <button
+                type="button"
+                onClick={() => setShowThumbnails(!showThumbnails)}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer hidden md:flex items-center gap-1.5 ${
+                  showThumbnails
+                    ? 'bg-white/10 border-white/20 text-white'
+                    : 'bg-[#09090b] border-white/10 text-zinc-400 hover:text-white'
+                }`}
+              >
+                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Thumbnails ({totalPages})</span>
+              </button>
 
-          {/* Page Flipper Navigation */}
+              {/* Page Flipper Navigation */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 bg-[#09090b] border border-white/10 rounded-xl px-2 py-1 shadow-2xs">
               <button
@@ -610,11 +610,11 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     )}
 
         {/* 4. MODAL FOOTER */}
-        <div className="px-4 py-3 sm:px-6 bg-[#09090b] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 text-xs">
-          <div className="text-zinc-400 flex items-center gap-2">
+        <div className="px-3.5 py-2.5 sm:px-6 sm:py-3 bg-[#09090b] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 shrink-0 text-xs">
+          <div className="text-zinc-400 flex items-center gap-2 text-[11px] sm:text-xs truncate w-full sm:w-auto">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>
-              Official Textbook: <strong className="text-white">{bookSlice.pdfFileName}</strong> &bull; Verified Syllabus for BISE D.G. Khan
+            <span className="truncate">
+              Official Key Book: <strong className="text-white">{bookSlice.keyBookTitle || bookSlice.pdfFileName}</strong> &bull; Verified Syllabus for BISE D.G. Khan
             </span>
           </div>
 
@@ -628,7 +628,7 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-zinc-300 bg-[#18181b] hover:bg-white/10 border border-white/10 rounded-xl transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-zinc-300 bg-[#18181b] hover:bg-white/10 border border-white/10 rounded-xl transition-colors cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5 text-zinc-400" />
               <span>Print Pages</span>
@@ -680,13 +680,13 @@ const RenderBookPageSheet: React.FC<RenderBookPageSheetProps> = ({
 
   return (
     <div
-      className={`relative w-[340px] sm:w-[580px] md:w-[680px] min-h-[820px] sm:min-h-[880px] bg-[#FCFCF9] text-[#142D27] p-6 sm:p-10 shadow-2xl border border-[#D5DDD8] flex flex-col justify-between font-sans select-text ${
+      className={`relative w-full max-w-[680px] min-h-[500px] sm:min-h-[880px] bg-[#FCFCF9] text-[#142D27] p-3.5 sm:p-10 shadow-2xl border border-[#D5DDD8] flex flex-col justify-between font-sans select-text ${
         isLeftSpread ? 'rounded-l-2xl' : isRightSpread ? 'rounded-r-2xl' : 'rounded-2xl'
-      } print:m-0 print:border-none print:shadow-none print:w-full print:min-h-screen`}
+      } print:m-0 print:border-none print:shadow-none print:w-full print:min-h-screen mx-auto`}
       dir={isUrdu ? 'rtl' : 'ltr'}
     >
       {/* Subtle Inner Framing Border */}
-      <div className="absolute inset-3 sm:inset-4 border border-[#E3EBE6] pointer-events-none rounded-xl" />
+      <div className="absolute inset-2 sm:inset-4 border border-[#E3EBE6] pointer-events-none rounded-xl" />
 
       {/* Watermark in Background */}
       {page.watermarkText && (
@@ -698,14 +698,14 @@ const RenderBookPageSheet: React.FC<RenderBookPageSheetProps> = ({
       )}
 
       {/* 1. TOP RUNNING HEADER */}
-      <div className="relative z-10 pb-3 border-b-2 border-[#142D27]/20 flex items-center justify-between text-[11px] sm:text-xs font-serif text-[#39564D] shrink-0">
-        <span className="font-bold truncate max-w-[200px] sm:max-w-xs">
+      <div className="relative z-10 pb-2.5 sm:pb-3 border-b-2 border-[#142D27]/20 flex items-center justify-between text-[10px] sm:text-xs font-serif text-[#39564D] shrink-0 gap-2">
+        <span className="font-bold truncate max-w-[130px] sm:max-w-xs">
           {page.headerBookTitle}
         </span>
         <span className="font-medium hidden sm:inline truncate max-w-[180px]">
           {page.headerChapterTitle}
         </span>
-        <span className="font-mono font-bold px-2 py-0.5 rounded bg-[#142D27]/5 border border-[#142D27]/10 text-[#142D27]">
+        <span className="font-mono font-bold px-1.5 py-0.5 rounded bg-[#142D27]/5 border border-[#142D27]/10 text-[#142D27] text-[10px] sm:text-xs shrink-0">
           {isUrdu ? `صفحہ ${page.pageIndex} / ${totalPages}` : `Page ${page.pageIndex} of ${totalPages}`}
         </span>
       </div>

@@ -2613,6 +2613,13 @@ export const testService = {
         passed,
         answers,
       };
+      saveLocalTestStatus(test.id, 'submitted', autoScore);
+      notificationService.notifyStudentSubmission('Henza Noor', test.title);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('studyhub_tests_updated'));
+        window.dispatchEvent(new Event('studyhub_submissions_updated'));
+        window.dispatchEvent(new Event('studyhub_notification_update'));
+      }
       return { attempt: mockResult, error: null };
     }
 
@@ -2631,6 +2638,14 @@ export const testService = {
         .single();
 
       if (error) throw error;
+
+      saveLocalTestStatus(test.id, 'submitted', autoScore);
+      notificationService.notifyStudentSubmission('Henza Noor', test.title);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('studyhub_tests_updated'));
+        window.dispatchEvent(new Event('studyhub_submissions_updated'));
+        window.dispatchEvent(new Event('studyhub_notification_update'));
+      }
 
       return {
         attempt: {
@@ -2801,6 +2816,32 @@ export const testService = {
         },
         { onConflict: 'test_id,student_id' }
       );
+
+      saveLocalTestStatus(params.test.id, passed ? 'passed' : 'failed_retest', totalScore);
+
+      notificationService.notifyCertifiedGrade(
+        params.test.title,
+        totalScore,
+        params.test.totalMarks,
+        grade,
+        params.overallFeedback || `Official grade certified by Sir Ahmad • ${grade} (${passed ? 'PASSED' : 'RETEST'})`
+      );
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('studyhub_tests_updated'));
+        window.dispatchEvent(new Event('studyhub_submissions_updated'));
+        window.dispatchEvent(new Event('studyhub_notification_update'));
+      }
+
+      integrationService.recordActivityInGoogleSheet({
+        date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        studentName: params.studentName || 'Henza Noor',
+        activityType: '30-Mark Test Evaluation',
+        subject: params.test.subjectName,
+        score: `${totalScore}/${params.test.totalMarks} (${percentage}%)`,
+        resultStatus: passed ? 'PASSED' : 'RETEST',
+        remarks: params.overallFeedback || `Official grade certified by Sir Ahmad • ${grade} (${passed ? 'PASSED' : 'RETEST'})`,
+      });
 
       return { success: true, error: null };
     } catch (err: unknown) {

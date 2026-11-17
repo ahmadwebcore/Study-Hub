@@ -3,6 +3,7 @@
 // daily reading quotas, BISE DG Khan board feeds, and browser/mobile native push notifications.
 
 import { NotificationItem } from '../types';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'studyhub_in_app_notifications_v6';
 
@@ -155,9 +156,65 @@ function getDayScheduleAlerts(): NotificationItem[] {
 
 class NotificationService {
   private notifications: NotificationItem[] = [];
+  private realtimeChannel: any = null;
+  private broadcastChannel: any = null;
 
   constructor() {
     this.load();
+    this.initRealtimeSync();
+  }
+
+  private initRealtimeSync(): void {
+    if (typeof window === 'undefined') return;
+
+    // 1. Supabase Realtime across different devices (Phone <-> PC)
+    if (isSupabaseConfigured()) {
+      try {
+        this.realtimeChannel = supabase.channel('studyhub_realtime_alerts', {
+          config: { broadcast: { self: false } },
+        });
+
+        this.realtimeChannel
+          .on('broadcast', { event: 'push_alert' }, ({ payload }: { payload: NotificationItem }) => {
+            if (payload && payload.id) {
+              this.receiveRemoteNotification(payload);
+            }
+          })
+          .subscribe();
+      } catch (err) {
+        console.warn('Realtime notifications channel fallback:', err);
+      }
+    }
+
+    // 2. BroadcastChannel API for multi-tab sync on same device
+    if ('BroadcastChannel' in window) {
+      try {
+        this.broadcastChannel = new BroadcastChannel('studyhub_broadcast_notifications');
+        this.broadcastChannel.onmessage = (event: MessageEvent) => {
+          if (event.data && event.data.id) {
+            this.receiveRemoteNotification(event.data);
+          }
+        };
+      } catch {}
+    }
+  }
+
+  private receiveRemoteNotification(notif: NotificationItem): void {
+    if (!notif || !notif.id) return;
+    this.load();
+    // Prevent duplicate entries
+    if (this.notifications.some((n) => n.id === notif.id)) return;
+
+    this.notifications.unshift(notif);
+    this.save();
+
+    // Trigger audio chime, haptic vibration and in-app native banner on receiver's phone/desktop
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('studyhub_native_push_alert', { detail: notif })
+      );
+      this.dispatchNativeNotification(notif.title, notif.message, notif.actionUrl);
+    }
   }
 
   private load(): void {
@@ -225,6 +282,24 @@ class NotificationService {
         new CustomEvent('studyhub_native_push_alert', { detail: newNotif })
       );
       this.dispatchNativeNotification(newNotif.title, newNotif.message, newNotif.actionUrl);
+    }
+
+    // Broadcast across devices via Supabase Realtime channel
+    if (this.realtimeChannel) {
+      try {
+        this.realtimeChannel.send({
+          type: 'broadcast',
+          event: 'push_alert',
+          payload: newNotif,
+        });
+      } catch {}
+    }
+
+    // Broadcast across browser tabs via BroadcastChannel API
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.postMessage(newNotif);
+      } catch {}
     }
 
     return newNotif;
@@ -321,6 +396,18 @@ class NotificationService {
 
     const pick = samples[Math.floor(Math.random() * samples.length)];
     return this.addNotification(pick);
+  }
+
+  public notifyStudentAttendance(studentName: string, timeMarked?: string): NotificationItem {
+    return this.addNotification({
+      title: `🟢 Student Presence Marked: ${studentName}`,
+      message: `${studentName} checked in as PRESENT today at ${timeMarked || 'Morning'}. Attendance ledger synchronized with Sir Ahmad.`,
+      category: 'system',
+      actionUrl: '/dashboard',
+      actionLabel: 'View Attendance',
+      badge: 'Present',
+      urgent: false,
+    });
   }
 
   public notifyStudentSubmission(studentName: string, testTitle: string): NotificationItem {

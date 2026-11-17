@@ -28,6 +28,7 @@ import { BISEDGKhanModal } from '../../components/board/BISEDGKhanModal';
 import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
 import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 import { attendanceService, AttendanceRecord } from '../../services/attendanceService';
+import { notificationService } from '../../services/notificationService';
 
 export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
@@ -101,6 +102,7 @@ export const StudentDashboard: React.FC = () => {
     if (res.success) {
       setIsTodayPresent(true);
       setTodayAttendanceRecord(res.record);
+      notificationService.notifyStudentAttendance(studentName, res.record.timeMarked);
       setSuccessToast(`Attendance recorded: Present today at ${res.record.timeMarked}! Synced to Google Sheets.`);
       setTimeout(() => setSuccessToast(null), 4000);
     }
@@ -516,19 +518,19 @@ export const StudentDashboard: React.FC = () => {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl border border-zinc-200 max-w-lg w-full max-h-[92dvh] sm:max-h-[88vh] shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto animate-in zoom-in-95 duration-200"
+              className="bg-white rounded-3xl border border-zinc-200 max-w-lg w-full max-h-[90dvh] sm:max-h-[88vh] shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto animate-in zoom-in-95 duration-200"
             >
               {/* Header (Fixed) */}
-              <div className="shrink-0 p-5 sm:p-6 border-b border-zinc-100 bg-[#F7F9F8] flex items-start justify-between gap-3 relative">
-                <div className="space-y-1.5 min-w-0 flex-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Global Science Academy &bull; Fatehpur</span>
+              <div className="shrink-0 p-4 sm:p-5 border-b border-zinc-100 bg-[#F7F9F8] flex items-start justify-between gap-3 relative">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] sm:text-[11px] font-bold">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="truncate">Global Science Academy &bull; Fatehpur</span>
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight font-serif text-zinc-900">
+                  <h2 className="text-lg sm:text-2xl font-bold tracking-tight font-serif text-zinc-900 truncate">
                     Daily Briefing &bull; {studentName}
                   </h2>
-                  <p className="text-xs text-zinc-500 font-medium flex items-center gap-1.5">
+                  <p className="text-[11px] sm:text-xs text-zinc-500 font-medium flex items-center gap-1.5 flex-wrap">
                     <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     <span>{formattedToday}</span>
                     <span className="text-zinc-300">&bull;</span>
@@ -540,7 +542,7 @@ export const StudentDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleDismissDailyWelcome}
-                  className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/70 transition-colors cursor-pointer shrink-0 ml-1"
+                  className="p-1.5 sm:p-2 rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/70 transition-colors cursor-pointer shrink-0 ml-1"
                   aria-label="Dismiss Briefing"
                 >
                   <X className="w-5 h-5" />
@@ -548,23 +550,23 @@ export const StudentDashboard: React.FC = () => {
               </div>
 
               {/* Scrollable Body */}
-              <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4">
+              <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-5 space-y-3 sm:space-y-4">
                 {/* Daily Presentation Attendance Check-in */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50/70 border border-emerald-200/90 flex items-center justify-between gap-3 shadow-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50/70 border border-emerald-200/90 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
                       <CheckCircle2 className="w-5 h-5" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
                         Daily Presentation &bull; Attendance
                       </span>
-                      <span className="text-xs font-bold text-zinc-900 block">
+                      <span className="text-xs font-bold text-zinc-900 block truncate">
                         {isTodayPresent
-                          ? `Present Today (Marked at ${todayAttendanceRecord?.timeMarked || 'Morning'})`
+                          ? `Present Today (${todayAttendanceRecord?.timeMarked || 'Morning'})`
                           : 'Daily Presence Check-In'}
                       </span>
-                      <span className="text-[11px] text-zinc-500 block">
+                      <span className="text-[11px] text-zinc-500 block truncate">
                         {isTodayPresent
                           ? 'Synchronized directly to Faculty Google Sheet ledger.'
                           : 'Click to mark attendance and notify Sir Ahmad.'}
@@ -575,24 +577,25 @@ export const StudentDashboard: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleMarkPresentToday}
-                      className="px-3.5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors shrink-0 cursor-pointer"
+                      className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-colors shrink-0 cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
                     >
-                      Mark Present
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Mark Present</span>
                     </button>
                   ) : (
-                    <span className="px-2.5 py-1 text-xs font-bold text-emerald-800 bg-white border border-emerald-300 rounded-lg shrink-0">
+                    <span className="w-fit self-start sm:self-auto px-2.5 py-1 text-xs font-bold text-emerald-800 bg-white border border-emerald-300 rounded-lg shrink-0">
                       ✓ Recorded
                     </span>
                   )}
                 </div>
 
                 {/* Daily Checklist Cards */}
-                <div className="space-y-3">
-                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-start gap-3">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-start gap-3">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
                       <BookOpen className="w-4 h-4" />
                     </div>
-                    <div className="flex-1 space-y-0.5">
+                    <div className="flex-1 min-w-0 space-y-0.5">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                         Reading Quota: 2.5 Pages Target
                       </span>
@@ -605,11 +608,11 @@ export const StudentDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white border border-emerald-200 flex items-start gap-3 shadow-2xs">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-emerald-200 flex items-start gap-3 shadow-2xs">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
                       <Award className="w-4 h-4 text-emerald-700" />
                     </div>
-                    <div className="flex-1 space-y-0.5">
+                    <div className="flex-1 min-w-0 space-y-0.5">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                         Today's Assessment: 30 Marks
                       </span>
@@ -625,11 +628,11 @@ export const StudentDashboard: React.FC = () => {
               </div>
 
               {/* Fixed Footer */}
-              <div className="shrink-0 p-4 sm:p-5 border-t border-zinc-100 bg-[#F7F9F8]">
+              <div className="shrink-0 p-3.5 sm:p-4 border-t border-zinc-100 bg-[#F7F9F8]">
                 <button
                   type="button"
                   onClick={handleDismissDailyWelcome}
-                  className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 sm:py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Open Today's Workspace</span>
                   <ArrowRight className="w-4 h-4" />
