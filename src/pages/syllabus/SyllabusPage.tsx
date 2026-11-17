@@ -49,9 +49,24 @@ export const SyllabusPage: React.FC = () => {
   const { role, user } = useRole();
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_02');
-  const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(() =>
-    SAMPLE_SYLLABUS.filter((u) => u.subjectId === 'sub_02')
-  );
+  const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(() => {
+    try {
+      const raw = localStorage.getItem('studyhub_syllabus_progress_v3');
+      const localMap = raw ? JSON.parse(raw) : {};
+      const urduUnits = SAMPLE_SYLLABUS.filter((u) => u.subjectId === 'sub_02');
+      return urduUnits.map((u) => {
+        const topics = u.topics.map((t) => {
+          const st = localMap[t.id] || (t.completed ? 'completed' : t.progressStatus || 'not_started');
+          return { ...t, completed: st === 'completed', progressStatus: st };
+        });
+        const completedCount = topics.filter((t) => t.completed).length;
+        const progress = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
+        return { ...u, topics, progress };
+      });
+    } catch {
+      return SAMPLE_SYLLABUS.filter((u) => u.subjectId === 'sub_02');
+    }
+  });
   const [selectedChapterId, setSelectedChapterId] = useState<string>('all');
   const [selectedTopicStatus, setSelectedTopicStatus] = useState<string>('all');
   const [activeNotesTopic, setActiveNotesTopic] = useState<{ topic: SyllabusTopic; unitTitle: string } | null>(null);
@@ -181,9 +196,16 @@ export const SyllabusPage: React.FC = () => {
       })
     );
 
-    if (user?.id) {
-      await syllabusService.updateStudentTopicProgress(user.id, topic.id, nextStatus);
-    }
+    await syllabusService.updateStudentTopicProgress(user?.id || 'faculty_lead_ahmad', topic.id, nextStatus);
+
+    const statusLabel =
+      nextStatus === 'completed'
+        ? '✓ Marked Completed'
+        : nextStatus === 'in_progress'
+        ? '⚡ Marked In Progress'
+        : '○ Reset to Not Started';
+    setSuccessToast(`${statusLabel} — Progress calculated dynamically.`);
+    setTimeout(() => setSuccessToast(null), 2500);
   };
 
   // Chapter Handlers

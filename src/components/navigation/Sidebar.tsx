@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   ListTree,
-  CalendarDays,
   GraduationCap,
   ClipboardList,
   Award,
@@ -51,7 +50,6 @@ const navSections: NavSection[] = [
   {
     title: 'Academics & Schedule',
     items: [
-      { name: 'Daily Tasks & Quota', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sundays OFF', badgeVariant: 'holiday' },
       { name: 'Syllabus & Targets', path: '/syllabus', icon: ListTree, badge: 'Feb 28' },
       { name: 'Board Notes & Papers', path: '/notes', icon: FileText, badge: 'DG Khan', badgeVariant: 'primary' },
       { name: 'Book Library', path: '/library', icon: Library, badge: 'DG Khan' },

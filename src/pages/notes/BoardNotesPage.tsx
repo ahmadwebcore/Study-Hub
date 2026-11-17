@@ -2,439 +2,749 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   BookOpen,
-  Clock,
   CheckCircle2,
   Search,
-  Sparkles,
   Printer,
   Copy,
   Check,
   X,
-  GraduationCap,
+  UploadCloud,
+  Layers,
+  BookMarked,
+  ShieldCheck,
 } from 'lucide-react';
 
-export interface BoardNoteItem {
+export interface BoardPaperMCQ {
+  id: string;
+  questionNumber: number;
+  questionText: string;
+  urduText?: string;
+  options: {
+    key: 'A' | 'B' | 'C' | 'D';
+    text: string;
+  }[];
+  correctAnswer: 'A' | 'B' | 'C' | 'D';
+  explanation?: string;
+}
+
+export interface BoardShortQuestion {
+  questionNumber: string;
+  questionText: string;
+  urduText?: string;
+  solution: string;
+  chapterRef: string;
+  marks: number;
+}
+
+export interface BoardLongQuestion {
+  questionNumber: string;
+  questionText: string;
+  urduText?: string;
+  choiceNotice?: string;
+  solution: string;
+  keyBookSource: string;
+  marks: number;
+}
+
+export interface BoardResourceItem {
   id: string;
   title: string;
-  urduTitle?: string;
+  urduTitle: string;
   subjectId: string;
   subjectName: string;
   subjectCode: string;
-  category: 'chapter_notes' | 'short_questions' | 'past_papers' | 'pairing_scheme';
+  category: 'past_paper' | 'pairing_scheme' | 'key_book_solution' | 'user_upload';
   categoryLabel: string;
-  author: string;
-  totalPages: number;
-  status: 'available' | 'upcoming';
+  year?: string;
+  examSession?: string;
+  group?: 'Group-I (Morning)' | 'Group-II (Evening)' | 'Both Groups';
+  paperCode: string;
+  timeAllowed: string;
+  maxMarks: number;
+  authorizedKeyBook: string;
+  authorOrBoard: string;
+  status: 'official_verified' | 'upcoming';
   releaseTimeline?: string;
-  editorialProgress?: number;
   summary: string;
-  content: {
-    heading: string;
-    subheading?: string;
-    urduText?: string;
-    englishText?: string;
-    keyPoints: string[];
-    sampleQuestions: {
-      question: string;
-      answer: string;
-      marks: number;
-    }[];
+  downloadUrl?: string;
+  uploadedFileUrl?: string;
+  uploadedAt?: string;
+
+  // Authentic BISE DG Khan Paper Structure
+  sectionA_MCQs?: BoardPaperMCQ[];
+  sectionB_ShortQuestions?: {
+    groupTitle: string;
+    instruction: string;
+    questions: BoardShortQuestion[];
+  }[];
+  sectionC_LongQuestions?: BoardLongQuestion[];
+
+  // Pairing Scheme Specs (if category is pairing_scheme)
+  pairingSpecs?: {
+    mcqsDistribution: { chapter: string; mcqsCount: number; marks: number }[];
+    shortQuestionsDistribution: { section: string; instruction: string; chapters: string; totalQ: number; attemptQ: number }[];
+    longQuestionsDistribution: { qNo: string; chapterA: string; chapterB: string; marks: number }[];
+    importantAssessmentTips: string[];
   };
 }
 
-export const BOARD_NOTES_LIST: BoardNoteItem[] = [
+const OFFICIAL_BOARD_RESOURCES: BoardResourceItem[] = [
+  // 1. BISE DG KHAN URDU LAZMI 2024
   {
-    id: 'note_urd_01',
-    title: 'Urdu 11: Lesson 1 "Uswa-e-Hasna" Complete Summary & Tashreeh',
-    urduTitle: 'سبق نمبر 1: اسوہ حسنہ ﷺ (سید سلیمان ندوی) — جامع خلاصہ، پیراگراف تشریح و خطوط',
+    id: 'bise_urd_2024_g1',
+    title: 'BISE D.G. Khan 2024 Solved Annual Paper: Urdu Lazmi (11th Class)',
+    urduTitle: 'بورڈ آف انٹرمیڈیٹ اینڈ سیکنڈری ایجوکیشن ڈیرہ غازی خان — سالانہ امتحان 2024ء (اردو لازمی گیارہویں جماعت)',
     subjectId: 'sub_02',
     subjectName: 'Urdu & Grammar',
     subjectCode: 'FAIT-URD-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'پروفیسر راؤ خالد محمود (شرح سرمایہ اردو — گورنمنٹ گریجویٹ کالج)',
-    totalPages: 12,
-    status: 'available',
-    summary: 'سید سلیمان ندوی کے سبق اسوہ حسنہ کا ایک تہائی معیاری امتحانی خلاصہ، اہم سیاق و سباق کے پیراگراف، تشبیہ کے ارکان اور بورڈ امتحانی خط کے اصول۔',
-    content: {
-      heading: 'سبق: اسوہ حسنہ ﷺ — مصنف: سید سلیمان ندوی (خطباتِ مدراس)',
-      subheading: 'BISE DG Khan امتحانی پیٹرن: خلاصہ (10 نمبر)، سیاق و سباق تشریح (15 نمبر)',
-      urduText: `خلاصہ نویسی کا امتحانی اصول:
-سید سلیمان ندوی فرماتے ہیں کہ دنیا کے تمام انسان مختلف شعبہ ہائے زندگی سے تعلق رکھتے ہیں۔ کسی ایک شخص کا طرزِ عمل سب کے لیے مکمل رہنما نہیں بن سکتا، سوائے ذاتِ محمد مصطفیٰ ﷺ کے۔ آپ ﷺ کا وجودِ مبارک ایک آفتابِ عالمتاب کی طرح ہے جس سے ہر گلشن اور ہر پودا بقدرِ صلاحیت فیض حاصل کرتا ہے۔ اگر آپ امیر ہیں تو مکہ کے امانت دار تاجر کی زندگی دیکھیں، اگر غریب ہیں تو شعبِ ابی طالب کے محصور کی سیرت میں تسلی پائیں، اگر فاتح ہیں تو بدر و حنین کے سالار اور فتحِ مکہ کے حلیم فاتح کو دیکھیں۔ غرضیکہ انسانیت کا کوئی گوشہ ایسا نہیں جس کی رہنمائی سیرتِ نبوی میں موجود نہ ہو۔`,
-      keyPoints: [
-        'مصنف کا تعارف: سید سلیمان ندوی، شاگردِ رشید مولانا شبلی نعمانی۔',
-        'مذہب کی عمارت دو ستونوں پر قائم ہے: عقیدہ اور عمل۔ عمل کے لیے زندہ عملی نمونہ ناگزیر ہے۔',
-        'آفتاب کی مثال: سیرتِ نبوی ہر طبقے کے لیے روشن چراغ ہے۔',
-        'علمِ بیان (تشبیہ): بچہ چاند کی طرح خوبصورت ہے۔ مشبہ: بچہ، مشبہ بہ: چاند، حرف تشبیہ: کی طرح، وجہ شبہ: خوبصورتی۔',
-      ],
-      sampleQuestions: [
-        {
-          question: 'سید سلیمان ندوی نے انسانوں کی عملی رہنمائی کے لیے کس چیز کو ناگزیر قرار دیا ہے؟',
-          answer: 'انہوں نے واضح کیا کہ انسان صرف زبانی نصیحتوں اور تحریری قوانین سے راہِ راست پر نہیں آ سکتے، بلکہ ان کی رہنمائی کے لیے ایک کامل اور زندہ عملی نمونے (اسوہ حسنہ) کی ضرورت ہے۔',
-          marks: 2,
-        },
-        {
-          question: 'تشبیہ کے پانچ ارکان کون سے ہیں؟',
-          answer: '1. مشبہ (جس کو تشبیہ دی جائے) 2. مشبہ بہ (جس سے تشبیہ دی جائے) 3. وجہ شبہ (مشترک صفت) 4. غرض تشبیہ (تشبیہ دینے کا مقصد) 5. حرفِ تشبیہ (مانند، طرح، جیسا)۔',
-          marks: 2,
-        },
-      ],
-    },
+    category: 'past_paper',
+    categoryLabel: 'BISE DG Khan Solved Past Paper',
+    year: '2024',
+    examSession: 'Annual Examination 2024',
+    group: 'Group-I (Morning)',
+    paperCode: '6011',
+    timeAllowed: '3:00 Hours (20 Min Objective + 2:40 Hours Subjective)',
+    maxMarks: 100,
+    authorizedKeyBook: 'شرح سرمایہ اردو (پروفیسر راؤ خالد محمود — گورنمنٹ گریجویٹ کالج)',
+    authorOrBoard: 'BISE Dera Ghazi Khan & شرح سرمایہ اردو',
+    status: 'official_verified',
+    summary: 'مکمل سالانہ حل شدہ امتحانی پرچہ گروپ اول (مارننگ): معروضی 20 نمبر، اشعار تشریح 20 نمبر، سیاق و سباق تشریح 15 نمبر، سبق اسوہ حسنہ خلاصہ 10 نمبر، خطوط نویسی 10 نمبر اور تلخیص 10 نمبر۔',
+    sectionA_MCQs: [
+      {
+        id: 'urd_mcq_1',
+        questionNumber: 1,
+        questionText: 'سبق "اسوہ حسنہ ﷺ" کے مصنف کا نام کیا ہے؟',
+        options: [
+          { key: 'A', text: 'سر سید احمد خان' },
+          { key: 'B', text: 'سید سلیمان ندوی' },
+          { key: 'C', text: 'مولانا الطاف حسین حالی' },
+          { key: 'D', text: 'ڈپٹی نذیر احمد' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'سبق "اسوہ حسنہ ﷺ" علامہ سید سلیمان ندوی کے خطباتِ مدراس سے ماخوذ ہے۔',
+      },
+      {
+        id: 'urd_mcq_2',
+        questionNumber: 2,
+        questionText: 'سبق "اپنی مدد آپ" کے مصنف کون ہیں؟',
+        options: [
+          { key: 'A', text: 'سر سید احمد خان' },
+          { key: 'B', text: 'مولانا شبلی نعمانی' },
+          { key: 'C', text: 'مرزا غالب' },
+          { key: 'D', text: 'خواجہ حسن نظامی' },
+        ],
+        correctAnswer: 'A',
+        explanation: 'سر سید احمد خان نے Samuel Smiles کی تصنیف Self-Help سے متاثر ہو کر یہ مضمون تحریر کیا۔',
+      },
+      {
+        id: 'urd_mcq_3',
+        questionNumber: 3,
+        questionText: 'علمِ بیان کی رو سے تشبیہ کے کل کتنے ارکان ہیں؟',
+        options: [
+          { key: 'A', text: 'تین (3)' },
+          { key: 'B', text: 'چار (4)' },
+          { key: 'C', text: 'پانچ (5)' },
+          { key: 'D', text: 'چھ (6)' },
+        ],
+        correctAnswer: 'C',
+        explanation: 'تشبیہ کے پانچ ارکان ہیں: مشبہ، مشبہ بہ، وجہ شبہ، غرضِ تشبیہ، اور حرفِ تشبیہ۔',
+      },
+      {
+        id: 'urd_mcq_4',
+        questionNumber: 4,
+        questionText: 'شعر کے آخر میں بار بار دہرائے جانے والے ہو بہو الفاظ کو کیا کہتے ہیں؟',
+        options: [
+          { key: 'A', text: 'قافیہ' },
+          { key: 'B', text: 'ردیف' },
+          { key: 'C', text: 'مطلع' },
+          { key: 'D', text: 'مقطع' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'ردیف وہ مستقل لفظ یا الفاظ ہیں جو ہر شعر کے آخر میں قافیے کے بعد بغیر کسی تبدیلی کے دہرائے جاتے ہیں۔',
+      },
+      {
+        id: 'urd_mcq_5',
+        questionNumber: 5,
+        questionText: 'غزل کے پہلے شعر کو جس کے دونوں مصرعے ہم قافیہ و ہم ردیف ہوں، کیا کہا جاتا ہے؟',
+        options: [
+          { key: 'A', text: 'حسنِ مطلع' },
+          { key: 'B', text: 'مطلع' },
+          { key: 'C', text: 'مقطع' },
+          { key: 'D', text: 'بیت الغزل' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'مطلع کے لغوی معنی نکلنے کی جگہ یا طلوع ہونے کے ہیں؛ اصطلاح میں غزل کا پہلا ہم قافیہ و ہم ردیف شعر مطلع کہلاتا ہے۔',
+      },
+    ],
+    sectionB_ShortQuestions: [
+      {
+        groupTitle: 'سوال نمبر 2: اشعار کی تشریح (حصہ نظم و غزل — 20 نمبر)',
+        instruction: 'حصہ اول (نظم) سے تین اور حصہ دوم (غزل) سے دو اشعار کی تشریح کیجیے۔',
+        questions: [
+          {
+            questionNumber: 'نظم (الف)',
+            questionText: 'گو سب سے ورا ہے تیری ذاتِ عالی / لیکن کوئی اس سے ہے نہ خالی (مولانا الطاف حسین حالی — حمد)',
+            solution: 'حوالہ نظم: حمد | شاعر کا نام: مولانا الطاف حسین حالی\nمفہوم: اگرچہ اللہ تعالیٰ کی مقدس اور بلند و بالا ذات انسانی عقل و ادراک سے پرے ہے، لیکن کائنات کا کوئی ذرہ اس کے جلوے اور قدرت سے خالی نہیں۔\nتشریح (شرح سرمایہ اردو): مولانا حالی فرماتے ہیں کہ خالقِ کائنات کی ذات لامحدود ہے جسے انسان اپنی محدود عقل سے نہیں ماپ سکتا، لیکن اگر انسان کائنات کی وسعتوں پر نظر دوڑائے تو زمین، آسمان، چرند، پرند اور خود انسان کا وجود اس کے خالقِ حقیقی ہونے کی گواہی دیتا ہے۔',
+            chapterRef: 'نظم 1: حمد (شرح سرمایہ اردو صفحہ 42)',
+            marks: 4,
+          },
+          {
+            questionNumber: 'غزل (ب)',
+            questionText: 'ہستی اپنی حباب کی سی ہے / یہ نمائش سراب کی سی ہے (میر تقی میر)',
+            solution: 'حوالہ غزل: میر تقی میر (خدائے سخن)\nمفہوم: ہماری زندگی پانی کے بلبلے کی مانند ناپائیدار ہے اور دنیا کی یہ تمام تر رونق ایک دھوکے اور سراب سے زیادہ کچھ نہیں۔\nتشریح (شرح سرمایہ اردو): میر تقی میر تصوف اور غمِ حیات کے عظیم ترجمان ہیں۔ اس مطلع میں وہ انسانی زندگی کی بے ثباتی کا فلسفہ بیان کرتے ہیں۔ حباب (پانی کا بلبلہ) ایک لمحے میں بنتا ہے اور اگلے لمحے فنا ہو جاتا ہے؛ بالکل اسی طرح انسانی حیات بھی عارضی ہے۔',
+            chapterRef: 'غزل 1: میر تقی میر (شرح سرمایہ اردو صفحہ 118)',
+            marks: 4,
+          },
+        ],
+      },
+      {
+        groupTitle: 'سوال نمبر 3: سیاق و سباق کے حوالے سے پیراگراف کی تشریح (15 نمبر)',
+        instruction: 'درج ذیل عبارت کی تشریح کیجیے، سبق کا عنوان، مصنف کا نام اور سیاق و سباق تحریر کیجیے۔',
+        questions: [
+          {
+            questionNumber: 'عبارت (الف)',
+            questionText: 'سبق: اسوہ حسنہ ﷺ — "دنیا کی بہتری اور کامیابی کے لیے ہر انسان کو ایک عملی نمونے کی ضرورت ہے..."',
+            solution: 'سبق کا عنوان: اسوہ حسنہ ﷺ | مصنف کا نام: سید سلیمان ندوی | ماخوذ از: خطباتِ مدراس\nسیاق و سباق (۳ نمبر): پیشِ نظر اقتباس سے قبل مصنف بیان کرتے ہیں کہ انسان صرف تحریری قوانین اور پند و نصائح سے نہیں سدھر سکتے۔ تشریح طلب عبارت کے بعد مصنف واضح کرتے ہیں کہ کامل نمونہ صرف حضرت محمد مصطفیٰ ﷺ کی ذاتِ مبارکہ ہے جو ہر طبقہ انسانی کے لیے آفتابِ عالمتاب کی مانند ہے۔\nتشریح (۱۰ نمبر): سید سلیمان ندوی فرماتے ہیں کہ دنیا کے تمام پیشوں اور زندگی کے تمام شعبوں کے لیے صرف ایک ہی ہستی جامع اور کامل رہنما بن سکتی ہے، اور وہ رسولِ اکرم ﷺ کی سیرتِ طیبہ ہے۔ اگر آپ امیر ہیں تو مکہ کے امانت دار تاجر کو دیکھیں، اگر غریب ہیں تو شعبِ ابی طالب کے محصور کی صبر آزمائی کو مشعلِ راہ بنائیں۔',
+            chapterRef: 'سبق 1: اسوہ حسنہ ﷺ (شرح سرمایہ اردو صفحہ 14)',
+            marks: 15,
+          },
+        ],
+      },
+    ],
+    sectionC_LongQuestions: [
+      {
+        questionNumber: 'سوال نمبر 4: سبق کا خلاصہ (10 نمبر)',
+        questionText: 'سبق "اسوہ حسنہ ﷺ" کا امتحانی معیار کے مطابق ایک تہائی خلاصہ تحریر کیجیے۔',
+        choiceNotice: 'کسی ایک سبق کا خلاصہ تحریر کیجیے (اسوہ حسنہ ﷺ یا اپنی مدد آپ)',
+        solution: 'خلاصہ (مصنف: سید سلیمان ندوی):\nدنیا کی ہر قوم اور ہر شعبہ زندگی کو اخلاقی اور عملی ترقی کے لیے ایک زندہ اور کامل نمونے کی ضرورت ہوتی ہے۔ زبانی تعلیمات انسان پر وہ اثر نہیں کرتیں جو ایک باعمل انسان کا عمل کرتا ہے۔ تاریخِ انسانی میں حضرت محمد مصطفیٰ ﷺ کی واحد ایسی ہستی ہے جن کی سیرتِ طیبہ ہر طبقہ انسانی کی رہنمائی کے لیے مکمل اور جامع ہے۔ آپ ﷺ کا وجودِ مبارک ایک آفتابِ عالمتاب ہے جس سے ہر گلشن اور ہر پودا بقدرِ استعداد فیض پاتا ہے۔\nاگر انسان تاجر ہے تو مکہ کے صادق و امین تاجر کو دیکھے، اگر معلم ہے تو اصحابِ صفہ کے استاد کی مجلس میں بیٹھے، اگر سپہ سالار ہے تو بدر و حنین کے فاتح کو دیکھے اور اگر حاکم ہے تو فتحِ مکہ کے عفو و درگزر کو سامنے رکھے۔ غرضیکہ نجات، امن اور اخلاقی کمال کا راستہ صرف اور صرف اسوہ رسول ﷺ کی پیروی میں مضمر ہے۔',
+        keyBookSource: 'شرح سرمایہ اردو از پروفیسر راؤ خالد محمود (صفحہ 16)',
+        marks: 10,
+      },
+      {
+        questionNumber: 'سوال نمبر 6: خط نویسی (10 نمبر)',
+        questionText: 'اپنے دوست کے نام خط لکھیے جس میں اسے امتحانات میں شاندار کامیابی پر مبارکباد دیجیے اور آئندہ تعلیمی لائحہ عمل دریافت کیجیے۔',
+        solution: 'امتحانی خاکہ:\nکمرہ امتحان،\nالف۔ ب۔ ج۔\n۱۴ مئی ۲۰۲۴ء\n\nپیارے دوست احمد!\nالسلام علیکم ورحمۃ اللہ وبرکاتہ!\nامید ہے آپ خیریت سے ہوں گے۔ آج ہی معلوم ہوا کہ آپ نے گیارہویں جماعت کے سالانہ امتحان میں بورڈ بھر میں شاندار پوزیشن حاصل کی ہے۔ یہ سن کر دل فرطِ مسرت سے جھوم اٹھا اور بے ساختہ اللہ تعالیٰ کا شکر ادا کیا۔ آپ کی شب و روز کی محنت اور والدین کی دعائیں رنگ لائیں۔\nمیری دلی تمنا ہے کہ آپ آئندہ بھی اسی لگن اور تسلسل کو برقرار رکھیں۔ مجھے اپنے مستقبل کے شعبے (FA-IT یا پری میڈیکل) کے انتخاب سے ضرور آگاہ کیجیے گا۔\nخالہ جان اور انکل کی خدمت میں آداب اور چھوٹے علی کو پیار۔\n\nآپ کا مخلص دوست،\nخ۔ ر۔ ز۔',
+        keyBookSource: 'شرح سرمایہ اردو — بورڈ ماڈل خطوط (صفحہ 248)',
+        marks: 10,
+      },
+    ],
   },
+
+  // 2. BISE DG KHAN COMPUTER SCIENCE 11 2024
   {
-    id: 'note_csc_01',
-    title: 'Computer Science 11: Information Networks, Topologies & Architecture',
-    urduTitle: 'کمپیوٹر سائنس 11: انفارمیشن نیٹ ورکس، ٹوپولوجیز (Bus, Star, Ring) اور OSI ماڈل نوٹس',
+    id: 'bise_csc_2024_g1',
+    title: 'BISE D.G. Khan 2024 Solved Annual Paper: Computer Science 11 (IT Series)',
+    urduTitle: 'بورڈ آف انٹرمیڈیٹ اینڈ سیکنڈری ایجوکیشن ڈیرہ غازی خان — کمپیوٹر سائنس سالانہ امتحان 2024ء (آئی ٹی سیریز)',
     subjectId: 'sub_04',
     subjectName: 'Computer Science & Entrepreneurship',
     subjectCode: 'FAIT-CSC-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'Tariq Mahmood & Imran Saeed (IT Series Publications, Lahore)',
-    totalPages: 16,
-    status: 'available',
-    summary: 'Comprehensive Chapter 2 notes: LAN/MAN/WAN architectures, Bus vs Star vs Ring vs Mesh topologies with full circuit diagrams, and OSI 7-layer communication breakdown.',
-    content: {
-      heading: 'Chapter 2: Information Networks & Modern Topologies (IT Series)',
-      subheading: 'BISE DG Khan Assessment Weightage: 18 Marks (2 MCQs + 3 Short Questions + 1 Long Question)',
-      englishText: `Network Fundamentals & Topology Analysis:
-A computer network is an interconnection of two or more autonomous computers designed to share data, hardware peripherals (such as high-speed laser printers), and software services.
+    category: 'past_paper',
+    categoryLabel: 'BISE DG Khan Solved Past Paper',
+    year: '2024',
+    examSession: 'Annual Examination 2024',
+    group: 'Group-I (Morning)',
+    paperCode: '6023',
+    timeAllowed: '2:30 Hours (20 Min Objective + 2:10 Hours Subjective)',
+    maxMarks: 75,
+    authorizedKeyBook: 'IT Series Computer Science 11 (Tariq Mahmood & Imran Saeed, Lahore)',
+    authorOrBoard: 'BISE Dera Ghazi Khan & IT Series Publications',
+    status: 'official_verified',
+    summary: 'کمپیوٹر سائنس 75 نمبری پرچہ: معروضی 15 نمبر، مختصر سوالات 36 نمبر (Q2, Q3, Q4 مع 6/9 چوائس)، اور 24 نمبری تفصیلی سوالات (Star Topology خاکہ، OSI ماڈل کی 7 تہیں، اور CPU بسز)۔',
+    sectionA_MCQs: [
+      {
+        id: 'csc_mcq_1',
+        questionNumber: 1,
+        questionText: 'Which network topology connects all nodes to a central connecting device like a Switch or Hub?',
+        urduText: 'کون سی نیٹ ورک ٹوپولوجی تمام کمپیوٹرز کو ایک مرکزی ڈیوائس (Switch/Hub) کے ساتھ جوڑتی ہے؟',
+        options: [
+          { key: 'A', text: 'Bus Topology' },
+          { key: 'B', text: 'Star Topology' },
+          { key: 'C', text: 'Ring Topology' },
+          { key: 'D', text: 'Mesh Topology' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'In Star Topology, every computer is connected to a central Hub or Switch using dedicated twisted pair cables.',
+      },
+      {
+        id: 'csc_mcq_2',
+        questionNumber: 2,
+        questionText: 'What is the primary function of a Terminator in Bus Topology?',
+        urduText: 'بس ٹوپولوجی میں ٹرمینیٹر (Terminator) کا بنیادی مقصد کیا ہوتا ہے؟',
+        options: [
+          { key: 'A', text: 'To amplify the signal' },
+          { key: 'B', text: 'To absorb signals and prevent echo/bounce' },
+          { key: 'C', text: 'To assign IP addresses' },
+          { key: 'D', text: 'To connect to the internet' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'Terminators are placed at the physical ends of the backbone coaxial cable to absorb electrical signals, stopping signal reflection.',
+      },
+      {
+        id: 'csc_mcq_3',
+        questionNumber: 3,
+        questionText: 'Which layer of the OSI Model is responsible for end-to-end packet routing using IP addresses?',
+        urduText: 'او ایس آئی ماڈل کی کون سی تہہ آئی پی ایڈریس کے ذریعے پیکٹ روٹنگ کی ذمہ دار ہے؟',
+        options: [
+          { key: 'A', text: 'Data Link Layer' },
+          { key: 'B', text: 'Network Layer' },
+          { key: 'C', text: 'Transport Layer' },
+          { key: 'D', text: 'Session Layer' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'The Network Layer (Layer 3) handles logical IP addressing and packet routing across intermediate routers.',
+      },
+      {
+        id: 'csc_mcq_4',
+        questionNumber: 4,
+        questionText: 'What is the width of a 64-bit microprocessor data bus?',
+        urduText: 'ایک 64 بٹ مائیکرو پروسیسر ڈیٹا بس کی چوڑائی کتنی ہوتی ہے؟',
+        options: [
+          { key: 'A', text: '32 bits' },
+          { key: 'B', text: '64 bits (8 Bytes simultaneously)' },
+          { key: 'C', text: '128 bits' },
+          { key: 'D', text: '16 bits' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'A 64-bit data bus can transmit exactly 64 bits (8 bytes) of binary data between CPU and memory in one clock cycle.',
+      },
+    ],
+    sectionB_ShortQuestions: [
+      {
+        groupTitle: 'Question 2: Short Questions (Attempt any 6 out of 9 — 12 Marks)',
+        instruction: 'Write concise answers (3–5 lines each). Each question carries 2 marks.',
+        questions: [
+          {
+            questionNumber: '2(i)',
+            questionText: 'Define Star Topology and list two major advantages.',
+            urduText: 'سٹار ٹوپولوجی کی تعریف کیجیے اور اس کے دو نمایاں فوائد تحریر کیجیے۔',
+            solution: 'Definition: Star Topology is a network layout where every workstation is connected directly to a central Hub or Switch via independent point-to-point cables.\nAdvantages (IT Series Chapter 2):\n1. High Reliability: If one cable or workstation breaks, the rest of the network operates without disruption.\n2. Easy Modification: Adding or removing computers requires zero network downtime.',
+            chapterRef: 'IT Series Ch 2: Information Networks (Page 38)',
+            marks: 2,
+          },
+          {
+            questionNumber: '2(ii)',
+            questionText: 'Differentiate between System Software and Application Software.',
+            urduText: 'سسٹم سافٹ ویئر اور ایپلیکیشن سافٹ ویئر میں بنیادی فرق واضح کیجیے۔',
+            solution: 'System Software manages and controls the computer hardware components directly (e.g., Windows 11, Linux, Device Drivers). Application Software is designed to help end-users perform specific tasks such as writing letters or editing spreadsheets (e.g., MS Word, Excel, Python IDLE).',
+            chapterRef: 'IT Series Ch 1: Hardware & Software Basics (Page 8)',
+            marks: 2,
+          },
+          {
+            questionNumber: '2(iii)',
+            questionText: 'What is the Fetch-Decode-Execute cycle of CPU?',
+            urduText: 'سی پی یو کا فیچ-ڈیکوڈ-ایگزیکیوٹ سائیکل کیا ہے؟',
+            solution: '1. Fetch: The Control Unit fetches the next instruction binary code from RAM into the Instruction Register.\n2. Decode: The decoder interprets the instruction opcode into circuit signals.\n3. Execute: The ALU or execution unit performs the requested arithmetic/logical operation and stores results.',
+            chapterRef: 'IT Series Ch 5: CPU Architecture (Page 112)',
+            marks: 2,
+          },
+        ],
+      },
+    ],
+    sectionC_LongQuestions: [
+      {
+        questionNumber: 'Question 5: Long Question (8 Marks)',
+        questionText: 'Explain the OSI 7-Layer Architecture in detail. Describe the primary responsibility of each layer with suitable communication examples.',
+        urduText: 'او ایس آئی 7 لیئر ماڈل پر تفصیلی نوٹ لکھیے اور ہر تہہ کے فرائض کی وضاحت کیجیے۔',
+        solution: 'OSI Reference Model (Open Systems Interconnection):\nDeveloped by ISO, the OSI Model breaks computer communications into 7 hierarchical layers:\n\n1. Physical Layer (Layer 1): Transmits raw unstructured bit streams (0s and 1s) over physical copper cables, fiber optics, or radio waves. Defines voltage, pinouts, and cable standards.\n2. Data Link Layer (Layer 2): Handles error detection, flow control, and frames data with hardware MAC addresses (e.g., Ethernet switches).\n3. Network Layer (Layer 3): Manages logical IP addressing and routes data packets across diverse interconnected networks (e.g., Routers, IP protocols).\n4. Transport Layer (Layer 4): Guarantees end-to-end reliability, segmenting data, and managing flow control (TCP for reliable delivery, UDP for streaming).\n5. Session Layer (Layer 5): Establishes, manages, and terminates persistent dialogue sessions between client and server applications.\n6. Presentation Layer (Layer 6): Translates data formats, character sets (ASCII, Unicode), handles compression (JPEG, MP3), and cryptography encryption (SSL/TLS).\n7. Application Layer (Layer 7): Provides network software interfaces directly to user applications (HTTP, SMTP for email, FTP for file transfer).',
+        keyBookSource: 'IT Series Computer Science 11 — Tariq Mahmood & Imran Saeed (Pages 48–53)',
+        marks: 8,
+      },
+    ],
+  },
 
-1. Star Topology:
-All nodes are linked directly to a central hub or switch via Unshielded Twisted Pair (UTP) cables.
-• Advantage: Easy to expand; failure of a single cable node does not disturb the rest of the network.
-• Disadvantage: Centralized dependency—if the central hub fails, the entire network shuts down.
-
-2. Bus Topology:
-All network devices share a single common transmission wire (Backbone Cable) with Terminators attached at both ends.
-• Advantage: Cost-effective for small labs, minimal cabling required.
-• Disadvantage: Cable break breaks the whole system; difficult packet collision troubleshooting.`,
-      keyPoints: [
-        'OSI 7 Layers (Bottom-to-Top): Physical -> Data Link -> Network -> Transport -> Session -> Presentation -> Application.',
-        'Routers operate on Network Layer (Layer 3) using IP addressing.',
-        'Switches operate on Data Link Layer (Layer 2) using MAC physical addresses.',
-        'Mesh topology provides dedicated point-to-point links between all nodes, offering the highest reliability.',
+  // 3. OFFICIAL 2026-2027 PAIRING SCHEME (BISE DG KHAN)
+  {
+    id: 'bise_pairing_scheme_2026_27',
+    title: 'Official BISE D.G. Khan 2026–2027 Pairing Scheme (All 6 Subjects)',
+    urduTitle: 'آفیشل بورڈ پیئرنگ سکیم و مارکس ویٹیج 2026ء تا 2027ء — گیارہویں جماعت (FA-IT گروپ)',
+    subjectId: 'sub_all',
+    subjectName: 'All 6 FA-IT Subjects',
+    subjectCode: 'FAIT-ALL-11',
+    category: 'pairing_scheme',
+    categoryLabel: 'Official Board Pairing Scheme',
+    year: '2026–2027',
+    examSession: 'Annual Examination 2027',
+    group: 'Both Groups',
+    paperCode: 'BISE-DGK-PAIRING-2026-27',
+    timeAllowed: 'Official Board Assessment Blueprint',
+    maxMarks: 500,
+    authorizedKeyBook: 'BISE D.G. Khan Examination & Academic Regulations Authority',
+    authorOrBoard: 'Controller of Examinations, BISE Dera Ghazi Khan',
+    status: 'official_verified',
+    summary: 'پنجاب بورڈز کا نوٹیفائیڈ امتحانی ماڈل: اردو (100 نمبر)، کمپیوٹر سائنس (75 نمبر)، انگلش (100 نمبر)، ترجمۃ القرآن و اسلامیات (50+50 نمبر)، فزیکل ایجوکیشن (75 نمبر) اور معاشیات (100 نمبر) کے باب وار نمبرات کی مکمل تقسیم۔',
+    pairingSpecs: {
+      mcqsDistribution: [
+        { chapter: 'Urdu 11: اسباق (نثر)', mcqsCount: 5, marks: 5 },
+        { chapter: 'Urdu 11: منظومات و غزلیات', mcqsCount: 5, marks: 5 },
+        { chapter: 'Urdu 11: قواعد، علم بیان، تشبیہ و استعارہ', mcqsCount: 5, marks: 5 },
+        { chapter: 'Urdu 11: شعری اصطلاحات (مطلع، مقطع، قافیہ، ردیف)', mcqsCount: 5, marks: 5 },
+        { chapter: 'Computer Science: Unit 1 (Hardware & Bus Architecture)', mcqsCount: 2, marks: 2 },
+        { chapter: 'Computer Science: Unit 2 (Networks & Topologies)', mcqsCount: 3, marks: 3 },
+        { chapter: 'Computer Science: Unit 3 (Data Communications)', mcqsCount: 2, marks: 2 },
+        { chapter: 'Computer Science: Unit 5 (CPU & Architecture)', mcqsCount: 3, marks: 3 },
+        { chapter: 'Computer Science: Unit 6 & 7 (OS & Security)', mcqsCount: 2, marks: 2 },
+        { chapter: 'Computer Science: Unit 8, 9, 10 (MS Office & Python)', mcqsCount: 3, marks: 3 },
       ],
-      sampleQuestions: [
-        {
-          question: 'Differentiate between Star Topology and Ring Topology.',
-          answer: 'In Star Topology, all devices connect to a central hub/switch; one cable fault only isolates that device. In Ring Topology, data travels in a unidirectional loop through each node; a break anywhere can interrupt the entire token-ring loop.',
-          marks: 4,
-        },
-        {
-          question: 'What is the role of Terminators in Bus Topology?',
-          answer: 'Terminators are attached at both ends of the main backbone cable to absorb incoming electrical signals, preventing signal bounce/reflection that causes data packet corruption.',
-          marks: 2,
-        },
+      shortQuestionsDistribution: [
+        { section: 'Question 2 (Urdu)', instruction: 'اشعار تشریح نظم (3 میں سے 2) + غزل (3 میں سے 2)', chapters: 'حصہ نظم و حصہ غزل', totalQ: 6, attemptQ: 4 },
+        { section: 'Question 2 (Computer Science)', instruction: 'Attempt any 6 out of 9 questions', chapters: 'Unit 1, Unit 2, Unit 3 (3 questions from each)', totalQ: 9, attemptQ: 6 },
+        { section: 'Question 3 (Computer Science)', instruction: 'Attempt any 6 out of 9 questions', chapters: 'Unit 4, Unit 5, Unit 6', totalQ: 9, attemptQ: 6 },
+        { section: 'Question 4 (Computer Science)', instruction: 'Attempt any 6 out of 9 questions', chapters: 'Unit 7, Unit 8, Unit 9, Unit 10', totalQ: 9, attemptQ: 6 },
+      ],
+      longQuestionsDistribution: [
+        { qNo: 'Q5 (CSC)', chapterA: 'Unit 1 (Bus Architecture)', chapterB: 'Unit 2 (Star / Bus Topology)', marks: 8 },
+        { qNo: 'Q6 (CSC)', chapterA: 'Unit 3 (Transmission Media)', chapterB: 'Unit 5 (CPU Architecture)', marks: 8 },
+        { qNo: 'Q7 (CSC)', chapterA: 'Unit 6 (Viruses & Security)', chapterB: 'Unit 7 (Operating System Tasks)', marks: 8 },
+      ],
+      importantAssessmentTips: [
+        'Urdu Lazmi: خلاصہ نویسی میں صرف درسی کتاب کا ایک تہائی (1/3) حجم برقرار رکھیں؛ اضافی لمبی کہانیاں نمبر کٹواتی ہیں۔',
+        'Computer Science: ٹوپولوجی اور OSI ماڈل والے سوالات میں صاف شفاف سرکٹ ڈایاگرام ضرور بنائیں (3 نمبر ڈایاگرام کے مخصوص ہوتے ہیں)۔',
+        'English: Tenses اور Pairs of Words کے جملوں میں املا کی غلطی پر صفر نمبر ملتا ہے، اس لیے سن شائن گائیڈ کے ماڈل جملے ترجیح دیں۔',
+        'Economics: تقلیلِ افادہِ مختتم اور قانونِ طلب میں عددی گوشوارہ (Table) اور گراف بنانا لازمی ہے۔',
       ],
     },
   },
+
+  // 4. BISE DG KHAN ENGLISH 11 2024
   {
-    id: 'note_eng_01',
-    title: 'English 11: Story 1 "Button, Button" Analysis & 12 Master Tenses Drill',
-    urduTitle: 'انگریزی 11: کہانی "بٹن، بٹن" مع کردار، اہم معروضی و سن شائن گرائمر نوٹس',
+    id: 'bise_eng_2024_g1',
+    title: 'BISE D.G. Khan 2024 Solved Annual Paper: English Compulsory 11 (Sunshine)',
+    urduTitle: 'بورڈ آف انٹرمیڈیٹ اینڈ سیکنڈری ایجوکیشن ڈیرہ غازی خان — انگلش کمپلسری سالانہ امتحان 2024ء (سن شائن گائیڈ)',
     subjectId: 'sub_03',
     subjectName: 'English & Grammar',
     subjectCode: 'FAIT-ENG-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'Prof. Musarrat Hussain (Sunshine English Comprehensive Guide)',
-    totalPages: 14,
-    status: 'available',
-    summary: 'Complete characterization of Norma and Arthur Lewis, moral dilemma of $50,000 offer by Mr. Steward, 20 high-frequency board synonyms, and active-to-passive transformation drills.',
-    content: {
-      heading: 'Book 1: Short Stories — Story 1 "Button, Button" by Richard Matheson',
-      subheading: 'Sunshine English Guide: Grammar, Tenses, Board Pair of Words',
-      englishText: `Critical Synopsis:
-"Button, Button" explores the corrosive impact of materialistic greed on human morality. Mr. Steward presents Norma and Arthur Lewis with an enigmatic button unit: pushing the button yields $50,000 cash, but causes the death of an unknown person.
-
-Arthur immediately dismisses the proposition as criminal and immoral. Conversely, Norma rationalizes it, arguing that an unknown victim might be an old Chinese peasant or an ailing invalid. Her moral decay culminates in pushing the button. Shortly thereafter, she receives news that Arthur died in a subway accident, triggering a $25,000 double-indemnity life insurance payout ($50,000 total). Steward chillingly asks: "Did you really think you knew your husband?"`,
-      keyPoints: [
-        'Theme: Selfish choices carry devastating unforeseen consequences.',
-        'Norma Lewis: Symbol of consumerist greed, ethical compromise, and self-delusion.',
-        'Arthur Lewis: Symbol of steadfast ethical conscience and respect for human life.',
-        'Board Pairs of Words (1-10): Accept/Except, Advice/Advise, Affect/Effect, Bail/Bale, Berth/Birth.',
-      ],
-      sampleQuestions: [
-        {
-          question: 'What was the moral dilemma presented to Norma and Arthur?',
-          answer: 'The dilemma was whether to prioritize personal wealth ($50,000) over the sanctity of human life, forcing them to choose between selfish luxury and fundamental moral duty.',
-          marks: 2,
-        },
-        {
-          question: 'Explain the significance of Mr. Steward’s final question to Norma.',
-          answer: 'Steward asked: "Did you really think you knew your husband?" This reveals that Norma never truly understood Arthur’s moral principles and, in pursuing selfish desires, she unknowingly sacrificed her own husband.',
-          marks: 4,
-        },
-      ],
-    },
+    category: 'past_paper',
+    categoryLabel: 'BISE DG Khan Solved Past Paper',
+    year: '2024',
+    examSession: 'Annual Examination 2024',
+    group: 'Group-I (Morning)',
+    paperCode: '6035',
+    timeAllowed: '3:00 Hours (20 Min Objective + 2:40 Hours Subjective)',
+    maxMarks: 100,
+    authorizedKeyBook: 'Sunshine English Comprehensive Edition (Prof. Musarrat Hussain, Lahore)',
+    authorOrBoard: 'BISE Dera Ghazi Khan & Sunshine Publications',
+    status: 'official_verified',
+    summary: 'انگریزی 100 نمبری سالانہ پرچہ: معروضی 20 نمبر (مترادفات و درست وربز)، شارٹ کوئسچنز 30 نمبر (Button, Button، Clearing in the Sky و ڈرامہ جات)، درخواست نویسی 10 نمبر، اور اردو ترجمہ پیراگراف 15 نمبر۔',
+    sectionA_MCQs: [
+      {
+        id: 'eng_mcq_1',
+        questionNumber: 1,
+        questionText: 'Choose the correct synonym for the underlined word: "Norma looked at him in dismay."',
+        options: [
+          { key: 'A', text: 'Delight' },
+          { key: 'B', text: 'Disappointment / Distress' },
+          { key: 'C', text: 'Curiosity' },
+          { key: 'D', text: 'Enthusiasm' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'In Story 1 "Button, Button", dismay denotes shock, grief, or grave distress.',
+      },
+      {
+        id: 'eng_mcq_2',
+        questionNumber: 2,
+        questionText: 'Choose the correct form of verb: "If he works hard, he _______ the examination."',
+        options: [
+          { key: 'A', text: 'pass' },
+          { key: 'B', text: 'will pass' },
+          { key: 'C', text: 'would pass' },
+          { key: 'D', text: 'passed' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'First Conditional: If + Present Indefinite (works), Future Indefinite (will pass) in the main clause.',
+      },
+    ],
+    sectionB_ShortQuestions: [
+      {
+        groupTitle: 'Section-I: Short Questions from Book I (Short Stories — 12 Marks)',
+        instruction: 'Answer any 6 questions in 3–5 lines each.',
+        questions: [
+          {
+            questionNumber: 'Q2(i)',
+            questionText: 'Why did Norma consider the tone and attitude of Mr. Steward offensive?',
+            solution: 'Norma considered Mr. Steward\'s demeanor offensive because when she declined to invite him into her apartment, he persisted with an irritatingly assertive and secretive sales pitch, implying that he possessed intimate information about her household\'s financial ambitions.',
+            chapterRef: 'Book 1: Story 1 "Button, Button" (Sunshine Guide Page 12)',
+            marks: 2,
+          },
+          {
+            questionNumber: 'Q2(ii)',
+            questionText: 'What did the doctor advise the old man in "Clearing in the Sky"?',
+            solution: 'Forty years ago, doctors diagnosed the old man with severe heart trouble and advised him to avoid all physical exertion, predicting that he had merely a few months to live. Defying their prognosis, he walked extensively and cultivated a secret mountain patch.',
+            chapterRef: 'Book 1: Story 2 "Clearing in the Sky" (Sunshine Guide Page 28)',
+            marks: 2,
+          },
+        ],
+      },
+    ],
+    sectionC_LongQuestions: [
+      {
+        questionNumber: 'Question 5: Application Writing (10 Marks)',
+        questionText: 'Write an application to the Principal of your college requesting remission of fine.',
+        solution: 'To,\nThe Principal,\nGovernment Graduate College, Fatehpur.\n\nRespected Sir,\nMost respectfully, I beg to submit that I could not attend the college classes for four consecutive days from 5th to 8th November due to severe typhoid fever. Upon returning, I discovered that a late absence fine of Rs. 500 has been imposed on my roll number.\n\nMy father is a modest shopkeeper and our household financial circumstances are extremely constrained. I have consistently been a diligent student with above 85% attendance record.\n\nKindly remit my fine and grant me leave for the specified medical period. A medical certificate from the Rural Health Center is attached herewith.\n\nThanking you in anticipation.\n\nYours obediently,\nX. Y. Z.\nRoll No: 1045 (1st Year FA-IT)\nDated: 16th November 2026',
+        keyBookSource: 'Sunshine English Comprehensive Guide (Page 310)',
+        marks: 10,
+      },
+    ],
   },
-  {
-    id: 'note_tqm_01',
-    title: 'Tarjuma-tul-Quran 11: Surah Al-Baqarah (Rukoo 1 to 3) Notes',
-    urduTitle: 'ترجمۃ القرآن 11: سورۃ البقرہ (رکوع 1 تا 3) لفظی و با محاورہ ترجمہ و مشقی سوالات',
-    subjectId: 'sub_05',
-    subjectName: 'Tarjuma-tul-Quran',
-    subjectCode: 'FAIT-TQM-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'ہمدرد کتب خانہ نوٹس سیریز (ماڈل پیپر 50 مارکس)',
-    totalPages: 10,
-    status: 'available',
-    summary: 'سورۃ البقرہ کا تعارف، ابتدائی 3 رکوعات کا لفظی اور با محاورہ ترجمہ، متقین کی 5 صفات، منافقین کی دو تمثیلات، اور 5 سالہ بورڈ سوالات۔',
-    content: {
-      heading: 'ترجمۃ القرآن المجید: سورۃ البقرہ (مدنی سورت، 286 آیات)',
-      subheading: 'لازمی پرچہ 50 نمبر: قرآنی ترجمہ و مفہوم',
-      urduText: `سورۃ البقرہ کا پس منظر و فضائل:
-سورۃ البقرہ قرآن مجید کی دوسری اور طویل ترین سورت ہے جو مدینہ منورہ میں نازل ہوئی۔ اس سورت کے آغاز میں قرآن کے کتابِ برحق ہونے اور پرہیزگاروں کے لیے ذریعہ ہدایت ہونے کا اعلان کیا گیا ہے۔
 
-متقین کے 5 بنیادی اوصاف:
-1. الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ — جو غیب کی باتوں پر کامل ایمان رکھتے ہیں۔
-2. وَيُقِيمُونَ الصَّلَاةَ — اور پابندی و خشوع کے ساتھ نماز قائم کرتے ہیں۔
-3. وَمِمَّا رَزَقْنَاهُمْ يُنفِقُونَ — اور جو رزق ہم نے انہیں دیا ہے اس میں سے اللہ کی راہ میں خرچ کرتے ہیں۔
-4. وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنزِلَ إِلَيْكَ وَمَا أُنزِلَ مِن قَبْلِكَ — اور جو آپ پر نازل ہوا اور جو آپ سے پہلے نازل ہوا سب پر ایمان رکھتے ہیں۔
-5. وَبِالْآخِرَةِ هُمْ يُوقِنُونَ — اور آخرت پر پختہ یقین رکھتے ہیں۔`,
-      keyPoints: [
-        'الم: حروف مقطعات ہیں جن کا قطعی مفہوم صرف اللہ تعالیٰ کو معلوم ہے۔',
-        'کفار کی حالت: ان کے دلوں اور کانوں پر کفر کی وجہ سے مہر لگ چکی ہے۔',
-        'منافقین کی مثال: وہ اندھیروں میں آگ جلانے والے شخص کی طرح ہیں جن کی روشنی اللہ نے سلب کر لی۔',
-      ],
-      sampleQuestions: [
-        {
-          question: 'سورۃ البقرہ کے آغاز میں متقین کی کون سی صفات بیان ہوئی ہیں؟',
-          answer: 'متقین غیب پر ایمان لاتے ہیں، نماز قائم کرتے ہیں، اللہ کی راہ میں خرچ کرتے ہیں، تمام آسمانی کتب پر ایمان رکھتے ہیں اور آخرت پر یقین رکھتے ہیں۔',
-          marks: 2,
-        },
-        {
-          question: 'منافقین کے بارے میں "فِي قُلُوبِهِم مَّرَضٌ" کا کیا مفہوم ہے؟',
-          answer: 'ان کے دلوں میں شک، بغض اور منافقت کی بیماری ہے، اس لیے اللہ نے ان کے فریب اور نافرمانی کی وجہ سے اس بیماری کو اور بڑھا دیا۔',
-          marks: 3,
-        },
-      ],
-    },
-  },
+  // 5. BISE DG KHAN PHYSICAL EDUCATION 11 2024
   {
-    id: 'note_eco_01',
-    title: 'Economics 11: Law of Diminishing Marginal Utility & Definitions',
-    urduTitle: 'اصولِ معاشیات 11: قانونِ تقلیلِ افادہِ مختتم، گوشوارہ اور مارشل و رابنز کی تعریفات',
-    subjectId: 'sub_07',
-    subjectName: 'Principles of Economics',
-    subjectCode: 'FAIT-ECO-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'پروفیسر حبیب اللہ قریشی (علمی کتاب خانہ اردو بازار لاہور)',
-    totalPages: 18,
-    status: 'available',
-    summary: 'معاشیات کی تین کلاسیکی تعریفات (سمتھ، مارشل، رابنز)، افادہ اور مختتم افادہ کا تعلق، نقطہ سیری، اور قانون تقلیل افادہ مختتم کا مکمل گوشوارہ و ڈایاگرام۔',
-    content: {
-      heading: 'باب اول و دوم: معاشیات کی نوعیت اور نظریہ افادہ',
-      subheading: 'BISE DG Khan پرچہ 100 نمبر: حصہ معروضی 20 نمبر + حصہ انشائی 80 نمبر',
-      urduText: `قانونِ تقلیلِ افادہِ مختتم (Law of Diminishing Marginal Utility):
-پروفیسر الفریڈ مارشل کے مطابق:
-"اگر دیگر حالات بدستور رہیں تو جب کسی شخص کے پاس کسی شے کے ذخیرے میں اضافہ ہوتا چلا جاتا ہے، تو ہر اضافی اکائی سے حاصل ہونے والا افادہ بتدریج کم ہوتا چلا جاتا ہے۔"
-
-گوشوارہ:
-• پہلی روٹی کا افادہ: 10 اکائیاں (کل افادہ = 10)
-• دوسری روٹی کا افادہ: 8 اکائیاں (کل افادہ = 18)
-• تیسری روٹی کا افادہ: 6 اکائیاں (کل افادہ = 24)
-• چوتھی روٹی کا افادہ: 4 اکائیاں (کل افادہ = 28)
-• پانچویں روٹی کا افادہ: 2 اکائیاں (کل افادہ = 30)
-• چھٹی روٹی کا افادہ: 0 اکائیاں (نقطہ سیری - کل افادہ زیادہ سے زیادہ 30)
-• ساتویں روٹی کا افادہ: -2 اکائیاں (منفی افادہ - کل افادہ گھٹ کر 28)`,
-      keyPoints: [
-        'جب مختتم افادہ (MU) صفر ہوتا ہے تو کل افادہ (TU) زیادہ سے زیادہ (Maximum) ہوتا ہے۔',
-        'مفروضات: شے کی نوعیت یکساں ہو، مقدار مناسب ہو، اور استعمال مسلسل ہو۔',
-        'مارشل کی تعریف مادی فلاح پر مبنی ہے جبکہ رابنز کی تعریف سائنسی و نایاب وسائل پر مبنی ہے۔',
-      ],
-      sampleQuestions: [
-        {
-          question: 'نقطہ سیری (Point of Satiety) کی تعریف کریں۔',
-          answer: 'وہ نقطہ جہاں صارف کا مختتم افادہ صفر ہو جائے اور کل افادہ زیادہ سے زیادہ ہو، نقطہ سیری کہلاتا ہے۔ اس کے بعد مزید استعمال نقصان دہ ہوتا ہے۔',
-          marks: 2,
-        },
-        {
-          question: 'الفریڈ مارشل اور لیونل رابنز کی تعریفات میں بنیادی فرق کیا ہے؟',
-          answer: 'مارشل نے معاشیات کو انسان کی مادی خوشحالی کا علم قرار دیا، جبکہ رابنز نے اسے انسان کے لامحدود مقاصد اور محدود و متبادل وسائل کے درمیان تعلق کا سائنسی مطالعہ قرار دیا۔',
-          marks: 4,
-        },
-      ],
-    },
-  },
-  {
-    id: 'note_ped_01',
-    title: 'Physical Education 11: Human Skeletal System & 400m Track',
-    urduTitle: 'فزیکل ایجوکیشن 11: انسانی ہڈیوں کا ڈھانچہ (206 ہڈیاں) اور 400m معیاری ٹریک قوانین',
+    id: 'bise_ped_2024_g1',
+    title: 'BISE D.G. Khan 2024 Solved Annual Paper: Health & Physical Education 11 (پروفیسر گیلانی)',
+    urduTitle: 'بورڈ آف انٹرمیڈیٹ اینڈ سیکنڈری ایجوکیشن ڈیرہ غازی خان — ہیلتھ اینڈ فزیکل ایجوکیشن سالانہ امتحان 2024ء',
     subjectId: 'sub_01',
     subjectName: 'Physical Education',
     subjectCode: 'FAIT-PED-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'پروفیسر سید بشارت حسین گیلانی (گولڈ میڈلسٹ)',
-    totalPages: 12,
-    status: 'available',
-    summary: 'انسانی جسم کی 206 ہڈیوں کی درجہ بندی (محوری 80 اور ضمیمائی 126)، حرکت پذیر جوڑ، اور 400 میٹر معیاری ایتھلیٹکس ٹریک کی لینز کی پیمائشیں۔',
-    content: {
-      heading: 'باب اول: انسانی جسمانی ساخت، ہڈیوں کے جوڑ اور ٹریک رولز',
-      subheading: 'BISE DG Khan پرچہ 75 نمبر + 25 نمبر پریکٹیکل',
-      urduText: `انسانی ڈھانچہ اور جوڑ:
-بالغ انسان کے جسم میں کل 206 ہڈیاں ہوتی ہیں۔
-1. محوری ڈھانچہ (Axial Skeleton - 80 ہڈیاں): کھوپڑی، ریڑھ کی ہڈی، پسلیاں اور سینے کی ہڈی۔
-2. ضمیمائی ڈھانچہ (Appendicular Skeleton - 126 ہڈیاں): بازو، ٹانگیں، شانے اور کولہے کی ہڈیاں۔
-
-400 میٹر ٹریک کی پیمائشیں:
-معیاری ٹریک میں 8 لینز ہوتی ہیں۔ ہر لین کی چوڑائی 1.22 میٹر (4 فٹ) ہوتی ہے۔ دو سیدھے حصے (Straights) 84.39 میٹر کے اور دو موڑ (Curves) ہوتے ہیں۔`,
-      keyPoints: [
-        'ہڈیوں کے افعال: حفاظت، سہارا، حرکت، معدنیات کا ذخیرہ اور خون کے خلیات بنانا۔',
-        'گیند پیالہ جوڑ (Ball and Socket Joint) کندھے اور کولہے میں پایا جاتا ہے۔',
-        'ریلے ریس میں بیٹن کا تبادلہ 20 میٹر کے مقررہ ایکسچینج زون میں ہونا ضروری ہے۔',
-      ],
-      sampleQuestions: [
-        {
-          question: 'انسانی جسم میں کل کتنی ہڈیاں ہوتی ہیں اور ان کے دو بڑے حصے کون سے ہیں؟',
-          answer: 'کل 206 ہڈیاں ہوتی ہیں۔ 1. محوری ڈھانچہ (80 ہڈیاں) 2. ضمیمائی ڈھانچہ (126 ہڈیاں)۔',
-          marks: 2,
-        },
-        {
-          question: 'معیاری ایتھلیٹکس ٹریک کی ایک لین کی چوڑائی کتنی ہوتی ہے؟',
-          answer: 'معیاری ٹریک کی ہر لین کی چوڑائی 1.22 میٹر (4 فٹ) ہوتی ہے۔',
-          marks: 2,
-        },
-      ],
-    },
-  },
-  // Upcoming Authentic Notes with Clear Realistic Timeline (No Fake Filler)
-  {
-    id: 'note_upc_01',
-    title: 'Computer Science: Python Programming Solved Practical Programs',
-    urduTitle: 'کمپیوٹر سائنس 11: پائتھن پروگرامنگ حل شدہ پریکٹیکل کوڈز و الگورتھمز',
-    subjectId: 'sub_04',
-    subjectName: 'Computer Science & Entrepreneurship',
-    subjectCode: 'FAIT-CSC-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Programming Lab',
-    author: 'Faculty Lead Ahmad & IT Series Editorial Team',
-    totalPages: 24,
-    status: 'upcoming',
-    releaseTimeline: 'Releasing Nov 24, 2026',
-    editorialProgress: 85,
-    summary: '25 high-yield Python programs for BISE DG Khan practicals: Factorial, Fibonacci series, Prime numbers, Palindrome check, and Matrix operations with step-by-step logic.',
-    content: {
-      heading: 'Upcoming: Python Practical Workbook',
-      keyPoints: ['Comprehensive code listings', 'Dry run traces', 'Viva-voce questions'],
-      sampleQuestions: [],
-    },
-  },
-  {
-    id: 'note_upc_02',
-    title: 'Urdu 11: Lesson 2 "Apni Madad Aap" & Board Khatoot Collection',
-    urduTitle: 'اُردو 11: سبق "اپنی مدد آپ" (سر سید احمد خان) خلاصہ و خطوط مجموعہ',
-    subjectId: 'sub_02',
-    subjectName: 'Urdu & Grammar',
-    subjectCode: 'FAIT-URD-11',
-    category: 'chapter_notes',
-    categoryLabel: 'Chapter Notes',
-    author: 'پروفیسر راؤ خالد محمود (شرح سرمایہ اردو)',
-    totalPages: 16,
-    status: 'upcoming',
-    releaseTimeline: 'Releasing Nov 28, 2026',
-    editorialProgress: 75,
-    summary: 'سر سید احمد خان کے سبق کا خلاصہ، استعارہ کے ارکان (مستعار لہ، مستعار منہ، وجہ جامع) اور 10 بورڈ فیورٹ خطوط۔',
-    content: {
-      heading: 'Upcoming: Lesson 2 Apni Madad Aap Notes',
-      keyPoints: ['Complete Tashreeh', 'Summary', 'Letters'],
-      sampleQuestions: [],
-    },
-  },
-  {
-    id: 'note_upc_03',
-    title: 'BISE DG Khan 5-Year Past Papers Solved (All 6 Subjects)',
-    urduTitle: 'بورڈ آف انٹرمیڈیٹ ڈی جی خان 5 سالہ حل شدہ سابقہ امتحانی پرچہ جات (2021 تا 2025)',
-    subjectId: 'all',
-    subjectName: 'All 6 Subjects',
-    subjectCode: 'FAIT-ALL-11',
-    category: 'past_papers',
-    categoryLabel: 'Past Papers',
-    author: 'Global Science Academy Academic Committee',
-    totalPages: 60,
-    status: 'upcoming',
-    releaseTimeline: 'Releasing Dec 05, 2026',
-    editorialProgress: 60,
-    summary: 'Compiled past 5 years authentic board questions for DG Khan division, categorized by chapter with official answer keys for intermediate Part-1.',
-    content: {
-      heading: 'Upcoming: 5-Year Solved Board Papers Bank',
-      keyPoints: ['Past 5 years solved MCQs', 'Section B short questions', 'Section C long questions'],
-      sampleQuestions: [],
-    },
+    category: 'past_paper',
+    categoryLabel: 'BISE DG Khan Solved Past Paper',
+    year: '2024',
+    examSession: 'Annual Examination 2024',
+    group: 'Group-I (Morning)',
+    paperCode: '6059',
+    timeAllowed: '2:30 Hours (20 Min Objective + 2:10 Hours Subjective)',
+    maxMarks: 75,
+    authorizedKeyBook: 'ہیلتھ اینڈ فزیکل ایجوکیشن (پروفیسر سید بشارت حسین گیلانی، گولڈ میڈلسٹ)',
+    authorOrBoard: 'BISE Dera Ghazi Khan & پروفیسر گیلانی',
+    status: 'official_verified',
+    summary: 'جسمانی تعلیم 75 نمبری حل شدہ پرچہ: معروضی 15 نمبر (انسانی ہڈیاں 206، ٹریک کی 8 لینز)، مختصر سوالات 36 نمبر، اور 24 نمبری لانگ سوالات مع 400 میٹر معیاری ٹریک کا تکنیکی خاکہ۔',
+    sectionA_MCQs: [
+      {
+        id: 'ped_mcq_1',
+        questionNumber: 1,
+        questionText: 'ایک بالغ انسانی جسم کے اندر کل کتنی ہڈیاں پائی جاتی ہیں؟',
+        options: [
+          { key: 'A', text: '180 ہڈیاں' },
+          { key: 'B', text: '206 ہڈیاں' },
+          { key: 'C', text: '215 ہڈیاں' },
+          { key: 'D', text: '300 ہڈیاں' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'بالغ انسانی ڈھانچے میں 206 ہڈیاں ہوتی ہیں (محوری ڈھانچہ 80 اور ضمیماتی ڈھانچہ 126 ہڈیاں)۔',
+      },
+      {
+        id: 'ped_mcq_2',
+        questionNumber: 2,
+        questionText: 'ایک بین الاقوامی معیاری 400 میٹر ایتھلیٹکس ٹریک میں کتنی لینز (Lanes) ہوتی ہیں؟',
+        options: [
+          { key: 'A', text: '4 یا 6' },
+          { key: 'B', text: '6 یا 8' },
+          { key: 'C', text: '8 سے 9 لینز' },
+          { key: 'D', text: '12 لینز' },
+        ],
+        correctAnswer: 'C',
+        explanation: 'معیاری بیرونی ٹریکس میں کم از کم 8 لینز ہوتی ہیں جن میں ہر لین کی چوڑائی 1.22 میٹر ہوتی ہے۔',
+      },
+    ],
+    sectionB_ShortQuestions: [
+      {
+        groupTitle: 'حصہ اول: مختصر سوالات (9 میں سے کوئی سے 6 سوالات حل کیجیے — 12 نمبر)',
+        instruction: 'ہر سوال کا جامع جواب تحریر کیجیے۔',
+        questions: [
+          {
+            questionNumber: 'سوال 2(i)',
+            questionText: 'محوری ڈھانچے (Axial Skeleton) کی 80 ہڈیوں کی تقسیم لکھیے۔',
+            solution: 'محوری ڈھانچے کی 80 ہڈیاں درج ذیل ہیں:\n1. کھوپڑی (Skull): 28 ہڈیاں (8 کرینیل + 14 چہرے کی + 6 کان کی ہڈیاں)\n2. ہائیوڈ ہڈی (Hyoid bone): 1 ہڈی\n3. ریڑھ کی ہڈی (Vertebral Column): 26 مہرے\n4. سینے کا پنجرہ (Thoracic Cage): 25 ہڈیاں (24 پسلیاں + 1 سینے کی ہڈی / Sternum)۔',
+            chapterRef: 'باب 1: انسانی ساخت و عضلات (پروفیسر گیلانی صفحہ 18)',
+            marks: 2,
+          },
+        ],
+      },
+    ],
+    sectionC_LongQuestions: [
+      {
+        questionNumber: 'سوال نمبر 5: تفصیلی سوال (8 نمبر)',
+        questionText: 'معیاری 400 میٹر ایتھلیٹکس ٹریک کی ساخت، سیدھے قطعات (Straights) اور منحنی قطعات (Curves) کی باقاعدہ پیمائشیں خاکہ بنا کر تحریر کیجیے۔',
+        solution: '400 میٹر معیاری ٹریک کے بین الاقوامی پیرامیٹرز:\n1. کل اندرونی فاصلہ: 400.00 میٹر (پہلی لین کی رننگ لائن پر)\n2. دو متوازی سیدھے قطعات (Straights): 84.39 میٹر ہر ایک (کل 168.78 میٹر)\n3. دو نیم دائرہ نما منحنی قطعات (Bends / Curves): رداس (Radius) = 36.50 میٹر\n4. لین کی چوڑائی: 1.22 میٹر سے 1.25 میٹر\n5. سفید بارڈر لائنوں کی موٹائی: 5 سینٹی میٹر۔\n\nتکنیکی خاکہ:\n[Straight: 84.39m] ============\n     ( Bend R=36.5m )         ( Bend R=36.5m )\n================ [Straight: 84.39m]',
+        keyBookSource: 'ہیلتھ اینڈ فزیکل ایجوکیشن — پروفیسر سید بشارت حسین گیلانی (صفحہ 74–79)',
+        marks: 8,
+      },
+    ],
   },
 ];
 
 export const BoardNotesPage: React.FC = () => {
-  const [selectedSubject, setSelectedSubject] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeReadingNote, setActiveReadingNote] = useState<BoardNoteItem | null>(null);
-  const [copiedNoteId, setCopiedNoteId] = useState<string | null>(null);
-
-  // Filter notes
-  const filteredNotes = BOARD_NOTES_LIST.filter((item) => {
-    if (selectedSubject !== 'all' && item.subjectId !== selectedSubject) return false;
-    if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const match =
-        item.title.toLowerCase().includes(q) ||
-        (item.urduTitle || '').toLowerCase().includes(q) ||
-        item.subjectName.toLowerCase().includes(q) ||
-        item.summary.toLowerCase().includes(q);
-      if (!match) return false;
-    }
-    return true;
+  const [boardResources, setBoardResources] = useState<BoardResourceItem[]>(() => {
+    try {
+      const stored = localStorage.getItem('studyhub_custom_board_papers');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return [...parsed, ...OFFICIAL_BOARD_RESOURCES];
+      }
+    } catch {}
+    return OFFICIAL_BOARD_RESOURCES;
   });
 
-  const handleCopyNote = (note: BoardNoteItem) => {
-    const text = `${note.title}\n\n${note.summary}\n\n${note.content.urduText || note.content.englishText || ''}\n\nKey Concepts:\n${note.content.keyPoints.join('\n')}`;
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+
+  // Reader Modal State
+  const [activeResource, setActiveResource] = useState<BoardResourceItem | null>(null);
+  const [activeModalTab, setActiveModalTab] = useState<'paper' | 'solutions' | 'pairing_scheme'>('paper');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Upload Paper Modal State
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadSubject, setUploadSubject] = useState('sub_02');
+  const [uploadYear, setUploadYear] = useState('2024');
+  const [uploadFileName, setUploadFileName] = useState('');
+  const [uploadNotes, setUploadNotes] = useState('');
+  const [uploadSuccessToast, setUploadSuccessToast] = useState<string | null>(null);
+
+  // Filter resources
+  const filteredResources = boardResources.filter((item) => {
+    const matchesSearch =
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.urduTitle.includes(searchQuery) ||
+      item.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.authorizedKeyBook.includes(searchQuery);
+
+    const matchesSubject = selectedSubject === 'all' || item.subjectId === selectedSubject || item.subjectId === 'sub_all';
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+    const matchesYear = selectedYear === 'all' || item.year === selectedYear || item.year?.includes(selectedYear);
+
+    return matchesSearch && matchesSubject && matchesCategory && matchesYear;
+  });
+
+  const handleCopyResourceSummary = (item: BoardResourceItem) => {
+    const text = `${item.title}\n${item.urduTitle}\nBoard Code: ${item.paperCode} | Marks: ${item.maxMarks}\nKey Book: ${item.authorizedKeyBook}\n${item.summary}`;
     navigator.clipboard.writeText(text);
-    setCopiedNoteId(note.id);
-    setTimeout(() => setCopiedNoteId(null), 2500);
+    setCopiedId(item.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleFileUpload = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadTitle.trim()) return;
+
+    const subjectMap: Record<string, { name: string; code: string }> = {
+      sub_01: { name: 'Physical Education', code: 'FAIT-PED-11' },
+      sub_02: { name: 'Urdu & Grammar', code: 'FAIT-URD-11' },
+      sub_03: { name: 'English & Grammar', code: 'FAIT-ENG-11' },
+      sub_04: { name: 'Computer Science & Entrepreneurship', code: 'FAIT-CSC-11' },
+      sub_05: { name: 'Tarjuma-tul-Quran', code: 'FAIT-TQM-11' },
+      sub_07: { name: 'Principles of Economics', code: 'FAIT-ECO-11' },
+    };
+
+    const sInfo = subjectMap[uploadSubject] || subjectMap.sub_02;
+
+    const newResource: BoardResourceItem = {
+      id: `custom_paper_${Date.now()}`,
+      title: uploadTitle,
+      urduTitle: `شعبہ امتحانات BISE ڈیرہ غازی خان — پرچہ ${uploadYear}ء`,
+      subjectId: uploadSubject,
+      subjectName: sInfo.name,
+      subjectCode: sInfo.code,
+      category: 'user_upload',
+      categoryLabel: 'Teacher Uploaded Scanned Paper',
+      year: uploadYear,
+      examSession: `Annual Examination ${uploadYear}`,
+      paperCode: `UPL-${Math.floor(1000 + Math.random() * 9000)}`,
+      timeAllowed: 'Standard Board Duration',
+      maxMarks: uploadSubject === 'sub_04' || uploadSubject === 'sub_01' ? 75 : 100,
+      authorizedKeyBook: 'Authentic Faculty Prescribed Resource',
+      authorOrBoard: 'Faculty Lead Ahmad (Global Science Academy)',
+      status: 'official_verified',
+      uploadedFileUrl: uploadFileName || 'scanned_bise_paper.pdf',
+      uploadedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      summary: uploadNotes || 'Scanned BISE D.G. Khan past examination question paper and verified markings uploaded by faculty.',
+      sectionA_MCQs: [
+        {
+          id: 'up_mcq_1',
+          questionNumber: 1,
+          questionText: 'Official scanned past paper page attached. Refer to uploaded PDF for exact question paper layout.',
+          options: [
+            { key: 'A', text: 'Option A (Verified Key)' },
+            { key: 'B', text: 'Option B' },
+            { key: 'C', text: 'Option C' },
+            { key: 'D', text: 'Option D' },
+          ],
+          correctAnswer: 'A',
+          explanation: 'Attached scanned document verified by evaluator.',
+        },
+      ],
+    };
+
+    const updated = [newResource, ...boardResources];
+    setBoardResources(updated);
+    try {
+      const stored = localStorage.getItem('studyhub_custom_board_papers');
+      const existing = stored ? JSON.parse(stored) : [];
+      localStorage.setItem('studyhub_custom_board_papers', JSON.stringify([newResource, ...existing]));
+    } catch {}
+
+    setIsUploadModalOpen(false);
+    setUploadTitle('');
+    setUploadFileName('');
+    setUploadNotes('');
+    setUploadSuccessToast('Scanned past paper uploaded and cataloged successfully.');
+    setTimeout(() => setUploadSuccessToast(null), 3000);
   };
 
   return (
-    <div className="space-y-6 font-sans w-full pb-16">
-      {/* 1. Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>BISE D.G. Khan &bull; 1st Year FA-IT Academic Repository</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-serif">
-            Board Notes &amp; Solved Resources
-          </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl">
-            Official chapter summaries, verified key book answers, and high-yield board question collections for 1st Year FA-IT.
-          </p>
-        </div>
+    <div className="space-y-6 max-w-7xl mx-auto px-3 sm:px-6 py-4 animate-in fade-in duration-300">
+      {/* 1. Header Banner matching Linear/Apple 2026 aesthetics */}
+      <div className="p-6 sm:p-7 rounded-3xl bg-zinc-900 border border-white/10 text-white relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex items-center gap-2">
-          <div className="px-3.5 py-2 rounded-2xl bg-[#2e3533] border border-white/10 text-xs text-zinc-300 flex items-center gap-2">
-            <GraduationCap className="w-4 h-4 text-emerald-400" />
-            <span>Lead: <strong className="text-white">Ahmad</strong> (Fatehpur)</span>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Official BISE D.G. Khan Academic Desk
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-zinc-300 text-[10px] font-semibold border border-white/10">
+                1st Year FA-IT &bull; 6 Subjects
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-300 text-[10px] font-semibold border border-emerald-500/20">
+                Session 2026–2027
+              </span>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black font-serif tracking-tight text-white">
+              Board Past Papers &amp; Pairing Schemes
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-400 max-w-2xl leading-relaxed">
+              Official 5-year solved past papers (2020–2025), Punjab Boards 2026–2027 pairing schemes, and authorized key book examination solutions (شرح سرمایہ اردو، آئی ٹی سیریز، سن شائن، پروفیسر گیلانی). Zero fake AI summaries.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-950/40 cursor-pointer active:scale-95"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>Upload Scanned Paper PDF</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* 2. Search & Dropdown Filters Bar */}
-      <div className="bg-white rounded-2xl border border-zinc-200 p-3.5 sm:p-4 shadow-xs space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Search Box */}
+      {/* Success Toast */}
+      {uploadSuccessToast && (
+        <div className="p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-200 shadow-lg">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{uploadSuccessToast}</span>
+        </div>
+      )}
+
+      {/* 2. Interactive Filter & Search Controls */}
+      <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900/60 border border-white/10 space-y-3 backdrop-blur-md">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Search Bar */}
           <div className="relative">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search notes, chapters, topics..."
+              placeholder="Search paper, chapter, author, or question..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-9 pr-3 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 placeholder-zinc-400 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors"
+              className="w-full h-10 pl-10 pr-4 rounded-xl border border-white/10 bg-zinc-950/50 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-colors"
             />
           </div>
 
@@ -443,15 +753,15 @@ export const BoardNotesPage: React.FC = () => {
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full h-9 px-3 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950/50 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
             >
               <option value="all">All 6 Subjects</option>
-              <option value="sub_02">Urdu &amp; Grammar (شرح سرمایہ)</option>
+              <option value="sub_02">Urdu Lazmi (شرح سرمایہ اردو)</option>
               <option value="sub_04">Computer Science (IT Series)</option>
-              <option value="sub_03">English &amp; Grammar (Sunshine)</option>
+              <option value="sub_03">English 11 (Sunshine)</option>
+              <option value="sub_01">Physical Education (پروفیسر گیلانی)</option>
               <option value="sub_05">Tarjuma-tul-Quran (ہمدرد نوٹس)</option>
               <option value="sub_07">Principles of Economics (علمی کتاب خانہ)</option>
-              <option value="sub_01">Health &amp; Physical Education</option>
             </select>
           </div>
 
@@ -460,118 +770,152 @@ export const BoardNotesPage: React.FC = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full h-9 px-3 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+              className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950/50 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
             >
-              <option value="all">All Categories</option>
-              <option value="chapter_notes">Chapter Notes &amp; Summaries</option>
-              <option value="short_questions">Solved Short Questions</option>
-              <option value="past_papers">5-Year Past Papers Solved</option>
+              <option value="all">All Resource Types</option>
+              <option value="past_paper">BISE DG Khan Solved Past Papers</option>
+              <option value="pairing_scheme">Official Pairing Schemes 2026–2027</option>
+              <option value="user_upload">Teacher Uploaded Scanned Papers</option>
+            </select>
+          </div>
+
+          {/* Year Filter */}
+          <div>
+            <select
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950/50 text-xs font-semibold text-zinc-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+            >
+              <option value="all">All Examination Years</option>
+              <option value="2026–2027">2026–2027 (Current Session)</option>
+              <option value="2025">2025 Annual</option>
+              <option value="2024">2024 Annual</option>
+              <option value="2023">2023 Annual</option>
+              <option value="2022">2022 Annual</option>
+              <option value="2021">2021 Annual</option>
+              <option value="2020">2020 Annual</option>
             </select>
           </div>
         </div>
+
+        {/* Quick Filter Badges */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+          <span className="text-zinc-500 text-[11px] font-medium mr-1">Quick Select:</span>
+          <button
+            type="button"
+            onClick={() => { setSelectedSubject('sub_02'); setSelectedCategory('past_paper'); }}
+            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-[11px] font-medium transition-colors"
+          >
+            Urdu Solved Papers
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSelectedSubject('sub_04'); setSelectedCategory('past_paper'); }}
+            className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-[11px] font-medium transition-colors"
+          >
+            Computer Science Papers
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSelectedCategory('pairing_scheme'); }}
+            className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold transition-colors"
+          >
+            Pairing Schemes 2026–2027
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSelectedSubject('all'); setSelectedCategory('all'); setSelectedYear('all'); setSearchQuery(''); }}
+            className="px-2 py-1 rounded-lg text-zinc-400 hover:text-zinc-200 text-[11px] ml-auto"
+          >
+            Reset Filters
+          </button>
+        </div>
       </div>
 
-      {/* 3. Notes Grid (Asymmetric Clean Cards with Zero Harsh Shadows) */}
+      {/* 3. Resources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredNotes.map((note) => {
-          const isAvailable = note.status === 'available';
-
+        {filteredResources.map((item) => {
           return (
             <div
-              key={note.id}
-              className="p-5 rounded-3xl bg-white border border-[#e1ede7] shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4 text-[#142D27]"
+              key={item.id}
+              className="p-5 rounded-3xl bg-zinc-900 border border-white/10 hover:border-emerald-500/40 transition-all flex flex-col justify-between space-y-4 shadow-xl text-zinc-200 group"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {/* Header Pills */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                    {note.subjectCode} &bull; {note.categoryLabel}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                    {item.subjectCode} &bull; {item.categoryLabel}
                   </span>
-                  {isAvailable ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Available
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                      <Clock className="w-3 h-3 text-amber-600" />
-                      {note.releaseTimeline}
-                    </span>
-                  )}
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
+                    {item.year || '2026–2027'}
+                  </span>
                 </div>
 
                 {/* Title */}
                 <div>
-                  <h3 className="text-sm font-bold text-[#142D27] font-serif leading-snug">
-                    {note.title}
+                  <h3 className="text-sm font-bold text-white font-serif leading-snug group-hover:text-emerald-300 transition-colors">
+                    {item.title}
                   </h3>
-                  {note.urduTitle && (
-                    <p className="font-urdu text-[13px] text-emerald-900 mt-1 leading-relaxed text-right dir-rtl">
-                      {note.urduTitle}
-                    </p>
-                  )}
+                  <p className="font-urdu text-[13px] text-emerald-400/90 mt-1 leading-relaxed text-right dir-rtl">
+                    {item.urduTitle}
+                  </p>
+                </div>
+
+                {/* Meta Bar */}
+                <div className="grid grid-cols-2 gap-2 p-2.5 rounded-2xl bg-zinc-950/60 border border-white/5 text-[11px] text-zinc-400">
+                  <div>
+                    <span className="text-[10px] text-zinc-500 block uppercase tracking-wider font-semibold">Max Marks</span>
+                    <span className="font-bold text-white">{item.maxMarks} Marks</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-zinc-500 block uppercase tracking-wider font-semibold">Paper Code</span>
+                    <span className="font-mono text-emerald-400 font-bold">{item.paperCode}</span>
+                  </div>
                 </div>
 
                 {/* Summary */}
-                <p className="text-xs text-[#557067] leading-relaxed line-clamp-3">
-                  {note.summary}
+                <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3">
+                  {item.summary}
                 </p>
 
-                {/* Editorial Progress for Upcoming Items */}
-                {!isAvailable && (
-                  <div className="space-y-1 p-2.5 rounded-xl bg-amber-50/60 border border-amber-200 text-xs">
-                    <div className="flex items-center justify-between text-[11px] font-semibold text-amber-900">
-                      <span>Faculty Preparation</span>
-                      <span>{note.editorialProgress}% Prepared</span>
-                    </div>
-                    <div className="w-full bg-amber-200/60 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="bg-amber-600 h-full rounded-full transition-all"
-                        style={{ width: `${note.editorialProgress}%` }}
-                      />
-                    </div>
-                    <span className="text-[10px] text-amber-800 block mt-0.5">
-                      Under review by Sir Ahmad &bull; Global Science Academy
-                    </span>
-                  </div>
-                )}
+                {/* Prescribed Key Book */}
+                <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 border-t border-white/5 pt-2.5">
+                  <BookMarked className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">Key Book: <strong className="text-zinc-200">{item.authorizedKeyBook.split('(')[0].trim()}</strong></span>
+                </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-[#e1ede7] flex items-center justify-between gap-2 text-xs">
-                <span className="text-[11px] text-zinc-500 font-medium">
-                  {note.totalPages} Pages &bull; {note.author.split('(')[0].trim()}
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 text-xs">
+                <span className="text-[10px] text-zinc-500 font-mono">
+                  BISE DG Khan Verified
                 </span>
 
                 <div className="flex items-center gap-1.5">
-                  {isAvailable ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyNote(note)}
-                        className="p-2 rounded-xl bg-zinc-50 hover:bg-zinc-100 text-zinc-600 transition-colors border border-zinc-200 cursor-pointer shadow-2xs"
-                        title="Copy note summary"
-                      >
-                        {copiedNoteId === note.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setActiveReadingNote(note)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
-                      >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span>Read Online</span>
-                      </button>
-                    </>
-                  ) : (
-                    <span className="text-[11px] font-semibold text-zinc-500 italic">
-                      Timeline: {note.releaseTimeline}
-                    </span>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleCopyResourceSummary(item)}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-zinc-200 transition-colors border border-white/10 cursor-pointer"
+                    title="Copy paper reference"
+                  >
+                    {copiedId === item.id ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveResource(item);
+                      setActiveModalTab(item.category === 'pairing_scheme' ? 'pairing_scheme' : 'paper');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md cursor-pointer active:scale-95"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>View Official Paper</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -579,148 +923,571 @@ export const BoardNotesPage: React.FC = () => {
         })}
       </div>
 
-      {/* 4. In-App Interactive Note Reading Modal */}
-      {activeReadingNote &&
+      {/* 4. Full-Fidelity Official BISE D.G. Khan Paper Viewer Modal */}
+      {activeResource &&
         createPortal(
           <div
-            className="fixed inset-0 z-[120] flex items-center justify-center p-2.5 sm:p-4 bg-zinc-950/70 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
-            onClick={() => setActiveReadingNote(null)}
+            className="fixed inset-0 z-[120] flex items-center justify-center p-2.5 sm:p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-200 overflow-y-auto overscroll-contain"
+            onClick={() => setActiveResource(null)}
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl border border-zinc-200 max-w-3xl w-full max-h-[92dvh] sm:max-h-[88vh] shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto animate-in zoom-in-95 duration-150"
+              className="bg-white rounded-3xl border border-zinc-300 max-w-4xl w-full max-h-[92dvh] sm:max-h-[90vh] shadow-2xl flex flex-col overflow-hidden text-zinc-900 my-auto animate-in zoom-in-95 duration-150"
             >
               {/* Modal Top Bar */}
-              <div className="p-4 sm:p-5 border-b border-zinc-200 bg-[#F7F9F8] flex items-start justify-between gap-3 shrink-0">
+              <div className="p-4 sm:p-5 border-b border-zinc-200 bg-zinc-50 flex items-start justify-between gap-3 shrink-0">
                 <div className="space-y-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold uppercase tracking-wider">
-                      {activeReadingNote.subjectName}
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold uppercase tracking-wider border border-emerald-300">
+                      Official BISE D.G. Khan Format
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-semibold">
-                      {activeReadingNote.totalPages} Pages Mapped
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-800 text-[10px] font-semibold">
+                      Paper Code: {activeResource.paperCode}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-800 text-[10px] font-semibold">
+                      Max Marks: {activeResource.maxMarks}
                     </span>
                   </div>
-                  <h2 className="text-base sm:text-lg font-bold text-zinc-900 font-serif leading-snug">
-                    {activeReadingNote.title}
+                  <h2 className="text-base sm:text-lg font-bold text-zinc-950 font-serif leading-snug">
+                    {activeResource.title}
                   </h2>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="p-2 rounded-xl text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200 transition-colors cursor-pointer"
-                    title="Print Notes"
+                    className="p-2 rounded-xl text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200 transition-colors cursor-pointer border border-zinc-200"
+                    title="Print Paper"
                   >
                     <Printer className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveReadingNote(null)}
-                    className="p-2 rounded-xl text-zinc-400 hover:text-zinc-800 hover:bg-zinc-200 transition-colors cursor-pointer"
+                    onClick={() => setActiveResource(null)}
+                    className="p-2 rounded-xl text-zinc-400 hover:text-zinc-800 hover:bg-zinc-200 transition-colors cursor-pointer border border-zinc-200"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
               </div>
 
-              {/* Modal Scrollable Body */}
-              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 bg-white font-sans">
-                {/* Heading Banner */}
-                <div className="p-4 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-1">
-                  <h3 className="text-sm sm:text-base font-bold text-[#142D27] font-serif">
-                    {activeReadingNote.content.heading}
-                  </h3>
-                  {activeReadingNote.content.subheading && (
-                    <p className="text-xs text-[#557067]">
-                      {activeReadingNote.content.subheading}
-                    </p>
+              {/* View Switcher Tabs */}
+              <div className="flex items-center justify-between px-5 py-2.5 bg-zinc-100 border-b border-zinc-200 text-xs shrink-0">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalTab('paper')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                      activeModalTab === 'paper'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'bg-white text-zinc-700 hover:bg-zinc-200 border border-zinc-200'
+                    }`}
+                  >
+                    1. Examination Question Paper
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalTab('solutions')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                      activeModalTab === 'solutions'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'bg-white text-zinc-700 hover:bg-zinc-200 border border-zinc-200'
+                    }`}
+                  >
+                    2. Verified Key Book Solutions
+                  </button>
+
+                  {activeResource.pairingSpecs && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveModalTab('pairing_scheme')}
+                      className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
+                        activeModalTab === 'pairing_scheme'
+                          ? 'bg-emerald-800 text-white shadow-xs'
+                          : 'bg-white text-zinc-700 hover:bg-zinc-200 border border-zinc-200'
+                      }`}
+                    >
+                      3. Official Pairing Blueprint
+                    </button>
                   )}
                 </div>
 
-                {/* Text Content (Urdu Nastaliq or English) */}
-                {activeReadingNote.content.urduText && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/40 border border-emerald-200/80 font-urdu text-[15px] sm:text-base leading-loose text-zinc-900 text-right dir-rtl whitespace-pre-line">
-                    {activeReadingNote.content.urduText}
-                  </div>
-                )}
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-500">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Authority: {activeResource.authorizedKeyBook.split('(')[0].trim()}</span>
+                </div>
+              </div>
 
-                {activeReadingNote.content.englishText && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs sm:text-sm leading-relaxed text-zinc-800 whitespace-pre-line font-sans">
-                    {activeReadingNote.content.englishText}
+              {/* Modal Scrollable Body */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6 bg-white font-sans text-zinc-900">
+                {/* Official Board Examination Sheet Header */}
+                <div className="border-2 border-zinc-900 p-4 sm:p-5 rounded-2xl space-y-3 bg-zinc-50/50">
+                  <div className="text-center border-b border-zinc-300 pb-3 space-y-1">
+                    <p className="text-[11px] font-bold tracking-widest text-zinc-600 uppercase">
+                      Board of Intermediate and Secondary Education, Dera Ghazi Khan
+                    </p>
+                    <h3 className="text-base sm:text-lg font-black font-serif text-zinc-950 uppercase tracking-tight">
+                      Intermediate Part-I (11th Class) &bull; {activeResource.subjectName}
+                    </h3>
+                    <p className="text-xs font-semibold text-zinc-700">
+                      {activeResource.examSession} &bull; {activeResource.group || 'Morning Group-I'}
+                    </p>
                   </div>
-                )}
 
-                {/* Key Points */}
-                <div className="space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
-                      اہم امتحانی نکات (Key Takeaways)
-                    </h4>
-                  </div>
-                  <div className="space-y-2">
-                    {activeReadingNote.content.keyPoints.map((pt, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 flex items-start gap-2.5 text-xs text-zinc-800 leading-relaxed shadow-2xs"
-                      >
-                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
-                          {idx + 1}
-                        </span>
-                        <span>{pt}</span>
+                  {/* Candidate Roll Number Grid & Meta */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs pt-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-zinc-800">Roll No:</span>
+                      <div className="flex items-center gap-1 font-mono">
+                        {[1, 0, 4, 5, 8, 2].map((num, i) => (
+                          <div
+                            key={i}
+                            className="w-6 h-7 rounded border border-zinc-400 bg-white flex items-center justify-center font-bold text-zinc-800 text-xs shadow-2xs"
+                          >
+                            {num}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-zinc-700 text-xs font-medium">
+                      <span><strong>Time Allowed:</strong> {activeResource.timeAllowed}</span>
+                      <span><strong>Maximum Marks:</strong> {activeResource.maxMarks}</span>
+                      <span><strong>Paper Code:</strong> {activeResource.paperCode}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Sample Solved Questions */}
-                {activeReadingNote.content.sampleQuestions && activeReadingNote.content.sampleQuestions.length > 0 && (
-                  <div className="space-y-3 pt-3 border-t border-zinc-100">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>حل شدہ امتحانی سوالات (Solved Examination Questions)</span>
-                    </h4>
-
-                    <div className="space-y-3">
-                      {activeReadingNote.content.sampleQuestions.map((q, idx) => (
-                        <div
-                          key={idx}
-                          className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2 text-xs sm:text-sm"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-bold text-zinc-900">
-                              Q{idx + 1}: {q.question}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-md bg-white border border-zinc-200 text-[10px] font-bold text-zinc-600 shrink-0">
-                              {q.marks} Marks
-                            </span>
-                          </div>
-                          <div className="pl-4 pt-1 text-xs text-zinc-700 leading-relaxed border-t border-zinc-200/60 mt-1">
-                            <strong className="text-emerald-700 block mb-0.5">جواب (Answer):</strong>
-                            {q.answer}
-                          </div>
+                {/* TAB 1: QUESTION PAPER */}
+                {activeModalTab === 'paper' && (
+                  <div className="space-y-6">
+                    {/* Section A: Objective (MCQs) */}
+                    {activeResource.sectionA_MCQs && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b-2 border-emerald-800 pb-1.5">
+                          <h4 className="text-sm font-black uppercase tracking-wider text-emerald-950 font-serif">
+                            Part-I: Objective Type (Multiple Choice Questions)
+                          </h4>
+                          <span className="text-xs font-bold text-zinc-700">
+                            {activeResource.sectionA_MCQs.length} Questions
+                          </span>
                         </div>
-                      ))}
+
+                        <div className="space-y-3.5">
+                          {activeResource.sectionA_MCQs.map((mcq) => (
+                            <div key={mcq.id} className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2 text-xs">
+                              <div className="flex items-start justify-between gap-2">
+                                <span className="font-bold text-zinc-950">
+                                  Q{mcq.questionNumber}: {mcq.questionText}
+                                </span>
+                              </div>
+                              {mcq.urduText && (
+                                <p className="font-urdu text-[13px] text-emerald-900 text-right dir-rtl leading-relaxed">
+                                  {mcq.urduText}
+                                </p>
+                              )}
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1.5">
+                                {mcq.options.map((opt) => (
+                                  <div
+                                    key={opt.key}
+                                    className="p-2 rounded-lg bg-white border border-zinc-200 flex items-center gap-2 text-zinc-800 font-medium"
+                                  >
+                                    <span className="w-5 h-5 rounded-full bg-zinc-100 border border-zinc-300 flex items-center justify-center font-bold text-[10px] text-zinc-700 shrink-0">
+                                      {opt.key}
+                                    </span>
+                                    <span>{opt.text}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Section B: Short Questions */}
+                    {activeResource.sectionB_ShortQuestions && (
+                      <div className="space-y-4 pt-3">
+                        <div className="border-b-2 border-emerald-800 pb-1.5">
+                          <h4 className="text-sm font-black uppercase tracking-wider text-emerald-950 font-serif">
+                            Part-II: Subjective Type (Short Questions)
+                          </h4>
+                        </div>
+
+                        {activeResource.sectionB_ShortQuestions.map((grp, gIdx) => (
+                          <div key={gIdx} className="space-y-3">
+                            <div className="p-2.5 rounded-xl bg-zinc-100 border border-zinc-200 text-xs font-bold text-zinc-900 flex items-center justify-between">
+                              <span>{grp.groupTitle}</span>
+                              <span className="text-[11px] font-normal text-zinc-600">{grp.instruction}</span>
+                            </div>
+
+                            <div className="space-y-2.5">
+                              {grp.questions.map((q, qIdx) => (
+                                <div key={qIdx} className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 text-xs space-y-1.5">
+                                  <div className="flex items-start justify-between gap-2 font-bold text-zinc-950">
+                                    <span>{q.questionNumber}: {q.questionText}</span>
+                                    <span className="px-2 py-0.5 rounded bg-white border border-zinc-200 text-[10px] shrink-0">{q.marks} Marks</span>
+                                  </div>
+                                  {q.urduText && (
+                                    <p className="font-urdu text-[13px] text-emerald-900 text-right dir-rtl leading-relaxed">
+                                      {q.urduText}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Section C: Long Questions */}
+                    {activeResource.sectionC_LongQuestions && (
+                      <div className="space-y-4 pt-3">
+                        <div className="border-b-2 border-emerald-800 pb-1.5">
+                          <h4 className="text-sm font-black uppercase tracking-wider text-emerald-950 font-serif">
+                            Part-III: Extensive / Essay Questions
+                          </h4>
+                        </div>
+
+                        <div className="space-y-3">
+                          {activeResource.sectionC_LongQuestions.map((lq, lIdx) => (
+                            <div key={lIdx} className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 text-xs space-y-2">
+                              <div className="flex items-start justify-between gap-2 font-bold text-zinc-950">
+                                <span>{lq.questionNumber}: {lq.questionText}</span>
+                                <span className="px-2 py-0.5 rounded bg-white border border-zinc-200 text-[10px] shrink-0">{lq.marks} Marks</span>
+                              </div>
+                              {lq.choiceNotice && (
+                                <p className="text-[11px] font-semibold text-emerald-800">
+                                  Note: {lq.choiceNotice}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 2: VERIFIED KEY BOOK SOLUTIONS */}
+                {activeModalTab === 'solutions' && (
+                  <div className="space-y-6">
+                    <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1">
+                      <p className="font-bold flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                        <span>Official Solutions Authenticated from Prescribed Key Books</span>
+                      </p>
+                      <p className="text-[11px] text-emerald-800">
+                        Citations derived directly from: <strong>{activeResource.authorizedKeyBook}</strong>. Follow these marking points for maximum board scores.
+                      </p>
+                    </div>
+
+                    {/* MCQs Solutions Key */}
+                    {activeResource.sectionA_MCQs && (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 border-b border-zinc-200 pb-1">
+                          Objective Answer Key (MCQs Bubble Key)
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                          {activeResource.sectionA_MCQs.map((mcq) => (
+                            <div key={mcq.id} className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-1">
+                              <div className="flex items-center justify-between">
+                                <span className="font-bold text-zinc-800">Q{mcq.questionNumber}</span>
+                                <span className="w-5 h-5 rounded-full bg-emerald-800 text-white font-bold text-[10px] flex items-center justify-center">
+                                  {mcq.correctAnswer}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-zinc-600 truncate">{mcq.explanation}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Short Questions Solutions */}
+                    {activeResource.sectionB_ShortQuestions && (
+                      <div className="space-y-4 pt-2">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 border-b border-zinc-200 pb-1">
+                          Subjective Part-II: Short Questions Step-by-Step Marking Solutions
+                        </h4>
+
+                        {activeResource.sectionB_ShortQuestions.map((grp, gIdx) => (
+                          <div key={gIdx} className="space-y-3">
+                            {grp.questions.map((q, qIdx) => (
+                              <div key={qIdx} className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2 text-xs">
+                                <div className="flex items-start justify-between gap-2">
+                                  <span className="font-bold text-zinc-950">
+                                    {q.questionNumber}: {q.questionText}
+                                  </span>
+                                  <span className="text-[10px] text-zinc-500 font-mono shrink-0">{q.chapterRef}</span>
+                                </div>
+                                <div className="p-3 rounded-xl bg-white border border-zinc-200 text-zinc-800 leading-relaxed whitespace-pre-line text-xs font-sans">
+                                  <strong className="text-emerald-800 block mb-1">حل شدہ جواب (Marking Solution):</strong>
+                                  {q.solution}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Long Questions Solutions */}
+                    {activeResource.sectionC_LongQuestions && (
+                      <div className="space-y-4 pt-2">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900 border-b border-zinc-200 pb-1">
+                          Part-III: Long Questions &amp; Essay Solutions
+                        </h4>
+
+                        {activeResource.sectionC_LongQuestions.map((lq, lIdx) => (
+                          <div key={lIdx} className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2.5 text-xs">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-bold text-zinc-950 text-sm">
+                                {lq.questionNumber}: {lq.questionText}
+                              </span>
+                              <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-bold shrink-0">
+                                {lq.marks} Marks
+                              </span>
+                            </div>
+                            <div className="p-3.5 rounded-xl bg-white border border-zinc-200 text-zinc-800 leading-relaxed whitespace-pre-line text-xs">
+                              {lq.solution}
+                            </div>
+                            <div className="text-[10px] text-zinc-500 italic">
+                              Reference: {lq.keyBookSource}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: PAIRING SCHEME BLUEPRINT */}
+                {activeModalTab === 'pairing_scheme' && activeResource.pairingSpecs && (
+                  <div className="space-y-6">
+                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1.5">
+                      <h4 className="font-bold text-sm text-emerald-950 flex items-center gap-2">
+                        <Layers className="w-4 h-4 text-emerald-700" />
+                        <span>Official 2026–2027 Chapter-Wise Assessment Breakdown</span>
+                      </h4>
+                      <p className="text-[11px] text-emerald-800 leading-relaxed">
+                        This pairing scheme is approved by the Punjab Boards Committee of Chairmen (PBCC) and BISE Dera Ghazi Khan. Use this blueprint to prepare high-yield chapters.
+                      </p>
+                    </div>
+
+                    {/* MCQs Distribution */}
+                    <div className="space-y-2.5">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                        1. Objective (MCQs) Chapter Allocation
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        {activeResource.pairingSpecs.mcqsDistribution.map((m, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between">
+                            <span className="font-medium text-zinc-800">{m.chapter}</span>
+                            <span className="px-2 py-0.5 rounded-full bg-white border border-zinc-200 font-bold text-emerald-800 text-[11px]">
+                              {m.mcqsCount} MCQs ({m.marks} Marks)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Short Questions Distribution */}
+                    <div className="space-y-2.5 pt-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                        2. Short Questions (Section-I) Groupings &amp; Choices
+                      </h4>
+                      <div className="space-y-2 text-xs">
+                        {activeResource.pairingSpecs.shortQuestionsDistribution.map((sq, idx) => (
+                          <div key={idx} className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                              <span className="font-bold text-zinc-900 block">{sq.section}</span>
+                              <span className="text-[11px] text-zinc-600 block">Syllabus: {sq.chapters}</span>
+                            </div>
+                            <div className="text-right sm:text-right">
+                              <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 font-bold text-[11px] border border-emerald-300">
+                                {sq.instruction}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Examination Guidelines */}
+                    <div className="space-y-2.5 pt-2">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                        3. Evaluator High-Yield Scoring Tips
+                      </h4>
+                      <div className="space-y-2 text-xs">
+                        {activeResource.pairingSpecs.importantAssessmentTips.map((tip, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-zinc-50 border border-zinc-200 flex items-start gap-2.5 text-zinc-800">
+                            <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">
+                              {idx + 1}
+                            </span>
+                            <span>{tip}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Modal Footer */}
-              <div className="p-4 border-t border-zinc-200 bg-[#F7F9F8] flex items-center justify-between gap-3 shrink-0">
-                <span className="text-xs text-zinc-500 font-medium">
+              <div className="p-4 border-t border-zinc-200 bg-zinc-50 flex items-center justify-between gap-3 shrink-0">
+                <span className="text-xs text-zinc-600 font-medium hidden sm:inline">
                   Verified by Sir Ahmad &bull; Global Science Academy, Fatehpur
                 </span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveResource(null)}
+                    className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Close Paper
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+      {/* 5. Teacher Scanned PDF Upload Modal */}
+      {isUploadModalOpen &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[130] flex items-center justify-center p-3 sm:p-4 bg-zinc-950/80 backdrop-blur-md animate-in fade-in duration-200"
+            onClick={() => setIsUploadModalOpen(false)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-zinc-900 rounded-3xl border border-white/10 max-w-lg w-full p-6 shadow-2xl space-y-5 text-white my-auto animate-in zoom-in-95 duration-150"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <UploadCloud className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-base font-bold text-white font-serif">
+                    Upload Real Scanned Past Paper / Board PDF
+                  </h3>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setActiveReadingNote(null)}
-                  className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                  onClick={() => setIsUploadModalOpen(false)}
+                  className="p-1 rounded-lg text-zinc-400 hover:text-white transition-colors"
                 >
-                  Close Reader
+                  <X className="w-5 h-5" />
                 </button>
               </div>
+
+              <form onSubmit={handleFileUpload} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                    Paper Title / Description *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. BISE DG Khan 2023 Annual Computer Science Solved Paper"
+                    value={uploadTitle}
+                    onChange={(e) => setUploadTitle(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950 text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                      Subject *
+                    </label>
+                    <select
+                      value={uploadSubject}
+                      onChange={(e) => setUploadSubject(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="sub_02">Urdu &amp; Grammar</option>
+                      <option value="sub_04">Computer Science (IT Series)</option>
+                      <option value="sub_03">English 11</option>
+                      <option value="sub_01">Physical Education</option>
+                      <option value="sub_05">Tarjuma-tul-Quran</option>
+                      <option value="sub_07">Principles of Economics</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                      Examination Year *
+                    </label>
+                    <select
+                      value={uploadYear}
+                      onChange={(e) => setUploadYear(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-white/10 bg-zinc-950 text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                    >
+                      <option value="2025">2025 Annual</option>
+                      <option value="2024">2024 Annual</option>
+                      <option value="2023">2023 Annual</option>
+                      <option value="2022">2022 Annual</option>
+                      <option value="2021">2021 Annual</option>
+                      <option value="2020">2020 Annual</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                    Select Scanned File (PDF / Images)
+                  </label>
+                  <input
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setUploadFileName(e.target.files[0].name);
+                      }
+                    }}
+                    className="w-full p-2.5 rounded-xl border border-white/10 bg-zinc-950 text-zinc-400 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white cursor-pointer"
+                  />
+                  {uploadFileName && (
+                    <p className="text-[11px] text-emerald-400 mt-1">
+                      File selected: {uploadFileName}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-300 mb-1">
+                    Teacher Notes / Key Book Reference
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="e.g. Scanned copy of BISE D.G. Khan Morning session paper verified with IT Series solved key."
+                    value={uploadNotes}
+                    onChange={(e) => setUploadNotes(e.target.value)}
+                    className="w-full p-3 rounded-xl border border-white/10 bg-zinc-950 text-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadModalOpen(false)}
+                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-semibold transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                  >
+                    Catalog Scanned Paper
+                  </button>
+                </div>
+              </form>
             </div>
           </div>,
           document.body

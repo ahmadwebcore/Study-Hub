@@ -14,7 +14,6 @@ import { ResultsPage } from '../pages/results/ResultsPage';
 import { ReportsPage } from '../pages/reports/ReportsPage';
 import { SettingsPage } from '../pages/settings/SettingsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
-import { WeeklyTasksPage } from '../pages/tasks/WeeklyTasksPage';
 import { CompletedWorkPage } from '../pages/tasks/CompletedWorkPage';
 import { TestSubmissionPage } from '../pages/tests/TestSubmissionPage';
 import { DirectChatPage } from '../pages/chat/DirectChatPage';
@@ -83,7 +82,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="/ai-teacher" element={<AITeacherPage />} />
         <Route path="/syllabus" element={<SyllabusPage />} />
         <Route path="/planner" element={<StudyPlannerPage />} />
-        <Route path="/weekly-tasks" element={<WeeklyTasksPage />} />
+        <Route path="/weekly-tasks" element={<Navigate to="/tests" replace />} />
+        <Route path="/tasks" element={<Navigate to="/tests" replace />} />
         <Route path="/completed-work" element={<CompletedWorkPage />} />
         <Route path="/assignments" element={<AssignmentsPage />} />
         <Route path="/tests" element={<TestsPage />} />

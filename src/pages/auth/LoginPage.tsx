@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   UserCheck,
   Check,
-  CheckCircle2,
   Copy,
   AlertCircle,
   KeyRound,
@@ -405,8 +404,8 @@ export const LoginPage: React.FC = () => {
           {step === 'verification' && (
             <div className="space-y-4">
               {/* Authenticated Account Bar (Email Strictly Masked for Privacy) */}
-              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between text-xs gap-3">
-                <div className="flex items-center gap-2.5 text-emerald-950 min-w-0">
+              <div className="p-3 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs gap-3">
+                <div className="flex items-center gap-2.5 text-zinc-900 min-w-0">
                   <div className="w-8 h-8 rounded-xl bg-emerald-600/15 flex items-center justify-center text-emerald-700 shrink-0">
                     <ShieldCheck className="w-4 h-4 shrink-0" />
                   </div>
@@ -415,13 +414,9 @@ export const LoginPage: React.FC = () => {
                       {roleMode === 'teacher' ? 'Faculty Lead' : 'Enrolled Student'}
                     </span>
                     <span className="text-[11px] text-zinc-500 font-mono truncate block">
-                      {emailVerificationService.maskEmail(verifiedEmail)} &bull; Two-Factor Protected
+                      {emailVerificationService.maskEmail(verifiedEmail)} &bull; Google Authenticator Required
                     </span>
                   </div>
-                </div>
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-emerald-800 text-[11px] font-bold border border-emerald-300 shadow-2xs whitespace-nowrap shrink-0">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Password Verified</span>
                 </div>
               </div>
 

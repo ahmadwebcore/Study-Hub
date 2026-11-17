@@ -2,10 +2,54 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { SyllabusUnit, SyllabusTopic } from '../types';
 import { SAMPLE_SYLLABUS } from '../data/sampleData';
 
+const SYLLABUS_PROGRESS_KEY = 'studyhub_syllabus_progress_v3';
+
+function getLocalProgressMap(): Record<string, 'not_started' | 'in_progress' | 'completed'> {
+  try {
+    const raw = localStorage.getItem(SYLLABUS_PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLocalProgress(topicId: string, status: 'not_started' | 'in_progress' | 'completed') {
+  try {
+    const map = getLocalProgressMap();
+    map[topicId] = status;
+    localStorage.setItem(SYLLABUS_PROGRESS_KEY, JSON.stringify(map));
+  } catch (e) {
+    console.error('Failed to save syllabus progress locally', e);
+  }
+}
+
+function applyLocalProgress(units: SyllabusUnit[]): SyllabusUnit[] {
+  const localMap = getLocalProgressMap();
+  return units.map((unit) => {
+    const topics = unit.topics.map((t) => {
+      const savedStatus = localMap[t.id];
+      const effectiveStatus = savedStatus || (t.completed ? 'completed' : t.progressStatus || 'not_started');
+      return {
+        ...t,
+        completed: effectiveStatus === 'completed',
+        progressStatus: effectiveStatus,
+      };
+    });
+    const completedCount = topics.filter((t) => t.completed).length;
+    const progress = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
+    return {
+      ...unit,
+      topics,
+      progress,
+    };
+  });
+}
+
 export const syllabusService = {
   async fetchHierarchicalSyllabus(subjectId: string, studentId?: string): Promise<SyllabusUnit[]> {
     if (!isSupabaseConfigured()) {
-      return SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId || subjectId === 'all');
+      const filtered = SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId || subjectId === 'all');
+      return applyLocalProgress(filtered);
     }
 
     try {
@@ -17,7 +61,8 @@ export const syllabusService = {
         .order('sort_order', { ascending: true });
 
       if (error || !units || units.length === 0) {
-        return SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId);
+        const filtered = SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId);
+        return applyLocalProgress(filtered);
       }
 
       // 2. Fetch student-specific topic progress if studentId is provided
@@ -73,7 +118,8 @@ export const syllabusService = {
         };
       });
     } catch {
-      return SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId);
+      const filtered = SAMPLE_SYLLABUS.filter((u) => u.subjectId === subjectId);
+      return applyLocalProgress(filtered);
     }
   },
 
@@ -266,25 +312,37 @@ export const syllabusService = {
     topicId: string,
     status: 'not_started' | 'in_progress' | 'completed'
   ): Promise<{ success: boolean; error: Error | null }> {
+    // 1. Immediately persist locally so changes are instantaneous and resilient
+    saveLocalProgress(topicId, status);
+
+    // 2. Broadcast local update
+    try {
+      window.dispatchEvent(new CustomEvent('studyhub_syllabus_updated', { detail: { topicId, status } }));
+    } catch {}
+
     if (!isSupabaseConfigured()) {
       return { success: true, error: null };
     }
 
     const completedAt = status === 'completed' ? new Date().toISOString() : null;
 
-    const { error } = await supabase.from('topic_progress').upsert(
-      {
-        student_id: studentId,
-        topic_id: topicId,
-        status,
-        completed_at: completedAt,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'student_id,topic_id' }
-    );
+    try {
+      const { error } = await supabase.from('topic_progress').upsert(
+        {
+          student_id: studentId,
+          topic_id: topicId,
+          status,
+          completed_at: completedAt,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'student_id,topic_id' }
+      );
 
-    if (error) return { success: false, error: new Error(error.message) };
-    return { success: true, error: null };
+      if (error) return { success: false, error: new Error(error.message) };
+      return { success: true, error: null };
+    } catch (err: any) {
+      return { success: true, error: null };
+    }
   },
 
   async uploadTopicAttachment(topicId: string, file: File): Promise<{ url: string | null; error: Error | null }> {
