@@ -614,50 +614,50 @@ export const LoginPage: React.FC = () => {
                     Verify Authenticator Code & Enter
                   </Button>
 
-                  {/* Manual Setup Key Box */}
-                  <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-center space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-600 font-medium">Authenticator Setup Key (Manual Code):</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowQrModal(!showQrModal)}
-                        className="text-[11px] font-semibold text-emerald-700 hover:underline cursor-pointer flex items-center gap-1"
-                      >
-                        <QrCode className="w-3 h-3" />
-                        <span>{showQrModal ? 'Hide QR' : 'Show Setup QR'}</span>
-                      </button>
-                    </div>
+                  {/* Collapsed Pair New Device Option (Hidden by default because Authenticator is already set up) */}
+                  <div className="pt-1 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowQrModal(!showQrModal)}
+                      className="text-[11px] text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer inline-flex items-center gap-1"
+                    >
+                      <QrCode className="w-3 h-3" />
+                      <span>{showQrModal ? 'Hide Device Setup Key' : 'Pair a new phone or view setup key?'}</span>
+                    </button>
 
-                    <div className="flex items-center justify-center gap-2">
-                      <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
-                        {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026')}
-                      </code>
-                      <button
-                        type="button"
-                        onClick={handleCopySecret}
-                        className="p-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer"
-                        title="Copy Key"
-                      >
-                        {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+                    {showQrModal && (
+                      <div className="mt-2.5 p-3 bg-zinc-50 border border-zinc-200 rounded-2xl text-center space-y-2 animate-in fade-in duration-150">
+                        <span className="text-[11px] text-zinc-600 font-medium block">
+                          Authenticator Setup Key (Only for New Device):
+                        </span>
+                        <div className="flex items-center justify-center gap-2">
+                          <code className="text-xs font-mono font-bold text-zinc-900 bg-white px-2.5 py-1 rounded-lg border border-zinc-200 select-all">
+                            {tfaConfig?.secret || (roleMode === 'teacher' ? 'AHMADWEBCORE2345' : 'STUDENTSCHOLAR2026')}
+                          </code>
+                          <button
+                            type="button"
+                            onClick={handleCopySecret}
+                            className="p-1.5 rounded-lg bg-white border border-zinc-200 text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer"
+                            title="Copy Key"
+                          >
+                            {copiedSecret ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
 
-                    {showQrModal && qrCodeUrl && (
-                      <div className="pt-2 animate-in fade-in duration-200">
-                        <img
-                          src={qrCodeUrl}
-                          alt="Google Authenticator QR Code"
-                          className="w-36 h-36 mx-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-xs"
-                        />
-                        <p className="text-[10px] text-zinc-500 pt-1">
-                          Scan with Google Authenticator
-                        </p>
+                        {qrCodeUrl && (
+                          <div className="pt-1">
+                            <img
+                              src={qrCodeUrl}
+                              alt="Google Authenticator QR Code"
+                              className="w-32 h-32 mx-auto rounded-xl border border-zinc-200 bg-white p-1 shadow-xs"
+                            />
+                            <p className="text-[10px] text-zinc-500 pt-1">
+                              Scan once with Google Authenticator
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
-
-                    <p className="text-[11px] text-zinc-500 leading-tight">
-                      In Google Authenticator: tap <strong>+</strong> &gt; <strong>Enter a setup key</strong> &gt; paste this code.
-                    </p>
                   </div>
                 </form>
               )}
