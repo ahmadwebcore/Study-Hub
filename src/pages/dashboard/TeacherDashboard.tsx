@@ -10,6 +10,8 @@ import {
   Search,
   UserPlus,
   Upload,
+  GraduationCap,
+  ArrowRight,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
@@ -25,6 +27,9 @@ import { notificationService } from '../../services/notificationService';
 import { FebruarySprintTracker } from '../../components/planner/FebruarySprintTracker';
 import { BISEDGKhanBoardWidget } from '../../components/board/BISEDGKhanBoardWidget';
 import { MonthlyAttendanceReport } from '../../components/attendance/MonthlyAttendanceReport';
+import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
+import { TestItem } from '../../types';
+import { SAMPLE_TESTS } from '../../data/sampleData';
 
 const testSchema = z.object({
   title: z.string().min(3, 'Test title must be at least 3 characters'),
@@ -36,8 +41,9 @@ const testSchema = z.object({
 type TestFormData = z.infer<typeof testSchema>;
 
 export const TeacherDashboard: React.FC = () => {
-  const { user } = useRole();
+  const { user, switchToStudent, canSwitchRole } = useRole();
   const [tasks, setTasks] = useState<DailyTask[]>([]);
+  const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
   const [taskFilter, setTaskFilter] = useState<'all' | 'today' | 'awaiting' | 'approved'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isScheduleTestOpen, setIsScheduleTestOpen] = useState(false);
@@ -60,6 +66,17 @@ export const TeacherDashboard: React.FC = () => {
 
   useEffect(() => {
     loadTasks();
+    testService.fetchTests().then((t) => setTests(t || []));
+    const handleUpdate = () => {
+      loadTasks();
+      testService.fetchTests().then((t) => setTests(t || []));
+    };
+    window.addEventListener('studyhub_tests_updated', handleUpdate);
+    window.addEventListener('studyhub_tasks_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('studyhub_tests_updated', handleUpdate);
+      window.removeEventListener('studyhub_tasks_updated', handleUpdate);
+    };
   }, []);
 
   const {
@@ -258,6 +275,43 @@ export const TeacherDashboard: React.FC = () => {
             Email Student
           </button>
         </div>
+      </div>
+
+      {/* Faculty Perspective / Quick Student View Preview Switcher */}
+      {canSwitchRole && (
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-emerald-900 border border-emerald-500/40 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <GraduationCap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider bg-emerald-900/80 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                  Faculty Authority Active
+                </span>
+                <span className="text-xs text-zinc-300">Signed in as <strong>Sir Ahmad</strong></span>
+              </div>
+              <p className="text-xs text-zinc-300 mt-0.5">
+                Reviewing complete academic operations. You can switch to Henza Noor's view to see the student experience.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={switchToStudent}
+            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold text-xs shadow-xs transition-all cursor-pointer shrink-0 active:scale-95 flex items-center justify-center gap-1.5"
+            title="Preview how student sees the dashboard, test series, and quota"
+          >
+            <span>Preview Student Portal (Henza Noor)</span>
+            <ArrowRight className="w-4 h-4 text-emerald-950" />
+          </button>
+        </div>
+      )}
+
+      {/* Scheduled Daily Test Series Grid (15-Week Timetable • 30-Mark Tests) */}
+      <div className="space-y-2">
+        <DailyTestSeriesGrid tests={tests} />
       </div>
 
       {/* 3-Month Target Sprint & Daily Book Quota Engine */}

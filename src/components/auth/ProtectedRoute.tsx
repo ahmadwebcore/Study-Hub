@@ -26,9 +26,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
-  const hasPersistentSession =
-    !isExplicitLoggedOut &&
-    (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+  const hasSavedUser = !!localStorage.getItem('studyhub_logged_in_user');
+  const hasPersistentSession = !isExplicitLoggedOut && hasSavedUser && (!!user || !!profile);
 
   // If user is not authenticated and has no persistent session, redirect to login
   if (!hasPersistentSession) {

@@ -37,9 +37,8 @@ export const LoginPage: React.FC = () => {
 
   useEffect(() => {
     const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
-    const isAuthed =
-      !isExplicitLoggedOut &&
-      (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+    const hasSavedUser = !!localStorage.getItem('studyhub_logged_in_user');
+    const isAuthed = !isExplicitLoggedOut && hasSavedUser && (!!user || !!profile);
     if (isAuthed) {
       navigate('/dashboard', { replace: true });
     }
@@ -181,19 +180,11 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      // Faculty Lead direct access without authenticator challenge (User directive)
-      if (activeRole === 'teacher') {
-        completeTwoFactorAuth(cleanEmail, 'teacher');
-        setIsSubmitting(false);
-        navigate('/dashboard', { replace: true });
-        return;
-      }
-
-      // Student 2FA challenge: Enrolled scholar enters Google Authenticator or Manual Code
+      // Mandatory 2FA challenge for BOTH Teacher and Student: Google Authenticator / TOTP
       setVerifiedEmail(cleanEmail);
       sessionStorage.setItem(
         'studyhub_pending_2fa',
-        JSON.stringify({ email: cleanEmail, roleMode: 'student' })
+        JSON.stringify({ email: cleanEmail, roleMode: activeRole })
       );
 
       const config = twoFactorService.getConfig(cleanEmail);

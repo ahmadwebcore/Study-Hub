@@ -10,9 +10,8 @@ export const LandingPage: React.FC = () => {
 
   useEffect(() => {
     const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
-    const isAuthed =
-      !isExplicitLoggedOut &&
-      (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+    const hasSavedUser = !!localStorage.getItem('studyhub_logged_in_user');
+    const isAuthed = !isExplicitLoggedOut && hasSavedUser && (!!user || !!profile);
     if (isAuthed) {
       navigate('/dashboard', { replace: true });
     }

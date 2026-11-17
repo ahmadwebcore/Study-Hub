@@ -36,9 +36,8 @@ import { useAuth } from '../contexts/AuthContext';
 export const AppRoutes: React.FC = () => {
   const { user, profile } = useAuth();
   const isExplicitLoggedOut = localStorage.getItem('studyhub_logged_out') === 'true';
-  const isAuthenticated =
-    !isExplicitLoggedOut &&
-    (!!user || !!profile || !!localStorage.getItem('studyhub_logged_in_user'));
+  const hasSavedUser = !!localStorage.getItem('studyhub_logged_in_user');
+  const isAuthenticated = !isExplicitLoggedOut && hasSavedUser && (!!user || !!profile);
 
   return (
     <Routes>

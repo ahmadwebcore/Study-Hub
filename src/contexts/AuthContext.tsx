@@ -416,13 +416,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const currentRole: UserRole = profile?.role || demoRole;
-  const currentUserProfile: UserProfile = profile || (demoRole === 'teacher' ? SAMPLE_TEACHER : SAMPLE_STUDENT);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        profile: currentUserProfile,
+        profile,
         role: currentRole,
         authenticatedRole,
         canSwitchRole,
