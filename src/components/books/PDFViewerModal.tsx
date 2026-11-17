@@ -18,6 +18,7 @@ import {
   Square,
   List,
   Search,
+  ExternalLink,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { generateBookPagesForTest, BookPageItem } from '../../data/bookPageGenerator';
@@ -66,6 +67,40 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     });
   }, [subjectCode, subjectName, testTitle, syllabusCoverage, pagesRange]);
 
+  // Resolve real downloaded official textbook PDF
+  const realPdfUrl = React.useMemo(() => {
+    if (pdfFileName && pdfFileName.startsWith('/books/')) return pdfFileName;
+    const code = (subjectCode || '').toUpperCase();
+    const title = (bookTitle || testTitle || '').toLowerCase();
+
+    if (code.includes('CSC') || title.includes('computer')) {
+      return '/books/computer_science_11_itseries.pdf';
+    }
+    if (code.includes('URD') || title.includes('urdu') || title.includes('سرمایہ')) {
+      if (title.includes('شرح') || title.includes('sharh')) {
+        return '/books/urdu_sarmaya_11_pctb.pdf';
+      }
+      return '/books/urdu_compulsory_11_pectaa.pdf';
+    }
+    if (code.includes('ENG') || title.includes('english')) {
+      if (title.includes('play') || title.includes('book 3') || title.includes('poem')) {
+        return '/books/english_11_book3_plays.pdf';
+      }
+      return '/books/english_11_book1_stories.pdf';
+    }
+    if (code.includes('TQM') || title.includes('quran') || title.includes('قرآن')) {
+      return '/books/tarjuma_tul_quran_11_pctb.pdf';
+    }
+    if (code.includes('ISL') || title.includes('islam') || title.includes('اسلامیات')) {
+      return '/books/islamiat_lazmi_11_pectaa.pdf';
+    }
+    if (code.includes('ECO') || title.includes('economic') || title.includes('معاشیات')) {
+      return '/books/principles_of_economics_11_pctb.pdf';
+    }
+    return '/books/urdu_compulsory_11_pectaa.pdf';
+  }, [subjectCode, pdfFileName, bookTitle, testTitle]);
+
+  const [viewerTab, setViewerTab] = useState<'real_pdf' | 'slices'>('real_pdf');
   const [activePageIndex, setActivePageIndex] = useState<number>(initialPage); // 1-based index (1 to totalPages)
   const [viewMode, setViewMode] = useState<'single' | 'continuous' | 'spread'>('single');
   const [showThumbnails, setShowThumbnails] = useState<boolean>(true);
@@ -117,8 +152,8 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = bookCoverUrl || '/covers/cover_urdu_ptb.jpg';
-    link.download = pdfFileName || bookSlice.pdfFileName;
+    link.href = realPdfUrl;
+    link.download = realPdfUrl.split('/').pop() || 'official_textbook.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -216,7 +251,105 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
           </div>
         </div>
 
-        {/* 2. READER TOOLBAR */}
+        {/* TAB SWITCHER: REAL SCANNED PDF vs CHAPTER SLICE */}
+        <div className="px-4 py-2 sm:px-6 bg-[#09090b] border-b border-white/10 flex items-center justify-between gap-3 shrink-0 text-xs">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setViewerTab('real_pdf')}
+              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewerTab === 'real_pdf'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>1. Official Scanned Book PDF (PCTB / Taleem360)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewerTab('slices')}
+              className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewerTab === 'slices'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'bg-white/5 text-zinc-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>2. Test Syllabus Slices ({totalPages} Pages)</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href={realPdfUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-emerald-300 font-semibold text-xs border border-white/10 transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              <span>Open Raw PDF in Tab</span>
+            </a>
+          </div>
+        </div>
+
+        {viewerTab === 'real_pdf' ? (
+          <div className="flex-1 w-full h-full flex flex-col bg-zinc-950 overflow-hidden relative">
+            <div className="px-4 py-2.5 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0">
+              <div className="flex items-center gap-2 text-zinc-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-bold text-white">Genuine Scanned Textbook PDF</span>
+                <span className="text-zinc-500 hidden md:inline">
+                  &bull; Official Punjab Curriculum &amp; Textbook Authority (PECTAA) Edition
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-[#09090b] border border-white/10 rounded-xl px-2.5 py-1">
+                  <span className="text-[11px] text-zinc-400 font-semibold">Page:</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={totalPages || 300}
+                    value={activePageIndex}
+                    onChange={(e) => setActivePageIndex(Math.max(1, Number(e.target.value) || 1))}
+                    className="w-12 bg-zinc-900 border border-white/10 rounded px-1 py-0.5 text-center text-xs font-mono font-bold text-emerald-400 focus:outline-none"
+                  />
+                  <span className="text-[11px] text-zinc-500 font-mono">/ {totalPages || 300}</span>
+                </div>
+
+                <a
+                  href={`${realPdfUrl}#page=${activePageIndex}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Full Screen View</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/10 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Book File</span>
+                </button>
+              </div>
+            </div>
+
+            <iframe
+              key={`real-pdf-${activePageIndex}`}
+              src={`${realPdfUrl}#page=${activePageIndex}&zoom=100`}
+              title="Official Scanned Textbook PDF"
+              className="flex-1 w-full h-full border-0 bg-zinc-900"
+            />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* 2. READER TOOLBAR */}
         <div className="px-4 py-2 sm:px-6 bg-[#18181b] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0 text-xs">
           {/* View Mode Switcher */}
           <div className="flex items-center gap-1.5 bg-[#09090b] p-1 rounded-xl border border-white/10">
@@ -473,6 +606,8 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             )}
           </div>
         </div>
+      </div>
+    )}
 
         {/* 4. MODAL FOOTER */}
         <div className="px-4 py-3 sm:px-6 bg-[#09090b] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 text-xs">

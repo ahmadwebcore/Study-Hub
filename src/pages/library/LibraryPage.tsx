@@ -333,11 +333,14 @@ export const LibraryPage: React.FC = () => {
       alert('Could not generate secure download link. Please verify your connection.');
       return;
     }
-    if (signedUrl.startsWith('#')) {
-      alert(`Initiating download for "${book.fileName}" (${book.fileSize})...`);
-      return;
-    }
-    window.open(signedUrl, '_blank');
+    const link = document.createElement('a');
+    link.href = signedUrl;
+    link.download = book.fileName || 'official_textbook.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setSuccessToast(`Downloading authentic textbook PDF: ${book.fileName}`);
+    setTimeout(() => setSuccessToast(null), 4000);
   };
 
   const handleDelete = async () => {

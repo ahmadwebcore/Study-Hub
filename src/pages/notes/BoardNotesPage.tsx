@@ -12,7 +12,11 @@ import {
   Layers,
   BookMarked,
   ShieldCheck,
+  Download,
+  ExternalLink,
+  FileText,
 } from 'lucide-react';
+import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 
 export interface BoardPaperMCQ {
   id: string;
@@ -580,8 +584,89 @@ export const BoardNotesPage: React.FC = () => {
 
   // Reader Modal State
   const [activeResource, setActiveResource] = useState<BoardResourceItem | null>(null);
-  const [activeModalTab, setActiveModalTab] = useState<'paper' | 'solutions' | 'pairing_scheme'>('paper');
+  const [activeModalTab, setActiveModalTab] = useState<'paper' | 'solutions' | 'pairing_scheme' | 'textbook_pdf'>('paper');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Genuine Scanned PDF Viewer Modal State (Taleem360 / PCTB)
+  const [viewingBookPdf, setViewingBookPdf] = useState<{
+    title: string;
+    subjectCode: string;
+    subjectName: string;
+    pdfFileName: string;
+  } | null>(null);
+
+  const getRealBookPdfInfo = (subjectCode: string, title: string = '') => {
+    const code = (subjectCode || '').toUpperCase();
+    const t = (title || '').toLowerCase();
+    if (code.includes('CSC') || t.includes('computer')) {
+      return {
+        title: 'Computer Science 11 (IT Series - Tariq Mahmood)',
+        pdfFileName: 'computer_science_11_itseries.pdf',
+        fileName: 'computer_science_11_itseries.pdf',
+        fileUrl: '/books/computer_science_11_itseries.pdf',
+        subjectCode: 'FAIT-CSC-11',
+        subjectName: 'Computer Science & Entrepreneurship',
+      };
+    }
+    if (code.includes('URD') || t.includes('urdu') || t.includes('سرمایہ')) {
+      return {
+        title: 'شرح سرمایہ اردو (پروفیسر راؤ خالد محمود)',
+        pdfFileName: 'urdu_sarmaya_11_pctb.pdf',
+        fileName: 'urdu_sarmaya_11_pctb.pdf',
+        fileUrl: '/books/urdu_sarmaya_11_pctb.pdf',
+        subjectCode: 'FAIT-URD-11',
+        subjectName: 'Urdu & Grammar',
+      };
+    }
+    if (code.includes('ENG') || t.includes('english')) {
+      return {
+        title: 'English 11 Book-1 Short Stories (PCTB)',
+        pdfFileName: 'english_11_book1_stories.pdf',
+        fileName: 'english_11_book1_stories.pdf',
+        fileUrl: '/books/english_11_book1_stories.pdf',
+        subjectCode: 'FAIT-ENG-11',
+        subjectName: 'English & Grammar',
+      };
+    }
+    if (code.includes('TQM') || t.includes('ترجمہ') || t.includes('quran')) {
+      return {
+        title: 'ترجمۃ القرآن المجید 11 (PCTB)',
+        pdfFileName: 'tarjuma_tul_quran_11_pctb.pdf',
+        fileName: 'tarjuma_tul_quran_11_pctb.pdf',
+        fileUrl: '/books/tarjuma_tul_quran_11_pctb.pdf',
+        subjectCode: 'FAIT-TQM-11',
+        subjectName: 'Tarjuma-tul-Quran',
+      };
+    }
+    if (code.includes('ISL') || t.includes('اسلامیات')) {
+      return {
+        title: 'اسلامیات لازمی 11 (PECTAA Punjab)',
+        pdfFileName: 'islamiat_lazmi_11_pectaa.pdf',
+        fileName: 'islamiat_lazmi_11_pectaa.pdf',
+        fileUrl: '/books/islamiat_lazmi_11_pectaa.pdf',
+        subjectCode: 'FAIT-ISL-11',
+        subjectName: 'Islamiyat Lazmi',
+      };
+    }
+    if (code.includes('ECO') || t.includes('معاشیات')) {
+      return {
+        title: 'اصولِ معاشیات 11 (علمی کتاب خانہ اردو بازار لاہور)',
+        pdfFileName: 'principles_of_economics_11_pctb.pdf',
+        fileName: 'principles_of_economics_11_pctb.pdf',
+        fileUrl: '/books/principles_of_economics_11_pctb.pdf',
+        subjectCode: 'FAIT-ECO-11',
+        subjectName: 'Principles of Economics',
+      };
+    }
+    return {
+      title: 'اُردو 11 درسی کتاب (PECTAA)',
+      pdfFileName: 'urdu_compulsory_11_pectaa.pdf',
+      fileName: 'urdu_compulsory_11_pectaa.pdf',
+      fileUrl: '/books/urdu_compulsory_11_pectaa.pdf',
+      subjectCode: 'FAIT-URD-11',
+      subjectName: 'Urdu & Grammar',
+    };
+  };
 
   // Upload Paper Modal State
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -886,12 +971,34 @@ export const BoardNotesPage: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 text-xs">
+              <div className="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <span className="text-[10px] text-zinc-500 font-mono">
-                  BISE DG Khan Verified
+                  BISE DG Khan &bull; PCTB / Taleem360
                 </span>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pdf = getRealBookPdfInfo(item.subjectCode, item.title);
+                      setViewingBookPdf(pdf);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-emerald-300 font-semibold text-xs border border-white/10 transition-colors cursor-pointer"
+                    title="View Authentic Scanned PDF Textbook / Key Book (Taleem360 / PCTB)"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Real PDF</span>
+                  </button>
+
+                  <a
+                    href={getRealBookPdfInfo(item.subjectCode, item.title).fileUrl}
+                    download={getRealBookPdfInfo(item.subjectCode, item.title).fileName}
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors border border-white/10 cursor-pointer"
+                    title={`Download Official PDF: ${getRealBookPdfInfo(item.subjectCode, item.title).fileName}`}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </a>
+
                   <button
                     type="button"
                     onClick={() => handleCopyResourceSummary(item)}
@@ -1012,6 +1119,19 @@ export const BoardNotesPage: React.FC = () => {
                       3. Official Pairing Blueprint
                     </button>
                   )}
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveModalTab('textbook_pdf')}
+                    className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      activeModalTab === 'textbook_pdf'
+                        ? 'bg-emerald-800 text-white shadow-xs'
+                        : 'bg-white text-zinc-700 hover:bg-zinc-200 border border-zinc-200'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>4. Scanned Textbook &amp; Key Book (Taleem360 / PCTB)</span>
+                  </button>
                 </div>
 
                 <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-500">
@@ -1336,6 +1456,43 @@ export const BoardNotesPage: React.FC = () => {
                     </div>
                   </div>
                 )}
+
+                {/* TAB 4: SCANNED TEXTBOOK & KEY BOOK PDF (TALEEM360 / PCTB) */}
+                {activeModalTab === 'textbook_pdf' && (
+                  <div className="h-[68vh] flex flex-col bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-300">
+                    <div className="px-4 py-2.5 bg-zinc-900 border-b border-white/10 flex items-center justify-between text-xs text-white">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="font-bold">Official Scanned Textbook / Key Book PDF</span>
+                        <span className="text-zinc-400 hidden sm:inline">&bull; Taleem360 / PCTB Authentic Edition</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={getRealBookPdfInfo(activeResource.subjectCode, activeResource.title).fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-xs"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Open Full Tab</span>
+                        </a>
+                        <a
+                          href={getRealBookPdfInfo(activeResource.subjectCode, activeResource.title).fileUrl}
+                          download={getRealBookPdfInfo(activeResource.subjectCode, activeResource.title).fileName}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/10"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download PDF</span>
+                        </a>
+                      </div>
+                    </div>
+                    <iframe
+                      src={`${getRealBookPdfInfo(activeResource.subjectCode, activeResource.title).fileUrl}#page=1&zoom=100`}
+                      title="Official Textbook PDF"
+                      className="flex-1 w-full h-full border-0 bg-zinc-900"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Modal Footer */}
@@ -1492,6 +1649,18 @@ export const BoardNotesPage: React.FC = () => {
           </div>,
           document.body
         )}
+
+      {/* 6. Authentic Scanned Textbook / Key Book PDF Viewer Modal (Taleem360 / PCTB) */}
+      {viewingBookPdf && (
+        <PDFViewerModal
+          isOpen={!!viewingBookPdf}
+          onClose={() => setViewingBookPdf(null)}
+          bookTitle={viewingBookPdf.title}
+          pdfFileName={viewingBookPdf.pdfFileName}
+          subjectCode={viewingBookPdf.subjectCode}
+          subjectName={viewingBookPdf.subjectName}
+        />
+      )}
     </div>
   );
 };

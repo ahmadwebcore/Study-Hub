@@ -293,7 +293,11 @@ export const bookService = {
 
   async getSignedDownloadUrl(filePath: string): Promise<{ signedUrl: string | null; error: Error | null }> {
     if (!isSupabaseConfigured()) {
-      return { signedUrl: '#preview-download', error: null };
+      if (filePath && (filePath.startsWith('/') || filePath.startsWith('http') || filePath.startsWith('books/'))) {
+        const cleanPath = filePath.startsWith('/') ? filePath : `/${filePath}`;
+        return { signedUrl: cleanPath, error: null };
+      }
+      return { signedUrl: filePath || '/books/computer_science_11_itseries.pdf', error: null };
     }
 
     const { data, error } = await supabase.storage
