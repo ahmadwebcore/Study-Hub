@@ -124,7 +124,7 @@ export const NotificationDropdown: React.FC = () => {
         navigate('/library');
         break;
       case 'schedule':
-        navigate('/weekly-tasks');
+        navigate('/tests');
         break;
       case 'chat':
         navigate('/chat');

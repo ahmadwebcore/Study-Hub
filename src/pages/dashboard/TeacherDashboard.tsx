@@ -247,7 +247,7 @@ export const TeacherDashboard: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            to="/weekly-tasks"
+            to="/tests"
             className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 rounded-xl hover:bg-emerald-900/60 transition-colors shadow-2xs"
           >
             <Upload className="w-3.5 h-3.5 text-emerald-400" />

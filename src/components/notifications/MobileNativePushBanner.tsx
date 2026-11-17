@@ -119,7 +119,7 @@ export const MobileNativePushBanner: React.FC = () => {
     } else if (notif.category === 'test') {
       navigate('/test-submit');
     } else if (notif.category === 'assignment' || notif.category === 'schedule') {
-      navigate('/weekly-tasks');
+      navigate('/tests');
     } else {
       navigate('/dashboard');
     }
