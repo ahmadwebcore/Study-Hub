@@ -391,6 +391,70 @@ export const StudyBotWidget: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Quick AI Command Actions Pill Bar */}
+          <div className="px-3 py-1.5 bg-zinc-50 border-t border-zinc-200/80 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <Zap className="w-3 h-3 text-amber-500" />
+              Quick:
+            </span>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_unl', label: 'Unlock Test', actionType: 'unlock_today_test' })}
+              className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Unlock today's 30-mark test immediately"
+            >
+              🔓 Unlock Test
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_resch', label: 'Reschedule', actionType: 'reschedule_test' })}
+              className="px-2 py-0.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Shift test to next date"
+            >
+              📅 Reschedule
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_fix', label: 'Fix Issues', actionType: 'resolve_schedule_issues' })}
+              className="px-2 py-0.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Auto-resolve any schedule or timetable conflicts"
+            >
+              🛠️ Fix Issues
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_att', label: 'Attendance', actionType: 'mark_attendance' })}
+              className="px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Mark today's attendance present"
+            >
+              ✅ Hazri
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_quota', label: 'Approve Quota', actionType: 'complete_today_task' })}
+              className="px-2 py-0.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Approve 2.5 pages reading quota"
+            >
+              📚 Quota Done
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_retest', label: 'Allow Retest', actionType: 'allow_retest' })}
+              className="px-2 py-0.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Reset test attempt for a fresh retry"
+            >
+              🔄 Allow Retest
+            </button>
+            <button
+              type="button"
+              onClick={() => handleActionClick({ id: 'btn_gs', label: 'Sync Sheet', actionType: 'sync_google_sheet' })}
+              className="px-2 py-0.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-[10px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer shadow-2xs"
+              title="Upload row to real-time Google Sheet"
+            >
+              📊 Sync Sheet
+            </button>
+          </div>
+
           {/* Input Box */}
           <form
             onSubmit={(e) => {

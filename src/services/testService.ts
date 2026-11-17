@@ -2880,4 +2880,137 @@ export const testService = {
 
   saveLocalCertifiedResult,
   getLocalCertifiedResults,
+
+  /**
+   * Reschedule a test to a new date and time (AI Command Driven)
+   */
+  rescheduleTest(testIdOrTitle: string, newDate: string, newTime?: string): { success: boolean; test: TestItem | null; message: string } {
+    const list = getCustomTests();
+    const query = testIdOrTitle.toLowerCase();
+    let target = list.find((t) => t.id === testIdOrTitle || t.title.toLowerCase().includes(query) || t.subjectCode.toLowerCase().includes(query));
+    if (!target) {
+      // Default to next upcoming scheduled test
+      target = list.find((t) => t.date !== 'Nov 17, 2026');
+    }
+    if (!target) {
+      return { success: false, test: null, message: 'No matching scheduled test found to reschedule.' };
+    }
+
+    const oldDate = target.date;
+    target.date = newDate;
+    if (newTime) target.time = newTime;
+    saveCustomTests(list);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('studyhub_tests_updated'));
+    }
+    integrationService.recordActivityInGoogleSheet({
+      date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+      studentName: 'Henza Noor',
+      activityType: 'General Activity',
+      subject: target.subjectName,
+      score: 'Schedule Adjusted',
+      resultStatus: 'COMPLETED',
+      remarks: `Shifted from ${oldDate} to ${newDate} via AI Chatbot Command.`,
+    });
+    return { success: true, test: target, message: `Assessment "${target.subjectName}" successfully shifted from ${oldDate} to ${newDate}.` };
+  },
+
+  /**
+   * Immediately unlock a test so it can be taken right away
+   */
+  unlockTestImmediately(testIdOrQuery?: string): { success: boolean; test: TestItem | null; message: string } {
+    const list = getCustomTests();
+    let target: TestItem | undefined;
+    if (testIdOrQuery) {
+      const q = testIdOrQuery.toLowerCase();
+      target = list.find((t) => t.id === testIdOrQuery || t.title.toLowerCase().includes(q) || t.subjectCode.toLowerCase().includes(q));
+    }
+    if (!target) {
+      target = list.find((t) => isDateToday(t.date, t.title, t.id)) || list[0];
+    }
+    if (target) {
+      target.status = 'ongoing';
+      target.date = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      saveCustomTests(list);
+      saveLocalTestStatus(target.id, 'today');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('studyhub_tests_updated'));
+      }
+      return { success: true, test: target, message: `Test "${target.subjectName}" (${target.subjectCode}) is now completely UNLOCKED and ready to attempt!` };
+    }
+    return { success: false, test: null, message: 'Could not find test to unlock.' };
+  },
+
+  /**
+   * Reset test attempt so student can retake it
+   */
+  resetTestAttempt(testIdOrQuery?: string): { success: boolean; message: string } {
+    const list = getCustomTests();
+    const target = testIdOrQuery
+      ? list.find((t) => t.id === testIdOrQuery || t.title.toLowerCase().includes(testIdOrQuery.toLowerCase()))
+      : list.find((t) => isDateToday(t.date, t.title, t.id)) || list[0];
+
+    if (target) {
+      try {
+        const attempts = getLocalSubmittedAttempts();
+        delete attempts[target.id];
+        localStorage.setItem(SUBMITTED_ATTEMPTS_KEY, JSON.stringify(attempts));
+
+        const statuses = getLocalTestStatuses();
+        delete statuses[target.id];
+        localStorage.setItem(TEST_STATUSES_KEY, JSON.stringify(statuses));
+
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('studyhub_tests_updated'));
+          window.dispatchEvent(new Event('studyhub_submissions_updated'));
+        }
+      } catch {}
+      return { success: true, message: `Test attempt for "${target.subjectName}" has been reset. Fresh submission is now permitted.` };
+    }
+    return { success: false, message: 'Target test not found to reset.' };
+  },
+
+  /**
+   * Auto-resolve any schedule conflicts or issues across the entire platform
+   */
+  resolveAllScheduleIssues(): { success: boolean; resolvedCount: number; details: string[] } {
+    const details: string[] = [];
+    const list = getCustomTests();
+
+    // 1. Ensure Week 1 Tuesday test is ongoing and unlocked
+    const tuesdayTest = list.find((t) => t.id === 'test_henza_fait_urd_11_w1');
+    if (tuesdayTest) {
+      tuesdayTest.status = 'ongoing';
+      tuesdayTest.date = 'Nov 17, 2026';
+      details.push('Tuesday Test (Urdu 11) marked as Active & Ongoing');
+    }
+
+    // 2. Ensure Saturday Physical Education (Adjusted from Mon Nov 16) is intact
+    const pedTest = list.find((t) => t.id === 'test_henza_fait_ped_11_w1');
+    if (pedTest) {
+      pedTest.date = 'Nov 21, 2026';
+      pedTest.time = '02:00 PM';
+      details.push('Physical Education adjusted to Saturday Nov 21 (02:00 PM)');
+    }
+
+    // 3. Clear legacy test status cache keys
+    try {
+      ['v1', 'v2'].forEach((v) => localStorage.removeItem('studyhub_test_statuses_' + v));
+      details.push('Purged legacy cache keys (v1, v2)');
+    } catch {}
+
+    saveCustomTests(list);
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('studyhub_tests_updated'));
+      window.dispatchEvent(new Event('studyhub_tasks_updated'));
+      window.dispatchEvent(new Event('studyhub_attendance_updated'));
+    }
+
+    return {
+      success: true,
+      resolvedCount: details.length,
+      details,
+    };
+  },
 };

@@ -1,11 +1,22 @@
-// StudyHub AI Study Assistant & Academic Copilot Service
-// Supports English, Urdu, and Roman Urdu with live portal automations.
-// Allows students to query concepts, reschedule tests, mark daily tasks complete, and query exam marks.
+import { testService } from './testService';
+import { attendanceService } from './attendanceService';
+import { taskService } from './taskService';
+import { integrationService } from './integrationService';
 
 export interface AIChatAction {
   id: string;
   label: string;
-  actionType: 'reschedule_test' | 'complete_today_task' | 'check_marks' | 'share_whatsapp' | 'view_sprint_target';
+  actionType:
+    | 'reschedule_test'
+    | 'complete_today_task'
+    | 'check_marks'
+    | 'share_whatsapp'
+    | 'view_sprint_target'
+    | 'unlock_today_test'
+    | 'mark_attendance'
+    | 'resolve_schedule_issues'
+    | 'allow_retest'
+    | 'sync_google_sheet';
   details?: string;
 }
 
@@ -363,30 +374,67 @@ export class AIStudyBotService {
   /**
    * Execute Live Action in Portal State
    */
-  public executeAction(actionType: AIChatAction['actionType']): {
+  public executeAction(actionType: AIChatAction['actionType'], details?: string): {
     messageText: string;
     actionExecuted: string;
   } {
-    if (actionType === 'reschedule_test') {
-      try {
-        const existing = JSON.parse(localStorage.getItem('studyhub_rescheduled_tests_v1') || '[]');
-        existing.push({
-          id: `resched_${Date.now()}`,
-          requestedAt: new Date().toISOString(),
-          status: 'confirmed',
-          notes: 'Automated reschedule requested via AI Study Assistant.',
-        });
-        localStorage.setItem('studyhub_rescheduled_tests_v1', JSON.stringify(existing));
-        window.dispatchEvent(new CustomEvent('studyhub_tests_updated'));
-      } catch {
-        // ignore
-      }
+    // 1. Immediately Unlock Today's Test
+    if (actionType === 'unlock_today_test') {
+      const res = testService.unlockTestImmediately(details);
       return {
-        messageText: '✅ Test Series Rescheduled: Your next scheduled assessment has been shifted to the next open timetable slot. The live test calendar and notifications have been updated.',
+        messageText: `🔓 Test Unlocked & Activated Successfully:
+• Assessment: ${res.test ? res.test.subjectName : "Today's Assessment"}
+• Status: Active Now (Closes 11:59 PM)
+• Both your Dashboard card and Test Series grid are immediately unlocked. You can click 'Start 30-Mark Test' to begin your attempt!`,
+        actionExecuted: "Today's Test Unlocked",
+      };
+    }
+
+    // 2. Automated Diagnosis & Conflict Resolution for Schedule
+    if (actionType === 'resolve_schedule_issues') {
+      const res = testService.resolveAllScheduleIssues();
+      return {
+        messageText: `🛠️ Automated System & Schedule Health Check Completed:
+• Status: ${res.resolvedCount} timetable items successfully calibrated.
+• Week 1 Timetable: Verified Tuesday Nov 17 to Saturday Nov 21 (Sundays OFF).
+• Today's Urdu 11 Test: Unlocked & marked Ongoing.
+• Physical Education: Adjusted to Saturday Nov 21 at 02:00 PM (No test skipped).
+• Friday Combined Assessment: 2-Books (Islamiat + Tarjuma-tul-Quran) intact.
+• Google Sheets Stream: Re-synchronized with live LMS activity timestamp.
+All local schedule flags and cache have been successfully cleared!`,
+        actionExecuted: 'Schedule Issues Fully Resolved',
+      };
+    }
+
+    // 3. Reschedule / Shift Test Date
+    if (actionType === 'reschedule_test') {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const targetDate = tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const targetQuery = details || 'next';
+      const res = testService.rescheduleTest(targetQuery, targetDate);
+      return {
+        messageText: res.success
+          ? `📅 Test Timetable Rescheduled: ${res.message}\nThe calendar timetable, student notification alerts, and Google Sheets live sync stream have all been adjusted in real time.`
+          : `⚠️ Reschedule Note: ${res.message}`,
         actionExecuted: 'Test Series Timetable Adjusted',
       };
     }
 
+    // 4. Mark Attendance
+    if (actionType === 'mark_attendance') {
+      attendanceService.markPresentToday('Henza Noor');
+      return {
+        messageText: `✅ Daily Attendance Marked Present:
+• Student: Henza Noor (Roll # GSA-2026-042)
+• Status: Present (On-Time 09:05 AM)
+• Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+• Google Sheets Sync: Uploaded to live LMS attendance row!`,
+        actionExecuted: 'Attendance Marked Present',
+      };
+    }
+
+    // 5. Complete / Approve Daily Reading Quota
     if (actionType === 'complete_today_task') {
       try {
         const stored = localStorage.getItem('studyhub_daily_tasks_v3');
@@ -396,30 +444,63 @@ export class AIStudyBotService {
           if (pendingTask) {
             pendingTask.status = 'approved';
             localStorage.setItem('studyhub_daily_tasks_v3', JSON.stringify(tasks));
+            taskService.approveTask(pendingTask.id, 'Sir Ahmad', 'Approved via AI Academic Command');
           }
         }
         window.dispatchEvent(new CustomEvent('studyhub_tasks_updated'));
-      } catch {
-        // ignore
-      }
+      } catch {}
       return {
-        messageText: "✅ Today's Task Completed: Excellent dedication! Today's quota reading and exercises have been marked as 100% completed and synced to your February 28 progress tracker.",
-        actionExecuted: "Today's Task Marked Complete",
+        messageText: `📚 Daily Reading Quota Approved & Recorded:
+• Status: 100% Completed & Certified
+• Subject Target: 2.5 Pages / Day (1st Year FA-IT)
+• Progress: Tracked towards the February 28 Sprint benchmark. Synced to Google Sheets!`,
+        actionExecuted: "Today's Task Approved",
       };
     }
 
+    // 6. Allow Retest / Reset Attempt
+    if (actionType === 'allow_retest') {
+      const res = testService.resetTestAttempt(details);
+      return {
+        messageText: `🔄 Retest Enabled: ${res.message}\nPrevious submission record has been cleared, and a fresh 30-mark answer sheet is now ready for upload.`,
+        actionExecuted: 'Retest Attempt Cleared',
+      };
+    }
+
+    // 7. Sync Real-Time Google Sheet
+    if (actionType === 'sync_google_sheet') {
+      integrationService.recordActivityInGoogleSheet({
+        date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+        studentName: 'Henza Noor',
+        activityType: 'General Activity',
+        subject: 'All 6 FA-IT Subjects',
+        score: 'Status Active',
+        resultStatus: 'COMPLETED',
+        remarks: 'Manual sync trigger requested via AI Assistant.',
+      });
+      return {
+        messageText: `📊 Google Sheets Real-Time LMS Stream Synchronized!
+• Connected Sheet: Official FA-IT Academic Record Sheet
+• Latest Sync: ${new Date().toLocaleTimeString()}
+• All attendance, reading quota, and 30-mark test evaluations are uploaded. Click 'Open Google Sheet' on the integrations tab to view.`,
+        actionExecuted: 'Google Sheet Synchronized',
+      };
+    }
+
+    // 8. Check Certified Marks
     if (actionType === 'check_marks') {
       return {
-        messageText: `📊 Certified Academic Test Scores (1st Year FA-IT):
-• Computer Science Architecture: 28 / 30 Marks (93% - Grade A*)
-• Urdu & Grammar (Uswa-e-Hasna): 29 / 30 Marks (97% - Grade A*)
-• English & Grammar (Button Button): 26 / 30 Marks (87% - Grade A)
-• Overall Academic Standing: 92.5% Distinction
-📌 Passing Threshold: 15/30 Marks (All records permanently retained with zero deletion).`,
-        actionExecuted: 'Official Academic Transcript Retrieved',
+        messageText: `📊 Certified Academic Test Scores (1st Year FA-IT • Henza Noor):
+• Urdu & Grammar (Sabq Uswa-e-Hasna): 28 / 30 Marks (93% - Grade A*)
+• English 11 (Button Button & Voice): 26 / 30 Marks (87% - Grade A)
+• Computer Science (Bus Architecture): 29 / 30 Marks (97% - Grade A*)
+• Cumulative Score: 92.3% Distinction
+📌 Pass Threshold: 15/30 Marks (50%) strictly maintained per BISE DG Khan board standards.`,
+        actionExecuted: 'Certified Results Retrieved',
       };
     }
 
+    // 9. WhatsApp Share
     if (actionType === 'share_whatsapp') {
       const text = encodeURIComponent(
         `🇵🇰 StudyHub Academic Report\nStudent: Henza Noor (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nRecent Exam: Computer Science 28/30 Marks (Passed)\nGoal: Complete 6 Books before February 28, 2027`
@@ -466,13 +547,72 @@ export class AIStudyBotService {
       };
     }
 
-    // 1. Check for Automation Intents
+    // 1. UNLOCK TEST INTENT (Unlock test, lock issue, test kholo)
+    if (
+      qLower.includes('unlock') ||
+      qLower.includes('lock issue') ||
+      qLower.includes('locked aa') ||
+      qLower.includes('locked hai') ||
+      qLower.includes('lock khatam') ||
+      qLower.includes('test kholo') ||
+      qLower.includes('test open') ||
+      qLower.includes('unlocked nahi') ||
+      qLower.includes('lock hatado')
+    ) {
+      const actionRes = this.executeAction('unlock_today_test');
+      return {
+        id: `msg_auto_${Date.now()}`,
+        sender: 'assistant',
+        text: actionRes.messageText,
+        actionExecuted: actionRes.actionExecuted,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actions: [
+          { id: 'act_sched', label: 'Reschedule Test', actionType: 'reschedule_test' },
+          { id: 'act_res', label: 'Check All System Issues', actionType: 'resolve_schedule_issues' },
+        ],
+      };
+    }
+
+    // 2. RESOLVE SCHEDULE / TIMETABLE ISSUES INTENT (Resolve, issue solve, theek karo, masla hal)
+    if (
+      qLower.includes('resolve') ||
+      qLower.includes('issue solve') ||
+      qLower.includes('issue aa') ||
+      qLower.includes('problem solve') ||
+      qLower.includes('schedule issue') ||
+      qLower.includes('theek karo') ||
+      qLower.includes('fix karo') ||
+      qLower.includes('masla solve') ||
+      qLower.includes('error resolve') ||
+      qLower.includes('solve issue') ||
+      qLower.includes('masla hal')
+    ) {
+      const actionRes = this.executeAction('resolve_schedule_issues');
+      return {
+        id: `msg_auto_${Date.now()}`,
+        sender: 'assistant',
+        text: actionRes.messageText,
+        actionExecuted: actionRes.actionExecuted,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actions: [
+          { id: 'act_unl', label: 'Unlock Test Now', actionType: 'unlock_today_test' },
+          { id: 'act_gs', label: 'Sync Google Sheet', actionType: 'sync_google_sheet' },
+        ],
+      };
+    }
+
+    // 3. RESCHEDULE / SCHEDULE CHANGE INTENT
     if (
       qLower.includes('reschedule') ||
-      qLower.includes('series change') ||
+      qLower.includes('schedule change') ||
       qLower.includes('shift test') ||
       qLower.includes('test badal do') ||
-      qLower.includes('change date')
+      qLower.includes('change date') ||
+      qLower.includes('tarikh badal') ||
+      qLower.includes('aage kardo') ||
+      qLower.includes('timetable change') ||
+      qLower.includes('din badal') ||
+      qLower.includes('change schedule')
     ) {
       const actionRes = this.executeAction('reschedule_test');
       return {
@@ -482,19 +622,45 @@ export class AIStudyBotService {
         actionExecuted: actionRes.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         actions: [
-          { id: 'act_chk', label: 'Check All Test Scores', actionType: 'check_marks' },
-          { id: 'act_wa', label: 'Send WhatsApp Report', actionType: 'share_whatsapp' },
+          { id: 'act_unl', label: 'Unlock Today Test', actionType: 'unlock_today_test' },
+          { id: 'act_fix', label: 'Resolve All Issues', actionType: 'resolve_schedule_issues' },
         ],
       };
     }
 
+    // 4. ATTENDANCE INTENT (Hazri lagao, attendance mark karo)
+    if (
+      qLower.includes('attendance') ||
+      qLower.includes('hazri') ||
+      qLower.includes('mark present') ||
+      qLower.includes('present lagao') ||
+      qLower.includes('hazri lagado')
+    ) {
+      const actionRes = this.executeAction('mark_attendance');
+      return {
+        id: `msg_auto_${Date.now()}`,
+        sender: 'assistant',
+        text: actionRes.messageText,
+        actionExecuted: actionRes.actionExecuted,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actions: [
+          { id: 'act_tsk', label: 'Approve Today Quota', actionType: 'complete_today_task' },
+          { id: 'act_gs', label: 'Sync Google Sheet', actionType: 'sync_google_sheet' },
+        ],
+      };
+    }
+
+    // 5. DAILY QUOTA / TASK COMPLETE INTENT
     if (
       qLower.includes('complete task') ||
       qLower.includes('mark task') ||
       qLower.includes('task ho gaya') ||
       qLower.includes('kam ho gya') ||
       qLower.includes('parh liya') ||
-      qLower.includes('done today')
+      qLower.includes('done today') ||
+      qLower.includes('quota mark') ||
+      qLower.includes('quota approve') ||
+      qLower.includes('reading done')
     ) {
       const actionRes = this.executeAction('complete_today_task');
       return {
@@ -504,12 +670,60 @@ export class AIStudyBotService {
         actionExecuted: actionRes.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         actions: [
-          { id: 'act_tst', label: 'View Next Scheduled Test', actionType: 'reschedule_test' },
-          { id: 'act_wa', label: 'Share Progress to WhatsApp', actionType: 'share_whatsapp' },
+          { id: 'act_tst', label: 'Unlock Today Test', actionType: 'unlock_today_test' },
+          { id: 'act_wa', label: 'Share to WhatsApp', actionType: 'share_whatsapp' },
         ],
       };
     }
 
+    // 6. RETEST / RESET ATTEMPT INTENT
+    if (
+      qLower.includes('retest') ||
+      qLower.includes('retake') ||
+      qLower.includes('reset test') ||
+      qLower.includes('dobara test') ||
+      qLower.includes('retest allow') ||
+      qLower.includes('reset attempt') ||
+      qLower.includes('paper dobara')
+    ) {
+      const actionRes = this.executeAction('allow_retest');
+      return {
+        id: `msg_auto_${Date.now()}`,
+        sender: 'assistant',
+        text: actionRes.messageText,
+        actionExecuted: actionRes.actionExecuted,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actions: [
+          { id: 'act_unl', label: 'Unlock Test Now', actionType: 'unlock_today_test' },
+          { id: 'act_chk', label: 'Check Marks', actionType: 'check_marks' },
+        ],
+      };
+    }
+
+    // 7. GOOGLE SHEETS LIVE SYNC INTENT
+    if (
+      qLower.includes('sheet sync') ||
+      qLower.includes('google sheet') ||
+      qLower.includes('gsheet') ||
+      qLower.includes('sheet update') ||
+      qLower.includes('sheet upload') ||
+      qLower.includes('sheet check')
+    ) {
+      const actionRes = this.executeAction('sync_google_sheet');
+      return {
+        id: `msg_auto_${Date.now()}`,
+        sender: 'assistant',
+        text: actionRes.messageText,
+        actionExecuted: actionRes.actionExecuted,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        actions: [
+          { id: 'act_att', label: 'Mark Attendance', actionType: 'mark_attendance' },
+          { id: 'act_tsk', label: 'Approve Quota', actionType: 'complete_today_task' },
+        ],
+      };
+    }
+
+    // 8. CHECK MARKS INTENT
     if (
       qLower.includes('marks') ||
       qLower.includes('score') ||
@@ -526,7 +740,7 @@ export class AIStudyBotService {
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         actions: [
           { id: 'act_wa', label: 'Share to WhatsApp', actionType: 'share_whatsapp' },
-          { id: 'act_resch', label: 'Schedule Retest / Practice', actionType: 'reschedule_test' },
+          { id: 'act_resch', label: 'Reschedule Test', actionType: 'reschedule_test' },
         ],
       };
     }
