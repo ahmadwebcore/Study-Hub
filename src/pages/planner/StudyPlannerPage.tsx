@@ -69,7 +69,7 @@ export const StudyPlannerPage: React.FC = () => {
   const { role, user } = useRole();
   const [activeTab, setActiveTab] = useState<'calendar' | 'plans'>('calendar');
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('day');
-  const [selectedDate, setSelectedDate] = useState<string>('2026-11-12');
+  const [selectedDate, setSelectedDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
   const [sessions, setSessions] = useState<StudySession[]>(SAMPLE_TODAY_SCHEDULE);
   const [studyPlans, setStudyPlans] = useState<StudyPlan[]>(SAMPLE_STUDY_PLANS);
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
@@ -345,16 +345,21 @@ export const StudyPlannerPage: React.FC = () => {
   const targetMinutes = 210; // 3.5 hrs
   const progressPercent = Math.min(100, Math.round((completedMinutes / targetMinutes) * 100));
 
-  // Week Days (Nov 09 to Nov 15, 2026)
-  const weekDays = [
-    { label: 'Mon', date: '2026-11-09' },
-    { label: 'Tue', date: '2026-11-10' },
-    { label: 'Wed', date: '2026-11-11' },
-    { label: 'Thu', date: '2026-11-12' },
-    { label: 'Fri', date: '2026-11-13' },
-    { label: 'Sat', date: '2026-11-14' },
-    { label: 'Sun', date: '2026-11-15' },
-  ];
+  // Dynamically compute current week days (Mon-Sun) based on selectedDate
+  const currentSelectedObj = new Date(selectedDate);
+  const currentDayOfWeek = currentSelectedObj.getDay(); // 0 is Sun, 1 is Mon
+  const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+  const mondayDate = new Date(currentSelectedObj);
+  mondayDate.setDate(currentSelectedObj.getDate() + mondayOffset);
+
+  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((label, idx) => {
+    const d = new Date(mondayDate);
+    d.setDate(mondayDate.getDate() + idx);
+    return {
+      label,
+      date: d.toISOString().slice(0, 10),
+    };
+  });
 
   // Month Days (Nov 2026: 30 days)
   const monthDays = Array.from({ length: 30 }, (_, i) => {

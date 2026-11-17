@@ -48,8 +48,10 @@ type TopicFormData = z.infer<typeof topicSchema>;
 export const SyllabusPage: React.FC = () => {
   const { role, user } = useRole();
   const [subjects, setSubjects] = useState<Subject[]>(SAMPLE_SUBJECTS);
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_04');
-  const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(SAMPLE_SYLLABUS);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>('sub_02');
+  const [syllabusList, setSyllabusList] = useState<SyllabusUnit[]>(() =>
+    SAMPLE_SYLLABUS.filter((u) => u.subjectId === 'sub_02')
+  );
   const [selectedChapterId, setSelectedChapterId] = useState<string>('all');
   const [selectedTopicStatus, setSelectedTopicStatus] = useState<string>('all');
   const [activeNotesTopic, setActiveNotesTopic] = useState<{ topic: SyllabusTopic; unitTitle: string } | null>(null);
@@ -87,8 +89,8 @@ export const SyllabusPage: React.FC = () => {
   useEffect(() => {
     let mounted = true;
     syllabusService.fetchHierarchicalSyllabus(selectedSubjectId, user?.id).then((data) => {
-      if (mounted && data && data.length > 0) {
-        setSyllabusList(data);
+      if (mounted) {
+        setSyllabusList(data || []);
       }
     });
     return () => {

@@ -16,6 +16,7 @@ import {
   Share2,
   Eye,
   X,
+  FileText,
 } from 'lucide-react';
 import { useRole } from '../../hooks/useRole';
 import { cn } from '../../lib/utils';
@@ -52,6 +53,7 @@ const navSections: NavSection[] = [
     items: [
       { name: 'Daily Tasks & Quota', path: '/weekly-tasks', icon: CalendarDays, badge: 'Sundays OFF', badgeVariant: 'holiday' },
       { name: 'Syllabus & Targets', path: '/syllabus', icon: ListTree, badge: 'Feb 28' },
+      { name: 'Board Notes & Papers', path: '/notes', icon: FileText, badge: 'DG Khan', badgeVariant: 'primary' },
       { name: 'Book Library', path: '/library', icon: Library, badge: 'DG Khan' },
       { name: 'Media Center', path: '/media', icon: FolderArchive },
       { name: 'Results & Report Cards', path: '/results', icon: Award },

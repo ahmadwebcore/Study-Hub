@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  FileCheck2,
   CheckCircle2,
-  Check,
   MessageSquare,
   GraduationCap,
   Compass,
   Layers,
   ArrowRight,
-  Clock,
   Award,
   ChevronRight,
   ShieldCheck,
@@ -23,7 +20,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
 import { taskService, DailyTask } from '../../services/taskService';
-import { testService, extractDayAndCleanTitle, isDateToday } from '../../services/testService';
+import { testService } from '../../services/testService';
 import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
@@ -36,7 +33,7 @@ export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
   const studentName = userProfile?.fullName || userProfile?.name || user?.name || 'Henza Noor';
 
-  const [tasks, setTasks] = useState<DailyTask[]>([]);
+  const [, setTasks] = useState<DailyTask[]>([]);
   const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
   const [results, setResults] = useState<ResultRecord[]>([]);
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -72,10 +69,10 @@ export const StudentDashboard: React.FC = () => {
     window.addEventListener('studyhub_attendance_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
 
-    // Check if daily welcome modal has already been shown today
-    const welcomeKey = `gsa_daily_welcome_${todayStr}`;
-    const alreadyShown = localStorage.getItem(welcomeKey);
-    if (!alreadyShown) {
+    // Automated 24-hour attendance check:
+    // If today's attendance has not been recorded yet (even for already logged-in users),
+    // automatically prompt the Attendance Check-in Briefing popup!
+    if (!attendanceService.isTodayMarked()) {
       setIsDailyWelcomeOpen(true);
     }
 
@@ -109,22 +106,20 @@ export const StudentDashboard: React.FC = () => {
     }
   };
 
-  // 15-second live ticker to keep today's active test and timers updated across midnight
+  // 15-second live ticker to keep today's active test, timers, and 24h attendance detection reactive across midnight
   const [, setTick] = useState<number>(Date.now());
   useEffect(() => {
-    const timer = setInterval(() => setTick(Date.now()), 15000);
+    const timer = setInterval(() => {
+      setTick(Date.now());
+      const isMarked = attendanceService.isTodayMarked();
+      setIsTodayPresent(isMarked);
+      // Auto-trigger attendance popup if a new day begins or 24 hours roll over while logged in
+      if (!isMarked && !isDailyWelcomeOpen) {
+        setIsDailyWelcomeOpen(true);
+      }
+    }, 15000);
     return () => clearInterval(timer);
-  }, []);
-
-  const todayTasks = tasks.filter(
-    (t) => t.dueDate === todayStr || (!t.isSundayOff && !t.isPakistanHoliday && t.status === 'pending')
-  );
-  const activeTodayTask = todayTasks[0];
-  const activeTodayTest =
-    tests.find((t) => isDateToday(t.date, t.title, t.id) && t.status !== 'graded') ||
-    tests.find((t) => t.status === 'ongoing') ||
-    tests.find((t) => t.id.includes('urd_11_w1')) ||
-    tests[0];
+  }, [isDailyWelcomeOpen]);
 
   useEffect(() => {
     if (isDailyWelcomeOpen) {
@@ -140,19 +135,6 @@ export const StudentDashboard: React.FC = () => {
       };
     }
   }, [isDailyWelcomeOpen]);
-
-  const handleQuickCompleteQuota = (task?: DailyTask) => {
-    const targetTask = task || todayTasks[0];
-    if (targetTask) {
-      taskService.submitTaskForApproval(targetTask.id, 'Daily textbook quota completed.', 'daily_notes.pdf');
-      loadData();
-      setSuccessToast(`Reading marked completed for "${targetTask.title}".`);
-      setTimeout(() => setSuccessToast(null), 3000);
-    } else {
-      setSuccessToast("Today's 2.5 pages reading quota recorded as completed.");
-      setTimeout(() => setSuccessToast(null), 3000);
-    }
-  };
 
   // Attendance & Performance metrics
   const now = new Date();
@@ -414,175 +396,7 @@ export const StudentDashboard: React.FC = () => {
         </div>
       </div>
 
-            {/* 2. Today's Core Work (Harmonious Contrast: 1 Crisp White Card + 1 Rich Dark Prestige Card) */}
-      <div>
-        <div className="flex items-center justify-between pb-3">
-          <div>
-            <h2 className="text-lg font-bold text-white font-serif">Today's Focus</h2>
-            <p className="text-xs text-zinc-400">Your two core academic priorities for {formattedToday}.</p>
-          </div>
-          <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
-            Target: May 2027 Board Exams
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Card 1: Daily Reading Quota (Crisp White Card) */}
-          <div className="p-5 rounded-3xl bg-white border border-[#e1ede7] shadow-sm hover:shadow-md hover:border-emerald-300 transition-all flex flex-col justify-between space-y-4 text-[#142D27]">
-            {(() => {
-              const todayTaskMeta = activeTodayTask ? extractDayAndCleanTitle(activeTodayTask.title) : null;
-              return (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                        Step 1 &bull; Daily Quota
-                      </span>
-                      {todayTaskMeta && (
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-urdu-compact">
-                          {todayTaskMeta.day}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs font-semibold text-[#557067] flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                      {activeTodayTask ? `~${activeTodayTask.estimatedMinutes || 45} Mins` : '~45 Mins (2.5 Pgs)'}
-                    </span>
-                  </div>
-                  {activeTodayTask?.subjectName && (
-                    <span className="text-[11px] font-semibold text-emerald-700 block">
-                      {activeTodayTask.subjectName}
-                    </span>
-                  )}
-                  <h3 className={`font-serif ${
-                    todayTaskMeta?.isUrdu
-                      ? 'font-urdu text-[16px] font-bold text-[#142D27] leading-loose text-right dir-rtl'
-                      : 'text-base font-bold text-[#142D27]'
-                  }`}>
-                    <bdi>{todayTaskMeta ? todayTaskMeta.cleanTitle : 'No Daily Reading Task Scheduled'}</bdi>
-                  </h3>
-                  <p className="text-xs text-[#557067] leading-relaxed">
-                    {activeTodayTask
-                      ? activeTodayTask.description
-                      : 'Upload your 1st Year FA-IT textbook PDF in Book Library to auto-generate daily study targets and page quotas (Sundays OFF).'}
-                  </p>
-                </div>
-              );
-            })()}
-
-            <div className="pt-2 border-t border-[#e1ede7] flex flex-wrap items-center gap-2">
-              {activeTodayTask ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setPdfModalData({ isOpen: true, task: activeTodayTask })}
-                    className="inline-flex items-center gap-1.5 py-2 px-3 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all cursor-pointer shadow-2xs"
-                    title="View attached textbook pages in PDF"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>View in PDF {activeTodayTask.pagesRange ? `(${activeTodayTask.pagesRange})` : ''}</span>
-                  </button>
-                  <Link
-                    to="/weekly-tasks"
-                    className="flex-1 py-2 px-3 text-center text-xs font-semibold text-[#263B35] bg-[#F7F9F8] hover:bg-[#e8f8f0] border border-[#e1ede7] rounded-xl transition-colors"
-                  >
-                    Weekly Tasks
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickCompleteQuota(activeTodayTask)}
-                    className="py-2 px-3.5 inline-flex items-center justify-center gap-1 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-colors shadow-2xs active:scale-95 cursor-pointer"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                    <span>Mark Done</span>
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/library"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-white" />
-                  <span>Upload Book PDF in Library</span>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {/* Card 2: Today's 30-Mark Test (Crisp White Card with Emerald Accent) */}
-          {(() => {
-            const todayTestMeta = activeTodayTest ? extractDayAndCleanTitle(activeTodayTest.title, activeTodayTest.date) : null;
-
-            return (
-              <div className="p-5 rounded-3xl bg-white border-2 border-emerald-500/80 shadow-md hover:border-emerald-500 hover:shadow-lg transition-all flex flex-col justify-between space-y-4 text-[#142D27]">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                        Step 2 &bull; 30-Mark Test
-                      </span>
-                      {todayTestMeta && (
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-urdu-compact">
-                          {todayTestMeta.day}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                      <Award className="w-3.5 h-3.5 text-emerald-600" />
-                      {activeTodayTest ? `Pass: ${activeTodayTest.passingMarks}/${activeTodayTest.totalMarks} Marks` : 'Pass: 15/30 Marks'}
-                    </span>
-                  </div>
-                  <h3 className={`font-serif ${
-                    todayTestMeta?.isUrdu
-                      ? 'font-urdu text-[16px] font-bold text-[#142D27] leading-loose text-right dir-rtl'
-                      : 'text-base font-bold text-[#142D27]'
-                  }`}>
-                    <bdi>{todayTestMeta ? todayTestMeta.cleanTitle : 'No 30-Mark Test Scheduled'}</bdi>
-                  </h3>
-                  <p className="text-xs text-[#557067] leading-relaxed">
-                    {activeTodayTest
-                      ? activeTodayTest.syllabusCoverage || activeTodayTest.instructions
-                      : 'Upload your textbook PDF to break chapters into weekly 30-mark assessments mapped to BISE DG Khan pattern.'}
-                  </p>
-                </div>
-
-                <div className="pt-2 border-t border-[#e1ede7] flex flex-wrap items-center gap-2">
-                  {activeTodayTest ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setPdfModalData({ isOpen: true, test: activeTodayTest })}
-                        className="inline-flex items-center gap-1.5 py-2.5 px-3 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all cursor-pointer shadow-2xs"
-                        title="View test chapter & 30-mark past paper questions in PDF"
-                      >
-                        <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>View Test in PDF</span>
-                      </button>
-                      <Link
-                        to={`/test-submit?testId=${activeTodayTest.id}`}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer"
-                      >
-                        <FileCheck2 className="w-3.5 h-3.5 text-white" />
-                        <span>Start 30-Mark Test</span>
-                        <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-                      </Link>
-                    </>
-                  ) : (
-                    <Link
-                      to="/library"
-                      className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-all"
-                    >
-                      <span>📚 Browse Textbook Library &amp; PDFs</span>
-                    </Link>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-      </div>
-
-      {/* 3. This Week's 5-Box Scheduled Tests Grid */}
+      {/* 2. Scheduled Daily Test Series Grid (Primary Examination Focus) */}
       <div className="space-y-2">
         <DailyTestSeriesGrid tests={tests} />
       </div>

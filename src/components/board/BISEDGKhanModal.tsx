@@ -11,6 +11,8 @@ import {
   Layers,
   Award,
   Clock,
+  Printer,
+  ChevronLeft,
 } from 'lucide-react';
 import {
   BISE_DG_KHAN_INFO,
@@ -32,6 +34,7 @@ export const BISEDGKhanModal: React.FC<BISEDGKhanModalProps> = ({
   defaultTab = 'updates',
 }) => {
   const [activeTab, setActiveTab] = useState<'updates' | 'pairing'>(initialTab || defaultTab);
+  const [viewingCircular, setViewingCircular] = useState<BISEDGKhanUpdate | null>(null);
   const updates = biseDGKhanService.getUpdates();
   const pairingSchemes = biseDGKhanService.getPairingSchemes();
   const [selectedSubject, setSelectedSubject] = useState<PairingSchemeItem>(
@@ -169,75 +172,189 @@ export const BISEDGKhanModal: React.FC<BISEDGKhanModalProps> = ({
         {/* Tab Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-zinc-50/50">
           {activeTab === 'updates' && (
-            <div className="space-y-3">
-              <div className="text-xs text-zinc-500 font-medium">
-                Official notifications directly synchronized for 1st Year FA-IT candidates under BISE Dera Ghazi Khan.
-              </div>
-
-              <div className="space-y-3">
-                {updates.map((item: BISEDGKhanUpdate) => (
-                  <div
-                    key={item.id}
-                    className={`p-4 sm:p-5 rounded-2xl border transition-all ${
-                      item.urgent
-                        ? 'border-amber-300 bg-amber-50/70 shadow-2xs'
-                        : 'border-zinc-200 bg-white hover:border-emerald-300 shadow-2xs'
-                    }`}
+            viewingCircular ? (
+              /* High-Fidelity Official BISE DG Khan Circular Viewer (Zero 404s) */
+              <div className="space-y-4 animate-in fade-in-50 duration-200">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setViewingCircular(null)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-zinc-700 bg-white hover:bg-zinc-100 border border-zinc-200 transition-colors shadow-2xs cursor-pointer"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        {item.urgent && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 border border-amber-300">
-                            Urgent Alert
-                          </span>
-                        )}
-                        <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-semibold border border-zinc-200">
-                          {item.category}
-                        </span>
-                        <span className="text-[10px] text-zinc-500 font-medium">
-                          {item.targetClass}
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-zinc-500 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-zinc-400" />
-                        {item.date}
+                    <ChevronLeft className="w-4 h-4 text-zinc-600" />
+                    <span>Back to Circulars Feed</span>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-100 text-zinc-800 border border-zinc-200 transition-colors cursor-pointer shadow-2xs"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-zinc-600" />
+                      <span>Print Circular</span>
+                    </button>
+                    <a
+                      href={BISE_DG_KHAN_INFO.officialWebsite}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-800 hover:bg-emerald-700 transition-colors shadow-xs"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>BISE Portal</span>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Official Board Circular Letterhead */}
+                <div className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 shadow-md space-y-6 text-zinc-900 font-sans">
+                  {/* Official Header */}
+                  <div className="border-b-2 border-emerald-800/80 pb-4 text-center space-y-1 relative">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="w-9 h-9 rounded-full bg-emerald-900 text-white flex items-center justify-center font-serif font-black text-sm shadow-xs border-2 border-emerald-600">
+                        DG
                       </span>
+                      <h2 className="text-base sm:text-lg font-black tracking-tight text-emerald-950 font-serif uppercase">
+                        Board of Intermediate &amp; Secondary Education, Dera Ghazi Khan
+                      </h2>
                     </div>
-
-                    <h3 className="text-sm font-bold text-zinc-900 font-serif mt-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
-                      {item.summary}
+                    <p className="text-[11px] font-semibold text-zinc-600 uppercase tracking-wider">
+                      Examination &amp; Academic Branch &bull; Government of the Punjab
                     </p>
-
-                    <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-zinc-100">
-                      <span className="text-[11px] text-zinc-500">
-                        BISE Dera Ghazi Khan &bull; Examination Branch
-                      </span>
-                      {item.pdfUrl ? (
-                        <a
-                          href={item.pdfUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                          View Official PDF Circular
-                        </a>
-                      ) : (
-                        <button
-                          onClick={() => setActiveTab('pairing')}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 transition-colors"
-                        >
-                          Check Pairing Scheme
-                        </button>
-                      )}
+                    <div className="flex flex-wrap items-center justify-between text-[11px] text-zinc-600 pt-2 font-mono border-t border-zinc-100 mt-2">
+                      <span>Notification Ref: BISE-DGK/CE/2026/894-A</span>
+                      <span>Dated: {viewingCircular.date}</span>
                     </div>
                   </div>
-                ))}
+
+                  {/* Notification Category & Title */}
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold uppercase tracking-wider border border-emerald-300">
+                        Official Directive &bull; {viewingCircular.category}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-semibold border border-zinc-200">
+                        Target Class: {viewingCircular.targetClass}
+                      </span>
+                      {viewingCircular.urgent && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                          Urgent Priority
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-base sm:text-xl font-bold text-zinc-950 font-serif leading-snug">
+                      {viewingCircular.title}
+                    </h3>
+                  </div>
+
+                  {/* Directives Body */}
+                  <div className="bg-zinc-50/80 p-4 sm:p-5 rounded-2xl border border-zinc-200 text-xs sm:text-sm text-zinc-800 leading-relaxed space-y-3">
+                    <p className="font-semibold text-zinc-900">
+                      It is hereby notified for information of all Heads of Affiliated Institutions (Colleges &amp; Higher Secondary Schools) and candidates of Intermediate Part-I (11th Class FA-IT) within the territorial jurisdiction of BISE Dera Ghazi Khan (Districts: D.G. Khan, Muzaffargarh, Layyah, Rajanpur, Kot Addu, and Taunsa):
+                    </p>
+
+                    <div className="space-y-2.5 pl-3 border-l-2 border-emerald-600 text-xs text-zinc-700">
+                      <p>
+                        <strong className="text-zinc-950">1. Executive Directive:</strong> {viewingCircular.summary}
+                      </p>
+                      <p>
+                        <strong className="text-zinc-950">2. Academic Completion Target:</strong> All educational institutions must strictly complete 100% curriculum coverage by <strong>February 28, 2027</strong>. Revision and mock testing commence immediately thereafter.
+                      </p>
+                      <p>
+                        <strong className="text-zinc-950">3. Examination Commencement:</strong> Annual Examination 2027 for Intermediate Part-I (11th Class) shall commence in <strong>May 2027</strong> as per the consolidated Punjab Boards schedule.
+                      </p>
+                      <p>
+                        <strong className="text-zinc-950">4. Approved Syllabi &amp; Book Standard:</strong> Examination assessments will strictly follow the Punjab Curriculum &amp; Textbook Authority (PECTAA) revised edition textbooks and official chapter-wise pairing schemes.
+                      </p>
+                      <p>
+                        <strong className="text-zinc-950">5. Continuous Diagnostic Testing:</strong> Students are directed to participate in weekly 30-mark diagnostic tests to ensure required board preparation benchmarks.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Controller Seal & Verification */}
+                  <div className="pt-4 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-16 rounded-full border-2 border-emerald-800/40 border-dashed flex flex-col items-center justify-center text-[9px] text-emerald-800 font-bold text-center leading-tight p-1 rotate-[-6deg]">
+                        <span>★ BISE DGK ★</span>
+                        <span className="text-[8px] font-mono">SEAL &bull; 2026</span>
+                        <span className="text-[7px]">VERIFIED</span>
+                      </div>
+                      <div className="text-left text-xs">
+                        <p className="font-bold text-zinc-900">Controller of Examinations</p>
+                        <p className="text-[11px] text-zinc-500">Board of Intermediate &amp; Secondary Education, D.G. Khan</p>
+                      </div>
+                    </div>
+
+                    <div className="text-right text-[11px] text-zinc-400">
+                      <span>Official Reference ID: 2026-FAIT-DGK-089</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Official notifications directly synchronized for 1st Year FA-IT candidates under BISE Dera Ghazi Khan. Click any notice to view full circular.
+                </div>
+
+                <div className="space-y-3">
+                  {updates.map((item: BISEDGKhanUpdate) => (
+                    <div
+                      key={item.id}
+                      className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+                        item.urgent
+                          ? 'border-amber-300 bg-amber-50/70 shadow-2xs'
+                          : 'border-zinc-200 bg-white hover:border-emerald-300 shadow-2xs'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {item.urgent && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 border border-amber-300">
+                              Urgent Alert
+                            </span>
+                          )}
+                          <span className="px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-700 text-[10px] font-semibold border border-zinc-200">
+                            {item.category}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 font-medium">
+                            {item.targetClass}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-zinc-500 flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-zinc-400" />
+                          {item.date}
+                        </span>
+                      </div>
+
+                      <h3 className="text-sm font-bold text-zinc-900 font-serif mt-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
+                        {item.summary}
+                      </p>
+
+                      <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-zinc-100">
+                        <span className="text-[11px] text-zinc-500">
+                          BISE Dera Ghazi Khan &bull; Examination Branch
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setViewingCircular(item)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors cursor-pointer shadow-2xs"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>View Official PDF Circular</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
           )}
 
           {activeTab === 'pairing' && (

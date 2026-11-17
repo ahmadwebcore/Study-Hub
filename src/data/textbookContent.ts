@@ -580,7 +580,24 @@ export function getTextbookDetailsForTest(params: {
   }
 
   const bookData = TEXTBOOK_KNOWLEDGE_BASE[matchedKey] || TEXTBOOK_KNOWLEDGE_BASE['FAIT-CSC-11'];
-  const chapter = bookData.chapters[0];
+  
+  // Dynamically match the exact chapter based on title and syllabusCoverage
+  const query = (title + ' ' + (params.syllabusCoverage || '')).toLowerCase();
+  let chapter = bookData.chapters.find((ch) => {
+    const chTitle = ch.title.toLowerCase();
+    const chUrdu = (ch.urduTitle || '').toLowerCase();
+    return query.includes(chTitle) || (chUrdu && query.includes(chUrdu));
+  });
+
+  if (!chapter) {
+    if (query.includes('chapter 2') || query.includes('باب دوم') || query.includes('network') || query.includes('topolog') || query.includes('clearing') || query.includes('اپنی مدد') || query.includes('افادہ') || query.includes('athletics') || query.includes('400m')) {
+      chapter = bookData.chapters[1] || bookData.chapters[0];
+    } else if (query.includes('chapter 3') || query.includes('باب سوم') || query.includes('chapter 4') || query.includes('python') || query.includes('پائتھن') || query.includes('طلب')) {
+      chapter = bookData.chapters[2] || bookData.chapters[1] || bookData.chapters[0];
+    } else {
+      chapter = bookData.chapters[0];
+    }
+  }
 
   return {
     bookData,

@@ -22,6 +22,7 @@ import { MediaCenterPage } from '../pages/media/MediaCenterPage';
 import { GrammarHubPage } from '../pages/grammar/GrammarHubPage';
 import { AITeacherPage } from '../pages/ai/AITeacherPage';
 import { IntegrationsPage } from '../pages/integrations/IntegrationsPage';
+import { BoardNotesPage } from '../pages/notes/BoardNotesPage';
 
 // Authentication Pages
 import { LoginPage } from '../pages/auth/LoginPage';
@@ -77,6 +78,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="/subjects" element={<SubjectsPage />} />
         <Route path="/media" element={<MediaCenterPage />} />
         <Route path="/library" element={<LibraryPage />} />
+        <Route path="/notes" element={<BoardNotesPage />} />
         <Route path="/grammar" element={<GrammarHubPage />} />
         <Route path="/chat" element={<DirectChatPage />} />
         <Route path="/ai-teacher" element={<AITeacherPage />} />

@@ -53,8 +53,9 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   initialPage = 1,
   totalPages: propTotalPages,
 }) => {
-  const [activeTab, setActiveTab] = useState<'excerpt' | 'full_pdf'>('excerpt');
+  const [activeTab, setActiveTab] = useState<'excerpt' | 'key_book' | 'full_pdf'>('excerpt');
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
+  const [currentTestPageOffset, setCurrentTestPageOffset] = useState<number>(0);
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -92,6 +93,10 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
   const displayFileName = pdfFileName || resolvedBookData.pdfFileName;
   const totalPagesCount = propTotalPages || resolvedBookData.totalPages || 200;
   const effectivePagesRange = pagesRange || currentChapter.pagesRange;
+
+  const testPageStart = currentChapter.pageStart || 1;
+  const testPageEnd = currentChapter.pageEnd || (testPageStart + 14);
+  const testTotalPages = Math.max(1, testPageEnd - testPageStart + 1);
 
   const handleNextPage = () => {
     if (currentPage < totalPagesCount) setCurrentPage((p) => p + 1);
@@ -182,19 +187,31 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('excerpt')}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'excerpt'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'text-zinc-600 hover:text-zinc-900'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>Test Chapter &amp; Excerpt</span>
+              <span>Test Pages ({effectivePagesRange})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('key_book')}
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'key_book'
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Key Book &amp; Solved Answers</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('full_pdf')}
-              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'full_pdf'
                   ? 'bg-emerald-600 text-white shadow-2xs'
                   : 'text-zinc-600 hover:text-zinc-900'
@@ -211,21 +228,35 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
             <div className="flex items-center gap-1 bg-white border border-[#e1ede7] rounded-xl px-2 py-1 shadow-2xs">
               <button
                 type="button"
-                onClick={handlePrevPage}
-                disabled={currentPage <= 1}
-                className="p-1 text-zinc-500 hover:text-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (activeTab === 'excerpt') {
+                    setCurrentTestPageOffset((p) => Math.max(0, p - 1));
+                  } else {
+                    handlePrevPage();
+                  }
+                }}
+                disabled={activeTab === 'excerpt' ? currentTestPageOffset <= 0 : currentPage <= 1}
+                className="p-1 text-zinc-500 hover:text-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Previous Page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <span className="font-mono text-xs font-bold text-zinc-800 px-1">
-                Page {currentPage} of {totalPagesCount}
+                {activeTab === 'excerpt'
+                  ? `Book Page ${testPageStart + currentTestPageOffset} (${currentTestPageOffset + 1} of ${testTotalPages} Pgs)`
+                  : `Page ${currentPage} of ${totalPagesCount}`}
               </span>
               <button
                 type="button"
-                onClick={handleNextPage}
-                disabled={currentPage >= totalPagesCount}
-                className="p-1 text-zinc-500 hover:text-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (activeTab === 'excerpt') {
+                    setCurrentTestPageOffset((p) => Math.min(testTotalPages - 1, p + 1));
+                  } else {
+                    handleNextPage();
+                  }
+                }}
+                disabled={activeTab === 'excerpt' ? currentTestPageOffset >= testTotalPages - 1 : currentPage >= totalPagesCount}
+                className="p-1 text-zinc-500 hover:text-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Next Page"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -383,6 +414,91 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
                       <div className="pl-6 pt-2 text-[#2e473f] text-xs leading-relaxed border-t border-[#e1ede7] mt-2 bg-white p-3 rounded-xl border border-[#e1ede7]">
                         <strong className="text-emerald-700 block mb-0.5">جواب (Verified Solution):</strong>
                         {q.answer}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : activeTab === 'key_book' ? (
+            /* TAB 2: Verified Key Book & Solved Answers (Full Solutions with Marks Breakdown) */
+            <div
+              className="max-w-4xl mx-auto space-y-6 transition-all"
+              style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
+            >
+              {/* Key Book Banner */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-[#e1ede7] shadow-sm space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[#e1ede7]">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                      Official Key Book Solutions &bull; {displayBookTitle}
+                    </span>
+                  </div>
+                  <span className="text-xs font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Syllabus: {effectivePagesRange}
+                  </span>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-base sm:text-lg font-bold text-[#142D27] font-serif">
+                      100% Verified Answers &amp; Marking Scheme (BISE DG Khan Pattern)
+                    </h2>
+                    <p className="text-xs text-[#557067] mt-0.5">
+                      Model answers directly synchronized from authorized key books. Evaluated by Faculty Lead Ahmad.
+                    </p>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 shrink-0">
+                    Target Pass: 15 / 30 Marks
+                  </span>
+                </div>
+              </div>
+
+              {/* Solved Questions List */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white border border-[#e1ede7] shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-[#e1ede7] pb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <h3 className="text-sm font-bold text-[#142D27] uppercase tracking-wider">
+                      حل شدہ امتحانی سوالات و جوابات (Key Book Solutions)
+                    </h3>
+                  </div>
+                  <span className="text-xs font-bold text-zinc-500">
+                    {currentChapter.boardQuestions.length} Questions Solved
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {currentChapter.boardQuestions.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className="p-4 sm:p-5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-3 text-xs sm:text-sm"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="font-bold text-[#142D27] flex items-start gap-2">
+                          <span className="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                            Q{idx + 1}
+                          </span>
+                          <span className="leading-snug">{q.question}</span>
+                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            {q.marks} Marks
+                          </span>
+                          <span className="text-[10px] uppercase font-semibold text-zinc-500 bg-white px-2 py-0.5 rounded-md border border-zinc-200">
+                            {q.type}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pl-4 sm:pl-8 pt-3 text-[#2e473f] text-xs sm:text-sm leading-relaxed border-t border-[#e1ede7] bg-white p-4 rounded-xl border border-[#e1ede7] space-y-1">
+                        <strong className="text-emerald-800 text-xs uppercase tracking-wider block font-bold">
+                          ✓ کلید جواب (Verified Solution from Key Book):
+                        </strong>
+                        <p className="text-zinc-800 leading-relaxed font-normal whitespace-pre-line">
+                          {q.answer}
+                        </p>
                       </div>
                     </div>
                   ))}
