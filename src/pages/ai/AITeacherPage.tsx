@@ -340,7 +340,7 @@ export const AITeacherPage: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>
                   {aiConfig.provider === 'openai'
-                    ? `OpenAI ${aiConfig.model || 'GPT-5 Mini'} • Live Engine Active`
+                    ? `OpenAI ${aiConfig.model || 'GPT-4o Mini'} • Live Engine Active`
                     : aiConfig.provider === 'gemini'
                     ? 'Google Gemini 1.5 Flash • Free Tier Active'
                     : aiConfig.provider === 'anthropic'
@@ -377,9 +377,9 @@ export const AITeacherPage: React.FC = () => {
           <div className="relative z-10 pt-4 mt-2 border-t border-zinc-100 flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] font-semibold text-zinc-500 mr-1">Quick Model Switch:</span>
             {[
-              { provider: 'openai' as const, model: 'gpt-5-mini', label: 'GPT-5 Mini (Fastest)' },
-              { provider: 'openai' as const, model: 'gpt-5', label: 'GPT-5 (Reasoning)' },
-              { provider: 'openai' as const, model: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+              { provider: 'openai' as const, model: 'gpt-4o-mini', label: 'GPT-4o Mini (Fastest)' },
+              { provider: 'openai' as const, model: 'gpt-4o', label: 'GPT-4o (Flagship)' },
+              { provider: 'openai' as const, model: 'o3-mini', label: 'o3-mini (Reasoning)' },
               { provider: 'gemini' as const, model: 'gemini-1.5-flash', label: 'Gemini 1.5' },
               { provider: 'anthropic' as const, model: 'claude-3-5-sonnet', label: 'Claude 3.5' },
             ].map((btn) => {
@@ -557,7 +557,7 @@ export const AITeacherPage: React.FC = () => {
                   </span>
                 </h3>
                 <p className="text-[10px] text-zinc-500">
-                  {aiConfig.provider.toUpperCase()} &bull; {aiConfig.model || 'gpt-5-mini'}
+                  {aiConfig.provider.toUpperCase()} &bull; {aiConfig.model || 'gpt-4o-mini'}
                 </p>
               </div>
             </div>
@@ -823,7 +823,7 @@ export const AITeacherPage: React.FC = () => {
                   onChange={(e) => setAiConfig({ ...aiConfig, provider: e.target.value as any })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 bg-white text-zinc-900 font-medium focus:outline-none focus:border-emerald-600"
                 >
-                  <option value="openai">OpenAI (Active Key • GPT-5 Mini / GPT-5)</option>
+                  <option value="openai">OpenAI (Active Key • GPT-4o Mini / GPT-4o)</option>
                   <option value="gemini">Google Gemini 1.5 Flash (Free Tier via AI Studio)</option>
                   <option value="anthropic">Anthropic Claude (Claude 3.5 Sonnet)</option>
                   <option value="offline">Offline Academic Model (Built-in Punjab Board Knowledge)</option>
@@ -836,14 +836,14 @@ export const AITeacherPage: React.FC = () => {
                     OpenAI Model Target
                   </label>
                   <select
-                    value={aiConfig.model || 'gpt-5-mini'}
+                    value={aiConfig.model || 'gpt-4o-mini'}
                     onChange={(e) => setAiConfig({ ...aiConfig, model: e.target.value })}
                     className="w-full px-3 py-2 text-xs rounded-xl border border-zinc-200 bg-white text-zinc-900 font-medium focus:outline-none focus:border-emerald-600"
                   >
-                    <option value="gpt-5-mini">gpt-5-mini (Fastest, High Accuracy &amp; Urdu Support — Recommended)</option>
-                    <option value="gpt-5">gpt-5 (Deep Reasoning &amp; Research Grade)</option>
-                    <option value="gpt-4o-mini">gpt-4o-mini (Instant Response)</option>
-                    <option value="gpt-4o">gpt-4o (Standard Flagship)</option>
+                    <option value="gpt-4o-mini">gpt-4o-mini (Fastest, High Accuracy &amp; Urdu Support — Recommended)</option>
+                    <option value="gpt-4o">gpt-4o (Standard Flagship Intelligence)</option>
+                    <option value="o3-mini">o3-mini (Deep STEM Reasoning)</option>
+                    <option value="gpt-4-turbo">gpt-4-turbo (Comprehensive Analysis)</option>
                   </select>
                 </div>
               )}

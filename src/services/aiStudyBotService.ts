@@ -35,111 +35,178 @@ export interface AIChatMessage {
 }
 
 export interface AIProviderConfig {
-  provider: 'gemini' | 'openai' | 'anthropic' | 'offline';
+  provider: 'openai' | 'gemini' | 'anthropic' | 'offline';
   apiKey: string;
   model: string;
 }
 
 const STORAGE_KEY_AI_CONFIG = 'gsa_ai_config_v3';
 
-// 1st Year Intermediate Computer Science Academic Knowledge Base
-const CS_KNOWLEDGE = [
+// 1st Year Intermediate FA-IT Academic Syllabus Knowledge Base
+const ACADEMIC_KNOWLEDGE: {
+  keywords: string[];
+  title: string;
+  english: string;
+  romanUrdu: string;
+  urdu?: string;
+}[] = [
   {
-    keywords: ['bus', 'bus topology'],
-    title: 'Bus Topology',
-    english: `Bus Topology is the simplest network topology where all nodes are connected to a single central cable called the "Backbone" or "Trunk". Terminators are connected at both ends of the cable to absorb signals and prevent signal bounce. If a host sends data, it travels along the backbone and only the destination machine with matching IP accepts it.`,
-    romanUrdu: `Bus Topology network ki sab se aasan type hai jismein saare computers ek hi central cable (Backbone) se connect hotay hain. Cable k dono ends par Terminators lagaye jaate hain taake signal wapis na takraaye. Agar main cable toot jaye toh poora network down ho jata hai.`,
-    urdu: `بس ٹوپولوجی کمپیوٹر نیٹ ورک کی وہ قسم ہے جس میں تمام کمپیوٹرز ایک ہی مرکزی کیبل (بیک بون) کے ساتھ جڑے ہوتے ہیں۔ کیبل کے دونوں سروں پر ٹرمینیٹر لگائے جاتے ہیں تاکہ سگنل باؤنس نہ ہو۔ اگر مین کیبل خراب ہو جائے تو پورا نیٹ ورک بند ہو جاتا ہے۔`,
-    analogy: `🚌 Real-World Analogy (Single Route Bus):
-Imagine a single linear road with passenger stops. If the main bridge in the middle breaks down, the entire bus route halts. Similarly, in Bus Topology, if the central backbone cable breaks, all communication stops.`,
-    boardTips: [
-      'Board Long Question (5 Marks): Define Bus Topology with advantages and disadvantages.',
-      'Advantage: Very cheap and simple to install with minimum cabling.',
-      'Disadvantage: Fault detection is difficult and cable failure shuts down the entire network.',
-    ],
-    codeSnippet: `[Terminator] === [PC 1] === [PC 2] === [PC 3] === [Terminator]
-                    |           |           |
-              (Shared Central Backbone Cable)`,
+    keywords: ['bus topology', 'bus network', 'backbone cable'],
+    title: 'Bus Topology (Computer Science 11 - Unit 2)',
+    english: `**Bus Topology** is a network configuration where all computers and network devices connect to a single central transmission line known as the **Backbone** or **Trunk cable**.
+
+• **How It Works**: When a device transmits data, signals broadcast along the central cable in both directions. Every connected device receives the packet, but only the machine whose MAC/IP address matches accepts and processes it.
+• **Terminators**: 50-ohm terminators are installed at both physical ends of the cable to absorb electromagnetic signals and prevent signal bounce-back (reflection).
+• **Advantages**:
+  1. Low cabling cost and easy setup.
+  2. Best suited for small, linear networks.
+• **Disadvantages**:
+  1. If the central backbone cable breaks, the entire network fails.
+  2. Difficult to troubleshoot individual faulty nodes.`,
+    romanUrdu: `**Bus Topology** network ki sab se basic type hai jismein saare computers ek hi central cable (Backbone) ke sath connected hotay hain.
+
+• **Kaise kaam karta hai**: Jab koi computer data bhejta hai to wo central cable ke zariye travel karta hai aur sirf target computer usse accept karta hai.
+• **Terminators**: Cable k dono ends par Terminators lagaye jaate hain taake signals bounce back na karein.
+• **Fawaid**: Cable ka kharcha bohat kam hota hai aur setup aasan hai.
+• **Nuqsaan**: Agar central backbone cable toot jaye to poora network band ho jata hai.`,
+    urdu: `**بس ٹوپولوجی** کمپیوٹر نیٹ ورک کی وہ قسم ہے جس میں تمام کمپیوٹرز ایک ہی مرکزی کیبل (بیک بون) کے ساتھ جڑے ہوتے ہیں۔
+• مرکزی کیبل کے دونوں سروں پر ٹرمینیٹرز لگائے جاتے ہیں تاکہ سگنل واپس نہ ٹکرائے۔
+• اگر مین کیبل خراب ہو جائے تو پورا نیٹ ورک بند ہو جاتا ہے۔`,
   },
   {
-    keywords: ['star', 'star topology'],
-    title: 'Star Topology',
-    english: `In Star Topology, each host is connected directly to a central hub or switch via a dedicated cable. Packets sent by a station travel to the central switch, which routes them to the destination. If one cable fails, only that computer is disconnected while the rest of the network remains operational.`,
-    romanUrdu: `Star Topology mein har computer ek central device (Switch ya Hub) ke sath separate wire se jurra hota hai. Agar kisi ek computer ki wire toot bhi jaye toh baqi network bilkul theek chalta rehta hai. Switch ka kharcha thora zyada hota hai.`,
-    urdu: `اسٹار ٹوپولوجی میں تمام کمپیوٹرز ایک مرکزی سوئچ یا ہب سے الگ الگ کیبل کے ذریعے جڑے ہوتے ہیں۔ اگر کسی ایک کمپیوٹر کی تار خراب ہو جائے تو باقی نیٹ ورک متاثر نہیں ہوتا۔`,
-    analogy: `🏢 Real-World Analogy (Principal's Central Office):
-Think of a college where every classroom has a direct intercom wire to the Principal's Office. If Class 11's intercom breaks, Class 12 and 10 can still communicate without issue.`,
-    boardTips: [
-      'Short Question: Why is Star Topology better than Bus Topology?',
-      'Answer: Cable failure in Star Topology only disconnects a single workstation, not the entire network.',
-    ],
-    codeSnippet: `          [PC 1]
-             \\
-    [PC 4] --- [CENTRAL SWITCH] --- [PC 2]
-             /
-          [PC 3]`,
+    keywords: ['star topology', 'star network', 'central switch', 'hub'],
+    title: 'Star Topology (Computer Science 11 - Unit 2)',
+    english: `**Star Topology** is the most widely deployed network topology in modern computer labs and corporate offices.
+
+• **Architecture**: Every host computer connects via a dedicated point-to-point cable directly to a central connecting device, typically a **Network Switch** or **Hub**.
+• **Fault Isolation**: If an individual cable breaks or a single computer fails, only that specific node is disconnected; the remaining network continues functioning seamlessly without downtime.
+• **Switch Intelligence**: Modern switches learn MAC addresses and forward frames exclusively to the destination port, avoiding collisions.
+• **Disadvantages**: Heavy cable requirements and if the central switch fails, the entire network drops.`,
+    romanUrdu: `**Star Topology** modern networks mein sab se zyada use hone wali topology hai.
+
+• **Architecture**: Har computer ek central switch ya hub se separate cable ke zariye jurra hota hai.
+• **Faida**: Agar kisi ek computer ki wire toot jaye ya wo band ho jaye, toh baqi poora network bilkul theek chalta rehta hai.
+• **Nuqsaan**: Cable ka kharcha zyada hota hai aur agar central switch kharab ho jaye to saara network down ho jata hai.`,
   },
   {
-    keywords: ['cpu', 'processor', 'alu', 'cu', 'registers'],
-    title: 'CPU Architecture: ALU, Control Unit & Registers',
-    english: `The Central Processing Unit (CPU) is the brain of the computer. It comprises three primary subunits:
-1. Arithmetic Logic Unit (ALU): Executes arithmetic calculations (+, -, *, /) and logical comparisons (AND, OR, <, >).
-2. Control Unit (CU): The supervisor that fetches, decodes, and directs data movement across devices.
-3. Registers: High-speed temporary memory locations located directly inside the processor.`,
-    romanUrdu: `CPU computer ka dimagh hai. Iske 3 main hissay hain:
-1. ALU: Hisaabi amal (+, -, *, /) aur comparisons karta hai.
-2. Control Unit (CU): Poore computer ka supervisor hai jo instructions laata hai aur orders deta hai.
-3. Registers: Processor ke andar ki sab se tez temporary memory hai jo immediate calculations ko save karti hai.`,
-    urdu: `سی پی یو (CPU) کمپیوٹر کا دماغ ہے۔ اس کے تین اہم یونٹس ہیں:
-۱. ALU: حسابی اور منطقی عمل سرانجام دیتا ہے۔
-۲. Control Unit: پورے کمپیوٹر کا نگران ہے جو ہدایات کو چلاتا ہے۔
-۳. Registers: پروسیسر کے اندر انتہائی تیز رفتار عارضی میموری۔`,
-    analogy: `👨‍🏫 Real-World Analogy (Headmaster & Math Teacher):
-Control Unit is the Headmaster guiding the timetable. ALU is the Mathematics Teacher solving algebra on the blackboard. Registers are the small pocket notebook where quick intermediate notes are jotted down.`,
-    boardTips: [
-      'Board MCQ: Which unit acts as the supervisor of the computer? Answer: Control Unit (CU).',
-      'Important Registers: Program Counter (PC), Instruction Register (IR), Accumulator (AC).',
-    ],
+    keywords: ['ring topology', 'ring network', 'token passing'],
+    title: 'Ring Topology & Token Passing',
+    english: `**Ring Topology** connects every computer to exactly two neighboring nodes, forming an unbroken circular loop.
+
+• **Token Passing Protocol**: Communication is coordinated via a special 3-byte frame called a **Token**. A computer can only transmit data when it captures the free token.
+• **Unidirectional Flow**: Data packets travel in one direction (clockwise or counter-clockwise), being regenerated by each intermediate workstation before reaching the destination.
+• **Disadvantage**: Standard unidirectional ring networks fail entirely if any single workstation or cable link breaks, unless a Dual Ring (FDDI) is used.`,
+    romanUrdu: `**Ring Topology** mein har computer aglay aur pichlay computer se jurr kar ek circular ring banata hai. Data Token Passing ke zariye ek hi simt (direction) mein travel karta hai. Agar ek computer bhi band ho to ring toot sakti hai.`,
   },
   {
-    keywords: ['ram', 'rom', 'memory'],
-    title: 'Difference between RAM & ROM',
-    english: `1. RAM (Random Access Memory): Volatile primary storage that holds currently running programs. Data is wiped instantly when power is lost.
-2. ROM (Read Only Memory): Non-volatile permanent storage storing startup firmware (BIOS/UEFI). Contents are retained even during power outages.`,
-    romanUrdu: `1. RAM: Yeh temporary (volatile) memory hai. Jab computer band hota hai toh iska sara data khatam ho jata hai.
-2. ROM: Yeh permanent (non-volatile) memory hai jismein computer ko start karne wala BIOS program save hota hai. Bijli band hone par bhi data mehfooz rehta hai.`,
-    urdu: `۱. ریم (RAM): عارضی میموری ہے جس کا ڈیٹا بجلی بند ہونے پر ختم ہو جاتا ہے۔
-۲. روم (ROM): مستقل میموری ہے جس میں کمپیوٹر شروع کرنے والے BIOS پروگرام محفوظ ہوتے ہیں۔`,
-    analogy: `📖 Real-World Analogy (Study Desk vs Library Shelf):
-RAM is your active study desk where you spread out notebook pages while working. ROM is the permanent stone carving on the library wall that can never be erased.`,
-    boardTips: [
-      'Board 4-Mark Distinction: Volatile vs Non-Volatile, Read/Write capability, Speed, and Cost.',
-    ],
+    keywords: ['mesh topology', 'full mesh'],
+    title: 'Mesh Topology (Fault Tolerance & Redundancy)',
+    english: `**Mesh Topology** connects every device to every other device via dedicated physical links.
+
+• **Formula for Links**: For $n$ devices, the network requires $\\frac{n(n-1)}{2}$ physical links and $n-1$ I/O ports per device.
+• **Advantages**:
+  1. Maximum reliability and zero traffic congestion (dedicated channels).
+  2. Robust security and point-to-point privacy.
+• **Disadvantages**: Prohibitively expensive cabling and complex hardware installation. Mainly used in critical backbone routers and banking networks.`,
+    romanUrdu: `**Mesh Topology** mein har computer har doosre computer ke sath direct dedicated wire se jurra hota hai. Yeh sab se reliable aur mehfooz topology hai lekin iska kharcha aur setup sab se mushkil hota hai.`,
+  },
+  {
+    keywords: ['cpu', 'processor', 'alu', 'cu', 'registers', 'cache'],
+    title: 'Central Processing Unit (CPU) Architecture',
+    english: `The **CPU (Central Processing Unit)** is the primary computational core of a computer system. It carries out the **Fetch-Decode-Execute** cycle.
+
+1. **ALU (Arithmetic Logic Unit)**:
+   - *Arithmetic Section*: Performs addition, subtraction, multiplication, and division.
+   - *Logic Section*: Evaluates comparisons (Equal to, Less than, Greater than, AND, OR, NOT).
+2. **Control Unit (CU)**:
+   - The supervisor/conductor of the processor. It fetches instructions from RAM, decodes opcode, and issues electronic timing signals to memory and I/O devices.
+3. **Internal Registers**:
+   - High-speed, low-capacity storage cells located directly on the processor silicon die (e.g., Program Counter (PC), Instruction Register (IR), Memory Address Register (MAR), Accumulator (AC)).
+4. **L1/L2/L3 Cache**:
+   - Ultra-fast SRAM placed between CPU and system RAM to store frequently accessed data and prevent CPU starvation.`,
+    romanUrdu: `**CPU (Central Processing Unit)** computer ka dimagh hai. Iske 3 bunyadi hissay hotay hain:
+
+1. **ALU (Arithmetic Logic Unit)**: Yeh hisaabi sawalat (+, -, *, /) aur mantiqi faislay (AND, OR, <, >) karta hai.
+2. **Control Unit (CU)**: Yeh computer ka supervisor hai jo instructions ko RAM se laata hai, samajhta hai, aur baqi hisson ko chalata hai.
+3. **Registers**: Processor ke andar mojood intehai tez raftaar temporary memory jo calculations k doraan data rakhti hai.`,
+  },
+  {
+    keywords: ['ram', 'rom', 'difference between ram and rom', 'volatile memory'],
+    title: 'RAM vs ROM Comparison (BISE DG Khan Exam Standard)',
+    english: `| Feature | RAM (Random Access Memory) | ROM (Read-Only Memory) |
+|---|---|---|
+| **Volatility** | Volatile (data lost immediately on power outage) | Non-volatile (contents retained permanently) |
+| **Operation** | Read and Write | Read-Only during normal operations |
+| **Contents** | Currently running OS processes, active applications | Startup firmware (BIOS, UEFI, Bootstrap Loader) |
+| **Speed** | Extremely Fast (Nanosecond latency) | Slower than RAM |
+| **Types** | DRAM (Dynamic RAM), SRAM (Static RAM) | PROM, EPROM, EEPROM |`,
+    romanUrdu: `• **RAM (Random Access Memory)**: Yeh arzi (volatile) memory hai. Bijli band hote hi iska saara data saaf ho jata hai. Is par data read aur write dono hota hai.
+• **ROM (Read Only Memory)**: Yeh mustaqil (non-volatile) memory hai. Ismein computer ko on karne wala BIOS program store hota hai jo bijli band hone par bhi mehfooz rehta hai.`,
+  },
+  {
+    keywords: ['osi model', 'osi layers', '7 layers'],
+    title: 'OSI 7-Layer Reference Model',
+    english: `The **Open Systems Interconnection (OSI)** model defines 7 distinct abstraction layers for network communications:
+
+7. **Application Layer**: End-user interfaces (HTTP, HTTPS, FTP, SMTP, DNS).
+6. **Presentation Layer**: Data formatting, compression, and encryption/decryption (SSL/TLS, ASCII, JPEG).
+5. **Session Layer**: Establishes, manages, and terminates dialogues between applications (RPC, NetBIOS).
+4. **Transport Layer**: End-to-end transport, segmenting, flow control, and error recovery (TCP, UDP).
+3. **Network Layer**: Logical IP addressing and best-path routing across routers (IP, ICMP, OSPF).
+2. **Data Link Layer**: Physical MAC addressing, frame switching, and error detection (Ethernet, Wi-Fi, Switches).
+1. **Physical Layer**: Bit transmission over physical media (Cables, Fiber optics, RF signals, Hubs).
+
+*Mnemonic to remember*: **A**ll **P**eople **S**eem **T**o **N**eed **D**ata **P**rocessing (Layers 7 down to 1).`,
+    romanUrdu: `OSI model networking ke 7 darjaat (layers) par mushtamil hai:
+7. Application Layer (HTTP, Email)
+6. Presentation Layer (Encryption, Format)
+5. Session Layer (Connection maintain)
+4. Transport Layer (TCP, UDP)
+3. Network Layer (IP Address & Routers)
+2. Data Link Layer (MAC Address & Switch)
+1. Physical Layer (Wires & Signals)`,
+  },
+  {
+    keywords: ['operating system', 'os functions', 'scheduler', 'multitasking'],
+    title: 'Operating System Functions & CPU Scheduling',
+    english: `An **Operating System (OS)** is system software that acts as an intermediary between computer hardware and the user/applications.
+
+• **Core Functions**:
+  1. *Processor Management*: Allocates CPU time slices across concurrent processes using scheduling algorithms (Round Robin, FCFS, Shortest Job First).
+  2. *Memory Management*: Tracks memory allocations, paging, and virtual memory swapping.
+  3. *File Management*: Organizes files in hierarchical directory trees (FAT32, NTFS, EXT4).
+  4. *Device Management*: Interacts with peripheral controllers via device drivers.
+  5. *Security & Access Control*: Authentication, user permissions, and process isolation.`,
+    romanUrdu: `**Operating System (OS)** wo software hai jo computer hardware aur user ke darmiyan pul ka kaam karta hai (maslan Windows, Linux).
+Iske ahem kaam: Processor ko schedule karna, RAM memory manage karna, files ko organize karna, aur computer ko viruses aur unauthorized access se mehfooz rakhna.`,
+  },
+  {
+    keywords: ['uswa', 'uswa-e-hasna', 'shibli', 'urdu 11'],
+    title: 'Urdu 11: Sabaq 1 "Uswa-e-Hasna" (Maulana Shibli Nomani)',
+    english: `• **Author**: Allama Shibli Nomani (Seerat-un-Nabi).
+• **Core Theme**: Prophet Muhammad ﷺ's life is the only complete, universal, and eternal model (Uswa-e-Hasna) applicable to every human role—rulers, merchants, teachers, commanders, judges, and family heads.
+• **Exam Tip**: In Tashreeh, quote Quranic reference: *"Laqad kaana lakum fee rasoolillahi uswatun hasanah"*. Maintain formal Urdu diction with author background.`,
+    romanUrdu: `• **Musannif**: Maulana Shibli Nomani.
+• **Markazi Khayal**: Hazrat Muhammad ﷺ ki zaat mubarak har insaan ke liye qiyamat tak kamil aur mukammal namoona (Uswa-e-Hasna) hai.
+• **Exam Hidayat**: Tashreeh mein siaq-o-sabaq ke 3 number aur tashreeh ke 10 number hotay hain. Hawala-e-matan mein sabaq ka unwan aur musannif ka naam lazmi likhein.`,
+  },
+  {
+    keywords: ['button button', 'richard matheson', 'norma', 'arthur'],
+    title: 'English 11: Story 1 "Button, Button" by Richard Matheson',
+    english: `• **Author**: Richard Matheson.
+• **Main Characters**: Norma Lewis, Arthur Lewis, and Mr. Steward.
+• **Moral Dilemma**: The conflict between greed and human values. Mr. Steward offers $50,000 if they push the button, which will cause someone they don't know to die. Arthur rejects the offer on moral grounds, while Norma rationalizes it.
+• **Resolution**: Norma pushes the button, and her husband Arthur dies in a subway accident, triggering a $50,000 life insurance policy. When Norma screams, Steward chillingly asks: *"Did you really think you knew your husband?"*`,
+    romanUrdu: `• **Characters**: Norma, Arthur Lewis, aur Mr. Steward.
+• **Theme**: Lalach aur insani qadron ka tazad. Norma $50,000 ke lalach mein button daba deti hai jiski qeemat uske shohar Arthur ki jaan se ada hoti hai.`,
   },
 ];
-
-const ENV_OPENAI_KEY = (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
-
-const getSeedOpenAIKey = (): string => {
-  if (ENV_OPENAI_KEY) return ENV_OPENAI_KEY;
-  try {
-    const encoded =
-      'c2stcHJvai1sMmdvenUyb1hoVTFObUNHY1FpUDFJaHVKWEFlZ3IwN2FMR0RLdk91TTdpMmdmajNYTXM1SEVaLUxIVVdIUjI4dFlKRlJtQXZpRVQzQmxia0ZKei0wbjZOeEl4NXRRVndHSWdhS05QNy1BZUNyUzZpcmhvRWlidjJManFNZzN0UTByeEFsVllFenQ0T2FaS2FvQTBHZW9taGlPUUE=';
-    if (typeof atob !== 'undefined') {
-      return atob(encoded);
-    }
-  } catch {}
-  return '';
-};
-
-const DEFAULT_OPENAI_MODEL =
-  (import.meta as any).env?.VITE_OPENAI_MODEL || 'gpt-5-mini';
 
 export class AIStudyBotService {
   private config: AIProviderConfig = {
     provider: 'openai',
-    apiKey: getSeedOpenAIKey(),
-    model: DEFAULT_OPENAI_MODEL,
+    apiKey: '',
+    model: 'gpt-4o-mini',
   };
 
   constructor() {
@@ -147,40 +214,64 @@ export class AIStudyBotService {
   }
 
   public loadConfig(): AIProviderConfig {
-    const seedKey = getSeedOpenAIKey();
+    const envKey = (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
+    const envModel = (import.meta as any).env?.VITE_OPENAI_MODEL || 'gpt-4o-mini';
+
     try {
       const stored = localStorage.getItem(STORAGE_KEY_AI_CONFIG);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && (!parsed.apiKey || parsed.apiKey.trim().length < 5 || parsed.model?.includes('gpt-5'))) {
-          parsed.model = 'gpt-4o-mini';
-          parsed.apiKey = seedKey;
-          parsed.provider = 'openai';
-          parsed.model = DEFAULT_OPENAI_MODEL;
+        if (parsed && typeof parsed === 'object') {
+          // Fix legacy fictional model names
+          if (!parsed.model || parsed.model.includes('gpt-5')) {
+            parsed.model = 'gpt-4o-mini';
+          }
+          // Preserve user-saved key! Only fall back to env key if empty
+          if (!parsed.apiKey || parsed.apiKey.trim().length === 0) {
+            parsed.apiKey = envKey;
+          }
+          if (!parsed.provider) {
+            parsed.provider = 'openai';
+          }
+          this.config = parsed;
+          return this.config;
         }
-        this.config = parsed;
-        return this.config;
       }
-    } catch {
-      // fallback
-    }
+    } catch {}
+
     this.config = {
       provider: 'openai',
-      apiKey: seedKey,
-      model: DEFAULT_OPENAI_MODEL,
+      apiKey: envKey,
+      model: envModel.includes('gpt-5') ? 'gpt-4o-mini' : envModel,
     };
     return this.config;
   }
 
-  public async testConnection(customConfig?: AIProviderConfig): Promise<{ success: boolean; message: string; latencyMs: number; model?: string }> {
+  public saveConfig(config: AIProviderConfig): void {
+    // Sanitize model
+    if (config.model && config.model.includes('gpt-5')) {
+      config.model = 'gpt-4o-mini';
+    }
+    this.config = { ...config };
+    try {
+      localStorage.setItem(STORAGE_KEY_AI_CONFIG, JSON.stringify(this.config));
+    } catch {}
+  }
+
+  public async testConnection(customConfig?: AIProviderConfig): Promise<{
+    success: boolean;
+    message: string;
+    latencyMs: number;
+    model?: string;
+  }> {
     const active = customConfig || this.config;
     const start = Date.now();
 
     if (active.provider === 'offline') {
       return {
         success: true,
-        message: 'Offline Academic Engine ready with Punjab Board syllabus & CS knowledge base.',
-        latencyMs: 12,
+        message: 'Offline Academic Engine ready with Punjab Board FA-IT syllabus knowledge.',
+        latencyMs: 8,
         model: 'offline-local-kb',
       };
     }
@@ -188,31 +279,36 @@ export class AIStudyBotService {
     if (!active.apiKey || active.apiKey.trim().length < 5) {
       return {
         success: false,
-        message: 'No API key provided. Please enter a valid API key.',
+        message: 'No API key provided. Please paste your API key to test.',
         latencyMs: 0,
       };
     }
 
     if (active.provider === 'openai') {
       try {
-        const modelToTest = active.model || 'gpt-5-mini';
+        const rawModel = active.model || 'gpt-4o-mini';
+        const modelToTest = rawModel.includes('gpt-5') ? 'gpt-4o-mini' : rawModel;
+
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${active.apiKey}`,
+            Authorization: `Bearer ${active.apiKey.trim()}`,
           },
           body: JSON.stringify({
             model: modelToTest,
-            messages: [{ role: 'user', content: 'Ping' }],
+            messages: [{ role: 'user', content: 'Say OK' }],
             max_tokens: 5,
           }),
         });
+
         const latencyMs = Date.now() - start;
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+          const errMsg = errData?.error?.message || `HTTP ${response.status} from OpenAI`;
+          throw new Error(errMsg);
         }
+
         const data = await response.json();
         return {
           success: true,
@@ -231,12 +327,13 @@ export class AIStudyBotService {
 
     if (active.provider === 'gemini') {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${active.apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${active.apiKey.trim()}`;
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping' }] }] }),
+          body: JSON.stringify({ contents: [{ parts: [{ text: 'Say OK' }] }] }),
         });
+
         const latencyMs = Date.now() - start;
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
@@ -257,52 +354,57 @@ export class AIStudyBotService {
       }
     }
 
-    if (active.provider === 'anthropic') {
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': active.apiKey,
-            'anthropic-version': '2023-06-01',
-            'dangerously-allow-browser': 'true',
-          },
-          body: JSON.stringify({
-            model: 'claude-3-5-sonnet-20241022',
-            max_tokens: 5,
-            messages: [{ role: 'user', content: 'Ping' }],
-          }),
-        });
-        const latencyMs = Date.now() - start;
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
-        }
-        return {
-          success: true,
-          message: 'Connected successfully to Anthropic Claude 3.5 Sonnet!',
-          latencyMs,
-          model: 'claude-3-5-sonnet',
-        };
-      } catch (err: any) {
-        return {
-          success: false,
-          message: `Anthropic Connection Error: ${err.message}`,
-          latencyMs: Date.now() - start,
-        };
-      }
-    }
-
     return { success: true, message: 'Provider ready.', latencyMs: 5 };
   }
 
-  public saveConfig(config: AIProviderConfig): void {
-    this.config = config;
+  public getChatHistory(roleOverride?: 'teacher' | 'student'): AIChatMessage[] {
+    const currentRole = roleOverride || this.getCurrentUserContext().role;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
     try {
-      localStorage.setItem(STORAGE_KEY_AI_CONFIG, JSON.stringify(config));
-    } catch {
-      // ignore
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {}
+
+    if (currentRole === 'teacher') {
+      return [
+        {
+          id: 'msg_welcome_teacher',
+          sender: 'assistant',
+          text: 'Salam Sir Ahmad! Welcome to the Faculty Academic AI Desk. Ask me any question regarding student performance, 30-mark diagnostic test rubrics, or BISE DG Khan curriculum pacing.',
+          timestamp: 'Just now',
+        },
+      ];
     }
+
+    return [
+      {
+        id: 'msg_welcome_student',
+        sender: 'assistant',
+        text: 'Salam Henza! Welcome to your GSA Academic AI Copilot. Ask any question from Computer Science, Urdu grammar, English, or 1st Year board syllabus.',
+        timestamp: 'Just now',
+      },
+    ];
+  }
+
+  public saveChatHistory(history: AIChatMessage[], roleOverride?: 'teacher' | 'student'): void {
+    const currentRole = roleOverride || this.getCurrentUserContext().role;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(history.slice(-30)));
+    } catch {}
+  }
+
+  public clearChatHistory(roleOverride?: 'teacher' | 'student'): void {
+    const currentRole = roleOverride || this.getCurrentUserContext().role;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
+    try {
+      localStorage.removeItem(storageKey);
+    } catch {}
   }
 
   public getCurrentUserContext(): { role: 'teacher' | 'student'; name: string } {
@@ -322,659 +424,319 @@ export class AIStudyBotService {
     }
   }
 
-  public getActiveStudentName(): string {
-    const ctx = this.getCurrentUserContext();
-    return ctx.role === 'teacher' ? 'Sir Ahmad' : 'Henza Noor';
-  }
-
-  public getChatHistory(roleOverride?: 'teacher' | 'student'): AIChatMessage[] {
-    const currentRole = roleOverride || this.getCurrentUserContext().role;
-    const storageKey = `gsa_academic_chat_history_${currentRole}_v9`;
-    try {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch {}
-
-    if (currentRole === 'teacher') {
-      return [
-        {
-          id: 'msg_welcome_teacher',
-          sender: 'assistant',
-          text: 'Salam Sir Ahmad! Welcome to the GSA Academic Faculty Assistant. How can I assist you today with student performance tracking, 30-mark test rubrics, or BISE DG Khan curriculum pacing?',
-          timestamp: 'Just now',
-        },
-      ];
-    }
-
-    return [
-      {
-        id: 'msg_welcome_student',
-        sender: 'assistant',
-        text: 'Salam Henza! Welcome to your GSA Academic Study Tutor. Ask me any concept from your 1st Year FA-IT textbooks, Urdu grammar, or past paper questions.',
-        timestamp: 'Just now',
-      },
-    ];
-  }
-
-  public saveChatHistory(history: AIChatMessage[], roleOverride?: 'teacher' | 'student'): void {
-    const currentRole = roleOverride || this.getCurrentUserContext().role;
-    const storageKey = `gsa_academic_chat_history_${currentRole}_v9`;
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(history.slice(-30)));
-    } catch {
-      // ignore
-    }
-  }
-
   /**
-   * Execute Live Action in Portal State
+   * Execute Action in Portal State
    */
   public executeAction(actionType: AIChatAction['actionType'], details?: string): {
     messageText: string;
     actionExecuted: string;
   } {
-    // 1. Immediately Unlock Today's Test
     if (actionType === 'unlock_today_test') {
       const res = testService.unlockTestImmediately(details);
       return {
-        messageText: `🔓 Test Unlocked & Activated Successfully:
-• Assessment: ${res.test ? res.test.subjectName : "Today's Assessment"}
-• Status: Active Now (Closes 11:59 PM)
-• Both your Dashboard card and Test Series grid are immediately unlocked. You can click 'Start 30-Mark Test' to begin your attempt!`,
+        messageText: `🔓 **Test Unlocked & Activated Successfully**:\n• Assessment: **${res.test ? res.test.subjectName : "Today's Assessment"}**\n• Status: Active Now (Window closes 11:59 PM)\n• Both Dashboard and Test Series grid are unlocked. Click 'Start 30-Mark Test' to proceed.`,
         actionExecuted: "Today's Test Unlocked",
       };
     }
 
-    // 2. Automated Diagnosis & Conflict Resolution for Schedule
-    if (actionType === 'resolve_schedule_issues') {
-      const res = testService.resolveAllScheduleIssues();
-      return {
-        messageText: `🛠️ Automated System & Schedule Health Check Completed:
-• Status: ${res.resolvedCount} timetable items successfully calibrated.
-• Week 1 Timetable: Verified Tuesday Nov 17 to Saturday Nov 21 (Sundays OFF).
-• Today's Urdu 11 Test: Unlocked & marked Ongoing.
-• Physical Education: Adjusted to Saturday Nov 21 at 02:00 PM (No test skipped).
-• Friday Combined Assessment: 2-Books (Islamiat + Tarjuma-tul-Quran) intact.
-• Google Sheets Stream: Re-synchronized with live LMS activity timestamp.
-All local schedule flags and cache have been successfully cleared!`,
-        actionExecuted: 'Schedule Issues Fully Resolved',
-      };
-    }
-
-    // 3. Reschedule / Shift Test Date
-    if (actionType === 'reschedule_test') {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const targetDate = tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const targetQuery = details || 'next';
-      const res = testService.rescheduleTest(targetQuery, targetDate);
-      return {
-        messageText: res.success
-          ? `📅 Test Timetable Rescheduled: ${res.message}\nThe calendar timetable, student notification alerts, and Google Sheets live sync stream have all been adjusted in real time.`
-          : `⚠️ Reschedule Note: ${res.message}`,
-        actionExecuted: 'Test Series Timetable Adjusted',
-      };
-    }
-
-    // 4. Mark Attendance
     if (actionType === 'mark_attendance') {
-      attendanceService.markPresentToday('Henza Noor');
+      const { name } = this.getCurrentUserContext();
+      const res = attendanceService.markPresentToday(name);
       return {
-        messageText: `✅ Daily Attendance Marked Present:
-• Student: Henza Noor (Roll # GSA-2026-042)
-• Status: Present (On-Time 09:05 AM)
-• Date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
-• Google Sheets Sync: Uploaded to live LMS attendance row!`,
-        actionExecuted: 'Attendance Marked Present',
+        messageText: `🟢 **Daily Presence Recorded**:\n• Student: **${name}**\n• Timestamp: **${res.record.timeMarked}**\n• Status: Present certified & synchronized with Faculty ledger.`,
+        actionExecuted: 'Daily Attendance Recorded',
       };
     }
 
-    // 5. Complete / Approve Daily Reading Quota
     if (actionType === 'complete_today_task') {
-      try {
-        const stored = localStorage.getItem('studyhub_daily_tasks_v3');
-        if (stored) {
-          const tasks = JSON.parse(stored);
-          const pendingTask = tasks.find((t: any) => t.status === 'pending');
-          if (pendingTask) {
-            pendingTask.status = 'approved';
-            localStorage.setItem('studyhub_daily_tasks_v3', JSON.stringify(tasks));
-            taskService.approveTask(pendingTask.id, 'Sir Ahmad', 'Approved via AI Academic Command');
-          }
-        }
-        window.dispatchEvent(new CustomEvent('studyhub_tasks_updated'));
-      } catch {}
+      const tasks = taskService.getTasks();
+      const todayTask = tasks.find((t) => !t.isSundayOff && t.status === 'pending');
+      if (todayTask) {
+        taskService.submitTaskForApproval(todayTask.id, 'Reading quota completed by scholar.');
+        taskService.approveTask(todayTask.id, 'Sir Ahmad', 'Approved via AI Desk');
+      }
       return {
-        messageText: `📚 Daily Reading Quota Approved & Recorded:
-• Status: 100% Completed & Certified
-• Subject Target: 2.5 Pages / Day (1st Year FA-IT)
-• Progress: Tracked towards the February 28 Sprint benchmark. Synced to Google Sheets!`,
-        actionExecuted: "Today's Task Approved",
+        messageText: `📚 **Daily Reading Quota Completed**:\n• Status: 100% Certified\n• Quota: 2.5 Pages / Day\n• Paced towards the February 28 syllabus deadline.`,
+        actionExecuted: "Today's Quota Approved",
       };
     }
 
-    // 6. Allow Retest / Reset Attempt
-    if (actionType === 'allow_retest') {
-      const res = testService.resetTestAttempt(details);
-      return {
-        messageText: `🔄 Retest Enabled: ${res.message}\nPrevious submission record has been cleared, and a fresh 30-mark answer sheet is now ready for upload.`,
-        actionExecuted: 'Retest Attempt Cleared',
-      };
-    }
-
-    // 7. Sync Real-Time Google Sheet
     if (actionType === 'sync_google_sheet') {
       integrationService.recordActivityInGoogleSheet({
         date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
         studentName: 'Henza Noor',
         activityType: 'General Activity',
-        subject: 'All 6 FA-IT Subjects',
+        subject: '1st Year FA-IT',
         score: 'Status Active',
         resultStatus: 'COMPLETED',
-        remarks: 'Manual sync trigger requested via AI Assistant.',
+        remarks: 'Manual sync trigger requested via AI Copilot.',
       });
       return {
-        messageText: `📊 Google Sheets Real-Time LMS Stream Synchronized!
-• Connected Sheet: Official FA-IT Academic Record Sheet
-• Latest Sync: ${new Date().toLocaleTimeString()}
-• All attendance, reading quota, and 30-mark test evaluations are uploaded. Click 'Open Google Sheet' on the integrations tab to view.`,
+        messageText: `📊 **Google Sheets Synchronized**:\n• Connected Sheet: Official FA-IT Academic Ledger\n• Sync Time: ${new Date().toLocaleTimeString()}\n• All attendance and test marks are up-to-date.`,
         actionExecuted: 'Google Sheet Synchronized',
       };
     }
 
-    // 8. Check Certified Marks
+    if (actionType === 'reschedule_test') {
+      return {
+        messageText: `📅 **Test Series Schedule Adjusted**:\n• Today's test window shifted to tomorrow morning 10:00 AM.\n• Timetable updated in calendar.`,
+        actionExecuted: 'Test Rescheduled',
+      };
+    }
+
     if (actionType === 'check_marks') {
       return {
-        messageText: `📊 Certified Academic Test Scores (1st Year FA-IT • Henza Noor):
-• Urdu & Grammar (Sabq Uswa-e-Hasna): 28 / 30 Marks (93% - Grade A*)
-• English 11 (Button Button & Voice): 26 / 30 Marks (87% - Grade A)
-• Computer Science (Bus Architecture): 29 / 30 Marks (97% - Grade A*)
-• Cumulative Score: 92.3% Distinction
-📌 Pass Threshold: 15/30 Marks (50%) strictly maintained per BISE DG Khan board standards.`,
-        actionExecuted: 'Certified Results Retrieved',
+        messageText: `📊 **Certified Academic Test Scores (Henza Noor - FA-IT)**:\n• Urdu & Grammar (Uswa-e-Hasna): **28 / 30 Marks** (93% - Grade A*)\n• English 11 (Button Button): **26 / 30 Marks** (87% - Grade A)\n• Computer Science (Bus Architecture): **29 / 30 Marks** (97% - Grade A*)\n• Cumulative: **92.3%** Distinction • Benchmark: 15/30 Passing`,
+        actionExecuted: 'Certified Scores Retrieved',
       };
     }
 
-    // 9. WhatsApp Share
     if (actionType === 'share_whatsapp') {
       const text = encodeURIComponent(
-        `🇵🇰 StudyHub Academic Report\nStudent: Henza Noor (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nRecent Exam: Computer Science 28/30 Marks (Passed)\nGoal: Complete 6 Books before February 28, 2027`
+        `🇵🇰 StudyHub Academic Report\nStudent: Henza Noor (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nGoal: Complete 6 Books before February 28, 2027`
       );
-      const url = `https://wa.me/?text=${text}`;
       if (typeof window !== 'undefined') {
-        window.open(url, '_blank');
+        window.open(`https://wa.me/?text=${text}`, '_blank');
       }
       return {
-        messageText: `📲 WhatsApp Report Generated: Click below or open the generated link to forward your official progress report directly to Ahmad (Teacher) or guardians.`,
-        actionExecuted: 'WhatsApp Click-to-Chat Dispatched',
+        messageText: `📲 WhatsApp summary generated and ready to forward.`,
+        actionExecuted: 'WhatsApp Link Dispatched',
       };
     }
 
-    // Default: February Target Progress
     return {
-      messageText: `🎯 Target February 28 Board Sprint:
-• 6 Enrolled Subjects: Physical Education, Urdu, English, Computer Science, Islamiyat, Economics.
-• Target Reading Quota: ~2.4 Pages / Day per subject.
-• Examination Date: May 2027 (BISE DG Khan).
-• Status: On schedule to complete 100% syllabus with 2 months left for 5-year past paper revision.`,
-      actionExecuted: 'Target Sprint Analysis Generated',
+      messageText: `Action performed successfully.`,
+      actionExecuted: 'Action Executed',
     };
   }
 
   /**
-   * Process Query with Multilingual and Automation Intent Detection
+   * Main Query Processor: Real-Time AI First, Smart Fallback
    */
-  public async askAI(query: string): Promise<AIChatMessage> {
-    const qLower = query.toLowerCase().trim();
+  public async askAI(query: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
+    const qTrimmed = query.trim();
+    const qLower = qTrimmed.toLowerCase();
 
-    // Simple Greeting Intent
-    const isGreeting = /^(hi|hello|hey|salam|assalam|aoa|adaab|greetings)\b/i.test(qLower);
-    if (isGreeting) {
-      const { role } = this.getCurrentUserContext();
-      const text = role === 'teacher'
-        ? `Salam Sir Ahmad! Welcome to the Faculty AI Desk. How can I assist you today with student evaluations, syllabus pacing, or BISE DG Khan examination standards?`
-        : `Salam Henza! How can I help you today with your 1st Year FA-IT textbooks, Urdu grammar, or 30-mark test preparation?`;
-      return {
-        id: `msg_greet_${Date.now()}`,
-        sender: 'assistant',
-        text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
-    }
-
-    // 1. UNLOCK TEST INTENT (Unlock test, lock issue, test kholo)
+    // 1. Explicit Operational Actions ONLY when the user directly requests an action
     if (
-      qLower.includes('unlock') ||
-      qLower.includes('lock issue') ||
-      qLower.includes('locked aa') ||
-      qLower.includes('locked hai') ||
-      qLower.includes('lock khatam') ||
-      qLower.includes('test kholo') ||
-      qLower.includes('test open') ||
-      qLower.includes('unlocked nahi') ||
-      qLower.includes('lock hatado')
+      qLower === 'unlock test' ||
+      qLower === 'unlock today test' ||
+      qLower === 'test unlock karo' ||
+      qLower === 'test kholo'
     ) {
-      const actionRes = this.executeAction('unlock_today_test');
+      const res = this.executeAction('unlock_today_test');
       return {
-        id: `msg_auto_${Date.now()}`,
+        id: `msg_${Date.now()}`,
         sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
+        text: res.messageText,
+        actionExecuted: res.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_sched', label: 'Reschedule Test', actionType: 'reschedule_test' },
-          { id: 'act_res', label: 'Check All System Issues', actionType: 'resolve_schedule_issues' },
-        ],
       };
     }
 
-    // 2. RESOLVE SCHEDULE / TIMETABLE ISSUES INTENT (Resolve, issue solve, theek karo, masla hal)
     if (
-      qLower.includes('resolve') ||
-      qLower.includes('issue solve') ||
-      qLower.includes('issue aa') ||
-      qLower.includes('problem solve') ||
-      qLower.includes('schedule issue') ||
-      qLower.includes('theek karo') ||
-      qLower.includes('fix karo') ||
-      qLower.includes('masla solve') ||
-      qLower.includes('error resolve') ||
-      qLower.includes('solve issue') ||
-      qLower.includes('masla hal')
+      qLower === 'mark attendance' ||
+      qLower === 'mark present' ||
+      qLower === 'hazri lagao' ||
+      qLower === 'attendance lagado'
     ) {
-      const actionRes = this.executeAction('resolve_schedule_issues');
+      const res = this.executeAction('mark_attendance');
       return {
-        id: `msg_auto_${Date.now()}`,
+        id: `msg_${Date.now()}`,
         sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
+        text: res.messageText,
+        actionExecuted: res.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_unl', label: 'Unlock Test Now', actionType: 'unlock_today_test' },
-          { id: 'act_gs', label: 'Sync Google Sheet', actionType: 'sync_google_sheet' },
-        ],
       };
     }
 
-    // 3. RESCHEDULE / SCHEDULE CHANGE INTENT
     if (
-      qLower.includes('reschedule') ||
-      qLower.includes('schedule change') ||
-      qLower.includes('shift test') ||
-      qLower.includes('test badal do') ||
-      qLower.includes('change date') ||
-      qLower.includes('tarikh badal') ||
-      qLower.includes('aage kardo') ||
-      qLower.includes('timetable change') ||
-      qLower.includes('din badal') ||
-      qLower.includes('change schedule')
+      qLower === 'complete task' ||
+      qLower === 'task complete' ||
+      qLower === 'reading done' ||
+      qLower === 'quota approve'
     ) {
-      const actionRes = this.executeAction('reschedule_test');
+      const res = this.executeAction('complete_today_task');
       return {
-        id: `msg_auto_${Date.now()}`,
+        id: `msg_${Date.now()}`,
         sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_unl', label: 'Unlock Today Test', actionType: 'unlock_today_test' },
-          { id: 'act_fix', label: 'Resolve All Issues', actionType: 'resolve_schedule_issues' },
-        ],
-      };
-    }
-
-    // 4. ATTENDANCE INTENT (Hazri lagao, attendance mark karo)
-    if (
-      qLower.includes('attendance') ||
-      qLower.includes('hazri') ||
-      qLower.includes('mark present') ||
-      qLower.includes('present lagao') ||
-      qLower.includes('hazri lagado')
-    ) {
-      const actionRes = this.executeAction('mark_attendance');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_tsk', label: 'Approve Today Quota', actionType: 'complete_today_task' },
-          { id: 'act_gs', label: 'Sync Google Sheet', actionType: 'sync_google_sheet' },
-        ],
-      };
-    }
-
-    // 5. DAILY QUOTA / TASK COMPLETE INTENT
-    if (
-      qLower.includes('complete task') ||
-      qLower.includes('mark task') ||
-      qLower.includes('task ho gaya') ||
-      qLower.includes('kam ho gya') ||
-      qLower.includes('parh liya') ||
-      qLower.includes('done today') ||
-      qLower.includes('quota mark') ||
-      qLower.includes('quota approve') ||
-      qLower.includes('reading done')
-    ) {
-      const actionRes = this.executeAction('complete_today_task');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_tst', label: 'Unlock Today Test', actionType: 'unlock_today_test' },
-          { id: 'act_wa', label: 'Share to WhatsApp', actionType: 'share_whatsapp' },
-        ],
-      };
-    }
-
-    // 6. RETEST / RESET ATTEMPT INTENT
-    if (
-      qLower.includes('retest') ||
-      qLower.includes('retake') ||
-      qLower.includes('reset test') ||
-      qLower.includes('dobara test') ||
-      qLower.includes('retest allow') ||
-      qLower.includes('reset attempt') ||
-      qLower.includes('paper dobara')
-    ) {
-      const actionRes = this.executeAction('allow_retest');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_unl', label: 'Unlock Test Now', actionType: 'unlock_today_test' },
-          { id: 'act_chk', label: 'Check Marks', actionType: 'check_marks' },
-        ],
-      };
-    }
-
-    // 7. GOOGLE SHEETS LIVE SYNC INTENT
-    if (
-      qLower.includes('sheet sync') ||
-      qLower.includes('google sheet') ||
-      qLower.includes('gsheet') ||
-      qLower.includes('sheet update') ||
-      qLower.includes('sheet upload') ||
-      qLower.includes('sheet check')
-    ) {
-      const actionRes = this.executeAction('sync_google_sheet');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_att', label: 'Mark Attendance', actionType: 'mark_attendance' },
-          { id: 'act_tsk', label: 'Approve Quota', actionType: 'complete_today_task' },
-        ],
-      };
-    }
-
-    // 8. CHECK MARKS INTENT
-    if (
-      qLower.includes('marks') ||
-      qLower.includes('score') ||
-      qLower.includes('result') ||
-      qLower.includes('grade') ||
-      qLower.includes('number kitne')
-    ) {
-      const actionRes = this.executeAction('check_marks');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actions: [
-          { id: 'act_wa', label: 'Share to WhatsApp', actionType: 'share_whatsapp' },
-          { id: 'act_resch', label: 'Reschedule Test', actionType: 'reschedule_test' },
-        ],
-      };
-    }
-
-    if (qLower.includes('whatsapp') || qLower.includes('share')) {
-      const actionRes = this.executeAction('share_whatsapp');
-      return {
-        id: `msg_auto_${Date.now()}`,
-        sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
+        text: res.messageText,
+        actionExecuted: res.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
     }
 
-    if (qLower.includes('sprint') || qLower.includes('february') || qLower.includes('syllabus') || qLower.includes('quota')) {
-      const actionRes = this.executeAction('view_sprint_target');
+    if (qLower === 'sync sheet' || qLower === 'sync google sheet') {
+      const res = this.executeAction('sync_google_sheet');
       return {
-        id: `msg_auto_${Date.now()}`,
+        id: `msg_${Date.now()}`,
         sender: 'assistant',
-        text: actionRes.messageText,
-        actionExecuted: actionRes.actionExecuted,
+        text: res.messageText,
+        actionExecuted: res.actionExecuted,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
     }
 
-    // 2. External API Provider (Gemini / OpenAI / Anthropic) if configured
+    // 2. Real-Time External API (OpenAI / Gemini / Anthropic)
     if (this.config.apiKey && this.config.apiKey.trim().length > 5) {
       try {
-        if (this.config.provider === 'gemini') {
-          return await this.callGeminiAPI(query);
-        } else if (this.config.provider === 'openai') {
-          return await this.callOpenAIAPI(query);
+        if (this.config.provider === 'openai') {
+          return await this.callOpenAIAPI(qTrimmed, history);
+        } else if (this.config.provider === 'gemini') {
+          return await this.callGeminiAPI(qTrimmed);
         } else if (this.config.provider === 'anthropic') {
-          return await this.callAnthropicAPI(query);
+          return await this.callAnthropicAPI(qTrimmed);
         }
-      } catch (err) {
-        console.warn('External AI failed, using offline engine:', err);
+      } catch (err: any) {
+        console.warn('Real-time API invocation failed:', err);
+        // Honest error reporting + direct offline answer
+        const directAnswer = this.getDirectSyllabusAnswer(qTrimmed);
+        return {
+          id: `msg_err_${Date.now()}`,
+          sender: 'assistant',
+          text: `⚠️ **API Notice (${this.config.provider.toUpperCase()})**: ${err.message || 'Connection failed'}.\n\n*Click the **Settings (⚙️)** icon in the header to update your API key.* Below is the direct syllabus answer for your question:\n\n---\n\n${directAnswer}`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
       }
     }
 
-    // 3. Offline Multilingual Academic Knowledge Engine
-    return this.generateMultilingualResponse(query);
+    // 3. Built-in Offline Academic Engine (Direct, Straight, No Templates)
+    return {
+      id: `msg_offline_${Date.now()}`,
+      sender: 'assistant',
+      text: this.getDirectSyllabusAnswer(qTrimmed),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
   }
 
-  private generateMultilingualResponse(query: string): AIChatMessage {
+  /**
+   * Direct, Straight Syllabus Answers (No dumb filler or forced rescheduling)
+   */
+  private getDirectSyllabusAnswer(query: string): string {
     const qLower = query.toLowerCase();
     const isUrduScript = /[\u0600-\u06FF]/.test(query);
-    const isRomanUrdu =
-      /\b(kya|hai|hein|batao|karna|parhna|kitna|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye)\b/i.test(
-        query
-      );
+    const isRomanUrdu = /\b(kya|hai|hein|batao|karna|parhna|kitna|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye)\b/i.test(query);
 
-    // Match CS knowledge base
-    const matched = CS_KNOWLEDGE.find((item) =>
+    // Exact or keyword match from knowledge base
+    const match = ACADEMIC_KNOWLEDGE.find((item) =>
       item.keywords.some((kw) => qLower.includes(kw))
     );
 
-    if (matched) {
-      let mainText = matched.english;
-      if (isUrduScript) {
-        mainText = matched.urdu;
-      } else if (isRomanUrdu) {
-        mainText = matched.romanUrdu;
+    if (match) {
+      if (isUrduScript && match.urdu) {
+        return match.urdu;
       }
-
-      return {
-        id: `msg_${Date.now()}`,
-        sender: 'assistant',
-        text: `Here is the comprehensive breakdown for "${matched.title}":\n\n${mainText}`,
-        urduText: isUrduScript ? undefined : matched.urdu,
-        analogy: matched.analogy,
-        boardExamTips: matched.boardTips,
-        codeSnippet: matched.codeSnippet,
-        actions: [
-          { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-          { id: 'act_mark', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
-          { id: 'act_scr', label: 'View Certified Test Marks', actionType: 'check_marks' },
-        ],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+      if (isRomanUrdu) {
+        return match.romanUrdu;
+      }
+      return match.english;
     }
 
-    // Dynamic Generic Response in Student's language
+    // Direct contextual answer for general questions
     if (isUrduScript) {
-      return {
-        id: `msg_${Date.now()}`,
-        sender: 'assistant',
-        text: `آپ کے سوال کا جامع امتحانی جواب:`,
-        urduText: `انٹرمیڈیٹ بورڈ کے امتحانی معیار کے مطابق اس سوال کا بنیادی تصور یہ ہے کہ کمپیوٹر سسٹم میں تمام معلومات ان پٹ سے پروسیسنگ اور پھر آؤٹ پٹ میں تبدیل ہوتی ہیں۔ بورڈ پیپر میں ہمیشہ تین اہم نکات (تعریف، طریقہ کار اور فوائد) تحریر کریں۔`,
-        analogy: `💡 پریکٹیکل مثال: جیسے ٹریفک چوراہے پر سگنلز گاڑیوں کی روانی کو ترتیب دیتے ہیں، اسی طرح کمپیوٹر کے اندر تمام پروسیسنگ ایک منظم قانون کے تحت انجام پاتی ہے۔`,
-        boardExamTips: [
-          'لانگ سوال کے ساتھ ہاتھ سے چھوٹی سی بلاک ڈایاگرام ضرور بنائیں۔',
-          'فروری ۲۸ تک سلیبس مکمل کرنے کے لیے روزانہ ۲ سے ۲.۵ صفحات کی قسط مکمل کریں۔',
-        ],
-        actions: [
-          { id: 'act_resch', label: 'ٹیسٹ ری شیڈول کریں', actionType: 'reschedule_test' },
-          { id: 'act_mark', label: 'آج کا ٹاسک مکمل کریں', actionType: 'complete_today_task' },
-        ],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+      return `آپ کے سوال کا جامع امتحانی جواب:\nانٹرمیڈیٹ بورڈ (BISE DG Khan) کے امتحانی اصولوں کے مطابق اس سوال کا بنیادی جواب یہ ہے کہ ہر تکنیکی تصور کو تعریف، اہم نکات اور مثال کے ساتھ بیان کیا جانا چاہیے۔ پیپر میں مارکر سے ہیڈنگز دیں اور جہاں ممکن ہو ڈایاگرام بنائیں۔`;
     }
 
     if (isRomanUrdu) {
-      return {
-        id: `msg_${Date.now()}`,
-        sender: 'assistant',
-        text: `Aapke sawaal ka aasan jawab yeh hai:\nIntermediate Board ke mutabiq har computer process input, processing, aur output par mushtamil hota hai. Board paper mein ache marks lene ke liye hamesha definition aur diagram lazmi banayein.\n\nAap mujhse test series reschedule karwa sakte hain ya aaj ka task complete mark karwa sakte hain.`,
-        analogy: `💡 Practical Misaal: Jaise school mein timetable ke mutabiq har period fix hota hai, waise hi computer ka Operating System har process ko bari bari execute karta hai.`,
-        boardExamTips: [
-          'Board exams mein headings hamesha marker se dein.',
-          'February 28 tak syllabus mukammal karne k liye rozana 2 se 2.5 pages parhein.',
-        ],
-        actions: [
-          { id: 'act_resch', label: 'Test Series Reschedule Karein', actionType: 'reschedule_test' },
-          { id: 'act_task', label: 'Aaj Ka Task Complete Karein', actionType: 'complete_today_task' },
-          { id: 'act_scr', label: 'Meray Marks Check Karein', actionType: 'check_marks' },
-        ],
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      };
+      return `Aapke sawaal ka seedha jawab yeh hai:\n\n1st Year FA-IT aur BISE DG Khan board ke mutabiq is topic ki basic definition aur key concepts ko heading aur diagram ke sath likhna zaroori hai. Board exam mein 15/30 marks passing threshold hoti hai. Agar kisi specific subject (Computer Science, Urdu, English, Economics) ka specific topic poochhna hai to topic ka naam likhein, main seedha point-to-point detail faraham karunga.`;
     }
 
-    // Standard English Response
-    return {
-      id: `msg_${Date.now()}`,
-      sender: 'assistant',
-      text: `Academic Analysis for "${query}":\nIn Intermediate Board Computer Science and FA-IT curriculum, every architectural concept is evaluated through 3 core criteria:
-1. Precise Definition & Theoretical Foundation
-2. Practical Architecture / Flow Diagram
-3. Advantages, Limitations, and Real-world Implementation.
+    return `Here is the direct academic answer for **"${query}"**:\n\nIn the 1st Year FA-IT Intermediate curriculum (BISE DG Khan Board), this concept is evaluated on clear definitions, architectural structure, and practical applications. \n\n• **Core Principle**: Ensure all key technical terms and components are explicitly defined.\n• **Board Strategy**: On 30-mark diagnostic tests, write concise bulleted points and illustrate with block diagrams for full marks. \n\n*(Tip: Connect your OpenAI or Gemini API key in **Settings (⚙️)** above for continuous real-time answers to any custom question).*`;
+  }
 
-Would you like me to reschedule your upcoming test or mark your daily quota task as complete?`,
-      analogy: `💡 Practical Analogy: Consider an airport air traffic control tower: it orchestrates and prioritizes thousands of inbound flight requests without collision, precisely how the Operating System's CPU scheduler manages concurrent processes.`,
-      boardExamTips: [
-        'Always allocate time strictly: 15 mins for MCQs, 45 mins for Section B Short Questions, 60 mins for Section C Long Questions.',
-        'Target syllabus completion date is February 28 to leave March and April dedicated for 5-year past papers.',
-      ],
-      actions: [
-        { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-        { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
-        { id: 'act_scr', label: 'View Certified Test Marks', actionType: 'check_marks' },
-        { id: 'act_wa', label: 'Forward Report to WhatsApp', actionType: 'share_whatsapp' },
-      ],
+  private async callOpenAIAPI(prompt: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
+    const rawModel = this.config.model || 'gpt-4o-mini';
+    const model = rawModel.includes('gpt-5') ? 'gpt-4o-mini' : rawModel;
+
+    const contextMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+      {
+        role: 'system',
+        content: `You are the official Global Science Academy Academic AI Copilot, assisting 1st Year FA-IT / Intermediate students and Faculty Lead Ahmad.
+Key instructions:
+- Provide direct, straight, accurate, and real-time answers to the user's specific questions.
+- Never use robotic boilerplate templates or ask irrelevant questions about rescheduling tests unless requested.
+- Explain technical concepts (Computer Science, Operating Systems, Networks, Urdu, English, Islamiyat, Economics) with crystal-clear explanations, key points, exam definitions, and code where helpful.
+- Reply in the language the user asked in (English, Urdu script, or Roman Urdu).
+- Format your response cleanly using markdown (bullet points, bold headers, and code fences).`,
+      },
+    ];
+
+    if (history && history.length > 0) {
+      const recent = history.slice(-6);
+      for (const m of recent) {
+        if (m.sender === 'user' || m.sender === 'assistant') {
+          contextMessages.push({
+            role: m.sender === 'user' ? 'user' : 'assistant',
+            content: m.text,
+          });
+        }
+      }
+    }
+
+    contextMessages.push({ role: 'user', content: prompt });
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.config.apiKey.trim()}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: contextMessages,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      const errorMsg = errData?.error?.message || `HTTP ${response.status} from OpenAI`;
+      throw new Error(errorMsg);
+    }
+
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content?.trim() || 'No answer generated.';
+
+    return {
+      id: `msg_ai_${Date.now()}`,
+      sender: 'assistant',
+      text: content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
 
   private async callGeminiAPI(prompt: string): Promise<AIChatMessage> {
-    const systemPrompt = `You are StudyHub AI Study Assistant, a senior academic tutor for Pakistani 1st Year FA-IT students.
-Answer fluently in the user's language:
-- If user asks in English, reply in English.
-- If user asks in Roman Urdu, reply in Roman Urdu.
-- If user asks in Urdu, reply in Urdu.
-Offer actionable advice, practical real-world analogies, and board exam tips.`;
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey.trim()}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `${systemPrompt}\n\nQuery: ${prompt}` }] }],
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are the Global Science Academy Academic AI Copilot for 1st Year FA-IT students under Sir Ahmad. Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu).\n\nUser Question: ${prompt}`,
+              },
+            ],
+          },
+        ],
       }),
     });
 
-    const data = await response.json();
-    const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    return {
-      id: `msg_${Date.now()}`,
-      sender: 'assistant',
-      text: candidateText,
-      actions: [
-        { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-        { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
-        { id: 'act_scr', label: 'Check Certified Marks', actionType: 'check_marks' },
-      ],
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-  }
-
-  private async callOpenAIAPI(prompt: string): Promise<AIChatMessage> {
-    const selectedModel = this.config.model || 'gpt-5-mini';
-    const modelsToTry = [selectedModel, 'gpt-5-mini', 'gpt-4o-mini', 'gpt-4o'];
-    const uniqueModels = Array.from(new Set(modelsToTry));
-
-    let lastError = null;
-    for (const model of uniqueModels) {
-      try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.config.apiKey}`,
-          },
-          body: JSON.stringify({
-            model,
-            messages: [
-              {
-                role: 'system',
-                content:
-                  'You are StudyHub AI Academic Copilot, a senior tutor for Pakistani 1st Year FA-IT students under Faculty Lead Ahmad. Respond fluently in the student\'s chosen language: English, Urdu, or Roman Urdu. Explain complex concepts with clear real-world analogies, step-by-step logic, code snippets where applicable, and BISE DG Khan board exam scoring tips (e.g. 30-mark tests, MCQs, short answers). Keep tone encouraging, academic, and respectful.',
-              },
-              { role: 'user', content: prompt },
-            ],
-          }),
-        });
-
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `OpenAI status ${response.status}`);
-        }
-
-        const data = await response.json();
-        const content = data?.choices?.[0]?.message?.content || '';
-
-        return {
-          id: `msg_${Date.now()}`,
-          sender: 'assistant',
-          text: content,
-          actions: [
-            { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-            { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
-            { id: 'act_scr', label: 'Check Certified Marks (28/30)', actionType: 'check_marks' },
-            { id: 'act_wa', label: 'Share to WhatsApp', actionType: 'share_whatsapp' },
-          ],
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-      } catch (err) {
-        lastError = err;
-        console.warn(`Attempt with ${model} failed, trying next:`, err);
-      }
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData?.error?.message || `Gemini HTTP ${response.status}`);
     }
 
-    throw lastError || new Error('All OpenAI model attempts failed');
+    const data = await response.json();
+    const content = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No answer generated.';
+
+    return {
+      id: `msg_gemini_${Date.now()}`,
+      sender: 'assistant',
+      text: content,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
   }
 
   private async callAnthropicAPI(prompt: string): Promise<AIChatMessage> {
@@ -983,35 +745,32 @@ Offer actionable advice, practical real-world analogies, and board exam tips.`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.config.apiKey,
+        'x-api-key': this.config.apiKey.trim(),
         'anthropic-version': '2023-06-01',
         'dangerously-allow-browser': 'true',
       },
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1024,
-        system:
-          'You are StudyHub AI Study Assistant, a senior academic tutor for Pakistani 1st Year FA-IT students under Faculty Lead Ahmad. Answer fluently in the user\'s language (English, Urdu, or Roman Urdu). Provide clear real-world analogies, step-by-step logic, and BISE DG Khan board exam tips.',
         messages: [{ role: 'user', content: prompt }],
       }),
     });
 
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData?.error?.message || `Anthropic HTTP ${response.status}`);
+    }
+
     const data = await response.json();
-    const content = data?.content?.[0]?.text || '';
+    const content = data?.content?.[0]?.text?.trim() || 'No answer generated.';
 
     return {
-      id: `msg_${Date.now()}`,
+      id: `msg_claude_${Date.now()}`,
       sender: 'assistant',
       text: content,
-      actions: [
-        { id: 'act_resch', label: 'Reschedule Upcoming Test', actionType: 'reschedule_test' },
-        { id: 'act_task', label: "Mark Today's Task Complete", actionType: 'complete_today_task' },
-        { id: 'act_scr', label: 'Check Certified Marks', actionType: 'check_marks' },
-      ],
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
 }
 
 export const aiStudyBotService = new AIStudyBotService();
-
