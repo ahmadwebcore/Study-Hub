@@ -1,4 +1,4 @@
-import { testService } from './testService';
+import { testService, getLocalCertifiedResults } from './testService';
 import { attendanceService } from './attendanceService';
 import { taskService } from './taskService';
 import { integrationService } from './integrationService';
@@ -217,44 +217,61 @@ export class AIStudyBotService {
     const envKey = (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
     const envModel = (import.meta as any).env?.VITE_OPENAI_MODEL || 'gpt-4o-mini';
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_AI_CONFIG);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed && typeof parsed === 'object') {
-          // Fix legacy fictional model names
-          if (!parsed.model || parsed.model.includes('gpt-5')) {
-            parsed.model = 'gpt-4o-mini';
+    const candidateKeys = [
+      STORAGE_KEY_AI_CONFIG,
+      'studyhub_ai_config_v1',
+      'studyhub_ai_config_v2',
+      'studyhub_openai_key',
+      'openai_api_key',
+    ];
+
+    let resolvedKey = '';
+    let resolvedProvider: 'openai' | 'gemini' | 'anthropic' | 'offline' = 'openai';
+    let resolvedModel = envModel.includes('gpt-5') ? 'gpt-4o-mini' : envModel;
+
+    for (const k of candidateKeys) {
+      try {
+        const stored = localStorage.getItem(k);
+        if (stored) {
+          if (stored.startsWith('{')) {
+            const parsed = JSON.parse(stored);
+            if (parsed.apiKey && parsed.apiKey.trim().length > 10) {
+              resolvedKey = parsed.apiKey.trim();
+              if (parsed.provider) resolvedProvider = parsed.provider;
+              if (parsed.model && !parsed.model.includes('gpt-5')) resolvedModel = parsed.model;
+              break;
+            }
+          } else if (stored.startsWith('sk-') || stored.startsWith('AIza')) {
+            resolvedKey = stored.trim();
+            break;
           }
-          // Preserve user-saved key! Only fall back to env key if empty
-          if (!parsed.apiKey || parsed.apiKey.trim().length === 0) {
-            parsed.apiKey = envKey;
-          }
-          if (!parsed.provider) {
-            parsed.provider = 'openai';
-          }
-          this.config = parsed;
-          return this.config;
         }
-      }
-    } catch {}
+      } catch {}
+    }
+
+    if (!resolvedKey && envKey && envKey.trim().length > 10) {
+      resolvedKey = envKey.trim();
+    }
 
     this.config = {
-      provider: 'openai',
-      apiKey: envKey,
-      model: envModel.includes('gpt-5') ? 'gpt-4o-mini' : envModel,
+      provider: resolvedProvider,
+      apiKey: resolvedKey,
+      model: resolvedModel,
     };
     return this.config;
   }
 
   public saveConfig(config: AIProviderConfig): void {
-    // Sanitize model
     if (config.model && config.model.includes('gpt-5')) {
       config.model = 'gpt-4o-mini';
     }
     this.config = { ...config };
     try {
       localStorage.setItem(STORAGE_KEY_AI_CONFIG, JSON.stringify(this.config));
+      localStorage.setItem('studyhub_ai_config_v1', JSON.stringify(this.config));
+      if (this.config.apiKey) {
+        localStorage.setItem('openai_api_key', this.config.apiKey);
+      }
     } catch {}
   }
 
@@ -411,17 +428,105 @@ export class AIStudyBotService {
     try {
       const role = (localStorage.getItem('studyhub_active_role') as 'teacher' | 'student') || 'teacher';
       const userStr = localStorage.getItem('studyhub_logged_in_user');
-      let name = role === 'teacher' ? 'Sir Ahmad' : 'Henza Noor';
+      let name = role === 'teacher' ? 'Faculty Lead' : 'Enrolled Student';
       if (userStr) {
         const parsed = JSON.parse(userStr);
-        if (parsed.name && !parsed.name.toLowerCase().includes('scholar')) {
-          name = parsed.name;
-        }
+        if (parsed.fullName) name = parsed.fullName;
+        else if (parsed.name) name = parsed.name;
       }
       return { role, name };
     } catch {
-      return { role: 'teacher', name: 'Sir Ahmad' };
+      return { role: 'teacher', name: 'Faculty Lead' };
     }
+  }
+
+  public getDynamicUserAcademicContext(): {
+    role: 'teacher' | 'student';
+    name: string;
+    email: string;
+    academicClass: string;
+    attendanceSummary: string;
+    testSummary: string;
+    taskSummary: string;
+    fullContextString: string;
+  } {
+    let role: 'teacher' | 'student' = 'student';
+    let name = 'Student';
+    let email = '';
+    let academicClass = '1st Year FA-IT';
+
+    try {
+      const activeRole = localStorage.getItem('studyhub_active_role');
+      if (activeRole === 'teacher' || activeRole === 'student') {
+        role = activeRole;
+      }
+      const userStr = localStorage.getItem('studyhub_logged_in_user');
+      if (userStr) {
+        const parsed = JSON.parse(userStr);
+        if (parsed.fullName) name = parsed.fullName;
+        else if (parsed.name) name = parsed.name;
+        if (parsed.email) email = parsed.email;
+        if (parsed.academicClass || parsed.grade) academicClass = parsed.academicClass || parsed.grade;
+      }
+    } catch {}
+
+    // Live Attendance Record
+    let attendanceSummary = 'Attendance active.';
+    try {
+      const todayAtt = attendanceService.getTodayRecord();
+      const now = new Date();
+      const stats = attendanceService.getMonthlyStats(now.getFullYear(), now.getMonth());
+      const todayStatus = todayAtt?.status === 'present'
+        ? `Marked Present today at ${todayAtt.timeMarked || 'recorded time'}`
+        : 'Attendance not yet marked for today';
+      attendanceSummary = `${todayStatus}. Monthly attendance rate: ${stats.attendancePercentage}% (${stats.presentDays} of ${stats.workingDays} days present).`;
+    } catch {}
+
+    // Live Test Performance & Results
+    let testSummary = 'Diagnostic 30-mark test series active.';
+    try {
+      const certified = getLocalCertifiedResults();
+      if (certified && certified.length > 0) {
+        const recents = certified.slice(0, 4).map((r) => {
+          const title = r.testTitle || r.subjectName || 'Test';
+          const marks = r.maxScore ? `${r.score}/${r.maxScore}` : `${r.score} marks`;
+          return `${title}: ${marks} (${r.percentage || Math.round((r.score / (r.maxScore || 30)) * 100)}%, Grade ${r.grade})`;
+        });
+        testSummary = `Certified Test Scores: ${recents.join(' | ')}. Passing threshold: 15/30 marks.`;
+      }
+    } catch {}
+
+    // Today's Reading Quota & Pending Tasks
+    let taskSummary = 'Daily reading quota: 2.5 pages/day.';
+    try {
+      const tasks = taskService.getTasks();
+      const pending = tasks.filter((t) => !t.isSundayOff && t.status === 'pending');
+      if (pending && pending.length > 0) {
+        const top = pending[0];
+        taskSummary = `Active Target: ${top.subjectName} — ${top.title} (${top.pagesRange || 'Daily Reading Quota'}). Pending tasks: ${pending.length}. Target deadline: February 28.`;
+      } else {
+        taskSummary = 'All assigned targets for today are completed and verified.';
+      }
+    } catch {}
+
+    const fullContextString = `Current Active User Context:
+- User Role: ${role === 'teacher' ? 'Faculty / Teacher' : 'Enrolled Student'}
+- Full Name: ${name}
+- Enrolled Class / Curriculum: ${academicClass} (BISE D.G. Khan Board)
+- Live Attendance: ${attendanceSummary}
+- Live Test Results: ${testSummary}
+- Active Daily Tasks: ${taskSummary}`;
+
+    return {
+      role,
+      name,
+      email,
+      academicClass,
+      attendanceSummary,
+      testSummary,
+      taskSummary,
+      fullContextString,
+    };
   }
 
   /**
@@ -440,20 +545,21 @@ export class AIStudyBotService {
     }
 
     if (actionType === 'mark_attendance') {
-      const { name } = this.getCurrentUserContext();
-      const res = attendanceService.markPresentToday(name);
+      const ctx = this.getDynamicUserAcademicContext();
+      const res = attendanceService.markPresentToday(ctx.name);
       return {
-        messageText: `🟢 **Daily Presence Recorded**:\n• Student: **${name}**\n• Timestamp: **${res.record.timeMarked}**\n• Status: Present certified & synchronized with Faculty ledger.`,
+        messageText: `🟢 **Daily Presence Recorded**:\n• Scholar: **${ctx.name}**\n• Timestamp: **${res.record.timeMarked}**\n• Status: Present certified & synchronized with Faculty ledger.`,
         actionExecuted: 'Daily Attendance Recorded',
       };
     }
 
     if (actionType === 'complete_today_task') {
+      const ctx = this.getDynamicUserAcademicContext();
       const tasks = taskService.getTasks();
       const todayTask = tasks.find((t) => !t.isSundayOff && t.status === 'pending');
       if (todayTask) {
         taskService.submitTaskForApproval(todayTask.id, 'Reading quota completed by scholar.');
-        taskService.approveTask(todayTask.id, 'Sir Ahmad', 'Approved via AI Desk');
+        taskService.approveTask(todayTask.id, ctx.role === 'teacher' ? ctx.name : 'Faculty Lead', 'Approved via AI Desk');
       }
       return {
         messageText: `📚 **Daily Reading Quota Completed**:\n• Status: 100% Certified\n• Quota: 2.5 Pages / Day\n• Paced towards the February 28 syllabus deadline.`,
@@ -462,11 +568,12 @@ export class AIStudyBotService {
     }
 
     if (actionType === 'sync_google_sheet') {
+      const ctx = this.getDynamicUserAcademicContext();
       integrationService.recordActivityInGoogleSheet({
         date: new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
-        studentName: 'Henza Noor',
+        studentName: ctx.name,
         activityType: 'General Activity',
-        subject: '1st Year FA-IT',
+        subject: ctx.academicClass,
         score: 'Status Active',
         resultStatus: 'COMPLETED',
         remarks: 'Manual sync trigger requested via AI Copilot.',
@@ -485,15 +592,17 @@ export class AIStudyBotService {
     }
 
     if (actionType === 'check_marks') {
+      const ctx = this.getDynamicUserAcademicContext();
       return {
-        messageText: `📊 **Certified Academic Test Scores (Henza Noor - FA-IT)**:\n• Urdu & Grammar (Uswa-e-Hasna): **28 / 30 Marks** (93% - Grade A*)\n• English 11 (Button Button): **26 / 30 Marks** (87% - Grade A)\n• Computer Science (Bus Architecture): **29 / 30 Marks** (97% - Grade A*)\n• Cumulative: **92.3%** Distinction • Benchmark: 15/30 Passing`,
+        messageText: `📊 **Certified Academic Test Scores**:\n• Scholar: **${ctx.name}** (${ctx.academicClass})\n• ${ctx.testSummary}`,
         actionExecuted: 'Certified Scores Retrieved',
       };
     }
 
     if (actionType === 'share_whatsapp') {
+      const ctx = this.getDynamicUserAcademicContext();
       const text = encodeURIComponent(
-        `🇵🇰 StudyHub Academic Report\nStudent: Henza Noor (1st Year FA-IT)\nOverall Performance: 92.5% Grade A*\nGoal: Complete 6 Books before February 28, 2027`
+        `🇵🇰 Global Science Academy Academic Report\nStudent: ${ctx.name} (${ctx.academicClass})\nAttendance: ${ctx.attendanceSummary}\nScores: ${ctx.testSummary}\nGoal: Complete 6 Books before February 28, 2027`
       );
       if (typeof window !== 'undefined') {
         window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -577,8 +686,10 @@ export class AIStudyBotService {
       };
     }
 
+    const userCtx = this.getDynamicUserAcademicContext();
+
     // 2. Real-Time External API (OpenAI / Gemini / Anthropic)
-    if (this.config.apiKey && this.config.apiKey.trim().length > 5) {
+    if (this.config.apiKey && this.config.apiKey.trim().length > 10) {
       try {
         if (this.config.provider === 'openai') {
           return await this.callOpenAIAPI(qTrimmed, history);
@@ -589,35 +700,47 @@ export class AIStudyBotService {
         }
       } catch (err: any) {
         console.warn('Real-time API invocation failed:', err);
-        // Honest error reporting + direct offline answer
-        const directAnswer = this.getDirectSyllabusAnswer(qTrimmed);
+        const directAnswer = this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx);
         return {
           id: `msg_err_${Date.now()}`,
           sender: 'assistant',
-          text: `⚠️ **API Notice (${this.config.provider.toUpperCase()})**: ${err.message || 'Connection failed'}.\n\n*Click the **Settings (⚙️)** icon in the header to update your API key.* Below is the direct syllabus answer for your question:\n\n---\n\n${directAnswer}`,
+          text: `⚠️ **AI Provider Notice**: ${err.message || 'Connection failed'}.\n\n${directAnswer}`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
       }
     }
 
-    // 3. Built-in Offline Academic Engine (Direct, Straight, No Templates)
+    // 3. Dynamic Local Academic Engine (Uses Live User Context)
     return {
       id: `msg_offline_${Date.now()}`,
       sender: 'assistant',
-      text: this.getDirectSyllabusAnswer(qTrimmed),
+      text: this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
 
   /**
-   * Direct, Straight Syllabus Answers (No dumb filler or forced rescheduling)
+   * Direct, Straight Syllabus Answers (Uses Live Dynamic User Context)
    */
-  private getDirectSyllabusAnswer(query: string): string {
+  private getDirectDynamicSyllabusAnswer(query: string, userCtx: ReturnType<typeof this.getDynamicUserAcademicContext>): string {
     const qLower = query.toLowerCase();
     const isUrduScript = /[\u0600-\u06FF]/.test(query);
-    const isRomanUrdu = /\b(kya|hai|hein|batao|karna|parhna|kitna|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye)\b/i.test(query);
+    const isRomanUrdu = /\b(kya|hai|hein|batao|karna|parhna|kitna|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|kitne|marks|hazri)\b/i.test(query);
 
-    // Exact or keyword match from knowledge base
+    // 1. Dynamic questions about student's own records:
+    if (qLower.includes('marks') || qLower.includes('result') || qLower.includes('score') || qLower.includes('number') || qLower.includes('grade')) {
+      return `📊 **Certified Test Performance**:\n• ${userCtx.testSummary}\n\nTamam tests BISE DG Khan board examination standards ke mutabiq 30-mark diagnostic format par evaluate kiye gaye hain. Passing threshold 15/30 marks hai.`;
+    }
+
+    if (qLower.includes('attendance') || qLower.includes('hazri') || qLower.includes('present') || qLower.includes('ghair hazir')) {
+      return `🟢 **Live Attendance Record**:\n• ${userCtx.attendanceSummary}\n\nDaily attendance portal par digital/biometric status ke mutabiq certify hoti hai.`;
+    }
+
+    if (qLower.includes('task') || qLower.includes('homework') || qLower.includes('quota') || qLower.includes('target') || qLower.includes('aaj ka') || qLower.includes('today')) {
+      return `📚 **Today's Academic Target**:\n• ${userCtx.taskSummary}\n\nHar roz 2.5 pages ka reading quota complete kar ke submit karein taake 28 February tak poora syllabus complete ho jaye.`;
+    }
+
+    // 2. Exact or keyword match from knowledge base
     const match = ACADEMIC_KNOWLEDGE.find((item) =>
       item.keywords.some((kw) => qLower.includes(kw))
     );
@@ -632,37 +755,42 @@ export class AIStudyBotService {
       return match.english;
     }
 
-    // Direct contextual answer for general questions
+    // 3. Clean direct general academic answer
     if (isUrduScript) {
       return `آپ کے سوال کا جامع امتحانی جواب:\nانٹرمیڈیٹ بورڈ (BISE DG Khan) کے امتحانی اصولوں کے مطابق اس سوال کا بنیادی جواب یہ ہے کہ ہر تکنیکی تصور کو تعریف، اہم نکات اور مثال کے ساتھ بیان کیا جانا چاہیے۔ پیپر میں مارکر سے ہیڈنگز دیں اور جہاں ممکن ہو ڈایاگرام بنائیں۔`;
     }
 
     if (isRomanUrdu) {
-      return `Aapke sawaal ka seedha jawab yeh hai:\n\n1st Year FA-IT aur BISE DG Khan board ke mutabiq is topic ki basic definition aur key concepts ko heading aur diagram ke sath likhna zaroori hai. Board exam mein 15/30 marks passing threshold hoti hai. Agar kisi specific subject (Computer Science, Urdu, English, Economics) ka specific topic poochhna hai to topic ka naam likhein, main seedha point-to-point detail faraham karunga.`;
+      return `Aapke sawaal ka seedha jawab yeh hai:\n\n1st Year FA-IT aur BISE DG Khan board ke mutabiq is topic ki basic definition aur key concepts ko heading aur diagram ke sath likhna zaroori hai. Board exam mein 15/30 marks passing threshold hoti hai. Agar kisi specific topic (Computer Science, Urdu, English, Economics) ka specific sawaal hai to topic ka naam likhein, main seedha point-to-point detail faraham karunga.`;
     }
 
-    return `Here is the direct academic answer for **"${query}"**:\n\nIn the 1st Year FA-IT Intermediate curriculum (BISE DG Khan Board), this concept is evaluated on clear definitions, architectural structure, and practical applications. \n\n• **Core Principle**: Ensure all key technical terms and components are explicitly defined.\n• **Board Strategy**: On 30-mark diagnostic tests, write concise bulleted points and illustrate with block diagrams for full marks. \n\n*(Tip: Connect your OpenAI or Gemini API key in **Settings (⚙️)** above for continuous real-time answers to any custom question).*`;
+    return `Here is the academic guidance for **"${query}"**:\n\nIn the 1st Year Intermediate & FA-IT curriculum (BISE DG Khan Board):\n• **Core Principle**: Define technical concepts clearly with standard definitions and practical applications.\n• **Board Strategy**: On 30-mark diagnostic tests, write structured points with block diagrams for full credit.\n• **Pacing**: Target completion of all course units before February 28.`;
   }
 
   private async callOpenAIAPI(prompt: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
     const rawModel = this.config.model || 'gpt-4o-mini';
     const model = rawModel.includes('gpt-5') ? 'gpt-4o-mini' : rawModel;
+    const userCtx = this.getDynamicUserAcademicContext();
 
     const contextMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
       {
         role: 'system',
-        content: `You are the official Global Science Academy Academic AI Copilot, assisting 1st Year FA-IT / Intermediate students and Faculty Lead Ahmad.
-Key instructions:
-- Provide direct, straight, accurate, and real-time answers to the user's specific questions.
-- Never use robotic boilerplate templates or ask irrelevant questions about rescheduling tests unless requested.
-- Explain technical concepts (Computer Science, Operating Systems, Networks, Urdu, English, Islamiyat, Economics) with crystal-clear explanations, key points, exam definitions, and code where helpful.
+        content: `You are the official Global Science Academy Academic AI Copilot for 1st Year Intermediate & FA-IT students under BISE D.G. Khan Board.
+
+${userCtx.fullContextString}
+
+Response Guidelines:
+- Directly, concisely, and straight-forwardly answer the user's specific question without unnecessary pleasantries or filler.
+- If the user asks about personal student records (such as their test marks, attendance status, today's homework, tasks, or timetable), use the live user session context provided above to give an accurate, factual answer.
+- For academic curriculum topics (Computer Science, Operating Systems, Networks, Urdu, English, Islamic Studies, Economics), explain the concepts clearly with definitions, key exam points, bullet points, and code/diagrams where helpful.
 - Reply in the language the user asked in (English, Urdu script, or Roman Urdu).
-- Format your response cleanly using markdown (bullet points, bold headers, and code fences).`,
+- Do NOT use repetitive robotic boilerplate or dump generic paragraphs.
+- Keep the tone polite, encouraging, and academically rigorous. Format nicely with markdown bolding and bullet points.`,
       },
     ];
 
     if (history && history.length > 0) {
-      const recent = history.slice(-6);
+      const recent = history.slice(-8);
       for (const m of recent) {
         if (m.sender === 'user' || m.sender === 'assistant') {
           contextMessages.push({
@@ -684,7 +812,7 @@ Key instructions:
       body: JSON.stringify({
         model,
         messages: contextMessages,
-        temperature: 0.7,
+        temperature: 0.6,
       }),
     });
 
@@ -698,7 +826,7 @@ Key instructions:
     const content = data?.choices?.[0]?.message?.content?.trim() || 'No answer generated.';
 
     return {
-      id: `msg_ai_${Date.now()}`,
+      id: `msg_openai_${Date.now()}`,
       sender: 'assistant',
       text: content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

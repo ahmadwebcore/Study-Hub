@@ -15,6 +15,7 @@ import {
   Eye,
   EyeOff,
   Check,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -214,35 +215,27 @@ export const StudyBotWidget: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40">
-      {/* 2026 Floating Launcher Button */}
+      {/* WhatsApp-Style Clean Floating Launcher Button */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-full bg-zinc-950 text-white shadow-2xl hover:shadow-emerald-950/40 border border-white/15 backdrop-blur-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer ring-1 ring-white/10"
-          aria-label="Open Academic AI Assistant"
-          title={isTeacher ? 'Open GSA Faculty AI Copilot & Student Chat' : 'Open GSA Academic AI Copilot'}
+          className="group relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white shadow-xl hover:shadow-2xl shadow-emerald-950/30 transition-all duration-200 hover:scale-110 active:scale-95 border-2 border-white/40 cursor-pointer"
+          aria-label="Open Academic Chat"
+          title="Open Academic Chat & AI Copilot"
         >
-          <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-zinc-950" />
-          </div>
+          {/* WhatsApp-style message bubble icon */}
+          <MessageSquare className="w-6 h-6 text-white drop-shadow-xs fill-white/20 transition-transform group-hover:scale-105" />
 
-          <div className="flex flex-col text-left">
-            <span className="text-xs font-bold leading-tight flex items-center gap-1.5">
-              <span>GSA Copilot</span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
-                {aiConfig.apiKey ? 'OpenAI Live' : 'AI Assistant'}
-              </span>
-            </span>
-            <span className="text-[10px] text-zinc-400 leading-tight">
-              Instant academic answers &bull; 24/7
-            </span>
-          </div>
+          {/* Pulse Ripple & Live Dot */}
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white shadow-xs">
+            1
+          </span>
+          <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-400 animate-ping opacity-75" />
         </button>
       )}
 
-      {/* Modern 2026 Slide-over Chat Box */}
+      {/* Modern Slide-over Chat Box */}
       {isOpen && (
         <div className="fixed inset-2 sm:inset-auto sm:bottom-5 sm:right-5 sm:w-[440px] sm:h-[640px] h-[92vh] max-h-[92vh] sm:max-h-[88vh] bg-white rounded-3xl border border-zinc-200 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200 z-50 text-zinc-900 font-sans">
           {/* Header */}
@@ -259,9 +252,7 @@ export const StudyBotWidget: React.FC = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                 </div>
                 <p className="text-[10px] text-zinc-400 truncate">
-                  {isTeacher
-                    ? 'Faculty Lead Desk \u2022 Sir Ahmad'
-                    : '1st Year FA-IT Desk \u2022 Henza Noor'}
+                  AI Academic Copilot &bull; Live 24/7
                 </p>
               </div>
             </div>
@@ -459,7 +450,7 @@ export const StudyBotWidget: React.FC = () => {
               }`}
             >
               <Bot className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{isTeacher ? 'Faculty AI Copilot' : 'Academic AI Copilot'}</span>
+              <span>AI Copilot</span>
             </button>
             <button
               type="button"
@@ -471,7 +462,7 @@ export const StudyBotWidget: React.FC = () => {
               }`}
             >
               <UserCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>{isTeacher ? 'Henza Noor (Student)' : 'Sir Ahmad (Lead)'}</span>
+              <span>Direct Chat</span>
             </button>
           </div>
 
@@ -481,8 +472,8 @@ export const StudyBotWidget: React.FC = () => {
               <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
               <span className="text-blue-900 font-semibold text-[11px]">
                 {isTeacher
-                  ? 'Direct Channel: Message Henza Noor (1st Year FA-IT Scholar)'
-                  : 'Direct Channel: Message Sir Ahmad (Faculty Lead Evaluator)'}
+                  ? 'Direct Channel: Message Student'
+                  : 'Direct Channel: Message Faculty Evaluator'}
               </span>
             </div>
           )}
@@ -495,71 +486,69 @@ export const StudyBotWidget: React.FC = () => {
                   key={msg.id}
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                 >
-                  <div
-                    className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-emerald-600 text-white rounded-br-xs shadow-xs'
-                        : 'bg-white text-zinc-900 border border-zinc-200/80 rounded-bl-xs shadow-2xs'
-                    }`}
-                  >
-                    {/* Action Executed Banner */}
-                    {msg.actionExecuted && (
-                      <div className="mb-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center gap-1">
-                        <Zap className="w-3 h-3 text-emerald-600 shrink-0" />
-                        <span>{msg.actionExecuted}</span>
-                      </div>
-                    )}
+                  {/* Action Executed Banner */}
+                  {msg.actionExecuted && (
+                    <div className="mb-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold flex items-center gap-1 max-w-[85%]">
+                      <Zap className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span>{msg.actionExecuted}</span>
+                    </div>
+                  )}
 
-                    {/* Sender Header */}
-                    <div className="flex items-center justify-between gap-1.5 mb-1.5 text-[10px]">
-                      <span className={msg.sender === 'user' ? 'text-emerald-100 font-bold' : 'text-emerald-700 font-bold flex items-center gap-1'}>
-                        {msg.sender === 'user' ? (
-                          isTeacher ? 'Sir Ahmad' : 'Henza Noor'
-                        ) : (
-                          <>
-                            <Sparkles className="w-3 h-3 text-emerald-600" />
-                            <span>GSA Copilot</span>
-                          </>
-                        )}
-                      </span>
-                      <span className={msg.sender === 'user' ? 'text-emerald-200 text-[9px]' : 'text-zinc-400 text-[9px]'}>
+                  {msg.sender === 'user' ? (
+                    // User Question: Clean, simple, modern bubble aligned right
+                    <div className="max-w-[85%] rounded-2xl rounded-br-xs px-3.5 py-2.5 bg-emerald-600 text-white shadow-xs">
+                      <div className="text-xs leading-relaxed font-normal whitespace-pre-line select-text">
+                        {msg.text}
+                      </div>
+                      <div className="text-[9px] text-emerald-100/75 text-right mt-1 font-mono">
                         {msg.timestamp}
-                      </span>
-                    </div>
-
-                    {/* Message Body Content */}
-                    <div className={msg.sender === 'user' ? 'text-white' : 'text-zinc-900'}>
-                      {renderFormattedText(msg.text)}
-                    </div>
-
-                    {/* Urdu Nastaliq Content if present */}
-                    {msg.urduText && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-100 space-y-1">
-                        <p className="font-urdu text-[13px] text-zinc-900 leading-relaxed text-right dir-rtl whitespace-pre-line font-medium">
-                          {msg.urduText}
-                        </p>
                       </div>
-                    )}
-
-                    {/* Action buttons (ONLY rendered if message specifically provides interactive actions) */}
-                    {msg.actions && msg.actions.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-100 flex flex-wrap gap-1.5">
-                        {msg.actions.map((act) => (
-                          <button
-                            key={act.id}
-                            type="button"
-                            onClick={() => handleActionClick(act)}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs cursor-pointer active:scale-95"
-                          >
-                            <Zap className="w-3 h-3 text-emerald-600" />
-                            <span>{act.label}</span>
-                          </button>
-                        ))}
+                    </div>
+                  ) : (
+                    // Assistant Answer: Clean, clear card aligned left
+                    <div className="max-w-[90%] rounded-2xl rounded-bl-xs p-3.5 bg-white border border-zinc-200/90 text-zinc-900 shadow-2xs">
+                      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-100 text-[10px]">
+                        <span className="text-emerald-700 font-bold flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span>AI Copilot</span>
+                        </span>
+                        <span className="text-zinc-400 font-mono text-[9px]">
+                          {msg.timestamp}
+                        </span>
                       </div>
-                    )}
 
-                    {/* Copy Button */}
-                    {msg.sender === 'assistant' && (
+                      {/* Answer Content */}
+                      <div className="text-xs text-zinc-900 leading-relaxed font-normal">
+                        {renderFormattedText(msg.text)}
+                      </div>
+
+                      {/* Urdu Nastaliq Content if present */}
+                      {msg.urduText && (
+                        <div className="mt-2.5 pt-2 border-t border-zinc-100 space-y-1">
+                          <p className="font-urdu text-[13px] text-zinc-900 leading-relaxed text-right dir-rtl whitespace-pre-line font-medium">
+                            {msg.urduText}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Interactive Actions if specifically provided */}
+                      {msg.actions && msg.actions.length > 0 && (
+                        <div className="mt-2.5 pt-2 border-t border-zinc-100 flex flex-wrap gap-1.5">
+                          {msg.actions.map((act) => (
+                            <button
+                              key={act.id}
+                              type="button"
+                              onClick={() => handleActionClick(act)}
+                              className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold transition-all flex items-center gap-1 shadow-2xs cursor-pointer active:scale-95"
+                            >
+                              <Zap className="w-3 h-3 text-emerald-600" />
+                              <span>{act.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Copy Action */}
                       <div className="mt-2 flex items-center justify-end text-[10px] pt-1.5 border-t border-zinc-100">
                         <button
                           type="button"
@@ -574,13 +563,13 @@ export const StudyBotWidget: React.FC = () => {
                           ) : (
                             <>
                               <Copy className="w-3 h-3" />
-                              <span className="text-[9px]">Copy answer</span>
+                              <span className="text-[9px]">Copy</span>
                             </>
                           )}
                         </button>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
@@ -596,25 +585,21 @@ export const StudyBotWidget: React.FC = () => {
                     className={`flex flex-col ${isMyMessage ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`max-w-[88%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
                         isMyMessage
                           ? 'bg-blue-600 text-white rounded-br-xs shadow-xs'
                           : 'bg-white text-zinc-900 border border-zinc-200/80 rounded-bl-xs shadow-2xs'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2 mb-1 text-[10px]">
-                        <span className={isMyMessage ? 'text-blue-100 font-bold' : 'text-blue-800 font-bold'}>
-                          {isMyMessage
-                            ? 'You'
-                            : isTeacher
-                            ? 'Henza Noor (Student)'
-                            : 'Sir Ahmad (Faculty Lead)'}
+                        <span className={isMyMessage ? 'text-blue-100 font-semibold' : 'text-blue-800 font-semibold'}>
+                          {isMyMessage ? 'You' : isTeacher ? 'Student' : 'Faculty'}
                         </span>
                         <span className={isMyMessage ? 'text-blue-200 text-[9px]' : 'text-zinc-400 text-[9px]'}>
                           {msg.timestamp}
                         </span>
                       </div>
-                      <p className="whitespace-pre-line text-xs font-normal leading-relaxed">
+                      <p className="whitespace-pre-line text-xs font-normal leading-relaxed select-text">
                         {msg.text}
                       </p>
                     </div>
@@ -629,7 +614,7 @@ export const StudyBotWidget: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:-0.15s]"></span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce"></span>
                 <span className="text-[10px] text-zinc-500 font-medium ml-1">
-                  Generating straight answer...
+                  Thinking...
                 </span>
               </div>
             )}
@@ -673,10 +658,8 @@ export const StudyBotWidget: React.FC = () => {
               type="text"
               placeholder={
                 chatSource === 'direct'
-                  ? isTeacher
-                    ? 'Message Henza Noor directly...'
-                    : 'Message Sir Ahmad directly...'
-                  : 'Ask about Computer Science, Urdu grammar, syllabus, or exam...'
+                  ? 'Type your direct message...'
+                  : 'Ask about Computer Science, syllabus, marks, or hazri...'
               }
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
