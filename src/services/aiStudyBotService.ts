@@ -200,6 +200,206 @@ Iske ahem kaam: Processor ko schedule karna, RAM memory manage karna, files ko o
     romanUrdu: `• **Characters**: Norma, Arthur Lewis, aur Mr. Steward.
 • **Theme**: Lalach aur insani qadron ka tazad. Norma $50,000 ke lalach mein button daba deti hai jiski qeemat uske shohar Arthur ki jaan se ada hoti hai.`,
   },
+  {
+    keywords: ['binary', 'binary numbers', 'number systems', 'decimal to binary', 'hexadecimal', 'octal', 'conversion'],
+    title: 'Number Systems: Binary, Decimal, Octal & Hexadecimal',
+    english: `• **Binary (Base 2)**: Uses digits 0 and 1. The fundamental machine language of computing.
+• **Decimal (Base 10)**: Standard counting system using digits 0 to 9.
+• **Hexadecimal (Base 16)**: Digits 0-9 and letters A-F (where A=10, B=11, C=12, D=13, E=14, F=15). Used for memory addressing and color codes.
+• **Conversion Rule**: Divide decimal by 2 repeatedly and record remainders from bottom to top.`,
+    romanUrdu: `• **Binary (Base 2)**: Sirf 0 aur 1 (computer ki zaban).
+• **Decimal (Base 10)**: 0 se 9 tak aam ginti.
+• **Hexadecimal (Base 16)**: 0 se 9 aur A se F tak (memory addresses ke liye use hota hai).
+• **Conversion**: Decimal ko 2 par divide karte jayein aur remainders neechay se ooper likhein.`,
+  },
+  {
+    keywords: ['lan', 'man', 'wan', 'local area network', 'wide area network', 'network types'],
+    title: 'Network Types: LAN, MAN, WAN (Geographic Scope)',
+    english: `• **LAN (Local Area Network)**: Spans a single room, lab, or building. High data transfer speeds (up to 10 Gbps) with low latency.
+• **MAN (Metropolitan Area Network)**: Covers a city or large campus (e.g., Cable TV network).
+• **WAN (Wide Area Network)**: Spans countries and continents (the Internet is the largest WAN). Uses satellite links and submarine fiber cables.`,
+    romanUrdu: `• **LAN**: Ek kamray, school ya office tak mehdood network. Intehai tez raftaar (Ethernet / Wi-Fi).
+• **MAN**: Poore shehar par mushtamil network (maslan Cable TV network).
+• **WAN**: Poori dunya par phaila network (sab se bari misaal Internet hai).`,
+  },
+  {
+    keywords: ['switch', 'router', 'hub', 'network devices', 'gateway', 'bridge', 'repeater'],
+    title: 'Network Hardware Devices: Switch, Router, Hub & Bridge',
+    english: `• **Hub**: Layer 1 physical device. Multiport repeater that broadcasts all packets to all ports, causing collisions.
+• **Switch**: Layer 2 intelligent device. Filters and forwards frames directly to destination port using MAC addresses.
+• **Router**: Layer 3 network device. Connects disparate networks and routes packets using IP addresses.
+• **Repeater**: Amplifies and regenerates weakened electrical/optical signals over long distances.`,
+    romanUrdu: `• **Hub**: Dumb device jo aane wale data ko bina check kiye tamam ports par bhej deti hai.
+• **Switch**: Intelligent device jo MAC address dekh kar sirf matlooba computer ko data bhejti hai.
+• **Router**: Mukhtalif networks ko jorta hai aur best rasta talash karta hai.
+• **Repeater**: Lambay faaslay par kamzor hone wale signal ko taaza (regenerate) karta hai.`,
+  },
+  {
+    keywords: ['hardware', 'software', 'system software', 'application software', 'utility programs'],
+    title: 'Hardware vs Software & System Software Categories',
+    english: `• **Hardware**: The physical tangible components of a computer (CPU, RAM, Motherboard, Screen, Keyboard).
+• **Software**: Electronic instructions telling the hardware what to execute.
+  1. **System Software**: Manages hardware resources (Operating Systems like Windows 11, Device Drivers, Utilities).
+  2. **Application Software**: Assists end users in business or creative tasks (MS Office, Web Browsers, Media Players).`,
+    romanUrdu: `• **Hardware**: Computer ke wo hissay jinhein hum chhoo sakte hain (Processor, RAM, Screen, Keyboard).
+• **Software**: Computer ko chalane wali hidayat:
+  - System Software: Windows, Drivers, Utilities.
+  - Application Software: MS Word, Excel jo user ke kaam aatay hain.`,
+  },
+  {
+    keywords: ['input devices', 'output devices', 'keyboard', 'mouse', 'scanner', 'printers', 'monitor'],
+    title: 'Input & Output Peripherals: Classifications & Working',
+    english: `• **Input Devices**: Convert human input into digital signals (Keyboard, Mouse, Optical Scanner, OMR, OCR, Barcode Reader, MICR).
+• **Output Devices**: Convert processed digital data into human-perceptible format:
+  - Softcopy: Monitors (CRT, LCD, LED, OLED).
+  - Hardcopy: Impact printers (Dot Matrix) vs Non-impact printers (Laser, Inkjet, Plotters).`,
+    romanUrdu: `• **Input Devices**: Computer mein data daakhil karne ke alaat (Keyboard, Mouse, Scanner, Barcode Reader, OMR).
+• **Output Devices**: Computer se natija hasil karne ke alaat (Monitors, Laser Printers, Inkjet).`,
+  },
+  {
+    keywords: ['virus', 'computer virus', 'malware', 'trojan horse', 'worm', 'antivirus'],
+    title: 'Computer Viruses, Security Threats & Antivirus Defenses',
+    english: `• **Computer Virus**: Malicious program that replicates and attaches to executable files.
+• **Types of Malware**:
+  - *Boot Sector Virus*: Infects Master Boot Record (MBR).
+  - *Worm*: Self-replicating standalone program consuming network bandwidth.
+  - *Trojan Horse*: Disguises as useful software while opening backdoor access.
+  - *Ransomware*: Encrypts user files demanding payment.
+• **Defenses**: Real-time antivirus, firewall activation, regular data backups.`,
+    romanUrdu: `• **Virus**: Wo nuqsande program jo doosri files ke sath jurr kar unhein kharab karta hai.
+• **Worm**: Aisa virus jo khud ba khud network par phail kar computer ko slow kar deta hai.
+• **Trojan Horse**: Aisa dhokaybaaz program jo dekhne mein faidamand lagta hai magar andar se system ka control chura leta hai.
+• **Hifazat**: Antivirus install rakhein aur zaroori data ka backup rakhein.`,
+  },
+  {
+    keywords: ['tenses', '12 tenses', 'present indefinite', 'present continuous', 'past indefinite', 'future tense', 'english grammar'],
+    title: '12 English Tenses: Syntax, Formulas & Urdu Identification',
+    english: `• **Present Simple**: Sub + V1 (+ s/es). (e.g., He reads the daily quota.)
+• **Present Continuous**: Sub + is/am/are + V1+ing. (e.g., She is attempting the test.)
+• **Present Perfect**: Sub + has/have + V3. (e.g., I have completed the lesson.)
+• **Past Simple**: Sub + V2. (Negative: did not + V1).
+• **Future Simple**: Sub + will/shall + V1.`,
+    romanUrdu: `• **Present Simple**: Sub + Verb ki 1st form (+ s/es). (Urdu pehchan: ta hai, ti hai, te hain).
+• **Past Simple**: Sub + 2nd form of Verb. Negative: did not + 1st form. (Urdu pehchan: ya, yi, ye).
+• **Future Simple**: Sub + will/shall + 1st form. (Urdu pehchan: ga, gi, ge).`,
+  },
+  {
+    keywords: ['active passive', 'passive voice', 'voice conversion', 'active and passive voice'],
+    title: 'Active & Passive Voice Conversion Rules (BISE Exam Standard)',
+    english: `Golden Rules for Passive Voice:
+1. Object of active becomes Subject of passive.
+2. Always use V3 (Past Participle) in passive sentences.
+3. Add auxiliary 'by' before the active agent.
+4. Tense Shifts: Present Simple -> is/am/are + V3; Continuous -> being + V3; Perfect -> been + V3.`,
+    romanUrdu: `Passive Voice ke 4 bunyadi qawaneen:
+1. Object ko Subject banayein.
+2. Hamesha 3rd form of Verb (V3) lagayein.
+3. 'by' ka istemal karein.
+4. Continuous mein 'being' aur Perfect mein 'been' lagta hai.`,
+  },
+  {
+    keywords: ['apni madad aap', 'sir syed ahmad khan', 'sir syed', 'urdu sabaq 2'],
+    title: 'Urdu 11: Sabaq 2 "Apni Madad Aap" by Sir Syed Ahmad Khan',
+    english: `• **Author**: Sir Syed Ahmad Khan.
+• **Core Philosophy**: True national progress begins with individual self-reliance and moral discipline. External government assistance cannot cure internal moral degradation. God helps those who help themselves.`,
+    romanUrdu: `• **Musannif**: Sir Syed Ahmad Khan.
+• **Sabaq**: Qaum ki taraqqi fard ki mehnat aur apni madad aap ke jazbay mein muzmar hai. Jab tak afraad khud mehnat nahi karenge, qaum aage nahi barh sakti.`,
+    urdu: `• **مصنف**: سر سید احمد خان
+• **مرکزی خیال**: خدا ان کی مدد کرتا ہے جو اپنی مدد آپ کرتے ہیں۔ قومی ترقی افراد کی ذاتی محنت اور خود اعتمادی سے ممکن ہے۔`,
+  },
+  {
+    keywords: ['tashbih', 'arkan-e-tashbih', 'arkan e tashbih', 'tashbih ke arkan', 'ilm-e-bayan', 'urdu grammar'],
+    title: 'Ilm-e-Bayan: Tashbih (تشبیہ) & Its 5 Components (ارکانِ تشبیہ)',
+    english: `Tashbih (Simile) is establishing a likeness between two things based on a shared attribute.
+• 5 Components of Tashbih:
+  1. Mushabbah (مشبہ): The entity being compared (e.g., Ali).
+  2. Mushabbah Beh (مشبہ بہ): The benchmark entity (e.g., Sher).
+  3. Wajah-e-Shibh (وجہ شبہ): Shared attribute (Bahaduri).
+  4. Gharz-e-Tashbih (غرض تشبیہ): Purpose of comparison.
+  5. Harf-e-Tashbih (حرف تشبیہ): Comparison word (jaisa, ki tarah).`,
+    romanUrdu: `تشبیہ (Tashbih): Kisi ek cheez ko kisi doosri cheez ki tarah qarar dena.
+Iske 5 arkan hotay hain:
+1. مشبہ: Jis cheez ko tashbih di jaye.
+2. مشبہ بہ: Jis cheez ke sath tashbih di jaye.
+3. وجہ شبہ: Wo khoobi jo dono mein mushtarak ho.
+4. غرض تشبیہ: Tashbih dene ka maqsad.
+5. حرف تشبیہ: Wo lafz jo tashbih ke liye use ho (jaisa, ki tarah).`,
+    urdu: `تشبیہ کے پانچ ارکان ہیں: مشبہ، مشبہ بہ، وجہ شبہ، غرض تشبیہ، اور حرف تشبیہ۔`,
+  },
+  {
+    keywords: ['istaara', 'isteara', 'arkan-e-istaara', 'ilm-e-bayan'],
+    title: 'Ilm-e-Bayan: Ista\'ara (استعارہ) & Its 3 Components',
+    english: `Ista\'ara (Metaphor) means borrowing a word for another based on an imaginative resemblance without using comparison words.
+• 3 Components: Musta\'ar Lah (Original entity), Musta\'ar Minhu (Source entity), and Wajah-e-Jami (Common attribute).`,
+    romanUrdu: `استعارہ (Ista\'ara): Lafzi maani ke bajaye majazi maani lena bina kisi harf-e-tashbih ke (maslan: Mera sher beta aaya).
+3 arkan: Musta\'ar Lah, Musta\'ar Minhu, Wajah-e-Jami.`,
+  },
+  {
+    keywords: ['talmeeh', 'talmih', 'ilm-e-bayan'],
+    title: 'Ilm-e-Bayan: Talmeeh (تلمیح) Definition & Board Examples',
+    english: `Talmeeh (Allusion): A concise phrase in poetry pointing to a famous historical or religious event (e.g., Aatish-e-Namrood, Ibn-e-Maryam).`,
+    romanUrdu: `تلمیح (Talmeeh): Shairi mein kisi mashhoor tareekhi ya quranic waqiye ki taraf ishara karna.`,
+  },
+  {
+    keywords: ['khat noosi', 'khat ke ajza', 'urdu letter writing'],
+    title: 'Urdu Khat Noosi (خط نویسی کے ۶ اجزاء) & Board Pattern',
+    english: `Urdu Formal Letter contains 6 essential parts (10 Marks):
+1. Muqam-e-Rawangi aur Tareekh (امتحانی مرکز)
+2. Alqab (محترم ابا جان)
+3. Aadab (السلام علیکم)
+4. Nafs-e-Mazmoon (Main content)
+5. Ikhtitam (والسلام)
+6. Pata (Postal address).`,
+    romanUrdu: `خط کے 6 اجزاء: مقام روانگی و تاریخ، القاب، آداب، نفس مضمون، اختتام، اور پتہ.`,
+  },
+  {
+    keywords: ['economics', 'adam smith', 'alfred marshall', 'lionel robbins', 'usool-e-maashiyat', 'definitions of economics'],
+    title: 'Definitions of Economics: Adam Smith, Marshall & Robbins',
+    english: `1. Adam Smith: Economics is the science of Wealth (Production, Consumption, Distribution).
+2. Alfred Marshall: Economics is the study of Material Welfare in the ordinary business of life.
+3. Lionel Robbins: Economics is the study of human behavior facing unlimited wants and scarce means.`,
+    romanUrdu: `• Adam Smith: Ma\'ashiyat daulat ka ilm hai.
+• Alfred Marshall: Ma\'ashiyat insani falah-o-behbood (Material Welfare) ka ilm hai.
+• Lionel Robbins: Ma\'ashiyat na-mehdood khwahishat aur mehdood zaraye ke darmiyan intikhab ka science hai.`,
+  },
+  {
+    keywords: ['law of demand', 'qanoon talab', 'qanoon e talab', 'talab', 'demand', 'elasticity of demand'],
+    title: 'Law of Demand & Elasticity of Demand (قانونِ طلب اور لچک)',
+    english: `• Law of Demand: Keeping other factors constant (Ceteris Paribus), when the price of a good rises, its demand falls; when price falls, demand rises.
+• Price Elasticity of Demand: Responsiveness of demand to price changes (Ed > 1 for luxury goods, Ed < 1 for necessities).`,
+    romanUrdu: `• قانون طلب: Deegar halat badastoor rehte hue, jab kisi cheez ki qeemat barhti hai to uski talab kam ho jati hai, aur qeemat kam hone par talab barh jati hai.
+• طلب کی لچک: Qeemat badalne se talab par parne wala asar.`,
+  },
+  {
+    keywords: ['law of diminishing marginal utility', 'qanoon taqleel ifada', 'marginal utility', 'ifada mukhtatam', 'ifada'],
+    title: 'Law of Diminishing Marginal Utility (قانونِ تقلیلِ افادہِ مختتم)',
+    english: `Statement: As a consumer increases consumption of any good, the additional satisfaction (Marginal Utility) derived from each successive unit continuously declines.`,
+    romanUrdu: `قانون تقلیل افادہ مختتم: Jab koi shakhs kisi cheez ki musalsal ikaiyan istemal karta hai, to har agli ikai se milne wala izafi faida (Marginal Utility) kam hota jata hai.`,
+  },
+  {
+    keywords: ['skeleton', 'bones', 'human skeleton', 'haddi', 'haddiyan', '206 bones', 'sehat o jismani taleem'],
+    title: 'Human Skeletal System: 206 Bones, Axial vs Appendicular',
+    english: `The adult human skeleton comprises 206 bones:
+1. Axial Skeleton (80 Bones): Skull, Spine (Vertebral column), Ribs, Sternum.
+2. Appendicular Skeleton (126 Bones): Limbs, Shoulders, and Pelvic girdles.`,
+    romanUrdu: `Insani jism mein kul 206 haddiyan (bones) hoti hain:
+1. Mehwari Dhancha (Axial - 80 Haddiyan): Khopri, Reerh ki haddi, Pasliyan.
+2. Zameemati Dhancha (Appendicular - 126 Haddiyan): Baazu aur Taangein.`,
+  },
+  {
+    keywords: ['surah maryam', 'hazrat maryam', 'hazrat zakariya', 'hazrat isa', 'tarjuma tul quran'],
+    title: 'Tarjuma-tul-Quran 11: Surah Maryam Overview & Themes',
+    english: `• Makki Surah (98 verses).
+• Themes: Miraculous birth of Prophet Yahya (AS) to Prophet Zakariya (AS), and fatherless birth of Prophet Isa (AS) to Hazrat Maryam (AS). Prophet Isa speaking in the cradle to attest his mother\'s purity.`,
+    romanUrdu: `• Surah Maryam Makki Surah hai. Ismein Hazrat Zakariya (AS) ko burhapay mein Hazrat Yahya (AS) ki basharat aur Hazrat Maryam (AS) ke haan Hazrat Isa (AS) ki mojzana wiladat ka bayan hai.`,
+  },
+  {
+    keywords: ['tauheed', 'aqeedah-e-tauheed', 'islamic aqaid', 'islamiat 11'],
+    title: 'Islamiat Lazmi: Aqeedah-e-Tauheed (عقیدہِ توحید) & Its Impacts',
+    english: `Aqeedah-e-Tauheed is the cornerstone of Islam: Believing in Allah\'s absolute Oneness in Zaat (Person), Sifat (Attributes), and Ibadat (Worship).
+• Impacts: Inner peace, courage, dignity, and liberation from superstitions.`,
+    romanUrdu: `عقیدہ توحید: Allah ko zaat, sifat aur ibadat mein ek manna. Insaan shirk aur ghulami se aazad hota hai.`,
+  },
 ];
 
 export class AIStudyBotService {
@@ -387,12 +587,20 @@ export class AIStudyBotService {
       }
     } catch {}
 
+    const ctx = this.getCurrentUserContext();
+    const displayName =
+      ctx.name && ctx.name !== 'Student' && ctx.name !== 'Faculty Lead'
+        ? ctx.name
+        : currentRole === 'teacher'
+        ? 'Faculty Lead'
+        : 'Scholar';
+
     if (currentRole === 'teacher') {
       return [
         {
           id: 'msg_welcome_teacher',
           sender: 'assistant',
-          text: 'Salam Sir Ahmad! Welcome to the Faculty Academic AI Desk. Ask me any question regarding student performance, 30-mark diagnostic test rubrics, or BISE DG Khan curriculum pacing.',
+          text: `Salam ${displayName}! Welcome to your Faculty AI Desk. Ask any question regarding student performance, 30-mark diagnostic test rubrics, or BISE DG Khan curriculum pacing.`,
           timestamp: 'Just now',
         },
       ];
@@ -402,7 +610,7 @@ export class AIStudyBotService {
       {
         id: 'msg_welcome_student',
         sender: 'assistant',
-        text: 'Salam Henza! Welcome to your GSA Academic AI Copilot. Ask any question from Computer Science, Urdu grammar, English, or 1st Year board syllabus.',
+        text: `Salam ${displayName}! Welcome to your Academic AI Copilot. Ask any question from Computer Science, Urdu grammar, English, or 1st Year board syllabus.`,
         timestamp: 'Just now',
       },
     ];
@@ -623,6 +831,7 @@ export class AIStudyBotService {
    * Main Query Processor: Real-Time AI First, Smart Fallback
    */
   public async askAI(query: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
+    this.loadConfig();
     const qTrimmed = query.trim();
     const qLower = qTrimmed.toLowerCase();
 
@@ -725,34 +934,86 @@ export class AIStudyBotService {
   private getDirectDynamicSyllabusAnswer(query: string, userCtx: ReturnType<typeof this.getDynamicUserAcademicContext>): string {
     const qLower = query.toLowerCase();
     const isUrduScript = /[\u0600-\u06FF]/.test(query);
-    const isRomanUrdu = /\b(kya|hai|hein|batao|karna|parhna|kitna|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|kitne|marks|hazri)\b/i.test(query);
+    const isRomanUrdu = /\b(kya|hai|hain|hein|batao|karna|parhna|kitna|kitne|kitni|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|marks|hazri|mein|main|hoti|hota|hotay)\b/i.test(query);
 
-    // 1. Dynamic questions about student's own records:
-    if (qLower.includes('marks') || qLower.includes('result') || qLower.includes('score') || qLower.includes('number') || qLower.includes('grade')) {
+    // 1. Strict Intent Matching for Student Personal Records:
+    const isAskingMarks =
+      /\b(mere|mera|meri|my|student|obtained|check)\b.*\b(marks|result|score|grade|number|karkardagi)\b/i.test(query) ||
+      /\b(marks|result|score|kitne number)\b.*\b(kitne|batao|check|show|kya hai|bataen)\b/i.test(query);
+
+    if (isAskingMarks) {
       return `📊 **Certified Test Performance**:\n• ${userCtx.testSummary}\n\nTamam tests BISE DG Khan board examination standards ke mutabiq 30-mark diagnostic format par evaluate kiye gaye hain. Passing threshold 15/30 marks hai.`;
     }
 
-    if (qLower.includes('attendance') || qLower.includes('hazri') || qLower.includes('present') || qLower.includes('ghair hazir')) {
+    const isAskingAttendance =
+      /\b(meri|mera|my|aaj ki|today)\b.*\b(attendance|hazri|presence|haazri)\b/i.test(query) ||
+      /\b(attendance|hazri|haazri)\b.*\b(kitni|kya|lagi|batao|check|percentage|status|bataen)\b/i.test(query) ||
+      /\b(mark|laga do|lagao)\b.*\b(present|hazri)\b/i.test(query);
+
+    if (isAskingAttendance) {
       return `🟢 **Live Attendance Record**:\n• ${userCtx.attendanceSummary}\n\nDaily attendance portal par digital/biometric status ke mutabiq certify hoti hai.`;
     }
 
-    if (qLower.includes('task') || qLower.includes('homework') || qLower.includes('quota') || qLower.includes('target') || qLower.includes('aaj ka') || qLower.includes('today')) {
+    const isAskingTask =
+      /\b(aaj ka|today'?s|mera|meri|pending)\b.*\b(task|homework|quota|target|parhna|kaam)\b/i.test(query) ||
+      /\b(task|quota|homework|reading)\b.*\b(kya hai|batao|kitna|schedule|target)\b/i.test(query);
+
+    if (isAskingTask) {
       return `📚 **Today's Academic Target**:\n• ${userCtx.taskSummary}\n\nHar roz 2.5 pages ka reading quota complete kar ke submit karein taake 28 February tak poora syllabus complete ho jaye.`;
     }
 
-    // 2. Exact or keyword match from knowledge base
-    const match = ACADEMIC_KNOWLEDGE.find((item) =>
-      item.keywords.some((kw) => qLower.includes(kw))
-    );
+    // 2. High-Accuracy Token & Keyword Matcher from Knowledge Base:
+    const normalizedQ = qLower
+      .replace(/[\-_/\\,;:!?'"()]/g, ' ')
+      .replace(/\s+e\s+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
-    if (match) {
-      if (isUrduScript && match.urdu) {
-        return match.urdu;
+    const tokens = normalizedQ
+      .split(/\s+/)
+      .filter((w) => w.length >= 3 && !['what', 'explain', 'tell', 'about', 'difference', 'between', 'give', 'notes', 'kya', 'hai', 'hain', 'batao', 'samjhao', 'mein', 'hein'].includes(w));
+
+    let bestMatch: (typeof ACADEMIC_KNOWLEDGE)[0] | null = null;
+    let bestScore = 0;
+
+    const GENERIC_SUBJECT_WORDS = ['economics', 'maashiyat', 'computer', 'science', 'urdu', 'english', 'grammar', 'islam', 'islamiat', 'physical'];
+
+    for (const item of ACADEMIC_KNOWLEDGE) {
+      let score = 0;
+      for (const kw of item.keywords) {
+        const kwLower = kw.toLowerCase();
+        const normalizedKw = kwLower
+          .replace(/[\-_/\\,;:!?'"()]/g, ' ')
+          .replace(/\s+e\s+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+
+        const isGenericSubject = GENERIC_SUBJECT_WORDS.includes(normalizedKw);
+
+        if (normalizedQ.includes(normalizedKw) || qLower.includes(kwLower)) {
+          score += isGenericSubject ? 4 : (30 + normalizedKw.length * 2);
+        } else {
+          for (const token of tokens) {
+            if (normalizedKw.includes(token)) {
+              score += isGenericSubject ? 1 : 4;
+            }
+          }
+        }
       }
-      if (isRomanUrdu) {
-        return match.romanUrdu;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = item;
       }
-      return match.english;
+    }
+
+    if (bestMatch && bestScore >= 6) {
+      if (isUrduScript && bestMatch.urdu) {
+        return bestMatch.urdu;
+      }
+      if (isRomanUrdu && bestMatch.romanUrdu) {
+        return bestMatch.romanUrdu;
+      }
+      return bestMatch.english;
     }
 
     // 3. Clean direct general academic answer
@@ -834,6 +1095,7 @@ Response Guidelines:
   }
 
   private async callGeminiAPI(prompt: string): Promise<AIChatMessage> {
+    const userCtx = this.getDynamicUserAcademicContext();
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey.trim()}`;
     const response = await fetch(url, {
       method: 'POST',
@@ -843,7 +1105,12 @@ Response Guidelines:
           {
             parts: [
               {
-                text: `You are the Global Science Academy Academic AI Copilot for 1st Year FA-IT students under Sir Ahmad. Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu).\n\nUser Question: ${prompt}`,
+                text: `You are the Global Science Academy Academic AI Copilot for 1st Year FA-IT students under BISE D.G. Khan Board.
+${userCtx.fullContextString}
+
+Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu).
+
+User Question: ${prompt}`,
               },
             ],
           },

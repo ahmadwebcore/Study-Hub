@@ -73,6 +73,23 @@ export const StudyBotWidget: React.FC = () => {
     }
   }, [messages, directMessages, chatSource, isOpen]);
 
+  const handleDirectSaveConfig = () => {
+    const targetConfig: AIProviderConfig = {
+      ...aiConfig,
+      apiKey: keyInput.trim(),
+    };
+    aiStudyBotService.saveConfig(targetConfig);
+    setAiConfig(targetConfig);
+    setTestFeedback({
+      status: 'success',
+      message: 'Key saved & activated directly in browser storage.',
+    });
+    setTimeout(() => {
+      setShowConfigDrawer(false);
+      setTestFeedback({ status: 'idle', message: '' });
+    }, 1500);
+  };
+
   const handleTestAndSaveConfig = async () => {
     setTestFeedback({ status: 'testing', message: 'Testing live connection to API...' });
     const targetConfig: AIProviderConfig = {
@@ -80,10 +97,12 @@ export const StudyBotWidget: React.FC = () => {
       apiKey: keyInput.trim(),
     };
 
+    // Save key immediately so user never loses it
+    aiStudyBotService.saveConfig(targetConfig);
+    setAiConfig(targetConfig);
+
     const res = await aiStudyBotService.testConnection(targetConfig);
     if (res.success) {
-      aiStudyBotService.saveConfig(targetConfig);
-      setAiConfig(targetConfig);
       setTestFeedback({
         status: 'success',
         message: `${res.message} (${res.latencyMs}ms)`,
@@ -96,7 +115,7 @@ export const StudyBotWidget: React.FC = () => {
     } else {
       setTestFeedback({
         status: 'error',
-        message: res.message,
+        message: `${res.message} (Key saved anyway in storage)`,
       });
     }
   };
@@ -428,11 +447,19 @@ export const StudyBotWidget: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={handleDirectSaveConfig}
+                  className="px-3 py-1.5 rounded-xl bg-zinc-700 hover:bg-zinc-600 text-white font-medium text-xs transition-colors cursor-pointer"
+                  title="Save key immediately into browser storage without testing"
+                >
+                  Save Directly
+                </button>
+                <button
+                  type="button"
                   onClick={handleTestAndSaveConfig}
                   disabled={testFeedback.status === 'testing'}
                   className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                 >
-                  {testFeedback.status === 'testing' ? 'Verifying...' : 'Test & Save Connection'}
+                  {testFeedback.status === 'testing' ? 'Verifying...' : 'Test & Save'}
                 </button>
               </div>
             </div>
