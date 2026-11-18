@@ -1657,7 +1657,7 @@ export function saveLocalTestStatus(testId: string, status: string, score?: numb
 
 export function getLocalCertifiedResults(): ResultRecord[] {
   try {
-    const raw = localStorage.getItem(CERTIFIED_RESULTS_KEY);
+    const raw = localStorage.getItem(CERTIFIED_RESULTS_KEY) || localStorage.getItem('studyhub_certified_results_v2') || localStorage.getItem('studyhub_certified_results');
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
