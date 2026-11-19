@@ -764,6 +764,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={selectedWeek}
                   onChange={(e) => setSelectedWeek(e.target.value)}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   {ACADEMIC_WEEKS.map((w) => (
@@ -785,6 +786,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={selectedSubjectId}
                   onChange={(e) => setSelectedSubjectId(e.target.value)}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   <option value="all">All {SAMPLE_SUBJECTS.length} Subjects</option>
@@ -807,6 +809,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={filterTab}
                   onChange={(e) => setFilterTab(e.target.value as any)}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   <option value="all">All Tests ({tests.length})</option>

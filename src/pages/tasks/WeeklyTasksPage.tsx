@@ -418,6 +418,7 @@ export const WeeklyTasksPage: React.FC = () => {
               <select
                 value={selectedWeek}
                 onChange={(e) => setSelectedWeek(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 {ACADEMIC_WEEKS.map((w) => (
@@ -439,6 +440,7 @@ export const WeeklyTasksPage: React.FC = () => {
               <select
                 value={selectedDay}
                 onChange={(e) => setSelectedDay(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 {daysList.map((d) => (
@@ -460,6 +462,7 @@ export const WeeklyTasksPage: React.FC = () => {
               <select
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All {subjects.length} Subjects</option>
@@ -482,6 +485,7 @@ export const WeeklyTasksPage: React.FC = () => {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All Statuses ({tasks.length})</option>

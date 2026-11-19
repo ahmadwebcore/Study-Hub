@@ -440,6 +440,7 @@ export const SyllabusPage: React.FC = () => {
                   setSelectedSubjectId(e.target.value);
                   setSelectedChapterId('all');
                 }}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 {subjects.map((sub) => (
@@ -461,6 +462,7 @@ export const SyllabusPage: React.FC = () => {
               <select
                 value={selectedChapterId}
                 onChange={(e) => setSelectedChapterId(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All {syllabusList.length} Chapters</option>
@@ -483,6 +485,7 @@ export const SyllabusPage: React.FC = () => {
               <select
                 value={selectedTopicStatus}
                 onChange={(e) => setSelectedTopicStatus(e.target.value)}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All Topics ({allTopics.length})</option>
@@ -743,11 +746,13 @@ export const SyllabusPage: React.FC = () => {
             </Card>
           ))
         ) : (
-          <Card className="p-8 text-center text-[#557067]">
-            <BookOpen className="w-8 h-8 text-[#14B866] mx-auto mb-2" />
-            <h4 className="text-sm font-bold text-[#142D27]">No Syllabus Chapters Defined</h4>
-            <p className="text-xs text-[#7d9990] mt-1">
-              Select another subject course or create the first chapter using the button above.
+          <Card className="p-10 text-center text-[#557067] border-dashed border-2 border-emerald-200/80 bg-white/70">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-3 text-emerald-600 shadow-2xs">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <h4 className="text-base font-bold text-[#142D27]">Syllabus Cleared & Ready for Upload</h4>
+            <p className="text-xs text-zinc-500 mt-1.5 max-w-md mx-auto leading-relaxed">
+              Old syllabus records have been cleared. Upload new textbook PDFs and redacted syllabus documents to initialize the updated scheme.
             </p>
           </Card>
         )}
