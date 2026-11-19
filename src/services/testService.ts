@@ -1581,7 +1581,7 @@ const INITIAL_HENZA_TESTS: TestItem[] = [
   }
 ];
 
-function getCustomTests(): TestItem[] {
+export function getCustomTests(): TestItem[] {
   let list: TestItem[] = [];
   try {
     const raw = localStorage.getItem(CUSTOM_TESTS_KEY);
@@ -2069,6 +2069,8 @@ export function ensureQuestionsForTest(test: TestItem): TestItem {
 }
 
 export const testService = {
+  getCustomTests,
+  getTests: getCustomTests,
   /**
    * Fetch all scheduled and completed tests with relation joins
    */

@@ -2,6 +2,7 @@ import { testService, getLocalCertifiedResults } from './testService';
 import { attendanceService } from './attendanceService';
 import { taskService } from './taskService';
 import { integrationService } from './integrationService';
+import { TestItem } from '../types';
 
 export interface AIChatAction {
   id: string;
@@ -42,7 +43,7 @@ export interface AIProviderConfig {
 
 const STORAGE_KEY_AI_CONFIG = 'gsa_ai_config_v3';
 
-// 1st Year Intermediate FA-IT Academic Syllabus Knowledge Base
+// Comprehensive 1st Year Intermediate FA-IT Subject Knowledge Base
 const ACADEMIC_KNOWLEDGE: {
   keywords: string[];
   title: string;
@@ -50,355 +51,420 @@ const ACADEMIC_KNOWLEDGE: {
   romanUrdu: string;
   urdu?: string;
 }[] = [
+  // --- COMPUTER SCIENCE ---
   {
-    keywords: ['bus topology', 'bus network', 'backbone cable'],
+    keywords: ['bus topology', 'bus network', 'backbone cable', 'terminator', 'terminators'],
     title: 'Bus Topology (Computer Science 11 - Unit 2)',
-    english: `**Bus Topology** is a network configuration where all computers and network devices connect to a single central transmission line known as the **Backbone** or **Trunk cable**.
+    english: `**Bus Topology** connects all computers and devices to a single central cable known as the **Backbone** or **Trunk** cable.
 
-• **How It Works**: When a device transmits data, signals broadcast along the central cable in both directions. Every connected device receives the packet, but only the machine whose MAC/IP address matches accepts and processes it.
-• **Terminators**: 50-ohm terminators are installed at both physical ends of the cable to absorb electromagnetic signals and prevent signal bounce-back (reflection).
+• **Working**: Data sent by a device travels along the backbone in both directions. All devices receive the signal, but only the machine whose MAC/IP address matches processes it.
+• **Terminators**: 50-ohm terminators are fixed at both cable ends to absorb signals and prevent reflection/bounce.
 • **Advantages**:
   1. Low cabling cost and easy setup.
-  2. Best suited for small, linear networks.
+  2. Best suited for small networks.
 • **Disadvantages**:
-  1. If the central backbone cable breaks, the entire network fails.
-  2. Difficult to troubleshoot individual faulty nodes.`,
-    romanUrdu: `**Bus Topology** network ki sab se basic type hai jismein saare computers ek hi central cable (Backbone) ke sath connected hotay hain.
+  1. If the central cable breaks, the entire network shuts down.
+  2. Difficult to troubleshoot individual node faults.`,
+    romanUrdu: `**Bus Topology** mein tamam computers ek hi central cable (Backbone) se connect hotay hain.
 
-• **Kaise kaam karta hai**: Jab koi computer data bhejta hai to wo central cable ke zariye travel karta hai aur sirf target computer usse accept karta hai.
-• **Terminators**: Cable k dono ends par Terminators lagaye jaate hain taake signals bounce back na karein.
-• **Fawaid**: Cable ka kharcha bohat kam hota hai aur setup aasan hai.
-• **Nuqsaan**: Agar central backbone cable toot jaye to poora network band ho jata hai.`,
-    urdu: `**بس ٹوپولوجی** کمپیوٹر نیٹ ورک کی وہ قسم ہے جس میں تمام کمپیوٹرز ایک ہی مرکزی کیبل (بیک بون) کے ساتھ جڑے ہوتے ہیں۔
-• مرکزی کیبل کے دونوں سروں پر ٹرمینیٹرز لگائے جاتے ہیں تاکہ سگنل واپس نہ ٹکرائے۔
-• اگر مین کیبل خراب ہو جائے تو پورا نیٹ ورک بند ہو جاتا ہے۔`,
+• **Kaam karne ka tareeqa**: Data central cable par dono taraf travel karta hai. Har computer signal check karta hai magar accept sirf wahi karta hai jiska address match ho.
+• **Terminators**: Cable ke dono saron par terminators lagaye jaate hain taake signal wapis bounce na ho.
+• **Fawaid**: Cable ka kharcha kam hota hai aur setup aasan hai.
+• **Nuqsaan**: Agar main backbone cable toot jaye to poora network band ho jata hai.`,
+    urdu: `**بس ٹوپولوجی** میں تمام کمپیوٹرز ایک ہی مرکزی کیبل (بیک بون) کے ذریعے جڑے ہوتے ہیں۔
+• مرکزی کیبل کے دونوں سروں پر ٹرمینیٹرز لگے ہوتے ہیں تاکہ سگنل واپس نہ ٹکرائے۔
+• اگر مرکزی کیبل خراب ہو جائے تو پورا نیٹ ورک بند ہو جاتا ہے۔`
   },
   {
     keywords: ['star topology', 'star network', 'central switch', 'hub'],
     title: 'Star Topology (Computer Science 11 - Unit 2)',
-    english: `**Star Topology** is the most widely deployed network topology in modern computer labs and corporate offices.
+    english: `**Star Topology** connects every computer directly to a central connecting device (a **Network Switch** or **Hub**) via dedicated point-to-point cables.
 
-• **Architecture**: Every host computer connects via a dedicated point-to-point cable directly to a central connecting device, typically a **Network Switch** or **Hub**.
-• **Fault Isolation**: If an individual cable breaks or a single computer fails, only that specific node is disconnected; the remaining network continues functioning seamlessly without downtime.
-• **Switch Intelligence**: Modern switches learn MAC addresses and forward frames exclusively to the destination port, avoiding collisions.
-• **Disadvantages**: Heavy cable requirements and if the central switch fails, the entire network drops.`,
-    romanUrdu: `**Star Topology** modern networks mein sab se zyada use hone wali topology hai.
+• **Working**: All communication passes through the central device, which routes data packets to the intended recipient.
+• **Fault Isolation**: If any single workstation or cable fails, only that device is disconnected; the rest of the network operates normally.
+• **Advantages**: Easy to install, expand, and isolate faults.
+• **Disadvantages**: Requires more cable than bus topology; if the central switch fails, the whole network goes down.`,
+    romanUrdu: `**Star Topology** modern computer labs mein sab se zyada use hoti hai.
 
-• **Architecture**: Har computer ek central switch ya hub se separate cable ke zariye jurra hota hai.
-• **Faida**: Agar kisi ek computer ki wire toot jaye ya wo band ho jaye, toh baqi poora network bilkul theek chalta rehta hai.
-• **Nuqsaan**: Cable ka kharcha zyada hota hai aur agar central switch kharab ho jaye to saara network down ho jata hai.`,
+• **Working**: Har computer alag cable ke zariye ek central device (Switch ya Hub) se jurra hota hai.
+• **Faida**: Agar kisi ek computer ki wire toot jaye to baqi network bilkul theek chalta rehta hai.
+• **Nuqsaan**: Cable zyada lagti hai aur agar central switch kharab ho jaye to saara network band ho jata hai.`,
+    urdu: `**اسٹار ٹوپولوجی** میں تمام کمپیوٹرز ایک مرکزی سوئچ یا ہب سے الگ الگ کیبل کے ذریعے جڑے ہوتے ہیں۔
+• کسی ایک کمپیوٹر کی تار کٹ جانے سے باقی نیٹ ورک پر کوئی اثر نہیں پڑتا۔`
   },
   {
     keywords: ['ring topology', 'ring network', 'token passing'],
     title: 'Ring Topology & Token Passing',
-    english: `**Ring Topology** connects every computer to exactly two neighboring nodes, forming an unbroken circular loop.
+    english: `**Ring Topology** connects each device to exactly two adjacent devices, forming an unbroken closed circle.
 
-• **Token Passing Protocol**: Communication is coordinated via a special 3-byte frame called a **Token**. A computer can only transmit data when it captures the free token.
-• **Unidirectional Flow**: Data packets travel in one direction (clockwise or counter-clockwise), being regenerated by each intermediate workstation before reaching the destination.
-• **Disadvantage**: Standard unidirectional ring networks fail entirely if any single workstation or cable link breaks, unless a Dual Ring (FDDI) is used.`,
-    romanUrdu: `**Ring Topology** mein har computer aglay aur pichlay computer se jurr kar ek circular ring banata hai. Data Token Passing ke zariye ek hi simt (direction) mein travel karta hai. Agar ek computer bhi band ho to ring toot sakti hai.`,
+• **Token Passing**: Devices transmit data only when they acquire a circulating 3-byte frame called a **Token**.
+• **Unidirectional Flow**: Data moves in one continuous direction (clockwise or counter-clockwise). Each node regenerates the signal.
+• **Disadvantage**: If any single computer or cable link breaks, the entire ring is disrupted (unless a Dual Ring is used).`,
+    romanUrdu: `**Ring Topology** mein har computer aglay aur pichlay do computers se jurr kar ek circular ring banata hai.
+Data Token Passing ke zariye ek hi simt mein travel karta hai. Agar ek computer bhi band ho jaye to poori ring toot jati hai.`,
+    urdu: `**رنگ ٹوپولوجی** میں ہر کمپیوٹر دو ہمسایہ کمپیوٹرز کے ساتھ مل کر ایک دائرہ بناتا ہے اور ٹوکن پاسنگ کے ذریعے ڈیٹا ایک سمت میں سفر کرتا ہے۔`
   },
   {
     keywords: ['mesh topology', 'full mesh'],
     title: 'Mesh Topology (Fault Tolerance & Redundancy)',
-    english: `**Mesh Topology** connects every device to every other device via dedicated physical links.
+    english: `**Mesh Topology** connects every device to every other device via dedicated point-to-point links.
 
-• **Formula for Links**: For $n$ devices, the network requires $\\frac{n(n-1)}{2}$ physical links and $n-1$ I/O ports per device.
-• **Advantages**:
-  1. Maximum reliability and zero traffic congestion (dedicated channels).
-  2. Robust security and point-to-point privacy.
-• **Disadvantages**: Prohibitively expensive cabling and complex hardware installation. Mainly used in critical backbone routers and banking networks.`,
-    romanUrdu: `**Mesh Topology** mein har computer har doosre computer ke sath direct dedicated wire se jurra hota hai. Yeh sab se reliable aur mehfooz topology hai lekin iska kharcha aur setup sab se mushkil hota hai.`,
+• **Formula**: For $n$ devices, the network requires $\frac{n(n-1)}{2}$ physical links.
+• **Advantages**: Maximum reliability, dedicated non-shared channels, zero traffic congestion, and high privacy.
+• **Disadvantages**: Very high cabling cost and complex hardware configuration.`,
+    romanUrdu: `**Mesh Topology** mein har computer doosre har computer se dedicated direct wire se connect hota hai.
+• Yeh sab se zyada reliable aur safe hai magar sab se mehangi aur complex topology hai. Formula: $n(n-1)/2$ wires darkar hoti hain.`,
   },
   {
-    keywords: ['cpu', 'processor', 'alu', 'cu', 'registers', 'cache'],
-    title: 'Central Processing Unit (CPU) Architecture',
-    english: `The **CPU (Central Processing Unit)** is the primary computational core of a computer system. It carries out the **Fetch-Decode-Execute** cycle.
+    keywords: ['cpu', 'processor', 'central processing unit', 'alu', 'cu', 'control unit', 'registers'],
+    title: 'CPU Architecture (ALU, CU, Registers & Cache)',
+    english: `The **CPU (Central Processing Unit)** executes instructions using the **Fetch-Decode-Execute** cycle:
 
 1. **ALU (Arithmetic Logic Unit)**:
-   - *Arithmetic Section*: Performs addition, subtraction, multiplication, and division.
-   - *Logic Section*: Evaluates comparisons (Equal to, Less than, Greater than, AND, OR, NOT).
-2. **Control Unit (CU)**:
-   - The supervisor/conductor of the processor. It fetches instructions from RAM, decodes opcode, and issues electronic timing signals to memory and I/O devices.
-3. **Internal Registers**:
-   - High-speed, low-capacity storage cells located directly on the processor silicon die (e.g., Program Counter (PC), Instruction Register (IR), Memory Address Register (MAR), Accumulator (AC)).
-4. **L1/L2/L3 Cache**:
-   - Ultra-fast SRAM placed between CPU and system RAM to store frequently accessed data and prevent CPU starvation.`,
-    romanUrdu: `**CPU (Central Processing Unit)** computer ka dimagh hai. Iske 3 bunyadi hissay hotay hain:
+   - *Arithmetic Section*: Performs +, -, *, / calculations.
+   - *Logic Section*: Evaluates conditions (=, <, >, AND, OR, NOT).
+2. **Control Unit (CU)**: The supervisor of the CPU. Fetches instructions from RAM, decodes opcodes, and issues timing signals to components.
+3. **Registers**: Ultra-high-speed temporary storage cells on the CPU die (PC, IR, MAR, MBR, Accumulator).
+4. **Cache Memory**: High-speed SRAM (L1, L2, L3) bridging the speed gap between CPU and RAM.`,
+    romanUrdu: `**CPU (Central Processing Unit)** computer ka dimagh hai jo tamam hidayat ko fetch, decode aur execute karta hai:
 
-1. **ALU (Arithmetic Logic Unit)**: Yeh hisaabi sawalat (+, -, *, /) aur mantiqi faislay (AND, OR, <, >) karta hai.
-2. **Control Unit (CU)**: Yeh computer ka supervisor hai jo instructions ko RAM se laata hai, samajhta hai, aur baqi hisson ko chalata hai.
-3. **Registers**: Processor ke andar mojood intehai tez raftaar temporary memory jo calculations k doraan data rakhti hai.`,
+1. **ALU (Arithmetic Logic Unit)**: Hisaabi (+, -, *, /) aur mantiqi (<, >, AND, OR) faislay karta hai.
+2. **Control Unit (CU)**: Computer ka supervisor hai jo RAM se instructions lata hai aur hardware ko manage karta hai.
+3. **Registers**: Processor ke andar mojood fast temporary memory cells hain (jaise PC, IR, Accumulator).
+4. **Cache**: Fast memory jo CPU aur RAM ke darmiyan speed match karne ke liye use hoti hai.`,
+    urdu: `**سی پی یو (CPU)** کمپیوٹر کا دماغ ہے جس کے اہم حصے یہ ہیں:
+• **اے ایل یو (ALU)**: حسابی اور منطقی آپریشنز انجام دیتا ہے۔
+• **کنٹرول یونٹ (CU)**: کمپیوٹر کے تمام حصوں کی نگرانی کرتا ہے۔
+• **رجسٹرز**: پروسیسر کے اندر تیز ترین عارضی میموری۔`
   },
   {
-    keywords: ['ram', 'rom', 'difference between ram and rom', 'volatile memory'],
-    title: 'RAM vs ROM Comparison (BISE DG Khan Exam Standard)',
+    keywords: ['ram', 'rom', 'difference between ram and rom', 'volatile memory', 'dram', 'sram'],
+    title: 'RAM vs ROM Comparison (BISE Exam Standard)',
     english: `| Feature | RAM (Random Access Memory) | ROM (Read-Only Memory) |
 |---|---|---|
-| **Volatility** | Volatile (data lost immediately on power outage) | Non-volatile (contents retained permanently) |
-| **Operation** | Read and Write | Read-Only during normal operations |
-| **Contents** | Currently running OS processes, active applications | Startup firmware (BIOS, UEFI, Bootstrap Loader) |
-| **Speed** | Extremely Fast (Nanosecond latency) | Slower than RAM |
-| **Types** | DRAM (Dynamic RAM), SRAM (Static RAM) | PROM, EPROM, EEPROM |`,
-    romanUrdu: `• **RAM (Random Access Memory)**: Yeh arzi (volatile) memory hai. Bijli band hote hi iska saara data saaf ho jata hai. Is par data read aur write dono hota hai.
-• **ROM (Read Only Memory)**: Yeh mustaqil (non-volatile) memory hai. Ismein computer ko on karne wala BIOS program store hota hai jo bijli band hone par bhi mehfooz rehta hai.`,
+| **Volatility** | Volatile (data lost when power is off) | Non-volatile (data stays permanently) |
+| **Operations** | Read and Write | Read-Only during normal operation |
+| **Contents** | Active OS processes & open programs | Startup firmware (BIOS / UEFI) |
+| **Speed** | Nanosecond high speed | Slower than RAM |
+| **Types** | DRAM, SRAM | PROM, EPROM, EEPROM |`,
+    romanUrdu: `• **RAM (Random Access Memory)**: Arzi (volatile) memory hai. Bijli band hote hi iska data saaf ho jata hai. Is par read aur write dono hota hai.
+• **ROM (Read Only Memory)**: Mustaqil (non-volatile) memory hai. Ismein BIOS program hota hai jo computer ko start karta hai aur bijli band hone par bhi mehfooz rehta hai.`,
   },
   {
-    keywords: ['osi model', 'osi layers', '7 layers'],
+    keywords: ['system bus', 'bus', 'data bus', 'address bus', 'control bus'],
+    title: 'System Bus: Data Bus, Address Bus & Control Bus',
+    english: `A **System Bus** is an electronic pathway connecting the CPU to memory and peripheral devices:
+
+1. **Data Bus**: Bi-directional lines carrying actual data between CPU, memory, and I/O devices (8, 16, 32, 64-bit width).
+2. **Address Bus**: Unidirectional lines carrying physical memory addresses that the CPU wants to read from or write to.
+3. **Control Bus**: Transmits control and timing signals (Read, Write, Interrupt, Bus Request).`,
+    romanUrdu: `**System Bus** wires ka wo group hai jo CPU ko RAM aur doosri devices se connect karta hai:
+1. **Data Bus**: Data ko CPU aur memory ke darmiyan lata aur le jata hai (dono simt / bidirectional).
+2. **Address Bus**: Sirf memory ka address le kar jata hai (ek simt / unidirectional).
+3. **Control Bus**: Control signals (jaise Memory Read, Memory Write) pohanchata hai.`,
+  },
+  {
+    keywords: ['osi model', 'osi layers', '7 layers', 'open systems interconnection'],
     title: 'OSI 7-Layer Reference Model',
-    english: `The **Open Systems Interconnection (OSI)** model defines 7 distinct abstraction layers for network communications:
+    english: `The **OSI Model** standardizes network communication across 7 layers:
+7. **Application**: HTTP, HTTPS, FTP, SMTP (user interface).
+6. **Presentation**: Formatting, Compression, Encryption (SSL, JPEG).
+5. **Session**: Manages connection sessions (RPC, NetBIOS).
+4. **Transport**: End-to-end transport, segmenting, TCP/UDP.
+3. **Network**: IP addressing and packet routing across routers.
+2. **Data Link**: MAC addressing, frame transmission, switches.
+1. **Physical**: Raw bit stream over physical cables and signals.
 
-7. **Application Layer**: End-user interfaces (HTTP, HTTPS, FTP, SMTP, DNS).
-6. **Presentation Layer**: Data formatting, compression, and encryption/decryption (SSL/TLS, ASCII, JPEG).
-5. **Session Layer**: Establishes, manages, and terminates dialogues between applications (RPC, NetBIOS).
-4. **Transport Layer**: End-to-end transport, segmenting, flow control, and error recovery (TCP, UDP).
-3. **Network Layer**: Logical IP addressing and best-path routing across routers (IP, ICMP, OSPF).
-2. **Data Link Layer**: Physical MAC addressing, frame switching, and error detection (Ethernet, Wi-Fi, Switches).
-1. **Physical Layer**: Bit transmission over physical media (Cables, Fiber optics, RF signals, Hubs).
-
-*Mnemonic to remember*: **A**ll **P**eople **S**eem **T**o **N**eed **D**ata **P**rocessing (Layers 7 down to 1).`,
+*Mnemonic*: **A**ll **P**eople **S**eem **T**o **N**eed **D**ata **P**rocessing (7 to 1).`,
     romanUrdu: `OSI model networking ke 7 darjaat (layers) par mushtamil hai:
 7. Application Layer (HTTP, Email)
-6. Presentation Layer (Encryption, Format)
-5. Session Layer (Connection maintain)
-4. Transport Layer (TCP, UDP)
-3. Network Layer (IP Address & Routers)
-2. Data Link Layer (MAC Address & Switch)
-1. Physical Layer (Wires & Signals)`,
+6. Presentation Layer (Encryption, Compression)
+5. Session Layer (Dialogue coordination)
+4. Transport Layer (TCP, UDP packets)
+3. Network Layer (IP Address aur Router)
+2. Data Link Layer (MAC Address aur Switch)
+1. Physical Layer (Cables aur Electronic signals)`,
   },
   {
-    keywords: ['operating system', 'os functions', 'scheduler', 'multitasking'],
-    title: 'Operating System Functions & CPU Scheduling',
-    english: `An **Operating System (OS)** is system software that acts as an intermediary between computer hardware and the user/applications.
-
-• **Core Functions**:
-  1. *Processor Management*: Allocates CPU time slices across concurrent processes using scheduling algorithms (Round Robin, FCFS, Shortest Job First).
-  2. *Memory Management*: Tracks memory allocations, paging, and virtual memory swapping.
-  3. *File Management*: Organizes files in hierarchical directory trees (FAT32, NTFS, EXT4).
-  4. *Device Management*: Interacts with peripheral controllers via device drivers.
-  5. *Security & Access Control*: Authentication, user permissions, and process isolation.`,
-    romanUrdu: `**Operating System (OS)** wo software hai jo computer hardware aur user ke darmiyan pul ka kaam karta hai (maslan Windows, Linux).
-Iske ahem kaam: Processor ko schedule karna, RAM memory manage karna, files ko organize karna, aur computer ko viruses aur unauthorized access se mehfooz rakhna.`,
-  },
-  {
-    keywords: ['uswa', 'uswa-e-hasna', 'shibli', 'urdu 11'],
-    title: 'Urdu 11: Sabaq 1 "Uswa-e-Hasna" (Maulana Shibli Nomani)',
-    english: `• **Author**: Allama Shibli Nomani (Seerat-un-Nabi).
-• **Core Theme**: Prophet Muhammad ﷺ's life is the only complete, universal, and eternal model (Uswa-e-Hasna) applicable to every human role—rulers, merchants, teachers, commanders, judges, and family heads.
-• **Exam Tip**: In Tashreeh, quote Quranic reference: *"Laqad kaana lakum fee rasoolillahi uswatun hasanah"*. Maintain formal Urdu diction with author background.`,
-    romanUrdu: `• **Musannif**: Maulana Shibli Nomani.
-• **Markazi Khayal**: Hazrat Muhammad ﷺ ki zaat mubarak har insaan ke liye qiyamat tak kamil aur mukammal namoona (Uswa-e-Hasna) hai.
-• **Exam Hidayat**: Tashreeh mein siaq-o-sabaq ke 3 number aur tashreeh ke 10 number hotay hain. Hawala-e-matan mein sabaq ka unwan aur musannif ka naam lazmi likhein.`,
-  },
-  {
-    keywords: ['button button', 'richard matheson', 'norma', 'arthur'],
-    title: 'English 11: Story 1 "Button, Button" by Richard Matheson',
-    english: `• **Author**: Richard Matheson.
-• **Main Characters**: Norma Lewis, Arthur Lewis, and Mr. Steward.
-• **Moral Dilemma**: The conflict between greed and human values. Mr. Steward offers $50,000 if they push the button, which will cause someone they don't know to die. Arthur rejects the offer on moral grounds, while Norma rationalizes it.
-• **Resolution**: Norma pushes the button, and her husband Arthur dies in a subway accident, triggering a $50,000 life insurance policy. When Norma screams, Steward chillingly asks: *"Did you really think you knew your husband?"*`,
-    romanUrdu: `• **Characters**: Norma, Arthur Lewis, aur Mr. Steward.
-• **Theme**: Lalach aur insani qadron ka tazad. Norma $50,000 ke lalach mein button daba deti hai jiski qeemat uske shohar Arthur ki jaan se ada hoti hai.`,
-  },
-  {
-    keywords: ['binary', 'binary numbers', 'number systems', 'decimal to binary', 'hexadecimal', 'octal', 'conversion'],
-    title: 'Number Systems: Binary, Decimal, Octal & Hexadecimal',
-    english: `• **Binary (Base 2)**: Uses digits 0 and 1. The fundamental machine language of computing.
-• **Decimal (Base 10)**: Standard counting system using digits 0 to 9.
-• **Hexadecimal (Base 16)**: Digits 0-9 and letters A-F (where A=10, B=11, C=12, D=13, E=14, F=15). Used for memory addressing and color codes.
-• **Conversion Rule**: Divide decimal by 2 repeatedly and record remainders from bottom to top.`,
-    romanUrdu: `• **Binary (Base 2)**: Sirf 0 aur 1 (computer ki zaban).
-• **Decimal (Base 10)**: 0 se 9 tak aam ginti.
-• **Hexadecimal (Base 16)**: 0 se 9 aur A se F tak (memory addresses ke liye use hota hai).
-• **Conversion**: Decimal ko 2 par divide karte jayein aur remainders neechay se ooper likhein.`,
-  },
-  {
-    keywords: ['lan', 'man', 'wan', 'local area network', 'wide area network', 'network types'],
-    title: 'Network Types: LAN, MAN, WAN (Geographic Scope)',
-    english: `• **LAN (Local Area Network)**: Spans a single room, lab, or building. High data transfer speeds (up to 10 Gbps) with low latency.
-• **MAN (Metropolitan Area Network)**: Covers a city or large campus (e.g., Cable TV network).
-• **WAN (Wide Area Network)**: Spans countries and continents (the Internet is the largest WAN). Uses satellite links and submarine fiber cables.`,
-    romanUrdu: `• **LAN**: Ek kamray, school ya office tak mehdood network. Intehai tez raftaar (Ethernet / Wi-Fi).
-• **MAN**: Poore shehar par mushtamil network (maslan Cable TV network).
+    keywords: ['lan', 'man', 'wan', 'local area network', 'wide area network'],
+    title: 'Network Scales: LAN, MAN, WAN',
+    english: `• **LAN (Local Area Network)**: Spans a single room, lab, or building. High data rate (up to 10 Gbps), low latency, private ownership.
+• **MAN (Metropolitan Area Network)**: Spans an entire city or large campus (e.g., Cable TV network, city ISP).
+• **WAN (Wide Area Network)**: Spans multiple countries or continents. The Internet is the largest WAN.`,
+    romanUrdu: `• **LAN**: Ek kamray ya building ka network (maslan College Computer Lab).
+• **MAN**: Poore shehar ka network (maslan Shehar ka Cable TV network).
 • **WAN**: Poori dunya par phaila network (sab se bari misaal Internet hai).`,
   },
   {
-    keywords: ['switch', 'router', 'hub', 'network devices', 'gateway', 'bridge', 'repeater'],
-    title: 'Network Hardware Devices: Switch, Router, Hub & Bridge',
-    english: `• **Hub**: Layer 1 physical device. Multiport repeater that broadcasts all packets to all ports, causing collisions.
-• **Switch**: Layer 2 intelligent device. Filters and forwards frames directly to destination port using MAC addresses.
-• **Router**: Layer 3 network device. Connects disparate networks and routes packets using IP addresses.
-• **Repeater**: Amplifies and regenerates weakened electrical/optical signals over long distances.`,
-    romanUrdu: `• **Hub**: Dumb device jo aane wale data ko bina check kiye tamam ports par bhej deti hai.
+    keywords: ['switch', 'router', 'hub', 'network devices', 'bridge', 'gateway', 'repeater'],
+    title: 'Network Devices: Switch, Router, Hub & Bridge',
+    english: `• **Hub**: Layer 1 physical device. Broadcasts all data to every port (causes collisions).
+• **Switch**: Layer 2 intelligent device. Inspects MAC addresses and forwards frames only to the target device.
+• **Router**: Layer 3 device. Routes data packets between different networks using IP addresses.
+• **Repeater**: Amplifies and regenerates weakened signals over long cable lengths.`,
+    romanUrdu: `• **Hub**: Na-samajh (dumb) device jo data sab computers ko bhejti hai.
 • **Switch**: Intelligent device jo MAC address dekh kar sirf matlooba computer ko data bhejti hai.
-• **Router**: Mukhtalif networks ko jorta hai aur best rasta talash karta hai.
-• **Repeater**: Lambay faaslay par kamzor hone wale signal ko taaza (regenerate) karta hai.`,
+• **Router**: Mukhtalif networks ko aapas mein jorta hai aur best rasta talash karta hai.
+• **Repeater**: Lambay faaslay par kamzor hone wale signal ko mazboot karta hai.`,
   },
   {
-    keywords: ['hardware', 'software', 'system software', 'application software', 'utility programs'],
-    title: 'Hardware vs Software & System Software Categories',
-    english: `• **Hardware**: The physical tangible components of a computer (CPU, RAM, Motherboard, Screen, Keyboard).
-• **Software**: Electronic instructions telling the hardware what to execute.
-  1. **System Software**: Manages hardware resources (Operating Systems like Windows 11, Device Drivers, Utilities).
-  2. **Application Software**: Assists end users in business or creative tasks (MS Office, Web Browsers, Media Players).`,
-    romanUrdu: `• **Hardware**: Computer ke wo hissay jinhein hum chhoo sakte hain (Processor, RAM, Screen, Keyboard).
-• **Software**: Computer ko chalane wali hidayat:
-  - System Software: Windows, Drivers, Utilities.
-  - Application Software: MS Word, Excel jo user ke kaam aatay hain.`,
+    keywords: ['binary', 'binary numbers', 'number systems', 'decimal to binary', 'hexadecimal', 'octal'],
+    title: 'Number Systems: Binary, Decimal, Octal & Hexadecimal',
+    english: `• **Binary (Base 2)**: Digits 0 and 1. Machine language of computing.
+• **Decimal (Base 10)**: Digits 0-9. Standard human counting.
+• **Octal (Base 8)**: Digits 0-7.
+• **Hexadecimal (Base 16)**: Digits 0-9 and letters A-F (A=10, B=11, C=12, D=13, E=14, F=15).
+• **Conversion**: Divide decimal numbers repeatedly by target base (2, 8, 16) and record remainders from bottom to top.`,
+    romanUrdu: `• **Binary (Base 2)**: Sirf 0 aur 1 (computer ki zaban).
+• **Decimal (Base 10)**: 0 se 9 tak aam ginti.
+• **Hexadecimal (Base 16)**: 0 se 9 aur A se F tak (memory addresses ke liye).
+• **Conversion**: Decimal number ko 2 par divide karte jayein aur remainders neechay se ooper likhein.`,
   },
   {
-    keywords: ['input devices', 'output devices', 'keyboard', 'mouse', 'scanner', 'printers', 'monitor'],
-    title: 'Input & Output Peripherals: Classifications & Working',
-    english: `• **Input Devices**: Convert human input into digital signals (Keyboard, Mouse, Optical Scanner, OMR, OCR, Barcode Reader, MICR).
-• **Output Devices**: Convert processed digital data into human-perceptible format:
-  - Softcopy: Monitors (CRT, LCD, LED, OLED).
-  - Hardcopy: Impact printers (Dot Matrix) vs Non-impact printers (Laser, Inkjet, Plotters).`,
-    romanUrdu: `• **Input Devices**: Computer mein data daakhil karne ke alaat (Keyboard, Mouse, Scanner, Barcode Reader, OMR).
-• **Output Devices**: Computer se natija hasil karne ke alaat (Monitors, Laser Printers, Inkjet).`,
+    keywords: ['virus', 'malware', 'trojan horse', 'worm', 'ransomware', 'antivirus'],
+    title: 'Computer Security Threats & Malicious Software',
+    english: `• **Computer Virus**: Malicious program that replicates by attaching to executable files.
+• **Worm**: Standalone self-replicating malware that spreads across networks without host files.
+• **Trojan Horse**: Malware disguised as useful software that opens backdoor access for hackers.
+• **Ransomware**: Encrypts victim data and demands payment for the decryption key.
+• **Defenses**: Real-time antivirus scanners, active firewalls, and regular offline data backups.`,
+    romanUrdu: `• **Virus**: Files ke sath jurr kar nuksan pohanchane wala program.
+• **Worm**: Khud ba khud network par phail kar system ko slow karne wala program.
+• **Trojan Horse**: Faidamand ban kar system mein dakhil hota hai aur backdoor kholta hai.
+• **Ransomware**: Files ko lock kar ke paise mangta hai.
+• **Hifazat**: Antivirus install rakhein aur data ka backup rakhein.`,
   },
   {
-    keywords: ['virus', 'computer virus', 'malware', 'trojan horse', 'worm', 'antivirus'],
-    title: 'Computer Viruses, Security Threats & Antivirus Defenses',
-    english: `• **Computer Virus**: Malicious program that replicates and attaches to executable files.
-• **Types of Malware**:
-  - *Boot Sector Virus*: Infects Master Boot Record (MBR).
-  - *Worm*: Self-replicating standalone program consuming network bandwidth.
-  - *Trojan Horse*: Disguises as useful software while opening backdoor access.
-  - *Ransomware*: Encrypts user files demanding payment.
-• **Defenses**: Real-time antivirus, firewall activation, regular data backups.`,
-    romanUrdu: `• **Virus**: Wo nuqsande program jo doosri files ke sath jurr kar unhein kharab karta hai.
-• **Worm**: Aisa virus jo khud ba khud network par phail kar computer ko slow kar deta hai.
-• **Trojan Horse**: Aisa dhokaybaaz program jo dekhne mein faidamand lagta hai magar andar se system ka control chura leta hai.
-• **Hifazat**: Antivirus install rakhein aur zaroori data ka backup rakhein.`,
+    keywords: ['operating system', 'os', 'multitasking', 'scheduling', 'fcfs', 'round robin'],
+    title: 'Operating System Functions & CPU Scheduling',
+    english: `An **Operating System (OS)** manages computer hardware and system resources:
+
+• **Core Functions**:
+  1. *Processor Management*: Allocates CPU time to processes (Round Robin, FCFS).
+  2. *Memory Management*: Tracks RAM allocation and virtual memory paging.
+  3. *File Management*: Organizes files in hierarchical directories (NTFS, FAT32).
+  4. *Device Management*: Coordinates peripheral devices via device drivers.
+  5. *Security*: User authentication and permissions.`,
+    romanUrdu: `**Operating System (OS)** wo software hai jo computer hardware aur user ke darmiyan rabta banata hai (maslan Windows 11, Linux).
+Iske bunyadi kaam: Processor scheduling, RAM memory management, files organization, aur virus/security protection.`,
+  },
+
+  // --- ENGLISH 11 ---
+  {
+    keywords: ['button button', 'richard matheson', 'norma', 'arthur', 'mr steward'],
+    title: 'English 11 Story 1: "Button, Button" by Richard Matheson',
+    english: `• **Author**: Richard Matheson.
+• **Main Characters**: Norma Lewis (materialistic wife), Arthur Lewis (principled husband), Mr. Steward (agent).
+• **Plot Summary**: Mr. Steward delivers a box with a button. If pressed, someone they don't know will die, and they will receive $50,000. Arthur firmly opposes it on moral grounds. Norma rationalizes the act, pushes the button, and Arthur dies in a train accident, yielding a $50,000 life insurance policy.
+• **Moral**: Greed leads to catastrophe; selfishness blinds people to human values.`,
+    romanUrdu: `• **Story**: "Button, Button" by Richard Matheson.
+• **Kirdar**: Norma (lalachi biwi), Arthur (usool pasand shohar), Mr. Steward.
+• **Khulasa**: Steward $50,000 ka lalach de kar button dabane ki peshkash karta hai. Arthur mana karta hai magar Norma lalach mein button daba deti hai. Nateeja yeh nikalta hai ke Arthur train hadsay mein mara jata hai aur insurance ke $50,000 milte hain.
+• **Sabaq**: Lalach buri bala hai.`,
   },
   {
-    keywords: ['tenses', '12 tenses', 'present indefinite', 'present continuous', 'past indefinite', 'future tense', 'english grammar'],
-    title: '12 English Tenses: Syntax, Formulas & Urdu Identification',
-    english: `• **Present Simple**: Sub + V1 (+ s/es). (e.g., He reads the daily quota.)
-• **Present Continuous**: Sub + is/am/are + V1+ing. (e.g., She is attempting the test.)
-• **Present Perfect**: Sub + has/have + V3. (e.g., I have completed the lesson.)
-• **Past Simple**: Sub + V2. (Negative: did not + V1).
-• **Future Simple**: Sub + will/shall + V1.`,
-    romanUrdu: `• **Present Simple**: Sub + Verb ki 1st form (+ s/es). (Urdu pehchan: ta hai, ti hai, te hain).
-• **Past Simple**: Sub + 2nd form of Verb. Negative: did not + 1st form. (Urdu pehchan: ya, yi, ye).
-• **Future Simple**: Sub + will/shall + 1st form. (Urdu pehchan: ga, gi, ge).`,
+    keywords: ['clearing in the sky', 'jesse stuart', 'jess', 'old man'],
+    title: 'English 11 Story 2: "Clearing in the Sky" by Jesse Stuart',
+    english: `• **Author**: Jesse Stuart.
+• **Main Characters**: Jess (narrator) and his 70-year-old father.
+• **Plot Summary**: Despite heart doctors giving him only a few days to live, the father clears a steep mountain patch with his own hands to plant tomatoes, corn, and potatoes. He climbs multiple paths to test his strength.
+• **Theme**: Indomitable human willpower, hard work, and deep love for nature triumphing over physical frailty.`,
+    romanUrdu: `• **Story**: "Clearing in the Sky" by Jesse Stuart.
+• **Khulasa**: Jess ka 70 saala beemar baap jise doctors ne aaram ka mashwara diya tha, pahaar ki choti par ja kar zameen saaf karta hai aur faslein ugata hai.
+• **Sabaq**: Himmat, mehnat aur pukhta irada mout aur beemari ko bhi maat de deta hai.`,
   },
   {
-    keywords: ['active passive', 'passive voice', 'voice conversion', 'active and passive voice'],
-    title: 'Active & Passive Voice Conversion Rules (BISE Exam Standard)',
-    english: `Golden Rules for Passive Voice:
-1. Object of active becomes Subject of passive.
-2. Always use V3 (Past Participle) in passive sentences.
-3. Add auxiliary 'by' before the active agent.
-4. Tense Shifts: Present Simple -> is/am/are + V3; Continuous -> being + V3; Perfect -> been + V3.`,
-    romanUrdu: `Passive Voice ke 4 bunyadi qawaneen:
-1. Object ko Subject banayein.
-2. Hamesha 3rd form of Verb (V3) lagayein.
-3. 'by' ka istemal karein.
-4. Continuous mein 'being' aur Perfect mein 'been' lagta hai.`,
+    keywords: ['the rain', 'wh davies', 'w h davies', 'rain poem'],
+    title: 'English 11 Poem 1: "The Rain" by W. H. Davies',
+    english: `• **Poet**: W. H. Davies.
+• **Central Theme**: The poem portrays rain falling on leaves. The top thick leaves drink water first and pass the drops to poor lower leaves—a metaphor for social inequality where wealthy classes receive resources first.
+• **Hope**: The emergence of the sun spreading bright light over everything symbolizes universal equality and optimism.`,
+    romanUrdu: `• **Nazm**: "The Rain" by W. H. Davies.
+• **Theme**: Barish ke qatray ooper walay ameer paton par girtay hain jo neeche walay ghareeb paton ko qatra qatra dete hain (muashray ki ghurbat aur ameeri ka istara).
+• **Umeed**: Aakhir mein jab sooraj nikalta hai to har cheez barabar roshan ho jati hai jo insaf aur barabari ki alamat hai.`,
   },
   {
-    keywords: ['apni madad aap', 'sir syed ahmad khan', 'sir syed', 'urdu sabaq 2'],
-    title: 'Urdu 11: Sabaq 2 "Apni Madad Aap" by Sir Syed Ahmad Khan',
+    keywords: ['tenses', '12 tenses', 'english tenses', 'present indefinite', 'past indefinite', 'future'],
+    title: '12 English Tenses: Key Formulas & Rules',
+    english: `• **Present Simple**: Sub + V1 (+ s/es). (e.g., He studies computer science.)
+• **Present Continuous**: Sub + is/am/are + V1+ing. (e.g., They are taking the test.)
+• **Present Perfect**: Sub + has/have + V3. (e.g., She has completed Unit 1.)
+• **Past Simple**: Sub + V2. Negative: did not + V1. (e.g., We attempted the paper.)
+• **Past Continuous**: Sub + was/were + V1+ing.
+• **Future Simple**: Sub + will/shall + V1. (e.g., You will pass with distinction.)`,
+    romanUrdu: `• **Present Simple**: Sub + 1st form (+ s/es). (Pehchan: ta hai, ti hai, te hain).
+• **Past Simple**: Sub + 2nd form of verb. Negative: did not + 1st form.
+• **Future Simple**: Sub + will/shall + 1st form. (Pehchan: ga, gi, ge).
+• **Continuous**: Hamesha V1+ing lagta hai.
+• **Perfect**: Hamesha 3rd form (V3) lagti hai.`,
+  },
+  {
+    keywords: ['active passive', 'passive voice', 'voice change'],
+    title: 'Active & Passive Voice Conversion Rules',
+    english: `Key Rules for Passive Voice:
+1. Object of active sentence becomes the Subject.
+2. Always use the 3rd form of Verb (V3 / Past Participle).
+3. Insert auxiliary 'by' before the agent.
+4. Tense shift rules:
+   - Present Simple: is/am/are + V3
+   - Continuous: being + V3
+   - Perfect: been + V3
+   - Past Simple: was/were + V3`,
+    romanUrdu: `Passive Voice ke 4 bunyadi usool:
+1. Object ko shuroo mein Subject banayein.
+2. Hamesha Verb ki 3rd form (V3) lagayein.
+3. 'by' ka lafz istemal karein.
+4. Continuous sentences mein 'being' aur Perfect sentences mein 'been' ka izafa karein.`,
+  },
+
+  // --- URDU 11 ---
+  {
+    keywords: ['uswa', 'uswa-e-hasna', 'shibli nomani', 'sabaq 1'],
+    title: 'Urdu 11 Sabaq 1: "Uswa-e-Hasna" by Maulana Shibli Nomani',
+    english: `• **Author**: Allama Shibli Nomani (Seerat-un-Nabi).
+• **Theme**: The blessed life of Prophet Muhammad ﷺ is the only complete, universal, and eternal role model for all mankind across every station in life (kings, subjects, merchants, teachers, commanders).
+• **Board Exam Points**: Hawala-e-Matan mein sabaq ka unwan aur musannif ka naam 2 marks ka hota hai; Tashreeh 10 marks ki hoti hai.`,
+    romanUrdu: `• **Musannif**: Maulana Shibli Nomani.
+• **Markazi Khayal**: Hazrat Muhammad ﷺ ki mubarak zaat har insaan ke liye qiyamat tak kamil tareen namoona (Uswa-e-Hasna) hai chahe wo badshah ho ya ghareeb, tajir ho ya sipah salaar.
+• **Exam Tip**: Tashreeh mein Quranic aayat *"Laqad kaana lakum fee rasoolillahi uswatun hasanah"* ka hawala zaroor dein.`,
+    urdu: `• **مصنف**: مولانا شبلی نعمانی
+• **مرکزی خیال**: حضرت محمد مصطفیٰ ﷺ کی حیات طیبہ تمام انسانوں کے لیے ہر شعبہ زندگی میں کامل اور دائمی نمونہ عمل ہے۔`
+  },
+  {
+    keywords: ['apni madad aap', 'sir syed', 'sir syed ahmad khan', 'sabaq 2'],
+    title: 'Urdu 11 Sabaq 2: "Apni Madad Aap" by Sir Syed Ahmad Khan',
     english: `• **Author**: Sir Syed Ahmad Khan.
-• **Core Philosophy**: True national progress begins with individual self-reliance and moral discipline. External government assistance cannot cure internal moral degradation. God helps those who help themselves.`,
+• **Core Philosophy**: National progress stems from individual self-reliance, moral discipline, and labor. External government aid cannot cure moral weakness. God helps those who help themselves.`,
     romanUrdu: `• **Musannif**: Sir Syed Ahmad Khan.
-• **Sabaq**: Qaum ki taraqqi fard ki mehnat aur apni madad aap ke jazbay mein muzmar hai. Jab tak afraad khud mehnat nahi karenge, qaum aage nahi barh sakti.`,
+• **Sabaq**: Qaumi taraqqi fard ki zaati mehnat aur apni madad aap ke jazbay se aati hai. Jab tak afraad khud mehnat nahi kareinge qaum aage nahi barh sakti.`,
     urdu: `• **مصنف**: سر سید احمد خان
-• **مرکزی خیال**: خدا ان کی مدد کرتا ہے جو اپنی مدد آپ کرتے ہیں۔ قومی ترقی افراد کی ذاتی محنت اور خود اعتمادی سے ممکن ہے۔`,
+• **مرکزی خیال**: خدا ان کی مدد کرتا ہے جو اپنی مدد آپ کرتے ہیں۔ قوم کی ترقی افراد کی محنت اور خود اعتمادی سے ممکن ہے۔`
   },
   {
-    keywords: ['tashbih', 'arkan-e-tashbih', 'arkan e tashbih', 'tashbih ke arkan', 'ilm-e-bayan', 'urdu grammar'],
-    title: 'Ilm-e-Bayan: Tashbih (تشبیہ) & Its 5 Components (ارکانِ تشبیہ)',
-    english: `Tashbih (Simile) is establishing a likeness between two things based on a shared attribute.
-• 5 Components of Tashbih:
-  1. Mushabbah (مشبہ): The entity being compared (e.g., Ali).
-  2. Mushabbah Beh (مشبہ بہ): The benchmark entity (e.g., Sher).
-  3. Wajah-e-Shibh (وجہ شبہ): Shared attribute (Bahaduri).
-  4. Gharz-e-Tashbih (غرض تشبیہ): Purpose of comparison.
-  5. Harf-e-Tashbih (حرف تشبیہ): Comparison word (jaisa, ki tarah).`,
-    romanUrdu: `تشبیہ (Tashbih): Kisi ek cheez ko kisi doosri cheez ki tarah qarar dena.
-Iske 5 arkan hotay hain:
-1. مشبہ: Jis cheez ko tashbih di jaye.
-2. مشبہ بہ: Jis cheez ke sath tashbih di jaye.
-3. وجہ شبہ: Wo khoobi jo dono mein mushtarak ho.
-4. غرض تشبیہ: Tashbih dene ka maqsad.
-5. حرف تشبیہ: Wo lafz jo tashbih ke liye use ho (jaisa, ki tarah).`,
-    urdu: `تشبیہ کے پانچ ارکان ہیں: مشبہ، مشبہ بہ، وجہ شبہ، غرض تشبیہ، اور حرف تشبیہ۔`,
+    keywords: ['tashbih', 'arkan-e-tashbih', 'arkan e tashbih', 'ilm-e-bayan'],
+    title: 'Ilm-e-Bayan: Tashbih (تشبیہ) & Its 5 Components',
+    english: `**Tashbih (Simile)**: Establishing a resemblance between two entities based on a shared attribute.
+• 5 Components (ارکانِ تشبیہ):
+  1. *Mushabbah (مشبہ)*: The entity being compared (e.g., Ali).
+  2. *Mushabbah Beh (مشبہ بہ)*: The benchmark entity (e.g., Sher).
+  3. *Wajah-e-Shibh (وجہ شبہ)*: The shared quality (Bahaduri).
+  4. *Gharz-e-Tashbih (غرض تشبیہ)*: The purpose of comparison.
+  5. *Harf-e-Tashbih (حرف تشبیہ)*: Comparison words (jaisa, manind, ki tarah).`,
+    romanUrdu: `**تشبیہ (Tashbih)**: Kisi ek cheez ko kisi mushtarak khoobi ki bina par doosri cheez jaisa qarar dena.
+• 5 Arkan:
+  1. مشبہ: Jis cheez ko tashbih di jaye.
+  2. مشبہ بہ: Jis cheez ke sath tashbih di jaye.
+  3. وجہ شبہ: Wo khoobi jo dono mein common ho.
+  4. غرض تشبیہ: Tashbih dene ka maqsad.
+  5. حرف تشبیہ: Wo lafz jo tashbih ke liye use ho (jaisa, ki tarah).`,
+    urdu: `تشبیہ کے پانچ ارکان ہیں: مشبہ، مشبہ بہ، وجہ شبہ، غرض تشبیہ، اور حرف تشبیہ۔`
   },
   {
-    keywords: ['istaara', 'isteara', 'arkan-e-istaara', 'ilm-e-bayan'],
-    title: 'Ilm-e-Bayan: Ista\'ara (استعارہ) & Its 3 Components',
-    english: `Ista\'ara (Metaphor) means borrowing a word for another based on an imaginative resemblance without using comparison words.
-• 3 Components: Musta\'ar Lah (Original entity), Musta\'ar Minhu (Source entity), and Wajah-e-Jami (Common attribute).`,
-    romanUrdu: `استعارہ (Ista\'ara): Lafzi maani ke bajaye majazi maani lena bina kisi harf-e-tashbih ke (maslan: Mera sher beta aaya).
-3 arkan: Musta\'ar Lah, Musta\'ar Minhu, Wajah-e-Jami.`,
+    keywords: ['istaara', 'isteara', 'arkan-e-istaara'],
+    title: "Ilm-e-Bayan: Ista'ara (استعارہ) & Its 3 Components",
+    english: `**Ista'ara (Metaphor)**: Using a word for another based on an imaginative resemblance without using comparison words (e.g., "Mera sher aaya").
+• 3 Components:
+  1. *Musta'ar Lah*: The real subject.
+  2. *Musta'ar Minhu*: The borrowed entity.
+  3. *Wajah-e-Jami*: The underlying shared attribute.`,
+    romanUrdu: `**استعارہ (Ista'ara)**: Kisi lafz ko majazi maani mein istemal karna bina kisi harf-e-tashbih ke (maslan: "Mera sher beta aaya").
+• 3 Arkan: Musta'ar Lah, Musta'ar Minhu, Wajah-e-Jami.`,
   },
   {
-    keywords: ['talmeeh', 'talmih', 'ilm-e-bayan'],
-    title: 'Ilm-e-Bayan: Talmeeh (تلمیح) Definition & Board Examples',
-    english: `Talmeeh (Allusion): A concise phrase in poetry pointing to a famous historical or religious event (e.g., Aatish-e-Namrood, Ibn-e-Maryam).`,
-    romanUrdu: `تلمیح (Talmeeh): Shairi mein kisi mashhoor tareekhi ya quranic waqiye ki taraf ishara karna.`,
+    keywords: ['talmeeh', 'talmih'],
+    title: 'Ilm-e-Bayan: Talmeeh (تلمیح) Definition & Examples',
+    english: `**Talmeeh (Allusion)**: A concise reference in poetry to a renowned historical, religious, or literary event (e.g., Aatish-e-Namrood, Aab-e-Hayat, Koh-e-Toor).`,
+    romanUrdu: `**تلمیح (Talmeeh)**: Shairi ya nasar mein kisi mashhoor tareekhi ya deeni waqiye ki taraf ishara karna (maslan: Aatish-e-Namrood, Ibn-e-Maryam).`,
+    urdu: `**تلمیح**: کلام میں کسی مشہور تاریخی، قرآنی یا روایتی قصے کی طرف اشارہ کرنا تلمیح کہلاتا ہے۔`
   },
   {
-    keywords: ['khat noosi', 'khat ke ajza', 'urdu letter writing'],
-    title: 'Urdu Khat Noosi (خط نویسی کے ۶ اجزاء) & Board Pattern',
-    english: `Urdu Formal Letter contains 6 essential parts (10 Marks):
+    keywords: ['khat noosi', 'khat ke ajza', 'letter format urdu'],
+    title: 'Urdu Formal Letter Writing (خط نویسی کے ۶ اجزاء)',
+    english: `Urdu Letter Writing comprises 6 essential components (10 Marks):
 1. Muqam-e-Rawangi aur Tareekh (امتحانی مرکز)
 2. Alqab (محترم ابا جان)
 3. Aadab (السلام علیکم)
-4. Nafs-e-Mazmoon (Main content)
+4. Nafs-e-Mazmoon (Main body)
 5. Ikhtitam (والسلام)
 6. Pata (Postal address).`,
-    romanUrdu: `خط کے 6 اجزاء: مقام روانگی و تاریخ، القاب، آداب، نفس مضمون، اختتام، اور پتہ.`,
+    romanUrdu: `خط کے 6 اجزاء:
+1. مقام روانگی اور تاریخ (امتحانی مرکز)
+2. القاب (محترم والد صاحب)
+3. آداب (السلام علیکم)
+4. نفس مضمون (اصل مدعا)
+5. اختتام (والسلام)
+6. پتہ (امتحانی پتہ).`,
+  },
+
+  // --- PRINCIPLES OF ECONOMICS ---
+  {
+    keywords: ['economics', 'adam smith', 'alfred marshall', 'lionel robbins'],
+    title: 'Three Classic Definitions of Economics',
+    english: `1. **Adam Smith (Classical)**: Economics is the science of Wealth (Production, Exchange, Distribution, Consumption).
+2. **Alfred Marshall (Neo-Classical)**: Economics is the study of mankind in the ordinary business of life, specifically Material Welfare.
+3. **Lionel Robbins (Modern)**: Economics is the science studying human behavior as a relationship between unlimited ends and scarce means with alternative uses.`,
+    romanUrdu: `• **Adam Smith**: Ma'ashiyat daulat ka ilm hai.
+• **Alfred Marshall**: Ma'ashiyat insani falah-o-behbood (Material Welfare) ka ilm hai.
+• **Lionel Robbins**: Ma'ashiyat na-mehdood khwahishat aur mehdood zaraye ke darmiyan intikhab ka science hai.`,
   },
   {
-    keywords: ['economics', 'adam smith', 'alfred marshall', 'lionel robbins', 'usool-e-maashiyat', 'definitions of economics'],
-    title: 'Definitions of Economics: Adam Smith, Marshall & Robbins',
-    english: `1. Adam Smith: Economics is the science of Wealth (Production, Consumption, Distribution).
-2. Alfred Marshall: Economics is the study of Material Welfare in the ordinary business of life.
-3. Lionel Robbins: Economics is the study of human behavior facing unlimited wants and scarce means.`,
-    romanUrdu: `• Adam Smith: Ma\'ashiyat daulat ka ilm hai.
-• Alfred Marshall: Ma\'ashiyat insani falah-o-behbood (Material Welfare) ka ilm hai.
-• Lionel Robbins: Ma\'ashiyat na-mehdood khwahishat aur mehdood zaraye ke darmiyan intikhab ka science hai.`,
+    keywords: ['law of demand', 'qanoon talab', 'elasticity of demand'],
+    title: 'Law of Demand & Price Elasticity (قانونِ طلب)',
+    english: `• **Law of Demand**: Other things remaining equal (Ceteris Paribus), as the price of a good rises, quantity demanded falls; as price falls, quantity demanded rises.
+• **Elasticity of Demand**: Degree of responsiveness of demand to price variations (Ed > 1 for luxury items, Ed < 1 for necessities).`,
+    romanUrdu: `• **قانونِ طلب**: Deegar halat badastoor rehte hue, jab kisi cheez ki qeemat barhti hai to uski talab kam ho jati hai, aur qeemat kam hone se talab barh jati hai.
+• **طلب کی لچک**: Qeemat ki tabdeeli se talab mein aane wali tabdeeli ki sharah.`,
   },
   {
-    keywords: ['law of demand', 'qanoon talab', 'qanoon e talab', 'talab', 'demand', 'elasticity of demand'],
-    title: 'Law of Demand & Elasticity of Demand (قانونِ طلب اور لچک)',
-    english: `• Law of Demand: Keeping other factors constant (Ceteris Paribus), when the price of a good rises, its demand falls; when price falls, demand rises.
-• Price Elasticity of Demand: Responsiveness of demand to price changes (Ed > 1 for luxury goods, Ed < 1 for necessities).`,
-    romanUrdu: `• قانون طلب: Deegar halat badastoor rehte hue, jab kisi cheez ki qeemat barhti hai to uski talab kam ho jati hai, aur qeemat kam hone par talab barh jati hai.
-• طلب کی لچک: Qeemat badalne se talab par parne wala asar.`,
-  },
-  {
-    keywords: ['law of diminishing marginal utility', 'qanoon taqleel ifada', 'marginal utility', 'ifada mukhtatam', 'ifada'],
+    keywords: ['law of diminishing marginal utility', 'qanoon taqleel ifada', 'marginal utility'],
     title: 'Law of Diminishing Marginal Utility (قانونِ تقلیلِ افادہِ مختتم)',
-    english: `Statement: As a consumer increases consumption of any good, the additional satisfaction (Marginal Utility) derived from each successive unit continuously declines.`,
-    romanUrdu: `قانون تقلیل افادہ مختتم: Jab koi shakhs kisi cheez ki musalsal ikaiyan istemal karta hai, to har agli ikai se milne wala izafi faida (Marginal Utility) kam hota jata hai.`,
+    english: `**Statement**: As a consumer consumes successive units of a commodity, the extra satisfaction (Marginal Utility) derived from each consecutive unit continuously declines.`,
+    romanUrdu: `**قانون تقلیل افادہ مختتم**: Jab koi shakhs kisi cheez ki musalsal ikaiyan istemal karta hai to har agli ikai se milne wala izafi faida (Marginal Utility) kam hota jata hai.`,
+  },
+
+  // --- PHYSICAL & HEALTH EDUCATION ---
+  {
+    keywords: ['skeleton', 'bones', 'human skeleton', '206 bones', 'axial', 'appendicular'],
+    title: 'Human Skeletal System: 206 Bones',
+    english: `The human adult skeleton has 206 bones:
+1. **Axial Skeleton (80 Bones)**: Skull (28), Vertebral Column (26), Ribs (24), Sternum (1), Hyoid (1).
+2. **Appendicular Skeleton (126 Bones)**: Upper extremities/shoulders (64) and Lower extremities/pelvis (62).`,
+    romanUrdu: `Insani jism mein kul 206 haddiyan hoti hain:
+1. **Mehwari Dhancha (Axial - 80 Haddiyan)**: Khopri, Reerh ki haddi, Pasliyan, aur Seene ki haddi.
+2. **Zameemati Dhancha (Appendicular - 126 Haddiyan)**: Baazu, Kandhay aur Taangein.`,
   },
   {
-    keywords: ['skeleton', 'bones', 'human skeleton', 'haddi', 'haddiyan', '206 bones', 'sehat o jismani taleem'],
-    title: 'Human Skeletal System: 206 Bones, Axial vs Appendicular',
-    english: `The adult human skeleton comprises 206 bones:
-1. Axial Skeleton (80 Bones): Skull, Spine (Vertebral column), Ribs, Sternum.
-2. Appendicular Skeleton (126 Bones): Limbs, Shoulders, and Pelvic girdles.`,
-    romanUrdu: `Insani jism mein kul 206 haddiyan (bones) hoti hain:
-1. Mehwari Dhancha (Axial - 80 Haddiyan): Khopri, Reerh ki haddi, Pasliyan.
-2. Zameemati Dhancha (Appendicular - 126 Haddiyan): Baazu aur Taangein.`,
+    keywords: ['joints', 'joint types', 'hinge joint', 'ball and socket'],
+    title: 'Classification of Human Joints (جوڑوں کی اقسام)',
+    english: `• **Immovable Joints**: Sutures of the cranium.
+• **Slightly Movable**: Vertebrae discs.
+• **Freely Movable (Synovial)**:
+  1. *Ball and Socket*: Shoulder and hip (multi-directional movement).
+  2. *Hinge Joint*: Elbow and knee (one-directional flexion/extension).
+  3. *Pivot Joint*: Neck (rotation).`,
+    romanUrdu: `• **Ghair Mutaharrik (Immovable)**: Khopri ke jor jo harkat nahi karte.
+• **Mutaharrik (Freely Movable)**:
+  1. Ball and Socket: Kandhay aur koolhay ke jor (tamam simton mein ghoomte hain).
+  2. Hinge Joint: Kohni aur ghutnay ke jor (darwazay ke qabzay ki tarah ek taraf murte hain).`,
+  },
+
+  // --- ISLAMIAT & TARJUMA-TUL-QURAN ---
+  {
+    keywords: ['tauheed', 'aqeedah-e-tauheed', 'aqeedah tauheed'],
+    title: 'Islamiat Lazmi: Aqeedah-e-Tauheed (عقیدہِ توحید)',
+    english: `**Aqeedah-e-Tauheed** is the supreme foundation of Islam: Firm belief that Allah is One, unique in His Essence (Zaat), Attributes (Sifaat), and Rights to Worship (Ibadat), without partner or equal.
+• **Impacts**: Eliminates fear of worldly powers, grants self-respect, and cultivates humility and piety.`,
+    romanUrdu: `**عقیدہ توحید**: Allah Tala ko Zaat, Sifat aur Ibadat mein ek manna aur kisi ko Uska shareek na thehrana.
+• Iske asraat: Insaan dunya ke darr se aazad ho kar sirf Allah par bharosa karta hai aur uske andar khud daari aati hai.`,
+    urdu: `**عقیدہ توحید**: اللہ تعالیٰ کو ذات، صفات اور عبادات میں یکتا ماننا اور کسی کو اس کا شریک نہ ٹھہرانا۔`
   },
   {
-    keywords: ['surah maryam', 'hazrat maryam', 'hazrat zakariya', 'hazrat isa', 'tarjuma tul quran'],
-    title: 'Tarjuma-tul-Quran 11: Surah Maryam Overview & Themes',
-    english: `• Makki Surah (98 verses).
-• Themes: Miraculous birth of Prophet Yahya (AS) to Prophet Zakariya (AS), and fatherless birth of Prophet Isa (AS) to Hazrat Maryam (AS). Prophet Isa speaking in the cradle to attest his mother\'s purity.`,
-    romanUrdu: `• Surah Maryam Makki Surah hai. Ismein Hazrat Zakariya (AS) ko burhapay mein Hazrat Yahya (AS) ki basharat aur Hazrat Maryam (AS) ke haan Hazrat Isa (AS) ki mojzana wiladat ka bayan hai.`,
-  },
-  {
-    keywords: ['tauheed', 'aqeedah-e-tauheed', 'islamic aqaid', 'islamiat 11'],
-    title: 'Islamiat Lazmi: Aqeedah-e-Tauheed (عقیدہِ توحید) & Its Impacts',
-    english: `Aqeedah-e-Tauheed is the cornerstone of Islam: Believing in Allah\'s absolute Oneness in Zaat (Person), Sifat (Attributes), and Ibadat (Worship).
-• Impacts: Inner peace, courage, dignity, and liberation from superstitions.`,
-    romanUrdu: `عقیدہ توحید: Allah ko zaat, sifat aur ibadat mein ek manna. Insaan shirk aur ghulami se aazad hota hai.`,
+    keywords: ['surah maryam', 'hazrat maryam', 'hazrat zakariya', 'hazrat isa'],
+    title: 'Tarjuma-tul-Quran 11: Surah Maryam Overview',
+    english: `• **Surah Maryam**: Makki Surah (98 verses).
+• **Core Themes**: Miraculous birth of Prophet Yahya (AS) to Prophet Zakariya (AS) in extreme old age, and the miraculous fatherless birth of Prophet Isa (AS) to Hazrat Maryam (AS). Prophet Isa speaks in infancy to verify his mother's purity.`,
+    romanUrdu: `• **Surah Maryam**: Makki Surah hai (98 ayaat).
+• Ismein Hazrat Zakariya (AS) ko burhapay mein Hazrat Yahya (AS) ki basharat aur Hazrat Maryam (AS) ke haan Hazrat Isa (AS) ki baghair baap ke mojzana wiladat ka bayan hai.`,
   },
 ];
 
@@ -576,7 +642,7 @@ export class AIStudyBotService {
 
   public getChatHistory(roleOverride?: 'teacher' | 'student'): AIChatMessage[] {
     const currentRole = roleOverride || this.getCurrentUserContext().role;
-    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v11`;
     try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
@@ -600,7 +666,7 @@ export class AIStudyBotService {
         {
           id: 'msg_welcome_teacher',
           sender: 'assistant',
-          text: `Salam ${displayName}! Welcome to your Faculty AI Desk. Ask any question regarding student performance, 30-mark diagnostic test rubrics, or BISE DG Khan curriculum pacing.`,
+          text: `Salam ${displayName}! Welcome to your Faculty AI Desk. Main student evaluation, attendance certification, aur BISE DG Khan curriculum pacing mein aapki live madad kar sakta hoon.`,
           timestamp: 'Just now',
         },
       ];
@@ -610,7 +676,7 @@ export class AIStudyBotService {
       {
         id: 'msg_welcome_student',
         sender: 'assistant',
-        text: `Salam ${displayName}! Welcome to your Academic AI Copilot. Ask any question from Computer Science, Urdu grammar, English, or 1st Year board syllabus.`,
+        text: `Salam ${displayName}! Welcome to your Study Hub AI Copilot. Aap mujh se aaj ka test, schedule, attendance, marks, ya Computer Science aur kisi bhi subject ke baray mein seedha sawal pooch sakte hain.`,
         timestamp: 'Just now',
       },
     ];
@@ -618,15 +684,15 @@ export class AIStudyBotService {
 
   public saveChatHistory(history: AIChatMessage[], roleOverride?: 'teacher' | 'student'): void {
     const currentRole = roleOverride || this.getCurrentUserContext().role;
-    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v11`;
     try {
-      localStorage.setItem(storageKey, JSON.stringify(history.slice(-30)));
+      localStorage.setItem(storageKey, JSON.stringify(history.slice(-40)));
     } catch {}
   }
 
   public clearChatHistory(roleOverride?: 'teacher' | 'student'): void {
     const currentRole = roleOverride || this.getCurrentUserContext().role;
-    const storageKey = `gsa_academic_chat_history_${currentRole}_v10`;
+    const storageKey = `gsa_academic_chat_history_${currentRole}_v11`;
     try {
       localStorage.removeItem(storageKey);
     } catch {}
@@ -656,6 +722,7 @@ export class AIStudyBotService {
     attendanceSummary: string;
     testSummary: string;
     taskSummary: string;
+    todayTestSummary: string;
     fullContextString: string;
   } {
     let role: 'teacher' | 'student' = 'student';
@@ -701,6 +768,8 @@ export class AIStudyBotService {
           return `${title}: ${marks} (${r.percentage || Math.round((r.score / (r.maxScore || 30)) * 100)}%, Grade ${r.grade})`;
         });
         testSummary = `Certified Test Scores: ${recents.join(' | ')}. Passing threshold: 15/30 marks.`;
+      } else {
+        testSummary = 'No tests submitted yet. First test starting Friday Nov 20.';
       }
     } catch {}
 
@@ -717,13 +786,28 @@ export class AIStudyBotService {
       }
     } catch {}
 
+    // Today's active test details
+    let todayTestSummary = 'Assessment window: 12:00 AM - 11:59 PM.';
+    try {
+      const allTests = testService.getTests();
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const foundToday = allTests.find((t: TestItem) => t.date === todayStr || t.id === 'tst_today');
+      if (foundToday) {
+        todayTestSummary = `Today's Assessment: ${foundToday.subjectName} — "${foundToday.title}" (30 Marks, 45 Mins, Pass: 15). Unlocked for active attempt.`;
+      } else {
+        todayTestSummary = `Next Scheduled Test: Friday Nov 20, 2026: Combined 2 Books (Islamiat Lazmi + Tarjuma-tul-Quran). 30 Marks.`;
+      }
+    } catch {}
+
     const fullContextString = `Current Active User Context:
 - User Role: ${role === 'teacher' ? 'Faculty / Teacher' : 'Enrolled Student'}
 - Full Name: ${name}
 - Enrolled Class / Curriculum: ${academicClass} (BISE D.G. Khan Board)
 - Live Attendance: ${attendanceSummary}
 - Live Test Results: ${testSummary}
-- Active Daily Tasks: ${taskSummary}`;
+- Active Daily Tasks: ${taskSummary}
+- Assessment Window: ${todayTestSummary}`;
 
     return {
       role,
@@ -733,6 +817,7 @@ export class AIStudyBotService {
       attendanceSummary,
       testSummary,
       taskSummary,
+      todayTestSummary,
       fullContextString,
     };
   }
@@ -747,7 +832,10 @@ export class AIStudyBotService {
     if (actionType === 'unlock_today_test') {
       const res = testService.unlockTestImmediately(details);
       return {
-        messageText: `🔓 **Test Unlocked & Activated Successfully**:\n• Assessment: **${res.test ? res.test.subjectName : "Today's Assessment"}**\n• Status: Active Now (Window closes 11:59 PM)\n• Both Dashboard and Test Series grid are unlocked. Click 'Start 30-Mark Test' to proceed.`,
+        messageText: `🔓 **Test Unlocked Successfully**:
+• Assessment: **${res.test ? res.test.subjectName : "Today's Assessment"}**
+• Status: Active Now (Window closes 11:59 PM)
+• Aap Daily Test Series grid ya Test Submission page se direct paper start kar sakte hain.`,
         actionExecuted: "Today's Test Unlocked",
       };
     }
@@ -756,7 +844,10 @@ export class AIStudyBotService {
       const ctx = this.getDynamicUserAcademicContext();
       const res = attendanceService.markPresentToday(ctx.name);
       return {
-        messageText: `🟢 **Daily Presence Recorded**:\n• Scholar: **${ctx.name}**\n• Timestamp: **${res.record.timeMarked}**\n• Status: Present certified & synchronized with Faculty ledger.`,
+        messageText: `🟢 **Daily Attendance Marked**:
+• Scholar: **${ctx.name}**
+• Time: **${res.record.timeMarked}**
+• Status: Present certified & recorded on portal.`,
         actionExecuted: 'Daily Attendance Recorded',
       };
     }
@@ -770,7 +861,9 @@ export class AIStudyBotService {
         taskService.approveTask(todayTask.id, ctx.role === 'teacher' ? ctx.name : 'Faculty Lead', 'Approved via AI Desk');
       }
       return {
-        messageText: `📚 **Daily Reading Quota Completed**:\n• Status: 100% Certified\n• Quota: 2.5 Pages / Day\n• Paced towards the February 28 syllabus deadline.`,
+        messageText: `📚 **Daily Reading Quota Marked Complete**:
+• Quota: 2.5 Pages / Day
+• Status: Approved & synchronized with course tracker.`,
         actionExecuted: "Today's Quota Approved",
       };
     }
@@ -787,14 +880,18 @@ export class AIStudyBotService {
         remarks: 'Manual sync trigger requested via AI Copilot.',
       });
       return {
-        messageText: `📊 **Google Sheets Synchronized**:\n• Connected Sheet: Official FA-IT Academic Ledger\n• Sync Time: ${new Date().toLocaleTimeString()}\n• All attendance and test marks are up-to-date.`,
+        messageText: `📊 **Google Sheets Synchronized**:
+• Connected Sheet: Official FA-IT Academic Ledger
+• Sync Time: ${new Date().toLocaleTimeString()}
+• Tamam attendance aur test marks Google Sheet mein update ho gaye hain.`,
         actionExecuted: 'Google Sheet Synchronized',
       };
     }
 
     if (actionType === 'reschedule_test') {
       return {
-        messageText: `📅 **Test Series Schedule Adjusted**:\n• Today's test window shifted to tomorrow morning 10:00 AM.\n• Timetable updated in calendar.`,
+        messageText: `📅 **Test Series Schedule Adjusted**:
+• Aaj ka test window kal subah 10:00 AM ke liye adjust ho gaya hai.`,
         actionExecuted: 'Test Rescheduled',
       };
     }
@@ -802,7 +899,9 @@ export class AIStudyBotService {
     if (actionType === 'check_marks') {
       const ctx = this.getDynamicUserAcademicContext();
       return {
-        messageText: `📊 **Certified Academic Test Scores**:\n• Scholar: **${ctx.name}** (${ctx.academicClass})\n• ${ctx.testSummary}`,
+        messageText: `📊 **Certified Academic Test Scores**:
+• Scholar: **${ctx.name}** (${ctx.academicClass})
+• ${ctx.testSummary}`,
         actionExecuted: 'Certified Scores Retrieved',
       };
     }
@@ -816,32 +915,52 @@ export class AIStudyBotService {
         window.open(`https://wa.me/?text=${text}`, '_blank');
       }
       return {
-        messageText: `📲 WhatsApp summary generated and ready to forward.`,
+        messageText: `📲 WhatsApp summary link generated.`,
         actionExecuted: 'WhatsApp Link Dispatched',
       };
     }
 
     return {
-      messageText: `Action performed successfully.`,
+      messageText: `Action executed successfully.`,
       actionExecuted: 'Action Executed',
     };
   }
 
   /**
-   * Main Query Processor: Real-Time AI First, Smart Fallback
+   * Main Query Processor: Direct, Real-Time AI First, Smart Fallback
    */
   public async askAI(query: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
     this.loadConfig();
     const qTrimmed = query.trim();
     const qLower = qTrimmed.toLowerCase();
+    const userCtx = this.getDynamicUserAcademicContext();
 
-    // 1. Explicit Operational Actions ONLY when the user directly requests an action
-    if (
-      qLower === 'unlock test' ||
-      qLower === 'unlock today test' ||
-      qLower === 'test unlock karo' ||
-      qLower === 'test kholo'
-    ) {
+    // 1. Natural Conversational Greetings (No syllabus dump, simple warm 1-line answer)
+    const isGreeting = /^(hi|hello|hey|salam|assalam|slaam|aoa|kese ho|kaise ho|kia haal hai|kya haal|how are you|who are you|tum kon ho|ap kon ho)[\s!?.]*$/i.test(qLower);
+    if (isGreeting) {
+      const isUrduScript = /[\u0600-\u06FF]/.test(query);
+      const isEnglish = /^(hi|hello|hey|how are you|who are you)[\s!?.]*$/i.test(qLower);
+
+      let greetingText = '';
+      if (isUrduScript) {
+        greetingText = `وعلیکم السلام! میں آپ کا سٹڈی ہب اے آئی کوپائلٹ ہوں۔ آپ مجھ سے روزانہ ٹیسٹ، نصاب، حاضری، مارکس، یا کسی بھی مضمون کے بارے میں سوال پوچھ سکتے ہیں۔`;
+      } else if (isEnglish) {
+        greetingText = `Hello! I am your Study Hub Academic AI Copilot. I can assist you with your 1st Year FA-IT syllabus, today's test schedule, attendance, marks, and course concepts. How can I assist you?`;
+      } else {
+        greetingText = `Walaikum Assalam! Main aapka Study Hub AI Assistant hoon. Main aapke tests, syllabus, attendance, marks, aur tamaam subjects (Computer Science, English, Urdu, Economics, Physical Ed, Islamiat) mein live madad ke liye hazir hoon. Aap koi bhi sawal pooch sakte hain!`;
+      }
+
+      return {
+        id: `msg_${Date.now()}`,
+        sender: 'assistant',
+        text: greetingText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+    }
+
+    // 2. Explicit Operational Actions (Fuzzy intent recognition)
+    const isUnlockIntent = /(unlock|kholo|un-lock)/i.test(qLower) && /(test|paper|assessment|quiz)/i.test(qLower);
+    if (isUnlockIntent) {
       const res = this.executeAction('unlock_today_test');
       return {
         id: `msg_${Date.now()}`,
@@ -852,12 +971,8 @@ export class AIStudyBotService {
       };
     }
 
-    if (
-      qLower === 'mark attendance' ||
-      qLower === 'mark present' ||
-      qLower === 'hazri lagao' ||
-      qLower === 'attendance lagado'
-    ) {
+    const isAttendanceMarkIntent = /(mark|lagao|laga do|record|register|bharo)/i.test(qLower) && /(attendance|hazri|presence|haazri)/i.test(qLower);
+    if (isAttendanceMarkIntent) {
       const res = this.executeAction('mark_attendance');
       return {
         id: `msg_${Date.now()}`,
@@ -868,12 +983,8 @@ export class AIStudyBotService {
       };
     }
 
-    if (
-      qLower === 'complete task' ||
-      qLower === 'task complete' ||
-      qLower === 'reading done' ||
-      qLower === 'quota approve'
-    ) {
+    const isTaskCompleteIntent = /(complete|mark done|done|khatam|parh lia|parh li|mukammal)/i.test(qLower) && /(task|quota|reading|homework|hisa)/i.test(qLower);
+    if (isTaskCompleteIntent) {
       const res = this.executeAction('complete_today_task');
       return {
         id: `msg_${Date.now()}`,
@@ -884,7 +995,8 @@ export class AIStudyBotService {
       };
     }
 
-    if (qLower === 'sync sheet' || qLower === 'sync google sheet') {
+    const isSyncIntent = /(sync|update|bhejo)/i.test(qLower) && /(sheet|google sheet|ledger)/i.test(qLower);
+    if (isSyncIntent) {
       const res = this.executeAction('sync_google_sheet');
       return {
         id: `msg_${Date.now()}`,
@@ -895,9 +1007,7 @@ export class AIStudyBotService {
       };
     }
 
-    const userCtx = this.getDynamicUserAcademicContext();
-
-    // 2. Real-Time External API (OpenAI / Gemini / Anthropic)
+    // 3. Real-Time External API (OpenAI / Gemini / Anthropic) if configured
     if (this.config.apiKey && this.config.apiKey.trim().length > 10) {
       try {
         if (this.config.provider === 'openai') {
@@ -908,18 +1018,18 @@ export class AIStudyBotService {
           return await this.callAnthropicAPI(qTrimmed);
         }
       } catch (err: any) {
-        console.warn('Real-time API invocation failed:', err);
+        console.warn('Real-time API invocation failed, falling back to smart local response:', err);
         const directAnswer = this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx);
         return {
-          id: `msg_err_${Date.now()}`,
+          id: `msg_fallback_${Date.now()}`,
           sender: 'assistant',
-          text: `⚠️ **AI Provider Notice**: ${err.message || 'Connection failed'}.\n\n${directAnswer}`,
+          text: directAnswer,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
       }
     }
 
-    // 3. Dynamic Local Academic Engine (Uses Live User Context)
+    // 4. Smart Local Academic & Portal Engine (Direct real answers, zero canned boilerplate)
     return {
       id: `msg_offline_${Date.now()}`,
       sender: 'assistant',
@@ -929,73 +1039,94 @@ export class AIStudyBotService {
   }
 
   /**
-   * Direct, Straight Syllabus Answers (Uses Live Dynamic User Context)
+   * Direct, Straight Syllabus & Live Portal Answers (NO echoing, NO canned filler)
    */
   private getDirectDynamicSyllabusAnswer(query: string, userCtx: ReturnType<typeof this.getDynamicUserAcademicContext>): string {
     const qLower = query.toLowerCase();
     const isUrduScript = /[\u0600-\u06FF]/.test(query);
-    const isRomanUrdu = /\b(kya|hai|hain|hein|batao|karna|parhna|kitna|kitne|kitni|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|marks|hazri|mein|main|hoti|hota|hotay)\b/i.test(query);
 
-    // 1. Strict Intent Matching for Student Personal Records:
+    // A. Query: Today's Test
+    const isAskingTodayTest =
+      /(aaj ka test|today('?s)? test|current test|konsa test hai aaj|aaj konsa test|test today)/i.test(qLower);
+    if (isAskingTodayTest) {
+      return `📝 **Today's Assessment Information**:\n• ${userCtx.todayTestSummary}\n\n• **Total Marks**: 30 Marks &bull; **Time Allowed**: 45 Minutes &bull; **Passing Criteria**: 15 Marks (50%)\n• Aap Daily Test Series grid ya Test Submission page se direct paper attempt kar sakte hain.`;
+    }
+
+    // B. Query: Tomorrow's Test / Next Test
+    const isAskingTomorrowTest =
+      /(kal ka test|tomorrow('?s)? test|next test|friday ka test|agle test|pehle test)/i.test(qLower);
+    if (isAskingTomorrowTest) {
+      return `📅 **Next Scheduled Test (Friday, Nov 20, 2026)**:\n• **Subjects (2 Books Combined)**: Islamiat Lazmi + Tarjuma-tul-Quran (Test 1)\n• **Syllabus**: Aqeedah-e-Tauheed, Akhlaq-o-Aadaab + Surah Maryam (Ayaat 1-36)\n• **Format**: 30 Marks &bull; 45 Minutes &bull; Passing: 15/30\n• Har Friday ko 2 books ka combined test hota hai aur Sunday mukammal OFF hota hai.`;
+    }
+
+    // C. Query: Full Timetable / Schedule
+    const isAskingSchedule =
+      /(schedule|timetable|time table|routine|test plan|hafte ka schedule|timing|schedule batao)/i.test(qLower);
+    if (isAskingSchedule) {
+      return `🗓️ **Official 15-Week Test Series Timetable (Starting Friday Nov 20)**:\n• **Friday**: 2 Books Combined (Islamiat Lazmi + Tarjuma-tul-Quran)\n• **Saturday**: Principles of Economics\n• **Sunday**: 🌴 **100% OFF (Rest & Revision Day)**\n• **Monday**: Physical & Health Education\n• **Tuesday**: Urdu & Grammar\n• **Wednesday**: English & Grammar\n• **Thursday**: Computer Science & IT\n\nKul 90 tests hain. Har test 30 marks ka hai aur passing threshold 15 marks hai.`;
+    }
+
+    // D. Query: Personal Marks / Result
     const isAskingMarks =
-      /\b(mere|mera|meri|my|student|obtained|check)\b.*\b(marks|result|score|grade|number|karkardagi)\b/i.test(query) ||
-      /\b(marks|result|score|kitne number)\b.*\b(kitne|batao|check|show|kya hai|bataen)\b/i.test(query);
-
+      /(mere marks|mera result|my score|kitne marks|kitne number|obtained marks|check result|test score|karkardagi)/i.test(qLower);
     if (isAskingMarks) {
-      return `📊 **Certified Test Performance**:\n• ${userCtx.testSummary}\n\nTamam tests BISE DG Khan board examination standards ke mutabiq 30-mark diagnostic format par evaluate kiye gaye hain. Passing threshold 15/30 marks hai.`;
+      return `📊 **Your Certified Academic Test Scores**:\n• Scholar: **${userCtx.name}** (${userCtx.academicClass})\n• ${userCtx.testSummary}\n\nTamam papers BISE DG Khan board examination standards ke mutabiq 30-mark diagnostic format par check hotay hain.`;
     }
 
+    // E. Query: Attendance / Hazri
     const isAskingAttendance =
-      /\b(meri|mera|my|aaj ki|today)\b.*\b(attendance|hazri|presence|haazri)\b/i.test(query) ||
-      /\b(attendance|hazri|haazri)\b.*\b(kitni|kya|lagi|batao|check|percentage|status|bataen)\b/i.test(query) ||
-      /\b(mark|laga do|lagao)\b.*\b(present|hazri)\b/i.test(query);
-
+      /(attendance|hazri|haazri|presence)/i.test(qLower) &&
+      /(kitni|kya|lagi|batao|check|percentage|status|record|dekho)/i.test(qLower);
     if (isAskingAttendance) {
-      return `🟢 **Live Attendance Record**:\n• ${userCtx.attendanceSummary}\n\nDaily attendance portal par digital/biometric status ke mutabiq certify hoti hai.`;
+      return `🟢 **Your Live Attendance Status**:\n• Scholar: **${userCtx.name}**\n• ${userCtx.attendanceSummary}\n\nDaily attendance portal par digital status ke mutabiq certify hoti hai.`;
     }
 
+    // F. Query: Daily Reading Quota / Tasks
     const isAskingTask =
-      /\b(aaj ka|today'?s|mera|meri|pending)\b.*\b(task|homework|quota|target|parhna|kaam)\b/i.test(query) ||
-      /\b(task|quota|homework|reading)\b.*\b(kya hai|batao|kitna|schedule|target)\b/i.test(query);
-
+      /(task|quota|homework|reading|target|daily target)/i.test(qLower);
     if (isAskingTask) {
-      return `📚 **Today's Academic Target**:\n• ${userCtx.taskSummary}\n\nHar roz 2.5 pages ka reading quota complete kar ke submit karein taake 28 February tak poora syllabus complete ho jaye.`;
+      return `📚 **Today's Reading Quota & Task Target**:\n• ${userCtx.taskSummary}\n\nHar roz 2.5 pages ka reading quota complete karein taake 28 February tak poora syllabus easily complete ho jaye.`;
     }
 
-    // 2. High-Accuracy Token & Keyword Matcher from Knowledge Base:
+    // G. Query: 7 Books List
+    const isAskingBooksList =
+      /(7 books|kitni books|kitne subject|books konsi|subjects kon|subjects list)/i.test(qLower);
+    if (isAskingBooksList) {
+      return `📚 **Official 7 Textbooks (1st Year FA-IT Punjab Board)**:\n1. **Computer Science** (IT Series Punjab Curriculum)\n2. **Principles of Economics** (Usool-e-Maashiyat)\n3. **English Book 1** (Short Stories & Plays)\n4. **Urdu Compulsory** (Sarmaya-e-Urdu)\n5. **Physical & Health Education** (Sehat-o-Jismani Taleem)\n6. **Islamiat Lazmi** (Islamic Studies Compulsory)\n7. **Tarjuma-tul-Quran Majeed** (Quran Translation 11)\n\nTamam original PDF books Library aur PDF Viewer mein available hain.`;
+    }
+
+    // H. Query: Redacted / Excluded Syllabus (PECTAA ALP 2026-27)
+    const isAskingRedacted =
+      /(redacted|smart syllabus|alp|syllabus cut|excluded|hata diya)/i.test(qLower);
+    if (isAskingRedacted) {
+      return `✂️ **PECTAA ALP 2026-27 Redacted (Excluded) Syllabus**:\n• **English**: Stories 4, 7, 9, 12 excluded from tests.\n• **Urdu**: Charpai, Pakistani Zabanain, Kharha Darn, Tip Tip Boota Boota excluded.\n• **Computer Science**: Topic 1.5, 2.8-2.10, 3.3.3, 5.3, 5.4.1.5, 6.4-6.5, 7.3, 9.5 excluded.\n\nStudy Hub ke tamaam 90 tests strictly is official redacted notification ke mutabiq design kiye gaye hain.`;
+    }
+
+    // I. High-Accuracy Matcher from Knowledge Base
     const normalizedQ = qLower
       .replace(/[\-_/\\,;:!?'"()]/g, ' ')
       .replace(/\s+e\s+/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
 
+    const stopWords = ['what', 'is', 'the', 'explain', 'tell', 'about', 'difference', 'between', 'give', 'notes', 'kya', 'hai', 'hain', 'batao', 'samjhao', 'mein', 'hein', 'define'];
     const tokens = normalizedQ
       .split(/\s+/)
-      .filter((w) => w.length >= 3 && !['what', 'explain', 'tell', 'about', 'difference', 'between', 'give', 'notes', 'kya', 'hai', 'hain', 'batao', 'samjhao', 'mein', 'hein'].includes(w));
+      .filter((w) => w.length >= 2 && !stopWords.includes(w));
 
     let bestMatch: (typeof ACADEMIC_KNOWLEDGE)[0] | null = null;
     let bestScore = 0;
-
-    const GENERIC_SUBJECT_WORDS = ['economics', 'maashiyat', 'computer', 'science', 'urdu', 'english', 'grammar', 'islam', 'islamiat', 'physical'];
 
     for (const item of ACADEMIC_KNOWLEDGE) {
       let score = 0;
       for (const kw of item.keywords) {
         const kwLower = kw.toLowerCase();
-        const normalizedKw = kwLower
-          .replace(/[\-_/\\,;:!?'"()]/g, ' ')
-          .replace(/\s+e\s+/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        const isGenericSubject = GENERIC_SUBJECT_WORDS.includes(normalizedKw);
-
-        if (normalizedQ.includes(normalizedKw) || qLower.includes(kwLower)) {
-          score += isGenericSubject ? 4 : (30 + normalizedKw.length * 2);
+        if (normalizedQ.includes(kwLower) || qLower.includes(kwLower)) {
+          score += 40 + kwLower.length * 2;
         } else {
           for (const token of tokens) {
-            if (normalizedKw.includes(token)) {
-              score += isGenericSubject ? 1 : 4;
+            if (kwLower.includes(token)) {
+              score += token.length >= 4 ? 8 : 4;
             }
           }
         }
@@ -1006,26 +1137,29 @@ export class AIStudyBotService {
       }
     }
 
-    if (bestMatch && bestScore >= 6) {
+    if (bestMatch && bestScore >= 8) {
       if (isUrduScript && bestMatch.urdu) {
         return bestMatch.urdu;
       }
+      // Check if user asked in Roman Urdu
+      const isRomanUrdu = /\b(kya|hai|hain|batao|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|mein|main|hoti|hota)\b/i.test(query);
       if (isRomanUrdu && bestMatch.romanUrdu) {
         return bestMatch.romanUrdu;
       }
       return bestMatch.english;
     }
 
-    // 3. Clean direct general academic answer
+    // J. Fallback without repeating or echoing the user's question!
     if (isUrduScript) {
-      return `آپ کے سوال کا جامع امتحانی جواب:\nانٹرمیڈیٹ بورڈ (BISE DG Khan) کے امتحانی اصولوں کے مطابق اس سوال کا بنیادی جواب یہ ہے کہ ہر تکنیکی تصور کو تعریف، اہم نکات اور مثال کے ساتھ بیان کیا جانا چاہیے۔ پیپر میں مارکر سے ہیڈنگز دیں اور جہاں ممکن ہو ڈایاگرام بنائیں۔`;
+      return `اس موضوع کے بارے میں مزید تفصیل کے لیے براہ کرم کتاب یا چیپٹر کا نام بتائیں (جیسے کمپیوٹر سائنس یونٹ 2 یا اردو گرامر)، تاکہ میں آپ کو مخصوص امتحانی نوٹس اور بورڈ پیٹرن فراہم کر سکوں۔`;
     }
 
+    const isRomanUrdu = /\b(kya|hai|hain|batao|kaise|mera|meri|meray|kab|samjhao|acha|theek|chahiye|mein|main|hoti|hota)\b/i.test(query);
     if (isRomanUrdu) {
-      return `Aapke sawaal ka seedha jawab yeh hai:\n\n1st Year FA-IT aur BISE DG Khan board ke mutabiq is topic ki basic definition aur key concepts ko heading aur diagram ke sath likhna zaroori hai. Board exam mein 15/30 marks passing threshold hoti hai. Agar kisi specific topic (Computer Science, Urdu, English, Economics) ka specific sawaal hai to topic ka naam likhein, main seedha point-to-point detail faraham karunga.`;
+      return `Aapka sawal mil gaya hai. Is topic ki mukammal board detail ke liye barahe karam subject ya specific chapter ka naam batayein (maslan Computer Science, Urdu, English, ya Economics), taake main seedha point-to-point BISE DG Khan board standard notes faraham kar sakun.`;
     }
 
-    return `Here is the academic guidance for **"${query}"**:\n\nIn the 1st Year Intermediate & FA-IT curriculum (BISE DG Khan Board):\n• **Core Principle**: Define technical concepts clearly with standard definitions and practical applications.\n• **Board Strategy**: On 30-mark diagnostic tests, write structured points with block diagrams for full credit.\n• **Pacing**: Target completion of all course units before February 28.`;
+    return `Please specify the subject or chapter (e.g., Computer Science Unit 2, English Grammar, or Principles of Economics) so I can provide concise, structured board examination notes and key points for your query.`;
   }
 
   private async callOpenAIAPI(prompt: string, history?: AIChatMessage[]): Promise<AIChatMessage> {
@@ -1036,22 +1170,21 @@ export class AIStudyBotService {
     const contextMessages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
       {
         role: 'system',
-        content: `You are the official Global Science Academy Academic AI Copilot for 1st Year Intermediate & FA-IT students under BISE D.G. Khan Board.
+        content: `You are Study Hub's official Academic AI Copilot for 1st Year FA-IT students (BISE D.G. Khan Board).
 
 ${userCtx.fullContextString}
 
-Response Guidelines:
-- Directly, concisely, and straight-forwardly answer the user's specific question without unnecessary pleasantries or filler.
-- If the user asks about personal student records (such as their test marks, attendance status, today's homework, tasks, or timetable), use the live user session context provided above to give an accurate, factual answer.
-- For academic curriculum topics (Computer Science, Operating Systems, Networks, Urdu, English, Islamic Studies, Economics), explain the concepts clearly with definitions, key exam points, bullet points, and code/diagrams where helpful.
-- Reply in the language the user asked in (English, Urdu script, or Roman Urdu).
-- Do NOT use repetitive robotic boilerplate or dump generic paragraphs.
-- Keep the tone polite, encouraging, and academically rigorous. Format nicely with markdown bolding and bullet points.`,
+Crucial Directives:
+- Answer directly, concisely, and accurately to the user's question without preamble, pleasantries, or echoing their prompt.
+- If the user asks about tests, timetable, marks, tasks, or attendance, answer using the live dynamic context provided above.
+- If the user asks an academic concept question (Computer Science, English, Urdu, Economics, Physical Ed, Islamiat), explain clearly with standard definitions, bullet points, and board exam tips.
+- Respond in the exact same language the user wrote (Roman Urdu, Urdu, or English).
+- Do NOT output repetitive generic filler or canned analogies unless specifically requested.`,
       },
     ];
 
     if (history && history.length > 0) {
-      const recent = history.slice(-8);
+      const recent = history.slice(-6);
       for (const m of recent) {
         if (m.sender === 'user' || m.sender === 'assistant') {
           contextMessages.push({
@@ -1073,7 +1206,7 @@ Response Guidelines:
       body: JSON.stringify({
         model,
         messages: contextMessages,
-        temperature: 0.6,
+        temperature: 0.5,
       }),
     });
 
@@ -1108,9 +1241,9 @@ Response Guidelines:
                 text: `You are the Global Science Academy Academic AI Copilot for 1st Year FA-IT students under BISE D.G. Khan Board.
 ${userCtx.fullContextString}
 
-Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu).
+Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu). Do not repeat the prompt.
 
-User Question: ${prompt}`,
+Question: ${prompt}`,
               },
             ],
           },

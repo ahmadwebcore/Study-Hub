@@ -655,12 +655,14 @@ export const StudyBotWidget: React.FC = () => {
               Quick:
             </span>
             {[
-              { label: '💡 Bus vs Star Topology', query: 'Explain the difference between Bus Topology and Star Topology in detail.' },
-              { label: '⚡ CPU Architecture', query: 'What is the function of ALU, Control Unit, and Registers in the CPU?' },
-              { label: '📝 30-Mark Test Pattern', query: 'Explain the BISE DG Khan 30-mark diagnostic test pattern and passing criteria.' },
+              { label: '📅 15-Week Schedule', query: '15-week timetable aur schedule batao' },
+              { label: '📝 Aaj Ka Test', query: 'aaj ka test kya hai' },
+              { label: '💡 Bus vs Star', query: 'Explain difference between Bus Topology and Star Topology' },
+              { label: '⚡ CPU Architecture', query: 'What is CPU, ALU, and Control Unit?' },
               { label: '🔓 Unlock Test', query: 'unlock test' },
-              { label: '✅ Mark Hazri', query: 'mark attendance' },
-              { label: '🔄 Sync Sheet', query: 'sync sheet' },
+              { label: '🟢 Mark Hazri', query: 'mark attendance' },
+              { label: '📊 Mere Marks', query: 'mere marks kitne hain' },
+              { label: '📚 7 Books List', query: '7 books konsi hain' },
             ].map((chip, idx) => (
               <button
                 key={idx}
@@ -686,7 +688,7 @@ export const StudyBotWidget: React.FC = () => {
               placeholder={
                 chatSource === 'direct'
                   ? 'Type your direct message...'
-                  : 'Ask about Computer Science, syllabus, marks, or hazri...'
+                  : 'Sawal poochhein ya action dein (e.g. bus topology, schedule, unlock test)...'
               }
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}

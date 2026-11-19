@@ -393,7 +393,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <select
                 value={selectedWeek}
                 onChange={(e) => setSelectedWeek(e.target.value)}
-                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 {ACADEMIC_WEEKS.map((w) => {
@@ -418,7 +418,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <select
                 value={selectedSubjectId}
                 onChange={(e) => setSelectedSubjectId(e.target.value)}
-                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All {SAMPLE_SUBJECTS.length} Subjects ({subjectCounts['all'] ?? tests.length} Tests)</option>
@@ -441,7 +441,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
               <select
                 value={selectedStatusFilter}
                 onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
                 <option value="all">All Tests &bull; Active &amp; Scheduled ({statusCounts.all})</option>

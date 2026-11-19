@@ -265,7 +265,7 @@ export const AITeacherPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await aiStudyBotService.askAI(text);
+      const response = await aiStudyBotService.askAI(text, next);
       const withResp = [...next, response];
       setMessages(withResp);
       aiStudyBotService.saveChatHistory(withResp);
