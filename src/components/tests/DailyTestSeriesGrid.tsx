@@ -37,14 +37,14 @@ interface DailyTestSeriesGridProps {
 export type TestDisplayStatus = 'locked' | 'today' | 'passed' | 'failed_retest' | 'submitted' | 'pending';
 
 export const ACADEMIC_WEEKS = [
-  { id: 'w1', label: 'Week 1 (Nov 17 - Nov 21) • Current' },
-  { id: 'all', label: 'All 15 Weeks (Full Timetable • 90 Tests)' },
-  { id: 'w2', label: 'Week 2 (Nov 24 - Nov 28)' },
-  { id: 'w3', label: 'Week 3 (Dec 01 - Dec 05)' },
-  { id: 'w4', label: 'Week 4 (Dec 08 - Dec 12)' },
-  { id: 'w5', label: 'Week 5 (Dec 15 - Dec 19)' },
-  { id: 'w6', label: 'Week 6 (Dec 22 - Dec 26)' },
-  { id: 'w7', label: 'Week 7 (Dec 29 - Jan 02)' },
+  { id: 'w1', label: 'Week 1 (Nov 20 - Nov 21) • Starting Tomorrow' },
+  { id: 'all', label: 'All Weeks (Full Timetable • 90 Tests)' },
+  { id: 'w2', label: 'Week 2 (Nov 23 - Nov 28)' },
+  { id: 'w3', label: 'Week 3 (Nov 30 - Dec 05)' },
+  { id: 'w4', label: 'Week 4 (Dec 07 - Dec 12)' },
+  { id: 'w5', label: 'Week 5 (Dec 14 - Dec 19)' },
+  { id: 'w6', label: 'Week 6 (Dec 21 - Dec 26)' },
+  { id: 'w7', label: 'Week 7 (Dec 28 - Jan 02)' },
   { id: 'w8', label: 'Week 8 (Jan 05 - Jan 09)' },
   { id: 'w9', label: 'Week 9 (Jan 12 - Jan 16)' },
   { id: 'w10', label: 'Week 10 (Jan 19 - Jan 23)' },
@@ -52,7 +52,8 @@ export const ACADEMIC_WEEKS = [
   { id: 'w12', label: 'Week 12 (Feb 02 - Feb 06)' },
   { id: 'w13', label: 'Week 13 (Feb 09 - Feb 13)' },
   { id: 'w14', label: 'Week 14 (Feb 16 - Feb 20)' },
-  { id: 'w15', label: 'Week 15 (Feb 23 - Feb 28 - Final Mocks)' },
+  { id: 'w15', label: 'Week 15 (Feb 22 - Feb 27)' },
+  { id: 'w16', label: 'Week 16 (Mar 01 - Mar 04 • Final Mocks)' },
 ];
 
 export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
@@ -244,25 +245,56 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     };
   };
 
+  // Dynamic test counts for dropdowns
+  const weekCounts = React.useMemo(() => {
+    const counts: Record<string, number> = { all: tests.length };
+    ACADEMIC_WEEKS.forEach((w) => {
+      if (w.id === 'all') return;
+      counts[w.id] = tests.filter((t) => new RegExp(`_${w.id}(?:_t\\d+)?$`).test(t.id)).length;
+    });
+    return counts;
+  }, [tests]);
+
+  const subjectCounts = React.useMemo(() => {
+    const counts: Record<string, number> = { all: tests.length };
+    SAMPLE_SUBJECTS.forEach((s) => {
+      counts[s.id] = tests.filter((t) => t.subjectId === s.id).length;
+    });
+    return counts;
+  }, [tests]);
+
+  const statusCounts = React.useMemo(() => {
+    let todayCount = 0;
+    let lockedCount = 0;
+    let passedCount = 0;
+    let retestCount = 0;
+    let pendingCount = 0;
+
+    tests.forEach((t) => {
+      const meta = getTestStatus(t);
+      if (meta.isToday) todayCount++;
+      if (meta.isLocked) lockedCount++;
+      if (meta.status === 'passed') passedCount++;
+      if (meta.status === 'failed_retest') retestCount++;
+      if (meta.status === 'pending' || meta.status === 'submitted') pendingCount++;
+    });
+
+    return {
+      all: tests.length,
+      today: todayCount,
+      locked: lockedCount,
+      passed: passedCount,
+      retest: retestCount,
+      pending: pendingCount,
+    };
+  }, [tests, completedMap, nowTick]);
+
   // Week & Subject & Status Filtering
   const filteredTests = tests.filter((t) => {
-    // Week filter (Week 1, Week 2, ..., Week 15)
+    // Week filter (Week 1, Week 2, ..., Week 16)
     if (selectedWeek !== 'all') {
-      // Strictly match exact week suffix like _w1, _w2 (prevents _w1 matching _w10, _w11, etc.)
-      const isExactIdMatch = new RegExp(`_${selectedWeek}$`).test(t.id);
-      if (!isExactIdMatch) {
-        const base = new Date(2026, 10, 17);
-        base.setHours(0, 0, 0, 0);
-        const testDate = new Date(t.date);
-        testDate.setHours(0, 0, 0, 0);
-        if (!isNaN(testDate.getTime())) {
-          const diffDays = Math.floor((testDate.getTime() - base.getTime()) / (24 * 3600 * 1000));
-          const diffWeeks = Math.floor(diffDays / 7) + 1;
-          if (`w${diffWeeks}` !== selectedWeek) return false;
-        } else {
-          return false;
-        }
-      }
+      const isExactIdMatch = new RegExp(`_${selectedWeek}(?:_t\\d+)?$`).test(t.id);
+      if (!isExactIdMatch) return false;
     }
 
     // Subject filter
@@ -317,12 +349,15 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
       <div className="bg-white rounded-2xl border border-zinc-200 p-3.5 sm:p-4 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-base font-bold text-zinc-900 tracking-tight font-serif">
                 Daily Test Series
               </h2>
               <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 30 Marks Each &bull; Pass: 15 (50%)
+              </span>
+              <span className="text-[10px] font-bold text-zinc-700 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-full shadow-2xs">
+                Showing {displayTests.length} of {tests.length} Tests
               </span>
             </div>
             <p className="text-xs text-zinc-500 mt-0.5">
@@ -347,7 +382,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
           </div>
         </div>
 
-        {/* 3 Unified Filter Dropdowns (Week, Subject, Status) */}
+        {/* 3 Unified Filter Dropdowns (Week, Subject, Status) with Live Dynamic Counts */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2.5 border-t border-zinc-100">
           {/* 1. Academic Week Dropdown */}
           <div className="flex flex-col gap-1.5 min-w-0">
@@ -361,11 +396,14 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
-                {ACADEMIC_WEEKS.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.label}
-                  </option>
-                ))}
+                {ACADEMIC_WEEKS.map((w) => {
+                  const count = weekCounts[w.id] ?? 0;
+                  return (
+                    <option key={w.id} value={w.id}>
+                      {w.label} ({count} Tests)
+                    </option>
+                  );
+                })}
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -383,10 +421,10 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
-                <option value="all">All {SAMPLE_SUBJECTS.length} Subjects</option>
+                <option value="all">All {SAMPLE_SUBJECTS.length} Subjects ({subjectCounts['all'] ?? tests.length} Tests)</option>
                 {SAMPLE_SUBJECTS.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} ({s.code})
+                    {s.name} ({subjectCounts[s.id] ?? 0} Tests)
                   </option>
                 ))}
               </select>
@@ -406,12 +444,12 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
                 style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
                 className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-zinc-50/80 text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:bg-white focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
               >
-                <option value="all">All Tests &bull; Active &amp; Scheduled</option>
-                <option value="today">Today's Active Test (Unlocked Now)</option>
-                <option value="locked">Upcoming Tests (Locked Until Test Day)</option>
-                <option value="passed">Passed Tests (&ge;15 Marks)</option>
-                <option value="retest">Retest Needed (&lt;15 Marks)</option>
-                <option value="pending">Submitted / Under Review</option>
+                <option value="all">All Tests &bull; Active &amp; Scheduled ({statusCounts.all})</option>
+                <option value="today">Today's Active Test ({statusCounts.today})</option>
+                <option value="locked">Upcoming Tests ({statusCounts.locked})</option>
+                <option value="passed">Passed Tests ({statusCounts.passed})</option>
+                <option value="retest">Retest Needed ({statusCounts.retest})</option>
+                <option value="pending">Submitted / Under Review ({statusCounts.pending})</option>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>

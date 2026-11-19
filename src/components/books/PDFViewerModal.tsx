@@ -74,34 +74,46 @@ export const PDFViewerModal: React.FC<PDFViewerModalProps> = ({
     const title = (bookTitle || testTitle || '').toLowerCase();
 
     if (code.includes('CSC') || title.includes('computer')) {
-      return '/books/computer_science_11_itseries.pdf';
+      return '/books/computer_science_11_punjab.pdf';
     }
-    if (code.includes('URD') || title.includes('urdu') || title.includes('سرمایہ')) {
-      if (title.includes('شرح') || title.includes('sharh')) {
-        return '/books/urdu_sarmaya_11_pctb.pdf';
-      }
-      return '/books/urdu_compulsory_11_pectaa.pdf';
+    if (code.includes('URD') || title.includes('urdu') || title.includes('اردو') || title.includes('سرمایہ')) {
+      return '/books/urdu_11_punjab.pdf';
     }
     if (code.includes('ENG') || title.includes('english')) {
-      if (title.includes('play') || title.includes('book 3') || title.includes('poem')) {
-        return '/books/english_11_book3_plays.pdf';
-      }
-      return '/books/english_11_book1_stories.pdf';
+      return '/books/english_11_punjab.pdf';
     }
     if (code.includes('TQM') || title.includes('quran') || title.includes('قرآن')) {
-      return '/books/tarjuma_tul_quran_11_pctb.pdf';
+      return '/books/tarjuma_tul_quran_11_punjab.pdf';
     }
     if (code.includes('ISL') || title.includes('islam') || title.includes('اسلامیات')) {
-      return '/books/islamiat_lazmi_11_pectaa.pdf';
+      return '/books/islamiat_11_punjab.pdf';
     }
     if (code.includes('ECO') || title.includes('economic') || title.includes('معاشیات')) {
-      return '/books/principles_of_economics_11_pctb.pdf';
+      return '/books/principles_of_economics_11_punjab.pdf';
     }
-    return '/books/urdu_compulsory_11_pectaa.pdf';
+    if (code.includes('PED') || title.includes('physical') || title.includes('جسمانی') || title.includes('صحت')) {
+      return '/books/physical_education_11_punjab.pdf';
+    }
+    return '/books/urdu_11_punjab.pdf';
   }, [subjectCode, pdfFileName, bookTitle, testTitle]);
 
-  const [viewerTab, setViewerTab] = useState<'slices' | 'real_pdf'>('slices');
-  const [activePageIndex, setActivePageIndex] = useState<number>(initialPage); // 1-based index (1 to totalPages)
+  const parsedStartPage = React.useMemo(() => {
+    if (initialPage && initialPage > 1) return initialPage;
+    const cov = syllabusCoverage || pagesRange || '';
+    const match = cov.match(/(?:pages|صفحات|صفحہ|pp\.?)\s*(\d+)/i) || cov.match(/(\d+)\s*[-–toتا]\s*\d+/i);
+    if (match && match[1]) {
+      const p = parseInt(match[1], 10);
+      if (!isNaN(p) && p > 0) return p;
+    }
+    return 1;
+  }, [initialPage, syllabusCoverage, pagesRange]);
+
+  const [viewerTab, setViewerTab] = useState<'slices' | 'real_pdf'>('real_pdf');
+  const [activePageIndex, setActivePageIndex] = useState<number>(parsedStartPage);
+
+  useEffect(() => {
+    setActivePageIndex(parsedStartPage);
+  }, [parsedStartPage]);
   const [viewMode, setViewMode] = useState<'single' | 'continuous' | 'spread'>('single');
   const [showThumbnails, setShowThumbnails] = useState<boolean>(true);
   const [zoomLevel, setZoomLevel] = useState<number>(100);
