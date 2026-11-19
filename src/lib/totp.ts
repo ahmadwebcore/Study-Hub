@@ -95,8 +95,18 @@ export async function syncServerTime(serverUrl?: string): Promise<number> {
   }
 
   try {
-    const target = serverUrl || import.meta.env.VITE_SUPABASE_URL || window.location.origin;
-    const response = await fetch(target, { method: 'HEAD', cache: 'no-store' });
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timeoutId = controller ? setTimeout(() => controller.abort(), 800) : null;
+    const target = serverUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    if (!target) return serverTimeDriftSeconds;
+
+    const response = await fetch(target, {
+      method: 'HEAD',
+      cache: 'no-store',
+      signal: controller ? controller.signal : undefined,
+    });
+    if (timeoutId) clearTimeout(timeoutId);
+
     const dateHeader = response.headers.get('date');
     if (dateHeader) {
       const serverTimeMs = new Date(dateHeader).getTime();
@@ -105,7 +115,7 @@ export async function syncServerTime(serverUrl?: string): Promise<number> {
       lastSyncTimestamp = now;
     }
   } catch {
-    // If offline or network error, retain existing drift
+    // Fall back immediately to local device time without blocking
   }
   return serverTimeDriftSeconds;
 }

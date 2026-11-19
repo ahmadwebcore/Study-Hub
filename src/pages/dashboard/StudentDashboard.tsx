@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
   CheckCircle2,
@@ -20,7 +20,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useRole } from '../../hooks/useRole';
 import { taskService, DailyTask } from '../../services/taskService';
-import { testService } from '../../services/testService';
+import { testService, isDateToday } from '../../services/testService';
 import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS } from '../../data/sampleData';
 import { DailyTestSeriesGrid } from '../../components/tests/DailyTestSeriesGrid';
@@ -34,7 +34,7 @@ export const StudentDashboard: React.FC = () => {
   const { userProfile, user } = useRole();
   const studentName = userProfile?.fullName || userProfile?.name || user?.name || 'Henza Noor';
 
-  const [, setTasks] = useState<DailyTask[]>([]);
+  const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [tests, setTests] = useState<TestItem[]>(SAMPLE_TESTS);
   const [results, setResults] = useState<ResultRecord[]>([]);
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -157,6 +157,27 @@ export const StudentDashboard: React.FC = () => {
     month: 'long',
     year: 'numeric',
   }).format(new Date());
+
+  // Dynamically resolve today's scheduled assessment and reading quota task
+  const todayTest = useMemo(() => {
+    return (
+      tests.find((t) => isDateToday(t.date, t.title, t.id)) ||
+      tests.find((t) => t.status === 'ongoing') ||
+      tests[0]
+    );
+  }, [tests]);
+
+  const todayTask = useMemo(() => {
+    const todayDayIndex = new Date().getDay();
+    const isSunday = todayDayIndex === 0;
+    if (isSunday) {
+      return tasks.find((t) => t.isSundayOff) || tasks[0];
+    }
+    return (
+      tasks.find((t) => !t.isSundayOff && t.status === 'pending') ||
+      tasks[0]
+    );
+  }, [tasks]);
 
   return (
     <div className="space-y-7 font-sans w-full pb-12">
@@ -597,13 +618,13 @@ export const StudentDashboard: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0 space-y-0.5">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                        Reading Quota: 2.5 Pages Target
+                        Reading Quota: {todayTask?.pagesRange || '2.5 Pages Target'}
                       </span>
                       <h4 className="text-xs font-bold text-zinc-900">
-                        Computer Science: Read Pages 96–98
+                        {todayTask ? `${todayTask.subjectName}: ${todayTask.title}` : 'Computer Science: Read Pages'}
                       </h4>
                       <p className="text-[11px] text-zinc-600 leading-relaxed">
-                        Chapter 2: Information Networks. Review Network Topologies (Bus, Star, Ring, Mesh).
+                        {todayTask?.description || 'Daily reading quota target for BISE DG Khan examination.'}
                       </p>
                     </div>
                   </div>
@@ -614,13 +635,13 @@ export const StudentDashboard: React.FC = () => {
                     </div>
                     <div className="flex-1 min-w-0 space-y-0.5">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                        Today's Assessment: 30 Marks
+                        Today's Assessment: {todayTest?.totalMarks || 30} Marks
                       </span>
                       <h4 className="text-xs font-bold text-zinc-900">
-                        Chapter 2 Diagnostic Assessment
+                        {todayTest ? `${todayTest.subjectName} — ${todayTest.title}` : "Today's Assessment"}
                       </h4>
                       <p className="text-[11px] text-zinc-600 leading-relaxed">
-                        10 MCQs + 4 Short Questions. Passing score is 15 marks. Evaluated by Ahmad.
+                        {todayTest?.instructions || 'Attempt 10 MCQs + Short Questions. Passing score is 15 marks. Evaluated by Ahmad.'}
                       </p>
                     </div>
                   </div>

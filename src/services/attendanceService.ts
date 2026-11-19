@@ -91,7 +91,11 @@ class AttendanceService {
 
       for (let day = 1; day <= daysInMonth; day++) {
         const d = new Date(year, month, day);
-        if (monthOffset === 0 && d > today) continue; // Future days not generated
+        const isToday =
+          d.getFullYear() === today.getFullYear() &&
+          d.getMonth() === today.getMonth() &&
+          d.getDate() === today.getDate();
+        if (monthOffset === 0 && (d > today || isToday)) continue; // Future days and today are not pre-marked! Today must be marked fresh dynamically by student!
 
         const dateStr = d.toISOString().slice(0, 10);
         const dayOfWeek = d.getDay();

@@ -25,11 +25,8 @@ export function parseDateRobust(dateStr?: string): Date {
   return new Date();
 }
 
-export function isDateToday(dateStr?: string, testTitle?: string, testId?: string): boolean {
+export function isDateToday(dateStr?: string, testTitle?: string, _testId?: string): boolean {
   const now = new Date();
-  if (testId === 'test_henza_fait_urd_11_w1' && now.getDay() === 2) {
-    return true;
-  }
   if (!dateStr) return false;
   const testDate = parseDateRobust(dateStr);
   const isExactDay =
