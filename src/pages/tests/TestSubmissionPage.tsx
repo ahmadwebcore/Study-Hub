@@ -30,6 +30,7 @@ import {
   getLocalCertifiedResults,
   getLocalTestStatuses,
   isDateToday,
+  ensureQuestionsForTest,
 } from '../../services/testService';
 import { submissionService } from '../../services/submissionService';
 import { notificationService } from '../../services/notificationService';
@@ -37,7 +38,6 @@ import { TestItem, ResultRecord } from '../../types';
 import { SAMPLE_TESTS, SAMPLE_SUBJECTS } from '../../data/sampleData';
 import { ACADEMIC_WEEKS } from '../../components/tests/DailyTestSeriesGrid';
 import { useRole } from '../../hooks/useRole';
-import { getTextbookDetailsForTest } from '../../data/textbookContent';
 import { PDFViewerModal } from '../../components/books/PDFViewerModal';
 
 interface UploadedPage {
@@ -217,8 +217,6 @@ export const TestSubmissionPage: React.FC = () => {
   const isPreviouslyFailed =
     (activeCertified && activeCertified.score < 15) || activeLocalStatus?.status === 'failed_retest';
 
-  // Details for current test textbook & questions
-  const bookDetails = activeTest ? getTextbookDetailsForTest(activeTest) : null;
   const activeDayAndTitle = activeTest
     ? extractDayAndCleanTitle(activeTest.title, activeTest.date)
     : { day: 'Tuesday', cleanTitle: '', isUrdu: false };
@@ -454,91 +452,142 @@ export const TestSubmissionPage: React.FC = () => {
               </div>
 
               {/* CURATED QUESTION PAPER BREAKDOWN (30 Marks BISE DG Khan) */}
-              <div className="mt-4 pt-3 border-t border-[#e1ede7] space-y-3.5">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#557067] flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                    Formal Test Paper (30 Marks)
-                  </h3>
-                  <span className="text-[11px] font-semibold text-emerald-700">Section A, B &amp; C</span>
-                </div>
+              {(() => {
+                const fullTest = ensureQuestionsForTest(activeTest);
+                const questions = fullTest.questions || [];
+                const mcqQuestions = questions.filter((q) => q.questionType === 'mcq');
+                const shortQuestions = questions.filter((q) => q.questionType === 'short_answer');
+                const longQuestions = questions.filter((q) => q.questionType === 'file_upload' || q.questionType === 'long_answer');
 
-                {/* Section A: MCQs (10 Marks) */}
-                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
-                    <span className="text-xs font-bold text-[#142D27]">حreader حصہ اوّل — کثیر الانتخابی سوالات (Section A: MCQs)</span>
-                    <span className="text-[11px] font-bold text-emerald-700">10 Marks</span>
-                  </div>
-                  {bookDetails?.chapter?.boardQuestions?.filter((q) => q.type === 'mcq').length ? (
-                    <div className="space-y-2">
-                      {bookDetails.chapter.boardQuestions
-                        .filter((q) => q.type === 'mcq')
-                        .map((q, idx) => (
-                          <div key={idx} className="text-xs text-right dir-rtl">
-                            <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
-                              سوال {idx + 1}: {q.question}
+                return (
+                  <div className="mt-4 pt-3 border-t border-[#e1ede7] space-y-4">
+                    {/* Official Examination Paper Header */}
+                    <div className="p-4 rounded-2xl bg-zinc-900 text-white space-y-2">
+                      <div className="flex flex-wrap items-center justify-between text-[10px] font-mono font-bold text-emerald-400 border-b border-white/10 pb-1.5">
+                        <span>BISE DERA GHAZI KHAN BOARD</span>
+                        <span>FA-IT DIAGNOSTIC ASSESSMENT 2026–2027</span>
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pt-0.5">
+                        <span className="text-xs font-bold text-white truncate">
+                          {activeTest.subjectName} ({activeTest.subjectCode})
+                        </span>
+                        <span className="text-[11px] text-zinc-300 font-mono">
+                          Roll No: <strong>SH-2026-001 (Henza Noor)</strong>
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-zinc-300 pt-1 border-t border-white/10">
+                        <span>Time: {activeTest.durationMinutes || 45} Mins</span>
+                        <span className="font-bold text-emerald-400">Total: 30 Marks &bull; Pass: 15 (50%)</span>
+                      </div>
+                    </div>
+
+                    {/* Section A: MCQs (10 Marks) */}
+                    <div className="p-3.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-2.5">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                        <span className="text-xs font-bold text-[#142D27]">
+                          حصہ اوّل — کثیر الانتخابی سوالات (Section A: Objective MCQs)
+                        </span>
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          10 Marks
+                        </span>
+                      </div>
+                      {mcqQuestions.length > 0 ? (
+                        <div className="space-y-3">
+                          {mcqQuestions.map((q, idx) => (
+                            <div key={q.id || idx} className="p-3 rounded-xl bg-white border border-[#e1ede7] space-y-2">
+                              <p className="text-xs font-bold text-[#142D27] leading-relaxed">
+                                Q{idx + 1}: {q.questionText}
+                              </p>
+                              {q.options && q.options.length > 0 && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                                  {q.options.map((opt, oIdx) => (
+                                    <div
+                                      key={opt.id || oIdx}
+                                      className="p-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs text-[#263B35] flex items-center gap-2"
+                                    >
+                                      <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] flex items-center justify-center shrink-0">
+                                        {String.fromCharCode(65 + oIdx)}
+                                      </span>
+                                      <span>{opt.optionText}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-xl bg-white border border-[#e1ede7] text-xs text-[#263B35] space-y-1">
+                          <p className="font-bold text-[#142D27]">درسی کتاب کے سبق اور خلاصہ سے 10 اہم کثیر الانتخابی سوالات حل کریں:</p>
+                          <p className="text-[11px] text-[#557067]">درست جواب کا انتخاب کر کے جوابی کاپی پر نمبر شمار کے ساتھ واضح تحریر کریں۔</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Section B: Short Questions (10 Marks) */}
+                    <div className="p-3.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-2.5">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                        <span className="text-xs font-bold text-[#142D27]">
+                          حصہ دوم — مختصر سوالات (Section B: Short Questions)
+                        </span>
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          10 Marks (5 &times; 2M)
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {shortQuestions.length > 0 ? (
+                          shortQuestions.map((q, idx) => (
+                            <div key={q.id || idx} className="p-2.5 rounded-xl bg-white border border-[#e1ede7] text-xs">
+                              <span className="font-bold text-[#142D27] block">
+                                س {idx + 1}: {q.questionText}
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <>
+                            <div className="p-2.5 rounded-xl bg-white border border-[#e1ede7] text-xs font-urdu text-right dir-rtl leading-loose text-[#142D27]">
+                              س 1: دیے گئے نصابی سبق کے مرکزی خیال، مصنف کے تعارف یا بنیادی اصطلاح کی مختصر تعریف کریں۔
+                            </div>
+                            <div className="p-2.5 rounded-xl bg-white border border-[#e1ede7] text-xs font-urdu text-right dir-rtl leading-loose text-[#142D27]">
+                              س 2: بورڈ پیٹرن کے مطابق اہم فنی و تکنیکی نکات کو 3 سے 4 لائنوں میں خوشخط تحریر کریں۔
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Section C: Long Question / Essay / Diagram (10 Marks) */}
+                    <div className="p-3.5 rounded-2xl bg-[#F7F9F8] border border-[#e1ede7] space-y-2.5">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
+                        <span className="text-xs font-bold text-[#142D27]">
+                          حصہ سوم — تفصیلی سوال و خاکہ (Section C: Long / Essay / Diagram)
+                        </span>
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          10 Marks
+                        </span>
+                      </div>
+                      {longQuestions.length > 0 ? (
+                        longQuestions.map((q, idx) => (
+                          <div key={q.id || idx} className="p-3 rounded-xl bg-white border border-[#e1ede7] text-xs">
+                            <span className="font-bold text-[#142D27] block mb-1">
+                              تفصیلی سوال: {q.questionText}
+                            </span>
+                            <p className="text-[11px] text-[#557067]">
+                              جوابی کاپی پر مارکر سے ہیڈنگز دیں، متعلقہ خاکہ (Diagram) بنائیں، اور حل کر کے تصویر اپلوڈ کریں۔
                             </p>
                           </div>
-                        ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#142D27]">
-                        1. درسی کتاب کے سبق اور خلاصہ سے 10 اہم معروضی کثیر الانتخابی سوالات حل کریں۔
-                      </p>
-                      <p className="font-urdu text-[13px] text-right dir-rtl leading-loose text-[#557067]">
-                        (الف) درست جواب کا انتخاب کریں اور اپنی جوابی کاپی پر نمبر شمار کے ساتھ واضح تحریر کریں)
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Section B: Short Questions (10 Marks) */}
-                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
-                    <span className="text-xs font-bold text-[#142D27]">حصہ دوم — مختصر سوالات (Section B: Short Questions)</span>
-                    <span className="text-[11px] font-bold text-emerald-700">10 Marks (5 &times; 2M)</span>
-                  </div>
-                  <div className="space-y-2">
-                    {bookDetails?.chapter?.boardQuestions
-                      ?.filter((q) => q.type === 'short')
-                      .slice(0, 3)
-                      .map((q, idx) => (
-                        <div key={idx} className="p-2 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
-                          <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
-                            س {idx + 1}: {q.question}
+                        ))
+                      ) : (
+                        <div className="p-3 rounded-xl bg-white border border-[#e1ede7] text-xs">
+                          <p className="font-urdu text-[13px] font-bold text-right dir-rtl leading-loose text-[#142D27]">
+                            سوال: عنوان کا مکمل جامع خلاصہ، متعلقہ خاکہ (Diagram)، تعریفات یا تشریح خوشخط تحریر کریں۔
                           </p>
                         </div>
-                      ))}
-                    <div className="p-2 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
-                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
-                        س 4: بورڈ پیٹرن کے مطابق باب کی بنیادی اصطلاحات اور اہم نکات کی مختصر تعریف کریں۔
-                      </p>
+                      )}
                     </div>
                   </div>
-                </div>
-
-                {/* Section C: Long Question / Diagram / Practical (10 Marks) */}
-                <div className="p-3.5 rounded-2xl bg-white border border-[#e1ede7] space-y-2">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-[#e1ede7]">
-                    <span className="text-xs font-bold text-[#142D27]">حصہ سوم — تفصیلی سوال و خاکہ (Section C: Long / Essay)</span>
-                    <span className="text-[11px] font-bold text-emerald-700">10 Marks</span>
-                  </div>
-                  {bookDetails?.chapter?.boardQuestions?.find((q) => q.type === 'long') ? (
-                    <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
-                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
-                        {bookDetails.chapter.boardQuestions.find((q) => q.type === 'long')?.question}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-[#e1ede7] text-right dir-rtl">
-                      <p className="font-urdu text-[13px] font-bold text-[#142D27] leading-loose">
-                        سوال: عنوان کا مکمل جامع خلاصہ، متعلقہ خاکہ (Diagram) یا تشریح خوشخط تحریر کریں۔
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+                );
+              })()}
             </div>
 
             {/* Bottom Actions for Question Paper */}
@@ -764,7 +813,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={selectedWeek}
                   onChange={(e) => setSelectedWeek(e.target.value)}
-                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   {ACADEMIC_WEEKS.map((w) => (
@@ -786,7 +835,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={selectedSubjectId}
                   onChange={(e) => setSelectedSubjectId(e.target.value)}
-                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   <option value="all">All {SAMPLE_SUBJECTS.length} Subjects</option>
@@ -809,7 +858,7 @@ export const TestSubmissionPage: React.FC = () => {
                 <select
                   value={filterTab}
                   onChange={(e) => setFilterTab(e.target.value as any)}
-                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none' }}
+                  style={{ WebkitAppearance: 'none', MozAppearance: 'none', appearance: 'none', backgroundImage: 'none' }}
                   className="w-full h-9 px-3 pr-8 rounded-xl border border-zinc-200 bg-white text-xs font-semibold text-zinc-800 hover:border-zinc-300 focus:border-emerald-500 focus:outline-none transition-colors appearance-none cursor-pointer"
                 >
                   <option value="all">All Tests ({tests.length})</option>

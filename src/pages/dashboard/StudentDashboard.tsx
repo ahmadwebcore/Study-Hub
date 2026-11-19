@@ -68,6 +68,8 @@ export const StudentDashboard: React.FC = () => {
     window.addEventListener('studyhub_tests_updated', handleUpdate);
     window.addEventListener('studyhub_tasks_updated', handleUpdate);
     window.addEventListener('studyhub_attendance_updated', handleUpdate);
+    window.addEventListener('studyhub_submissions_updated', handleUpdate);
+    window.addEventListener('studyhub_certified_results_update', handleUpdate);
     window.addEventListener('storage', handleUpdate);
 
     // Automated 24-hour attendance check:
@@ -81,6 +83,8 @@ export const StudentDashboard: React.FC = () => {
       window.removeEventListener('studyhub_tests_updated', handleUpdate);
       window.removeEventListener('studyhub_tasks_updated', handleUpdate);
       window.removeEventListener('studyhub_attendance_updated', handleUpdate);
+      window.removeEventListener('studyhub_submissions_updated', handleUpdate);
+      window.removeEventListener('studyhub_certified_results_update', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
   }, [todayStr]);

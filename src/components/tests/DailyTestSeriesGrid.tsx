@@ -339,7 +339,7 @@ export const DailyTestSeriesGrid: React.FC<DailyTestSeriesGridProps> = ({
     if (onTakeTest) {
       onTakeTest(test);
     } else {
-      window.location.href = '/test-submit';
+      window.location.href = `/test-submit?testId=${encodeURIComponent(test.id)}`;
     }
   };
 
