@@ -750,9 +750,9 @@ export const SyllabusPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-3 text-emerald-600 shadow-2xs">
               <BookOpen className="w-6 h-6" />
             </div>
-            <h4 className="text-base font-bold text-[#142D27]">Syllabus Cleared & Ready for Upload</h4>
+            <h4 className="text-base font-bold text-[#142D27]">No Units Added Yet</h4>
             <p className="text-xs text-zinc-500 mt-1.5 max-w-md mx-auto leading-relaxed">
-              Old syllabus records have been cleared. Upload new textbook PDFs and redacted syllabus documents to initialize the updated scheme.
+              No syllabus chapters found for this subject. Use the "Add Chapter" button above to add topics or synchronize with the official PECTAA curriculum.
             </p>
           </Card>
         )}

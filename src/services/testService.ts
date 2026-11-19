@@ -2808,7 +2808,7 @@ export const testService = {
           score: totalScore,
           max_score: params.test.totalMarks,
           percentage,
-          passing_marks: params.test.passingMarks || 40,
+          passing_marks: params.test.passingMarks || 15,
           passed,
           grade,
           feedback: params.overallFeedback,

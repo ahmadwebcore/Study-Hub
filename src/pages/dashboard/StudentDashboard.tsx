@@ -343,14 +343,14 @@ export const StudentDashboard: React.FC = () => {
                   Weekly Performance &bull; Week 1
                 </span>
                 <span className="text-xs font-semibold text-[#557067]">
-                  Nov 17 &ndash; Nov 21
+                  Nov 20 &ndash; Nov 21
                 </span>
               </div>
               <h3 className="text-base font-bold text-[#142D27] font-serif pt-1">
                 Current Week Targets
               </h3>
               <p className="text-xs text-[#557067]">
-                Tests start Tuesday (Urdu), Wednesday (English), Thursday (Computer), Friday (2 Books: اسلامیات لازمی + ترجمۃ القرآن), Saturday (Economics &amp; Physical Education).
+                Official 15-week timetable starting Friday (2 Books Combined: اسلامیات لازمی + ترجمۃ القرآن), Saturday (اصولِ معاشیات). Sundays Strictly OFF!
               </p>
             </div>
 
@@ -358,13 +358,13 @@ export const StudentDashboard: React.FC = () => {
               <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase block">Tests Done</span>
                 <span className="text-base font-extrabold text-[#142D27] mt-0.5 block">
-                  {completedWeekTests.length} / 6
+                  {completedWeekTests.length} / {currentWeekTests.length || 2}
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase block">Pass Rate</span>
                 <span className="text-base font-extrabold text-emerald-700 mt-0.5 block">
-                  {completedWeekTests.length > 0 ? `${weekPercentage}%` : 'Starting Tue'}
+                  {completedWeekTests.length > 0 ? `${weekPercentage}%` : 'Starts Tomorrow'}
                 </span>
               </div>
               <div className="p-2.5 rounded-xl bg-[#F7F9F8] border border-zinc-200/70">

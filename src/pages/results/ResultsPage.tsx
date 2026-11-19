@@ -54,7 +54,7 @@ export const ResultsPage: React.FC = () => {
     : 0;
 
   const passedCount = results.filter(
-    (r) => (r.passed !== undefined ? r.passed : r.score >= (r.passingMarks || 40))
+    (r) => (r.passed !== undefined ? r.passed : r.score >= (r.passingMarks || 15))
   ).length;
 
   const handleExportTranscript = () => {
@@ -299,7 +299,7 @@ export const ResultsPage: React.FC = () => {
                     const isPassed =
                       item.passed !== undefined
                         ? item.passed
-                        : item.score >= (item.passingMarks || 40);
+                        : item.score >= (item.passingMarks || 15);
 
                     return (
                       <tr key={item.id} className="hover:bg-[#F7F9F8]/60 transition-colors">
