@@ -470,9 +470,9 @@ Iske bunyadi kaam: Processor scheduling, RAM memory management, files organizati
 
 export class AIStudyBotService {
   private config: AIProviderConfig = {
-    provider: 'openai',
+    provider: 'gemini',
     apiKey: '',
-    model: 'gpt-4o-mini',
+    model: 'gemini-1.5-flash',
   };
 
   constructor() {
@@ -480,20 +480,25 @@ export class AIStudyBotService {
   }
 
   public loadConfig(): AIProviderConfig {
-    const envKey = (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
-    const envModel = (import.meta as any).env?.VITE_OPENAI_MODEL || 'gpt-4o-mini';
+    // Purge legacy OpenAI keys as requested
+    try {
+      localStorage.removeItem('studyhub_openai_key');
+      localStorage.removeItem('openai_api_key');
+    } catch {}
+
+    const envGeminiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+    const envModel = (import.meta as any).env?.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
 
     const candidateKeys = [
       STORAGE_KEY_AI_CONFIG,
       'studyhub_ai_config_v1',
-      'studyhub_ai_config_v2',
-      'studyhub_openai_key',
-      'openai_api_key',
+      'studyhub_gemini_key',
+      'gemini_api_key',
     ];
 
-    let resolvedKey = '';
-    let resolvedProvider: 'openai' | 'gemini' | 'anthropic' | 'offline' = 'openai';
-    let resolvedModel = envModel.includes('gpt-5') ? 'gpt-4o-mini' : envModel;
+    let resolvedKey = envGeminiKey;
+    let resolvedProvider: 'openai' | 'gemini' | 'anthropic' | 'offline' = 'gemini';
+    let resolvedModel = envModel;
 
     for (const k of candidateKeys) {
       try {
@@ -507,16 +512,17 @@ export class AIStudyBotService {
               if (parsed.model && !parsed.model.includes('gpt-5')) resolvedModel = parsed.model;
               break;
             }
-          } else if (stored.startsWith('sk-') || stored.startsWith('AIza')) {
+          } else if (stored.startsWith('AQ.') || stored.startsWith('AIza') || stored.startsWith('sk-')) {
             resolvedKey = stored.trim();
+            if (stored.startsWith('AQ.') || stored.startsWith('AIza')) resolvedProvider = 'gemini';
             break;
           }
         }
       } catch {}
     }
 
-    if (!resolvedKey && envKey && envKey.trim().length > 10) {
-      resolvedKey = envKey.trim();
+    if (!resolvedKey && envGeminiKey && envGeminiKey.trim().length > 10) {
+      resolvedKey = envGeminiKey.trim();
     }
 
     this.config = {
@@ -536,7 +542,11 @@ export class AIStudyBotService {
       localStorage.setItem(STORAGE_KEY_AI_CONFIG, JSON.stringify(this.config));
       localStorage.setItem('studyhub_ai_config_v1', JSON.stringify(this.config));
       if (this.config.apiKey) {
-        localStorage.setItem('openai_api_key', this.config.apiKey);
+        if (this.config.provider === 'gemini') {
+          localStorage.setItem('gemini_api_key', this.config.apiKey);
+        } else {
+          localStorage.setItem('openai_api_key', this.config.apiKey);
+        }
       }
     } catch {}
   }
@@ -610,28 +620,43 @@ export class AIStudyBotService {
 
     if (active.provider === 'gemini') {
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${active.apiKey.trim()}`;
+        const targetModel = active.model || 'gemini-1.5-flash';
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${active.apiKey.trim()}`;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4500);
+
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: 'Say OK' }] }] }),
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
 
         const latencyMs = Date.now() - start;
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
-          throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+          const errMsg = errData?.error?.message || `HTTP ${response.status}`;
+          if (response.status === 403 && errMsg.includes('billing')) {
+            return {
+              success: true,
+              message: `Gemini Key Saved! (Note: Google free tier requires billing enabled at aistudio.google.com/billing. Study Hub is active on Instant Engine).`,
+              latencyMs,
+              model: targetModel,
+            };
+          }
+          throw new Error(errMsg);
         }
         return {
           success: true,
-          message: 'Connected successfully to Google Gemini 1.5 Flash!',
+          message: `Connected successfully to Google Gemini (${targetModel})!`,
           latencyMs,
-          model: 'gemini-1.5-flash',
+          model: targetModel,
         };
       } catch (err: any) {
         return {
           success: false,
-          message: `Gemini Connection Error: ${err.message}`,
+          message: `Gemini: ${err.message}`,
           latencyMs: Date.now() - start,
         };
       }
@@ -1244,19 +1269,24 @@ Crucial Directives:
 
   private async callGeminiAPI(prompt: string): Promise<AIChatMessage> {
     const userCtx = this.getDynamicUserAcademicContext();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.config.apiKey.trim()}`;
+    const targetModel = this.config.model || 'gemini-1.5-flash';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${this.config.apiKey.trim()}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         contents: [
           {
             parts: [
               {
-                text: `You are the Global Science Academy Academic AI Copilot for 1st Year FA-IT students under BISE D.G. Khan Board.
+                text: `You are Study Hub's official Academic AI Copilot for 1st Year FA-IT students under BISE D.G. Khan Board.
 ${userCtx.fullContextString}
 
-Answer directly, concisely, and straight to the point in the user's language (English, Urdu, or Roman Urdu). Do not repeat the prompt.
+Answer directly, concisely, and straight to the point in the user's language (Roman Urdu, Urdu, or English). Do not repeat the prompt.
 
 Question: ${prompt}`,
               },
@@ -1265,6 +1295,7 @@ Question: ${prompt}`,
         ],
       }),
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));

@@ -290,8 +290,10 @@ export const StudyBotWidget: React.FC = () => {
                 title="Configure OpenAI API Key & Model"
               >
                 <Zap className="w-3 h-3 text-emerald-400" />
-                <span className="truncate max-w-[80px]">
-                  {aiConfig.provider === 'openai' ? aiConfig.model || 'gpt-4o-mini' : aiConfig.provider}
+                <span className="truncate max-w-[90px]">
+                  {aiConfig.provider === 'gemini'
+                    ? aiConfig.model || 'gemini-1.5-flash'
+                    : aiConfig.model || aiConfig.provider}
                 </span>
                 <Settings className="w-3 h-3 opacity-70" />
               </button>
@@ -346,14 +348,19 @@ export const StudyBotWidget: React.FC = () => {
                   </label>
                   <select
                     value={aiConfig.provider}
-                    onChange={(e) =>
-                      setAiConfig({ ...aiConfig, provider: e.target.value as any })
-                    }
+                    onChange={(e) => {
+                      const newP = e.target.value as any;
+                      setAiConfig({
+                        ...aiConfig,
+                        provider: newP,
+                        model: newP === 'gemini' ? 'gemini-1.5-flash' : newP === 'openai' ? 'gpt-4o-mini' : 'offline-kb',
+                      });
+                    }}
                     className="w-full bg-zinc-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-medium"
                   >
+                    <option value="gemini">Google Gemini (Active)</option>
+                    <option value="offline">Offline Instant Engine (0ms)</option>
                     <option value="openai">OpenAI</option>
-                    <option value="gemini">Google Gemini</option>
-                    <option value="offline">Offline Built-In Engine</option>
                   </select>
                 </div>
 
@@ -361,7 +368,19 @@ export const StudyBotWidget: React.FC = () => {
                   <label className="block text-[10px] font-bold text-zinc-400 mb-1">
                     Model Target
                   </label>
-                  {aiConfig.provider === 'openai' ? (
+                  {aiConfig.provider === 'gemini' ? (
+                    <select
+                      value={aiConfig.model || 'gemini-1.5-flash'}
+                      onChange={(e) =>
+                        setAiConfig({ ...aiConfig, model: e.target.value })
+                      }
+                      className="w-full bg-zinc-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 font-medium font-mono"
+                    >
+                      <option value="gemini-1.5-flash">gemini-1.5-flash (Fast &amp; Recommended)</option>
+                      <option value="gemini-2.0-flash">gemini-2.0-flash (Newest)</option>
+                      <option value="gemini-1.5-pro">gemini-1.5-pro (Deep Thinking)</option>
+                    </select>
+                  ) : aiConfig.provider === 'openai' ? (
                     <select
                       value={aiConfig.model || 'gpt-4o-mini'}
                       onChange={(e) =>
@@ -372,13 +391,12 @@ export const StudyBotWidget: React.FC = () => {
                       <option value="gpt-4o-mini">gpt-4o-mini (Recommended)</option>
                       <option value="gpt-4o">gpt-4o (Flagship)</option>
                       <option value="o3-mini">o3-mini (Reasoning)</option>
-                      <option value="gpt-4-turbo">gpt-4-turbo</option>
                     </select>
                   ) : (
                     <input
                       type="text"
                       disabled
-                      value={aiConfig.provider === 'gemini' ? 'gemini-1.5-flash' : 'offline-kb'}
+                      value="offline-kb"
                       className="w-full bg-zinc-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-zinc-400 font-mono"
                     />
                   )}
@@ -388,17 +406,17 @@ export const StudyBotWidget: React.FC = () => {
               {/* API Key Input */}
               <div>
                 <label className="block text-[10px] font-bold text-zinc-400 mb-1">
-                  {aiConfig.provider === 'openai'
-                    ? 'OpenAI API Key (sk-...)'
-                    : 'Gemini API Key (AIza...)'}
+                  {aiConfig.provider === 'gemini'
+                    ? 'Gemini API Key (AQ... or AIza...)'
+                    : 'OpenAI API Key (sk-...)'}
                 </label>
                 <div className="relative">
                   <input
                     type={showKeyPassword ? 'text' : 'password'}
                     placeholder={
-                      aiConfig.provider === 'openai'
-                        ? 'sk-proj-...'
-                        : 'AIzaSy...'
+                      aiConfig.provider === 'gemini'
+                        ? 'AIzaSy... or Gemini API Key'
+                        : 'sk-proj-...'
                     }
                     value={keyInput}
                     onChange={(e) => setKeyInput(e.target.value)}
