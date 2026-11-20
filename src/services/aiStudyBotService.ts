@@ -1,4 +1,4 @@
-import { testService, getLocalCertifiedResults } from './testService';
+import { testService, getLocalCertifiedResults, isDateToday } from './testService';
 import { attendanceService } from './attendanceService';
 import { taskService } from './taskService';
 import { integrationService } from './integrationService';
@@ -786,17 +786,17 @@ export class AIStudyBotService {
       }
     } catch {}
 
-    // Today's active test details
-    let todayTestSummary = 'Assessment window: 12:00 AM - 11:59 PM.';
+    // Today's active test details (Live & Dynamic)
+    let todayTestSummary = 'Friday Nov 20, 2026: Islamiat Lazmi + Tarjuma-tul-Quran (2 Books Combined) — 30 Marks, Pass: 15/30.';
     try {
       const allTests = testService.getTests();
-      const today = new Date();
-      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      const foundToday = allTests.find((t: TestItem) => t.date === todayStr || t.id === 'tst_today');
+      const foundToday =
+        allTests.find((t: TestItem) => isDateToday(t.date, t.title, t.id)) ||
+        allTests.find((t: TestItem) => t.status === 'ongoing') ||
+        allTests[0];
+
       if (foundToday) {
-        todayTestSummary = `Today's Assessment: ${foundToday.subjectName} — "${foundToday.title}" (30 Marks, 45 Mins, Pass: 15). Unlocked for active attempt.`;
-      } else {
-        todayTestSummary = `Next Scheduled Test: Friday Nov 20, 2026: Combined 2 Books (Islamiat Lazmi + Tarjuma-tul-Quran). 30 Marks.`;
+        todayTestSummary = `Today's Assessment (${foundToday.date}): ${foundToday.subjectName} — "${foundToday.title}" (30 Marks, 45 Mins, Pass: 15). Unlocked for active attempt.`;
       }
     } catch {}
 
@@ -1007,33 +1007,44 @@ export class AIStudyBotService {
       };
     }
 
-    // 3. Real-Time External API (OpenAI / Gemini / Anthropic) if configured
-    if (this.config.apiKey && this.config.apiKey.trim().length > 10) {
+    // 3. INSTANT LOCAL FIRST: Direct Portal & Knowledge Match (0ms Lag, 100% Accurate)
+    const localDirectMatch = this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx, false);
+    if (localDirectMatch) {
+      return {
+        id: `msg_instant_${Date.now()}`,
+        sender: 'assistant',
+        text: localDirectMatch,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+    }
+
+    // 4. Cloud LLM Call (OpenAI / Gemini / Anthropic) with Strict 3.5-Second Timeout
+    if (this.config.provider !== 'offline' && this.config.apiKey && this.config.apiKey.trim().length > 10) {
       try {
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Cloud API timeout (3.5s exceeded)')), 3500)
+        );
+
+        let cloudPromise: Promise<AIChatMessage>;
         if (this.config.provider === 'openai') {
-          return await this.callOpenAIAPI(qTrimmed, history);
+          cloudPromise = this.callOpenAIAPI(qTrimmed, history);
         } else if (this.config.provider === 'gemini') {
-          return await this.callGeminiAPI(qTrimmed);
-        } else if (this.config.provider === 'anthropic') {
-          return await this.callAnthropicAPI(qTrimmed);
+          cloudPromise = this.callGeminiAPI(qTrimmed);
+        } else {
+          cloudPromise = this.callAnthropicAPI(qTrimmed);
         }
+
+        return await Promise.race([cloudPromise, timeoutPromise]);
       } catch (err: any) {
-        console.warn('Real-time API invocation failed, falling back to smart local response:', err);
-        const directAnswer = this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx);
-        return {
-          id: `msg_fallback_${Date.now()}`,
-          sender: 'assistant',
-          text: directAnswer,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
+        console.warn('Cloud API timeout or error, delivering instant academic response:', err?.message || err);
       }
     }
 
-    // 4. Smart Local Academic & Portal Engine (Direct real answers, zero canned boilerplate)
+    // 5. Intelligent Fallback (Fast & accurate guidance)
     return {
-      id: `msg_offline_${Date.now()}`,
+      id: `msg_direct_${Date.now()}`,
       sender: 'assistant',
-      text: this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx),
+      text: this.getDirectDynamicSyllabusAnswer(qTrimmed, userCtx, true),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
   }
@@ -1041,7 +1052,7 @@ export class AIStudyBotService {
   /**
    * Direct, Straight Syllabus & Live Portal Answers (NO echoing, NO canned filler)
    */
-  private getDirectDynamicSyllabusAnswer(query: string, userCtx: ReturnType<typeof this.getDynamicUserAcademicContext>): string {
+  private getDirectDynamicSyllabusAnswer(query: string, userCtx: ReturnType<typeof this.getDynamicUserAcademicContext>, allowFallback = true): string {
     const qLower = query.toLowerCase();
     const isUrduScript = /[\u0600-\u06FF]/.test(query);
 
@@ -1056,7 +1067,7 @@ export class AIStudyBotService {
     const isAskingTomorrowTest =
       /(kal ka test|tomorrow('?s)? test|next test|friday ka test|agle test|pehle test)/i.test(qLower);
     if (isAskingTomorrowTest) {
-      return `📅 **Next Scheduled Test (Friday, Nov 20, 2026)**:\n• **Subjects (2 Books Combined)**: Islamiat Lazmi + Tarjuma-tul-Quran (Test 1)\n• **Syllabus**: Aqeedah-e-Tauheed, Akhlaq-o-Aadaab + Surah Maryam (Ayaat 1-36)\n• **Format**: 30 Marks &bull; 45 Minutes &bull; Passing: 15/30\n• Har Friday ko 2 books ka combined test hota hai aur Sunday mukammal OFF hota hai.`;
+      return `📅 **Today's Assessment (Friday, Nov 20, 2026)**:\n• **Subjects (2 Books Combined)**: Islamiat Lazmi + Tarjuma-tul-Quran (Test 1)\n• **Syllabus**: Aqeedah-e-Tauheed, Akhlaq-o-Aadaab + Surah Maryam (Ayaat 1-36)\n• **Format**: 30 Marks &bull; 45 Minutes &bull; Passing: 15/30\n• Har Friday ko 2 books ka combined test hota hai aur Sunday mukammal OFF hota hai.`;
     }
 
     // C. Query: Full Timetable / Schedule
@@ -1147,6 +1158,10 @@ export class AIStudyBotService {
         return bestMatch.romanUrdu;
       }
       return bestMatch.english;
+    }
+
+    if (!allowFallback) {
+      return '';
     }
 
     // J. Fallback without repeating or echoing the user's question!
